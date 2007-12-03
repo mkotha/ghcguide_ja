@@ -22,10 +22,6 @@
       
       <itemizedlist>
 	<listitem>
-	  <para>Haskellレポートでは、HaskellプログラムはUnicodeを使って書いても良いと規定されている。GHCは現在ISO-8859-1しか受け付けない。</para>
-	</listitem>
-
-	<listitem>
           <para>GHCでは、修飾された識別子に関するある種の字句規則がHaskellレポートのものとわずかに異なる。<replaceable>module</replaceable><literal>.</literal><replaceable>reservedop</replaceable>という形のもの、例えば<literal>M.\</literal>があったとき、<literal>M</literal>と<literal>.\</literal>という二つの字句要素ではなく、一つの修飾された演算子と解釈される。</para>
 	</listitem>
       </itemizedlist>
@@ -135,6 +131,13 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
 	      <para>GHCでの実装では、Unicodeのアルファベット文字のうち、小文字でも大文字でもない文字についても、<literal>isAlpha</literal>はこれをアルファベットだとみなすが、この点でHaskell 98から逸脱している。</para>
 	    </listitem>
 	  </varlistentry>
+
+          <varlistentry>
+            <term>文字列がISO-8859-1として扱われる</term>
+            <listitem>
+              <para><literal>putStrLn</literal>などの各種のライブラリ関数が、文字列をUTF-8でなくISO-8859-1であるかのように扱う。</para>
+            </listitem>
+          </varlistentry>
 	</variablelist>
     </sect3>
   </sect2>
