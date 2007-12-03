@@ -3410,7 +3410,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 
 <!-- ==================== BANG PATTERNS =================  -->
 
-<sect1 id="sec-bang-patterns">
+<sect1 id="bang-patterns">
 <title>びっくりパターン
 <indexterm><primary>Bang patterns</primary></indexterm>
 </title>
@@ -3420,7 +3420,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 びっくりパターンはフラグ<option>-fbang-patterns</option>で有効になる。
 </para>
 
-<sect2 id="sec-bang-patterns-informal">
+<sect2 id="bang-patterns-informal">
 <title>びっくりパターンについての非形式的な説明
 </title>
 <para>この拡張の要点は、パターンの構文に一つの新しい生成規則を追加することである。
@@ -3459,7 +3459,7 @@ let ![x,y] = e in b
 </sect2>
 
 
-<sect2 id="sec-bang-patterns-sem">
+<sect2 id="bang-patterns-sem">
 <title>構文と意味論
 </title>
 <para>
