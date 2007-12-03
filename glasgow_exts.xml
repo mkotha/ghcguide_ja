@@ -642,7 +642,7 @@ GHCは演算子の左セクションの構文に小さな拡張を認めてい�
   data T a    -- T :: * -> *
 </programlisting>
 
-<para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような類について多相的でも良いが、類が<literal>*</literal>でないなら、明示的な類注釈を使う必要がある。(<xref linkend="sec-kinding"/>を見よ)</para>
+<para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような類について多相的でも良いが、類が<literal>*</literal>でないなら、明示的な類注釈を使う必要がある。(<xref linkend="kinding"/>を見よ)</para>
 
 <para>このようなデータ型はボトムというただ一つの値しか持たないが、「幽霊型(phantom type)」を定義するときには便利なことがある。</para>
 </sect3>
@@ -2062,7 +2062,7 @@ and you'd be right.  That is why they are an experimental feature.
 
 ================ END OF Linear Implicit Parameters commented out -->
 
-<sect2 id="sec-kinding">
+<sect2 id="kinding">
 <title>明示的に類付けされた量化</title>
 
 <para>
