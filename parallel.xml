@@ -43,7 +43,7 @@
 
 <sect2><title>Parallel Haskell</title>
 
-  <para>GHCには、対称的・メモリ共有型のマルチプロセッサ(SMP)<indexterm><primary>SMP</primary></indexterm>上でHaskellプログラムを並列実行することのサポートが含まれている。デフォルトでは、プログラムはひとつのプロセッサ上で走る。並列実行されてほしい場合、プログラムを<option>-threaded</option>付きでリンクし、RTSの<option>-N</option>オプション付きで実行せねばならない。(<xref linkend="sec-using-smp" />を見よ)。OSスレッドはRTSオプション<option>-N</option>で指定された数だけ並列に実行され、ランタイムはこれらに対して実行中のHaskellスレッドをスケジュールする。</para>
+  <para>GHCには、対称的・メモリ共有型のマルチプロセッサ(SMP)<indexterm><primary>SMP</primary></indexterm>上でHaskellプログラムを並列実行することのサポートが含まれている。デフォルトでは、プログラムはひとつのプロセッサ上で走る。並列実行されてほしい場合、プログラムを<option>-threaded</option>付きでリンクし、RTSの<option>-N</option>オプション付きで実行せねばならない。(<xref linkend="using-smp" />を見よ)。OSスレッドはRTSオプション<option>-N</option>で指定された数だけ並列に実行され、ランタイムはこれらに対して実行中のHaskellスレッドをスケジュールする。</para>
 
   <para>GHCが並列実行に対応しているのはメモリ共有型のマルチプロセッサだけである。Glasgow Parallel Haskell<indexterm><primary>Glasgow Parallel Haskell</primary></indexterm>は、Parallel Haskellのプログラムを、複数の機械からなるクラスタ、および単一のマルチプロセッサの両方で動かす。GPHはGHCとは別に開発・配布されている。(<ulink url="http://www.cee.hw.ac.uk/~dsg/gph/">The GPH Page</ulink>を見よ)。ただしGPHの現在の版はかなり古いGHC(4.06)を元にしている。</para>
   </sect2>

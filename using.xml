@@ -1114,7 +1114,7 @@ f "2"    = 2
     </variablelist>
   </sect1>
 
-  <sect1 id="sec-using-smp">
+  <sect1 id="using-smp">
     <title>SMP並列計算を使う</title>
     <indexterm><primary>parallelism</primary>
     </indexterm>

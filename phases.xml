@@ -632,7 +632,7 @@ $ cat foo.hspp</screen>
 
           <itemizedlist> 
             <listitem>
-              <para>マルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>またはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械における並列性<indexterm><primary>parallelism</primary></indexterm>。<xref linkend="sec-using-smp"/>を見よ。</para>
+              <para>マルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>またはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械における並列性<indexterm><primary>parallelism</primary></indexterm>。<xref linkend="using-smp"/>を見よ。</para>
 
               <para>他のHaskellスレッドをブロックせずに他言語関数を呼び出す能力。</para>
 
