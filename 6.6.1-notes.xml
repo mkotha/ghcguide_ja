@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-6-6-1">
+    <title>Release notes for version 6.6.1</title>
+
+    <para>
+        6.6.1 is a bugfix release over 6.6. Most library APIs have not
+        changed, so code that worked with 6.6 should continue to work
+        with 6.6.1.
+    </para>
+    
+    <para>
+        Many, many bugs have been fixed relative to 6.6. Far too many
+        to list here.
+    </para>
+
+    <para>
+        The other changes in this release are:
+    </para>
+
+    <itemizedlist>
+        <listitem>
+            <para>
+                GHC works on Windows Vista.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                GHC can now be used to compile C++ files.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                There is an
+                <option>--install-signal-handlers=&lt;yes|no&gt;</option>
+                RTS flag. The main use is to stop GHC installing signal
+                handlers when you are putting your code in a DLL.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                Newtypes can now be defined using GADT syntax.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                Linear implicit parameters are no longer accepted.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                There is a manpage for <command>ghc</command> and
+                <command>ghci</command>.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The building guide has been moved to
+                <ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">the wiki</ulink>.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                GHC now comes with the <literal>filepath</literal> library.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The <literal>base</literal>
+                package has various bug fixes, as well as a couple
+                of interface changes that shouldn't affect most users.
+                The version number has been bumped from 2.0/2.1 to 2.1.1.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The <literal>Cabal</literal> package has had various bug
+                fixes. The version number has been bumped from 1.1.6 to
+                1.1.6.2.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The <literal>Win32</literal> package has various bug fixes.
+                The version number has been bumped from 2.0/2.1 to 2.1.1.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The <literal>regex-base</literal> package has a couple of
+                bug fixes. The version number has been bumped from 0.71
+                to 0.72.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The pretty-printer in the
+                <literal>template-haskell</literal> package has been
+                improved. The version number has been bumped from 2.0 to 2.1.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                The <literal>unix</literal> package has various bug fixes.
+                The version number has been bumped from 1.0/2.0 to 2.1.
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>
+                There are newer versions of all of the extralibs.
+            </para>
+        </listitem>
+    </itemizedlist>
+</sect1>
+

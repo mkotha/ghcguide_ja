@@ -1,0 +1,1899 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <sect1 id="flag-reference">
+    <title>フラグ早見表</title>
+
+    <para>この節はGHCのコマンド行フラグの早見表である。それぞれのフラグについて、動的/静的の区別(<xref linkend="static-dynamic-flags"/>を見よ)と逆のフラグ(存在すれば)も載せられている。</para>
+
+    <sect2>
+      <title>ヘルプと多弁さに関するオプション</title>
+
+      <para><xref linkend="options-help"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-?</option></entry>
+	      <entry>ヘルプ</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-help</option></entry>
+	      <entry>ヘルプ</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-n</option></entry>
+	      <entry>ドライランを行う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-v</option></entry>
+	      <entry>多弁モード(<option>-v3</option>と同等)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-v</option><replaceable>n</replaceable></entry>
+	      <entry>多弁さを設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-V</option></entry>
+	      <entry>GHCのバージョンを表示</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>&ndash;&ndash;version</option></entry>
+	      <entry>GHCのバージョンを表示</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>&ndash;&ndash;numeric-version</option></entry>
+	      <entry>GHCのバージョンを表示(数値のみ)</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>&ndash;&ndash;print-libdir</option></entry>
+	      <entry>GHCのライブラリディレクトリを表示</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ferror-spans</option></entry>
+	      <entry>エラーメッセージで範囲を完全な形で表示する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-H</option><replaceable>size</replaceable></entry>
+	      <entry>最低ヒープサイズを<replaceable>size</replaceable>にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-Rghc-timing</option></entry>
+	      <entry>GHCの時間情報の要約を表示する(<literal>+RTS -tstderr</literal>と同じ)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+
+    </sect2>
+    <sect2>
+      <title>どの段階を実行するか</title>
+      
+      <para><xref linkend="options-order"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-E</option></entry>
+	      <entry>前処理まで(<literal>.hspp</literal>ファイル)</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-C</option></entry>
+	      <entry>C生成まで(<literal>.hc</literal>ファイル)</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-S</option></entry>
+	      <entry>アセンブリ生成まで(<literal>.s</literal>ファイル)</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-c</option></entry>
+	      <entry>リンクしない</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-x</option> <replaceable>suffix</replaceable></entry>
+	      <entry>ソースファイルの種類に対してデフォルトでない振る舞いをする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+     <sect2>
+      <title>通常以外の実行モード</title>
+      
+      <para><xref linkend="modes"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>--interactive</option></entry>
+	      <entry>対話モード。通常これを使うときは単に<command>ghci</command>を走らせる。</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>--make</option></entry>
+              <entry>複数モジュールからなるHaskellプログラムを、依存性を自動的に解決しながらビルドする。<command>make</command>を使うのよりもずっと簡単で、速いことが期待できる。</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-e <replaceable>expr</replaceable></option></entry>
+	      <entry><replaceable>expr</replaceable>を評価する</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-M</option></entry>
+	      <entry><filename>Makefile</filename>で使うのに適した依存性情報を生成する。</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>出力先の変更</title>
+      
+      <para><xref linkend="options-output"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-hcsuf</option> <replaceable>suffix</replaceable></entry>
+              <entry>中間Cファイルに使う接尾辞を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-hidir</option> <replaceable>dir</replaceable></entry>
+              <entry>インタフェースファイルを置くディレクトリを設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-hisuf</option> <replaceable>suffix</replaceable></entry>
+              <entry>インタフェースファイルに使う接尾辞を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-o</option> <replaceable>filename</replaceable></entry>
+	      <entry>出力ファイル名を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-odir</option> <replaceable>dir</replaceable></entry>
+	      <entry>出力ディレクトリを設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ohi</option> <replaceable>filename</replaceable></entry>
+              <entry>インタフェースを置くファイルの名前を設定する</entry>
+	      <entry>動</entry>
+	      <entry></entry>
+	    </row>
+	    <row>
+	      <entry><option>-osuf</option> <replaceable>suffix</replaceable></entry>
+              <entry>出力ファイルの接尾辞を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-stubdir</option> <replaceable>dir</replaceable></entry>
+              <entry>FFIのスタブファイルの出力先を変更する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>中間ファイルの保持</title>
+      
+      <para><xref linkend="keeping-intermediates"/></para>
+      
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-keep-hc-file</option></entry>
+              <entry>中間の<literal>.hc</literal>ファイルを保持する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-keep-s-file</option></entry>
+	      <entry>中間の<literal>.s</literal>ファイルを保持する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-keep-raw-s-file</option></entry>
+	      <entry>中間の<literal>.raw_s</literal>ファイルを保持する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-keep-tmp-files</option></entry>
+	      <entry>全ての中間ファイルを保持する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>一時ファイル</title>
+      
+      <para><xref linkend="temp-files"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-tmpdir</option></entry>
+	      <entry>一時ファイルのディレクトリを設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>インポートされたものを見つける</title>
+
+      <para><xref linkend="search-path"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-i</option><replaceable>dir1</replaceable>:<replaceable>dir2</replaceable>:...</entry>
+	      <entry><replaceable>dir</replaceable>、<replaceable>dir2</replaceable>…をインポートパスに追加する</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-i</option></entry>
+	      <entry>インポートディレクトリの一覧を空にする</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>インタフェースファイルに関するオプション</title>
+
+      <para><xref linkend="hi-options"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-ddump-hi</option></entry>
+	      <entry>新しいインタフェースファイルを標準出力に出力する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-hi-diffs</option></entry>
+	      <entry>古いインタフェースファイルと比較しての差分を表示する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-minimal-imports</option></entry>
+	      <entry>最小のインポートを出力する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>--show-iface</option> <replaceable>file</replaceable></entry>
+	      <entry><replaceable>file</replaceable>からインタフェースを読み、テキストとして<literal>stdout</literal>に出力する。</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+    
+    <sect2>
+      <title>再コンパイル検査</title>
+
+      <para><xref linkend="recomp"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fforce-recomp</option></entry>
+	      <entry>再コンパイル検査を無効にする。<option>-ddump-X</option>系のオプションが一つでも指定されているときは自動的に有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-force-recomp</option></entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>対話モードのオプション</title>
+      
+      <para><xref linkend="ghci-dot-files"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-ignore-dot-ghci</option></entry>
+	      <entry><filename>.ghci</filename>ファイルを読むのを無効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-read-dot-ghci</option></entry>
+	      <entry><filename>.ghci</filename>ファイルを読むのを有効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>パッケージ</title>
+
+      <para><xref linkend="packages"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+    	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-package-name</option> <replaceable>P</replaceable></entry>
+	      <entry>パッケージ<replaceable>P</replaceable>の一員になるようにコンパイルする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-package</option> <replaceable>P</replaceable></entry>
+	      <entry>パッケージ<replaceable>P</replaceable>を露出する</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-hide-all-packages</option></entry>
+	      <entry>デフォルトで全てのパッケージを隠す</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-hide-package</option> <replaceable>name</replaceable></entry>
+	      <entry>パッケージ<replaceable>P</replaceable>を隠す</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ignore-package</option> <replaceable>name</replaceable></entry>
+	      <entry>パッケージ<replaceable>P</replaceable>を無視する</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-package-conf</option> <replaceable>file</replaceable></entry>
+	      <entry><replaceable>file</replaceable>から追加でパッケージをロードする</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-no-user-package-conf</option></entry>
+	      <entry>ユーザのパッケージ設定ファイルをロードしない</entry>
+	      <entry>静/<literal>:set</literal></entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>言語オプション</title>
+
+      <para><xref linkend="options-language"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+    	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fallow-overlapping-instances</option></entry>
+	      <entry><link linkend="instance-overlap">重複インスタンス</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-allow-overlapping-instances</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fallow-incoherent-instances</option></entry>
+	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-fallow-overlapping-instances</option>も有効になる</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-allow-incoherent-instances</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fallow-undecidable-instances</option></entry>
+	      <entry><link linkend="undecidable-instances">決定不能インスタンス</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-allow-undecidable-instances</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fcontext-stack=N</option><replaceable>n</replaceable></entry>
+	      <entry><link linkend="undecidable-instances">文脈簡約の制限値</link>を設定する</entry>
+	      <entry>動</entry>
+	      <entry><option>20</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-farrows</option></entry>
+	      <entry><link linkend="arrow-notation">アロー記法</link>拡張を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-arrows</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-ffi</option> or <option>-fffi</option></entry>
+	      <entry><link linkend="ffi">他言語関数インタフェース</link> (<option>-fglasgow-exts</option>によっても有効になる)</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-ffi</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fgenerics</option></entry>
+	      <entry><link linkend="generic-classes">総称クラス</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-fgenerics</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fglasgow-exts</option></entry>
+	      <entry>大部分の言語拡張を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-glasgow-exts</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fimplicit-params</option></entry>
+	      <entry><link linkend="implicit-parameters">暗黙パラメタ</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-implicit-params</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-firrefutable-tuples</option></entry>
+	      <entry>タプルのパターン照合を反駁不能にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-irrefutable-tuples</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-implicit-prelude</option></entry>
+	      <entry>暗黙に<literal>import Prelude</literal>しない</entry>
+	      <entry>動</entry>
+	      <entry><option>-fimplicit-prelude</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-monomorphism-restriction</option></entry>
+	      <entry><link linkend="monomorphism">単相性限定</link>を無効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fmonomorphism-restriction</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-mono-pat-binds</option></entry>
+	      <entry><link linkend="monomorphism">パターン束縛を多相的に</link>する。</entry>
+	      <entry>動</entry>
+	      <entry><option>-fmono-pat-binds</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fextended-default-rules</option></entry>
+	      <entry>GHCiの<link linkend="extended-default-rules">拡張デフォルト化規則</link>を通常のモードで使う</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-extended-default-rules</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fscoped-type-variables</option></entry>
+	      <entry><link linkend="scoped-type-variables">レキシカルスコープの型変数</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-scoped-type-variables</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fth</option></entry>
+	      <entry><link linkend="template-haskell">Template Haskell</link>を有効にする。もはや<option>-fglasgow-exts</option>によって有効にはならない</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-th</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fbang-patterns</option></entry>
+	      <entry><link linkend="sec-bang-patterns">びっくりパターン</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-bang-patterns</option></entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>警告</title>
+      
+      <para><xref linkend="options-sanity"/></para>
+
+    <informaltable>
+      <tgroup cols="4" align="left" colsep="1" rowsep="1">
+	<thead>
+	  <row>
+	    <entry>フラグ</entry>
+	    <entry>解説</entry>
+	    <entry>動静</entry>
+	    <entry>逆</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry><option>-W</option></entry>
+	    <entry>通常の警告を有効にする</entry>
+	    <entry>動</entry>
+	    <entry><option>-w</option></entry>
+	  </row>
+	  <row>
+	    <entry><option>-w</option></entry>
+	    <entry>全ての警告を無効にする</entry>
+	    <entry>動</entry>
+	    <entry>-</entry>
+	  </row>
+	  <row>
+	    <entry><option>-Wall</option></entry>
+	    <entry>全ての警告を有効にする</entry>
+	    <entry>動</entry>
+	    <entry><option>-w</option></entry>
+	  </row>
+	  <row>
+	    <entry><option>-Werror</option></entry>
+	    <entry>警告を致命的にする</entry>
+	    <entry>動</entry>
+	    <entry></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-deprecations</option></entry>
+	    <entry>非推奨の関数・型が使われているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-deprecations</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-duplicate-exports</option></entry>
+	    <entry>実体が複数回エクスポートされているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-duplicate-exports</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-hi-shadowing</option></entry>
+	    <entry>カレントディレクトリの<literal>.hi</literal>ファイルがライブラリを隠しているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-hi-shadowing</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-incomplete-patterns</option></entry>
+	    <entry>パターン照合が失敗し得るときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-incomplete-patterns</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-incomplete-record-updates</option></entry>
+	    <entry>レコード更新が失敗し得るときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-incomplete-record-updates</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-missing-fields</option></entry>
+	    <entry>レコードのフィールドが初期化されていないときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-missing-fields</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-missing-methods</option></entry>
+	    <entry>クラスメソッドが定義されていないときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-missing-methods</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-missing-signatures</option></entry>
+	    <entry>シグネチャのない最上位の関数があれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-missing-signatures</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-name-shadowing</option></entry>
+	    <entry>名前の隠蔽があれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-name-shadowing</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-orphans</option></entry>
+	    <entry>モジュールに孤立したインスタンス宣言や書き換え規則があるときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-orphans</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-overlapping-patterns</option></entry>
+	    <entry>重複パターンがあれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-overlapping-patterns</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-simple-patterns</option></entry>
+	    <entry>失敗し得るラムダパターンがあれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-simple-patterns</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-type-defaults</option></entry>
+	    <entry>デフォルト化が起きたときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-type-defaults</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-unused-binds</option></entry>
+	    <entry>未使用の束縛があれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unused-binds</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-unused-imports</option></entry>
+	    <entry>不必要なインポートがあれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unused-imports</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-unused-matches</option></entry>
+	    <entry>パターン中に未使用の変数があれば警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unused-matches</option></entry>
+	  </row>
+
+	  </tbody>
+	</tgroup>
+      </informaltable>
+
+    </sect2>
+    <sect2>
+      <title>最適化水準</title>
+
+      <para><xref linkend="options-optimise"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-O</option></entry>
+	      <entry>デフォルトの最適化(水準1)を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-O0</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-O</option><replaceable>n</replaceable></entry>
+	      <entry>最適化水準を<replaceable>n</replaceable>に設定する</entry>
+	      <entry>動</entry>
+	      <entry><option>-O0</option></entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+	      
+    </sect2>
+    <sect2>
+      <title>個々の最適化</title>
+
+      <para><xref linkend="options-f"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fcase-merge</option></entry>
+	      <entry>case-mergingを有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-case-merge</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fdicts-strict</option></entry>
+	      <entry>辞書を正格にする</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-dicts-strict</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fdo-eta-reduction</option></entry>
+	      <entry>イータ簡約を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-do-eta-reduction</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fdo-lambda-eta-expansion</option></entry>
+	      <entry>ラムダイータ展開を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-do-lambda-eta-expansion</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fexcess-precision</option></entry>
+	      <entry>中間値の精度超過を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-excess-precision</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-frules-off</option></entry>
+              <entry>全ての書き換え規則を無効にする(多重定義関数の自動特殊化で生成されたものも含める)</entry>
+	      <entry>静</entry>
+	      <entry><option>-frules-off</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fignore-asserts</option></entry>
+	      <entry>ソース中のアサーションを無視する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-ignore-asserts</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fignore-interface-pragmas</option></entry>
+	      <entry>インタフェースファイル中のプラグマを無視する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-ignore-interface-pragmas</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fliberate-case-threshold</option></entry>
+	      <entry>liberate-case最適化を調整する(デフォルト: 10)</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-liberate-case-threshold</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fomit-interface-pragmas</option></entry>
+	      <entry>インタフェースプログラムを生成しない</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-omit-interface-pragmas</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fmax-worker-args</option></entry>
+	      <entry>ワーカにこれだけの引数があるとき、これ以上アンパックしない(デフォルト: 10)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fmax-simplifier-iterations</option></entry>
+	      <entry>単純化器の最大繰り返し回数を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-state-hack</option></entry>
+              <entry>実世界の状態トークンを引数として持つラムダが単一進入だとみなされ、従ってその内容をインライン化できる、という「stateハック」を無効にする。</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-cse</option></entry>
+              <entry>共通部分式を無効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-full-laziness</option></entry>
+              <entry>完全遅延(束縛を外側に向かって浮遊させる)を無効にする。</entry>
+	      <entry>動</entry>
+	      <entry>-ffull-laziness</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-pre-inlining</option></entry>
+              <entry>pre-inliningを無効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-strictness</option></entry>
+              <entry>正確性解析を無効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funbox-strict-fields</option></entry>
+              <entry>構築子の正格なフィールドを平坦化する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-unbox-strict-fields</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funfolding-creation-threshold</option></entry>
+              <entry>展開の設定を調整する</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-unfolding-creation-threshold</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funfolding-fun-discount</option></entry>
+              <entry>展開の設定を調整する</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-unfolding-fun-discount</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funfolding-keeness-factor</option></entry>
+              <entry>展開の設定を調整する</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-unfolding-keeness-factor</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funfolding-update-in-place</option></entry>
+              <entry>展開の設定を調整する</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-unfolding-update-in-place</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-funfolding-use-threshold</option></entry>
+              <entry>展開の設定を調整する</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-unfolding-use-threshold</option></entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>プロファイルに関するオプション</title>
+      
+      <para><xref linkend="profiling"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-auto</option></entry>
+	      <entry>全てのエクスポートされている関数に自動的に<literal>_scc_</literal>を付加する</entry>
+	      <entry>静</entry>
+	      <entry><option>-no-auto</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-auto-all</option></entry>
+	      <entry>全ての最上位の関数に自動的に<literal>_scc_</literal>を付加する</entry>
+	      <entry>静</entry>
+	      <entry><option>-no-auto-all</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-caf-all</option></entry>
+	      <entry>全てのCAFに自動的に<literal>_scc_</literal>を付加する</entry>
+	      <entry>静</entry>
+	      <entry><option>-no-caf-all</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-prof</option></entry>
+	      <entry>プロファイルを有効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ticky</option></entry>
+	      <entry>ticky-tickyプロファイルを有効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>Haskell前処理器オプション</title>
+
+      <para><xref linkend="pre-processor"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-F</option></entry>
+	      <entry>前処理器(<option>-pgmF</option>で設定される)の使用を有効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>Cプリプロセッサオプション</title>
+
+      <para><xref linkend="c-pre-processor"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-cpp</option></entry>
+	      <entry>Haskellソースファイルに対してCプリプロセッサを走らせる</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-D</option><replaceable>symbol</replaceable><optional>=<replaceable>value</replaceable></optional></entry>
+	      <entry>Cプリプロセッサのシンボルを定義する</entry>
+	      <entry>動</entry>
+	      <entry><option>-U</option><replaceable>symbol</replaceable></entry>
+	    </row>
+	    <row>
+	      <entry><option>-U</option><replaceable>symbol</replaceable></entry>
+	      <entry>Cプリプロセッサのシンボルを未定義にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-I</option><replaceable>dir</replaceable></entry>
+	      <entry><literal>#include</literal>ファイルの探索ディレクトリに<replaceable>dir</replaceable>を加える</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>Cコンパイルオプション</title>
+
+      <para><xref linkend="options-C-compiler"/></para>
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-#include</option> <replaceable>file</replaceable></entry>
+              <entry><filename>.hc</filename>ファイルをコンパイルするときに<replaceable>file</replaceable>をインクルードする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>コード生成オプション</title>
+
+      <para><xref linkend="options-codegen"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fasm</option></entry>
+	      <entry>ネイティブコード生成器を使う</entry>
+	      <entry>動</entry>
+	      <entry>-fvia-C</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fvia-C</option></entry>
+	      <entry>Cを介してコンパイルする</entry>
+	      <entry>動</entry>
+	      <entry>-fasm</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-code</option></entry>
+	      <entry>コード生成を省略する</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>プログラムのリンク</title>
+
+      <para><xref linkend="options-linker"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fPIC</option></entry>
+	      <entry>(可能なら)位置独立コードを生成する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dynamic</option></entry>
+	      <entry>(可能なら)動的なHaskellライブラリを使う</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-framework</option> <replaceable>name</replaceable></entry>
+	      <entry>Darwin/MacOS Xのみ。フレームワーク<replaceable>name</replaceable>をリンクする。このオプションはAppleのリンカの<option>-framework</option>オプションに相当する。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-framework-path</option> <replaceable>name</replaceable></entry>
+              <entry>Darwin/MacOS Xのみ。ディレクトリ<replaceable>dir</replaceable>をフレームワークを探索するディレクトリ一覧に加える。これはAppleのリンカの<option>-F</option>オプションに相当する。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-l</option><replaceable>lib</replaceable></entry>
+	      <entry>ライブラリ<replaceable>lib</replaceable>をリンクする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-L</option><replaceable>dir</replaceable></entry>
+	      <entry><replaceable>dir</replaceable>をライブラリを探索するディレクトリの一覧に加える</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-main-is</option></entry>
+	      <entry>mainのモジュールと関数を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>--mk-dll</option></entry>
+	      <entry>DLL作成モード(Windows のみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-no-hs-main</option></entry>
+	      <entry>プログラムに<literal>main</literal>があるとは考えない</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-no-link</option></entry>
+	      <entry>リンクを省略する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-split-objs</option></entry>
+	      <entry>オブジェクトを分割する(ライブラリ用)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-static</option></entry>
+	      <entry>静的なHaskellライブラリを使う</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-threaded</option></entry>
+	      <entry>スレッド化されたランタイムを使う</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-debug</option></entry>
+	      <entry>デバッグ用ランタイムを使う</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>段階の置き換え</title>
+
+      <para><xref linkend="replacing-phases"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-pgmL</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>を文芸前処理器として使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmP</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をCプリプロセッサとして使う(<option>-cpp</option>が指定された場合のみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmc</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をCコンパイラとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmm</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をmanglerとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgms</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をsplitterとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgma</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をアセンブラとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgml</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をリンカとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmdll</option> <replaceable>cmd</replaceable></entry>
+	      <entry>Use <replaceable>cmd</replaceable>をDLL生成器として使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmF</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>を前処理器として使う(<option>-F</option>が指定されているときのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+      <indexterm><primary><option>-pgmL</option></primary></indexterm>
+      <indexterm><primary><option>-pgmP</option></primary></indexterm>
+      <indexterm><primary><option>-pgmc</option></primary></indexterm>
+      <indexterm><primary><option>-pgma</option></primary></indexterm>
+      <indexterm><primary><option>-pgml</option></primary></indexterm>
+      <indexterm><primary><option>-pgmdll</option></primary></indexterm>
+      <indexterm><primary><option>-pgmF</option></primary></indexterm>
+
+    </sect2>
+
+    <sect2>
+      <title>特定の段階にオプションを強制する</title>
+
+      <para><xref linkend="forcing-options-through"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-optL</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>を文芸前処理器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optP</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をcppに渡す(<option>-cpp</option>が指定されているときのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optF</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>を用意した前処理器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optc</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をCコンパイラに渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optm</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をmanglerに渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-opta</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をアセンブラに渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optl</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をリンカに渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optdll</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をDLL生成器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optdep</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>を依存関係生成器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
+      <title>プラットフォーム固有のオプション</title>
+      
+      <para><xref linkend="options-platform"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-monly-[432]-regs</option></entry>
+	      <entry>(x86のみ)レジスタをいくつかCコンパイラに返す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+         
+    <sect2>
+      <title>外部コアファイルに関するオプション</title>
+
+      <para><xref linkend="ext-core"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fext-core</option></entry>
+	      <entry>外部コアファイル<filename>.hcr</filename>を生成する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+
+    <sect2>
+      <title>コンパイラのデバッグに関するオプション</title>
+
+      <para><xref linkend="options-debugging"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-dcore-lint</option></entry>
+	      <entry>内部的な正気度チェックを有効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-asm</option></entry>
+	      <entry>アセンブリを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-bcos</option></entry>
+	      <entry>インタプリタバイトコードを出力</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-cmm</option></entry>
+	      <entry>C--出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-cpranal</option></entry>
+	      <entry>CPR解析の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-cse</option></entry>
+	      <entry>CSEの出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-deriv</option></entry>
+	      <entry>導出(deriving)の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-ds</option></entry>
+	      <entry>脱糖器の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-flatC</option></entry>
+	      <entry>「平坦な」Cを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-foreign</option></entry>
+	      <entry><literal>foreign export</literal>のスタブを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-inlinings</option></entry>
+	      <entry>インライン化情報を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-occur-anal</option></entry>
+	      <entry>出現解析の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-opt-cmm</option></entry>
+	      <entry>C--からC--への最適化過程の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-parsed</option></entry>
+	      <entry>構文解析木を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-prep</option></entry>
+	      <entry>prepared coreを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-rn</option></entry>
+	      <entry>名前変更器の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-rules</option></entry>
+	      <entry>規則(rules)を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-simpl</option></entry>
+	      <entry>単純化器の最終出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-simpl-iterations</option></entry>
+	      <entry>単純化器の繰り返し毎の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-spec</option></entry>
+	      <entry>特殊化器の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-splices</option></entry>
+	      <entry>接合されたTH式と、その評価結果を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-stg</option></entry>
+	      <entry>最終STGを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-stranal</option></entry>
+	      <entry>正確性解析器の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-tc</option></entry>
+	      <entry>型検査器の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-types</option></entry>
+	      <entry>型シグネチャを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-worker-wrapper</option></entry>
+	      <entry>ワーカ・ラッパ出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-if-trace</option></entry>
+	      <entry>インタフェースファイルを追跡</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-tc-trace</option></entry>
+	      <entry>型検査器を追跡</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-rn-trace</option></entry>
+	      <entry>名前変更器を追跡</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-rn-stats</option></entry>
+	      <entry>名前変更器の統計情報</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-simpl-stats</option></entry>
+	      <entry>単純化器の統計情報を出力</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dppr-debug</option></entry>
+	      <entry>デバッグ表示を有効にする(さらなる多弁)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dppr-noprags</option></entry>
+	      <entry>表示にプラグマを含めない</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dppr-user-length</option></entry>
+	      <entry>エラーメッセージ中の式の深さを設定する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dsource-stats</option></entry>
+	      <entry>Haskellソースの統計情報を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dcmm-lint</option></entry>
+	      <entry>C--過程の正気度チェック</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dstg-lint</option></entry>
+	      <entry>STG過程の正気度チェック</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dstg-stats</option></entry>
+	      <entry>STG統計情報を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dverbose-core2core</option></entry>
+	      <entry>コアからコアへの過程一回毎に出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dverbose-stg2stg</option></entry>
+	      <entry>STGからSTGへの過程一回毎に出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dshow-passes</option></entry>
+	      <entry>過程の名前を発生ごとに表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dfaststring-stats</option></entry>
+	      <entry>終了時にfast stringの利用に関する統計情報を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-unreg</option></entry>
+	      <entry>非レジスタ化コンパイルを有効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+      
+    <sect2>
+      <title>その他のコンパイルオプション</title>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fno-hi-version-check</option></entry>
+	      <entry><literal>.hi</literal>ファイルが合致しなくても文句を言わない</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dno-black-holing</option></entry>
+	      <entry>ブラックホール化を無効にする(おそらく動作しない)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-method-sharing</option></entry>
+	      <entry>多重定義された関数の特殊化を共有しない</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fhistory-size</option></entry>
+	      <entry>単純化履歴の大きさを設定する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-funregisterised</option></entry>
+	      <entry>非レジスタ化コンパイル(代わりに<option>-unreg</option>を使うこと)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-asm-mangling</option></entry>
+	      <entry>アセンブリのmanglingを無効にする(代わりに<option>-unreg</option>を使うこと)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-print-bind-result</option></entry>
+	      <entry><link linkend="ghci-stmts"><!-- 訳注: リンク貼り間違い linkendとすべき -->GHCiで束縛の結果を表示するのを無効にする</link></entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+  </sect1>
+
+
+<!--
+Still to document:
+
+Misc:
+  ,  ( "H"                 , HasArg (setHeapSize . fromIntegral . decodeSize) )
+
+  -Bdir
+-->
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

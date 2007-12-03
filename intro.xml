@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="introduction-GHC">
+  <title>GHCの紹介</title>
+
+  <para>これはグラスゴーHaskellコンパイラ(GHC)という、<ulink url="http://www.haskell.org/">Haskell&nbsp;98</ulink>のための対話的・一括処理的なコンパイルシステムの利用の手引きである。</para>
+
+  <para>GHCは主に二つの構成要素から成っている。対話的Haskellインタプリタ(GHCiとも呼ばれる。説明は<xref linkend="ghci"/>にある)と、一括処理コンパイラ(説明は<xref linkend="using-ghc"/>にある)である。GHCは実際には単一のプログラムであり、走るときのオプションによって、対話的システムを提供したり、一括処理システムを提供したりする。</para>
+
+  <para>一括処理コンパイラはGHCiと組み合わせて使うことができる。対話的セッション中にコンパイル済みモジュールをロードすることができ、ロードされたものは解釈実行コードと同じように扱える。実際、GHCiを使うとき、ライブラリコードの大部分はコンパイル済みのものが使われている。この機能のおかげで、二つの方法の利点を両方とも享受することができる。すなわち、ライブラリコードは高速な実行のためにあらかじめコンパイルしておき、一方、で活発に開発されている部分を繰り返しコンパイルするのに掛かる時間を省く、ということができる。</para>
+
+  <para>GHCはたくさんの言語拡張をサポートする。例えば、並列実行、他言語関数インタフェース、例外など。これに加えて、多引数の型クラス、局所的な全称/存在量化、関数従属、スコープを持つ型変数、明示的な非ボックス化型といった型システムの拡張もある。これらの説明は全て<xref linkend="ghc-language-features"/>にある。</para>
+
+  <para>GHCには総合的な最適化器があり、もしあなたが本気でそのつもり(で、時間に余裕がある)なら、GHCはとても速いコードを出力することができる。一方、デフォルトのオプションは、生成されるコードを最適化するのにあまり熱心にならないようにして、なるべく速くコンパイルを行うというものである。(それでもGHCを「速いコンパイラ」だとは思ってくれないだろうけど　笑)</para>
+
+  <para>GHCのプロファイルシステムは、「コスト集約点スタック」をサポートする。これは、Haskellプログラムのプロファイルをコールグラフ状の構造として見るためのものである。より詳しくは、<xref linkend="profiling"/>を参照せよ。</para>
+
+  <para>GHCには、パーサコンビネータからネットワークの利用まであらゆるライブラリが付属している。これらのライブラリの説明は別の文書にある。</para>
+
+  <sect1 id="mailing-lists-GHC">
+    <title>メタ情報: ウェブサイト、メーリングリストなど</title>
+
+    <indexterm><primary>mailing lists, Glasgow Haskell</primary></indexterm>
+    <indexterm><primary>Glasgow Haskell mailing lists</primary></indexterm>
+
+    <para>以下のURLは興味深いかもしれない。</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><ulink url="http://www.haskell.org/" >Haskell home
+	page</ulink></para>
+      </listitem>
+
+      <listitem>
+	<para><ulink url="http://www.haskell.org/ghc/">GHC home
+	page</ulink></para>
+      </listitem>
+
+      <listitem>
+	<para><ulink
+	url="http://www.cs.nott.ac.uk/~gmh/faq.html">comp.lang.functional
+	FAQ</ulink></para>
+      </listitem>
+
+    </itemizedlist>
+
+    <para>我々は、グラスゴーのHaskell実装に関する以下のメーリングリストを運営している。適切と思うものが有れば、是非参加して頂きたい。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>glasgow-haskell-users:</term>
+	<listitem>
+	  <para>これはGHCの利用者が互いにおしゃべりをする場である。なにかGHCに関する質問があるなら、先に<ulink url="http://hackage.haskell.org/trac/ghc/wiki/FAQ">FAQ</ulink>を探してみてほしい。</para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>リストのメールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-users@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>加入:</term> 
+	      <listitem>
+		<para><ulink
+	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-users"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-users</literal></ulink>.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>管理メールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-users-admin@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>リストのアーカイブ:</term>
+	      <listitem>
+		<para><ulink
+          url="http://www.haskell.org/pipermail/glasgow-haskell-users/"><literal>http://www.haskell.org/pipermail/glasgow-haskell-users/</literal></ulink></para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>glasgow-haskell-bugs:</term>
+	<listitem>
+	  <para>GHCのバグ報告はこちらへ。このリストに加入している不幸で孤独な人々が、何がおかしくて、それについて何ができるか、深く悩んでくれるだろう。</para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>リストのメールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-bugs@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>加入:</term> 
+	      <listitem>
+		<para><ulink
+	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs</literal></ulink>.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>管理メールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-bugs-admin@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>リストのアーカイブ:</term>
+	      <listitem>
+		<para><ulink
+          url="http://www.haskell.org/pipermail/glasgow-haskell-bugs/"><literal>http://www.haskell.org/pipermail/glasgow-haskell-bugs/</literal></ulink></para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>cvs-ghc:</term>
+	<listitem>
+	  <para>ここには筋金入りのGHC開発者たちがたむろしている。CVSリポジトリのコミットメッセージもこのリストに送られてくる。CVSリポジトリの他のいくつかの部分についても、同様のメーリングリストがある(<literal>cvs-hslibs</literal>、<literal>cvs-happy</literal>、<literal>cvs-hdirect</literal>など)。</para>
+	  
+	  <variablelist>
+	    <varlistentry>
+	      <term>リストのメールアドレス:</term>
+	      <listitem>
+		<para><email>cvs-ghc@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>加入:</term> 
+	      <listitem>
+		<para><ulink
+	      url="http://www.haskell.org/mailman/listinfo/cvs-ghc"><literal>http://www.haskell.org/mailman/listinfo/cvs-ghc</literal></ulink>.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>管理メールアドレス:</term>
+	      <listitem>
+		<para><email>cvs-ghc-admin@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>リストのアーカイブ:</term>
+	      <listitem>
+		<para><ulink
+          url="http://www.haskell.org/pipermail/cvs-ghc/"><literal>http://www.haskell.org/pipermail/cvs-ghc/</literal></ulink></para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>他にもHaskellやGHCに関するメーリングリストがいくつか<literal>www.haskell.org</literal>で提供されている。完全な一覧は、<ulink url="http://www.haskell.org/mailman/listinfo/"><literal>http://www.haskell.org/mailman/listinfo/</literal></ulink>を見よ。</para>
+
+    <para>Usenetニュースグループの<literal>comp.lang.functional</literal>でもHaskell関連の議論が行われる。</para>
+
+  </sect1>
+
+  <sect1 id="bug-reporting">
+    <title>GHCのバグを報告する</title>
+    <indexterm><primary>bugs</primary><secondary>reporting</secondary>
+    </indexterm>
+    <indexterm><primary>reporting bugs</primary>
+    </indexterm>
+
+    <para>Glasgow Haskellは変わりゆくシステムであり、そこには必ずバグがある。</para>
+
+    <para>バグを報告するには、次の二つの方法がある。</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>(より好ましい方法) <ulink url="http://hackage.haskell.org/trac/ghc/newticket?type=bug">バグを新規作成</ulink>し、報告を記入する。ここでバグデータベースを検索して、バグが既に報告されていないかを確かめることもできる。(既に報告されている場合でも、あなたが経験したことを既存の報告に付け加えるのは助けになるかもしれない)</para>
+      </listitem>
+      <listitem>
+	<para>バグ報告は<email>glasgow-haskell-bugs@haskell.org</email>にメールすることもできる。</para>
+      </listitem>
+    </itemizedlist>
+
+    <sect2>
+      <title>バグを報告すべきかどうかどうやって判断したら良い？</title>
+
+      <para><ulink url="http://hackage.haskell.org/trac/ghc/wiki/FAQ">FAQ</ulink>と<xref linkend="wrong"/>に目を通せば、問題の振る舞いが本当にバグかどうかを判断するのに役立つだろう。</para>
+
+      <para>もしバグなら、それは既に報告されているかもしれない。<ulink url="http://hackage.haskell.org/trac/ghc">bug tracker</ulink>で検索してみて、見付からないようなら、<ulink url="http://www.google.com">Google</ulink>を試してみること。</para>
+
+      <para>もし迷ったら、報告してほしい。</para>
+    </sect2>
+
+    <sect2>
+      <title>バグ報告に含めるもの</title>
+      <indexterm><primary>bug reports</primary><secondary>contents</secondary></indexterm>
+
+      <para>バグ報告には、何をおいても事実が必要である。「ああ、それが重要だなんて思わなかった…」からといって事実を省略してはいけない。</para>
+
+      <orderedlist>
+	<listitem>
+          <para>どういう種類の機械で動かしているか、正確にどのバージョンのOSを使っているか。(UNIXシステムでは、<command>uname -a</command>または<command>cat /etc/motd</command>で必要な情報が得られる)。バグトラッカでは、この情報は「Arghitecture」及び「Operating system」の項目に入力することができる。</para>
+	</listitem>
+
+	<listitem>
+	  <para>どの版のGCCを使っているか。 <command>gcc&nbsp;-v</command>で判る。</para>
+	</listitem>
+
+	<listitem>
+	  <para>問題を起こすコンパイル/実行の手順を再現して、セッション全体をバグ報告にコピー＆ペーストする。我々はできれば全体を見たい。</para>
+	</listitem>
+
+	<listitem>
+          <para>GHCを実行するときに -v フラグを付けると、正確に何が走ったか、および、関連するいろいろなもののバージョンなどが分かる。</para>
+	</listitem>
+
+	<listitem>
+          <para>プログラムの振る舞いのどこがおかしいか、についてのあなたの意見。</para>
+	</listitem>
+
+	<listitem>
+          <para>もし可能なら、問題を再現するのに可能なだけのソースファイルを添付するか、我々に送って頂きたい。</para>
+	</listitem>
+
+	<listitem>
+          <para>もし問題をコンパイルシステムのソースコード中に特定したら(あなたは英雄だ)、パッチを送ってほしい。(<literal>darcs send</literal>、単なるパッチ、またはお好みならファイル全体でも良い)</para>
+	</listitem>
+      </orderedlist>
+    </sect2>
+  </sect1>
+
+  <sect1 id="version-numbering">
+    <title>GHCのバージョン番号付け規則</title>
+    <indexterm><primary>version, of ghc</primary></indexterm>
+
+    <para>GHCバージョン6.0以降、GHCのバージョン番号を割り当てるのに次のような規則が採用された。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>安定版リリース</term>
+	<listitem>
+	  <para>安定版リリースは<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z</replaceable></literal>と振られる。ここで、<replaceable>y</replaceable>は<emphasis>偶数</emphasis>であり、<replaceable>z</replaceable>はパッチレベルの番号である(末尾の<literal>.<replaceable>z</replaceable></literal>は<replaceable>z</replaceable>が零なら省略できる)。パッチレベルのリリースはバグ修正のみで、システム供給のコードへのプログラマ用インタフェースが変更されることはない。ただし、新しいパッチレベルリリースを古いリリースに上書きインストールした場合、古いライブラリに対してコンパイルされたコードは全てコンパイルし直さなければならない。</para>
+
+          <para>メジャーリリース<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z</replaceable></literal>では、<literal>__GLASGOW_HASKELL__</literal>(<xref linkend="c-pre-processor"/>を参照)の値は整数<replaceable>xyy</replaceable>(もし<replaceable>y</replaceable>が一桁の数値なら、前に0が追加される。例えば、GHCバージョン6.2では、<literal>__GLASGOW_HASKELL__==602</literal>)である。</para>
+
+	  <indexterm>
+	    <primary><literal>__GLASGOW_HASKELL__</literal></primary>
+	  </indexterm>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>スナップショット/不安定版リリース</term>
+	<listitem>
+          <para>我々はときどきその時点の開発ソースコードからスナップショットリリースを出すかもしれない。また、最新のソースは常にCVSリポジトリ(詳細は<ulink url="http://www.hasell.org/ghc">GHC web site</ulink>を見よ)から取得可能である。</para>
+
+          <para>スナップショットリリースは<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.YYYYMMDD</literal>と名付けられる。ただし、<literal>YYYYMMDD</literal>はスナップショットのビルドに使われたソースの日付である。理論的には、この日付を使ってCVSリポジトリから全く同じソースをチェックアウトすることができる。</para>
+
+          <para>もし<replaceable>y</replaceable>が奇数なら、それはCVS HEAD(主たる開発ブランチ)のスナップショットである。もし<replaceable>y</replaceable>が偶数なら、それはパッチレベルリリース間の安定版ブランチのスナップショットである。例えば、<literal>6.3.20040225</literal>はHEADのスナップショットであり、<literal>6.2.20040225</literal>は<literal>6.2</literal>ブランチのスナップショットだろう。</para>
+
+          <para>スナップショットリリースにおける<literal>__GLASGOW_HASKELL__</literal>の値は、整数<replaceable>xyy</replaceable>である。しかし、この値をテストする条件コードを書くべきではない。インタフェースは毎日のレベルで変わり、しかも<literal>__GLASGOW_HASKELL__</literal>ではより細かい精度の値を表せないから、<literal>__GLASGOW_HASKELL__</literal>の値をテストするなら、メジャーリリースの番号との間での大小・等値比較のみを行うべきである。</para>
+
+	  <indexterm>
+	    <primary><literal>__GLASGOW_HASKELL__</literal></primary>
+	  </indexterm>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+    
+    <para>あなたの手元のGHCのバージョン番号は、<literal>ghc</literal>を<literal>--version</literal>フラグ(<xref linkend="options-help"/>を見よ)つきで起動することで知ることができる。</para>
+  </sect1>
+
+
+&relnotes;
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

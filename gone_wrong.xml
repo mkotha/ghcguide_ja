@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="wrong">
+  <title>何かがうまくいかないとき</title>
+
+  <indexterm><primary>problems</primary></indexterm>
+
+  <para>この節を読んでも問題が解決しない場合、あなたは<emphasis>バグ</emphasis>を発見した可能性がある。どうか報告してほしい。<xref linkend="bug-reporting"/>には、どのようにバグを報告するか、と、バグについて我々が知りたいと思うことの一覧がある。疑わしいなら、報告してほしい。我々は激怒した利用者からのメールを愛している:-!</para>
+
+  <para>(<xref linkend="vs-Haskell-defn"/>には、Haskellの言語定義と比較してのGlasgow Haskellの欠点が載っている。これも読みたいと思うかもしれない。)</para>
+
+  <sect1 id="wrong-compiler">
+    <title>コンパイラが「正しくないこと」をしたとき</title>
+
+    <indexterm><primary>compiler problems</primary></indexterm>
+    <indexterm><primary>problems with the compiler</primary></indexterm>
+
+    <variablelist>
+      <varlistentry>
+	<term>&ldquo;助けて！ コンパイラがクラッシュした(あるいは「panic」した)！&rdquo;</term>
+	<listitem>
+	  <para>これらが起きたときは<emphasis>常に</emphasis>GHCシステムのバグである。報告してほしい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;これはひどいエラーメッセージ&rdquo;</term>
+	<listitem>
+	  <para>より良いエラーメッセージを出力できたと思うなら、バグとして報告してほしい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;Cコンパイラからの警告は？&rdquo;</term>
+	<listitem>
+	  <para>例えば、&ldquo;&hellip;warning: `Foo' declared `static' but never defined.&rdquo;のようなもの。見苦しいが、問題はないはずである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><filename>.hi</filename>インタフェースファイルに関する鋭敏性</term>
+	<listitem>
+	  <para>GHCはインタフェースファイルについてとても敏感である。例えば、非標準の<filename>Prelude.hi</filename>を掴まされると、実に酷いことが起こるだろう。<option>-fno-implicit-prelude</option><indexterm><primary>-fno-implicit-prelude option</primary></indexterm>を、自分で何をしているか分からずに有効にすると、コンパイラはほとんど間違いなく死ぬ。</para>
+
+	  <para>さらに、下にあるように、不安定なインタフェースを使ってコンパイルされたプログラムは、走らせる時に大いに困難を招く。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;GHCが間違ったコードを生成していると思うのだが&rdquo;:</term>
+	<listitem>
+	  <para>本当に？ :-) <option>-dcore-lint</option><indexterm><primary>-dcore-lint option</primary></indexterm>という「偏執的になれ」オプションが便利である。これによって、CoreからCoreへの変換毎に「lint」過程が誤り(とくに型エラー)を検査する。我々は常に<option>-dcore-lint</option>付きで実行している。これには大体コンパイル時間の5%ほど掛かる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;リンクエラーが発生した。なぜ？&rdquo;</term>
+	<listitem>
+	  <para>リンカが<literal>&lowbar;&lt;なにか&gt;&lowbar;fast</literal>が見付からないと文句をいうなら、なにかが整合していない。おそらく、モジュールを正しい依存性順にコンパイルしなかったのだろう。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;この行番号は正しい？&rdquo;</term>
+	<listitem>
+	  <para>これに関しては、GHCはかなり良くやる。特に、一行か二行のずれを見逃してくれるなら。インスタンス宣言やクラス宣言の場合は、行番号は宣言を示すのであって、特定のメソッドではない。</para>
+
+	  <para>行番号の誤りで特に困ることがあれば、報告してほしい。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect1>
+
+  <sect1 id="wrong-compilee">
+    <title>あなたのプログラムが「正しくないこと」をしたとき</title>
+
+    <indexterm><primary>problems running your program</primary></indexterm>
+
+    <para>(遅すぎる、あるいはメモリを食いすぎるHaskellプログラムについては、<xref linkend="sooner-faster-quicker"/>を見てほしい)</para>
+
+    <variablelist>
+
+      <varlistentry>
+	<term>&ldquo;助けて！プログラムがクラッシュした！&rdquo;</term>
+	<listitem>
+	  <para>(つまり、「セグメンテーション違反」や「core dumped」)
+          <indexterm><primary>segmentation
+          fault</primary></indexterm></para>
+
+	  <para>プログラムで他言語呼び出しを行っておらず、安全でないと分かっている関数(<literal>unsafePerformIO</literal>など)も使っていないなら、一つの例外をのぞいて、これは常にGHCシステムのバグである。例外とは、プログラムが複数のモジュールから成り立っているとき、それぞれのモジュールは、そのモジュールが依存しているモジュールが全てコンパイルされた後でコンパイルされなければならない(<filename>.hi-boot</filename>を使う場合を除く。この場合それらはモジュールのソースと正しく対応してい<emphasis>なければならない</emphasis>)、という条件に反した場合である。</para>
+
+	  <para>例えば、インポートされる値の型について、インタフェースファイルに誤った情報がある場合、インポート元モジュールの生成コードが壊れることになる。<emphasis>これは、インタフェース中のプラグマにも適用される</emphasis>。プラグマに誤った情報(例えば値の項数について)がある場合、壊れたコードが得られる。さらに、型が変わらなくても項数が変わることがあり得る。</para>
+
+	  <para>簡単に言うと、モジュールをコンパイルした後にそのインタフェースが変わったら、そのインタフェースをインポートするモジュールは全て再コンパイルし<emphasis>なければならない</emphasis>。</para>
+
+	  <para>インタフェースが変わったときに知らせてくれる便利なオプションとして<option>-hi-diffs</option><indexterm><primary>-hi-diffs option</primary></indexterm>がある。これは、変更のあったインタフェースファイルに<command>diff</command>を施すものである。</para>
+
+	  <para><command>make</command>を使っているなら、依存性情報を自動的に生成して、全てのモジュールが、インポート先インタフェースに対して、古くならないようにすることができる。<xref linkend="sec-makefile-dependencies"/>を参照してほしい。</para>
+
+          <para>「バグ報告の前の最後のコンパイル」をすることになったら、コンパイルオプションに<option>-dcore-lint</option>を追加する(より詳しい検査ができる)ことを推奨する。</para>
+
+          <para>つまり、core dumpするとしてバグを報告する前に、次のようなことをするべきだろう。</para>
+
+<screen>
+% rm *.o        # オブジェクトファイルを片付ける
+% make my_prog  # プログラムを再makeする。変更点をはっきりさせるには-hi-diffsを使う。
+                # 上述のように、より偏執的に-dcore-lintを使うこともできる。
+% ./my_prog ... # もう一回...
+</screen>
+
+	  <para>もちろん、プログラム中に他言語関数の呼び出しがあるなら、話は全く別である。ヒープを破壊したり、スタックを破壊したり、なんでもできるからである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;プログラムが「absent」なargumentにenterした&rdquo;</term>
+	<listitem>
+	  <para>これは間違いなくGHCのバグが原因である。報告してほしい。(<xref linkend="bug-reporting"/>を見よ)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>&ldquo;「arithmetic(または「floating」) exception」って何？&rdquo;</term>
+	<listitem>
+	  <para><literal>Int</literal>、<literal>Float</literal>、<literal>Double</literal>の四則演算は<emphasis>検査されない</emphasis>。オーバーフロー、アンダーフロー、精度の損失は、黙って見過ごされるか、OSによって例外として報告される(どちらかはシステムによる)。零による除算の結果、受け取られない例外が発生する<emphasis>かもしれない</emphasis>。(もしそうなったら報告してほしい)</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

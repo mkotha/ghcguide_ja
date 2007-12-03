@@ -1,0 +1,658 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="options-phases">
+  <title>特定の段階に関するオプション</title>
+
+  <sect2 id="replacing-phases">
+    <title>それぞれの段階で使われるプログラムを変更する</title>
+    <indexterm><primary>phases, changing</primary></indexterm>
+    
+    <para>コンパイルシステムの段階のうち一つ一つについて、<command>ghc</command>に備え付けられたプログラムの代わりに別のものを使うように指定することができる。例えば、別のアセンブラを使ってみたいかもしれない。以下のオプションで、指定されたコンパイル段階で使われる外部プログラムを変更することができる。</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-pgmL</option> <replaceable>cmd</replaceable>
+        <indexterm><primary><option>-pgmL</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>文芸形式の前処理器として<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmP</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmP</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Cプリプロセッサとして<replaceable>cmd</replaceable>を使う(<option>-cpp</option>が指定されているときのみ)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmc</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmc</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Cコンパイラとして<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmm</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmm</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>manglerとして<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgms</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgms</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>splitterとして<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgma</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgma</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>アセンブラとして<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgml</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgml</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>リンカとして<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmdll</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmdll</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>DLL生成器として<replaceable>cmd</replaceable>を使う。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmF</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmF</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>前処理器として<replaceable>cmd</replaceable>を使う。(<option>-F</option>が指定されているときのみ)</para>
+        </listitem>
+      </varlistentry>
+
+
+    </variablelist>
+  </sect2>
+
+  <sect2 id="forcing-options-through">
+    <title>特定の段階にオプションを強制する</title>
+    <indexterm><primary>forcing GHC-phase options</primary></indexterm>
+
+    <para>以下のフラグを使って、特定のコンパイル段階に指定されたオプションを強制的に使わせることができる。</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-optL</option> <replaceable>option</replaceable>
+          <indexterm><primary><option>-optL</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>を文芸形式の前処理器に渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optP</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-optP</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をCPPに渡す。(<option>-cpp</option>が有効なときのみ効果がある)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optF</option> <replaceable>option</replaceable>
+          <indexterm><primary><option>-optF</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>を用意した前処理器に渡す。(<xref linkend="pre-processor"/>を見よ)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optc</option> <replaceable>option</replaceable>
+          <indexterm><primary><option>-optc</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をCコンパイラに渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optm</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-optm</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をmanglerに渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-opta</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-opta</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をアセンブラに渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optl</option> <replaceable>option</replaceable>
+          <indexterm><primary><option>-optl</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をリンカに渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optdll</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-optdll</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>をDLL生成器に渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optdep</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-optdep</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>option</replaceable>を依存関係生成器に渡す。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>つまり、例えば、<option>-Ewurble</option>オプションをアセンブラに渡すには、<option>-opta-Ewurble</option>とすれば良い。(Eの前のハイフンは必須である)</para>
+
+    <para>GHCはそれ自身Haskellプログラムなので、GHCのランタイムシステムに直接オプションを渡す必要があるなら、それらを<literal>+RTS ... -RTS</literal>で囲むことができる。(<xref linkend="runtime-control"/>を見よ)</para>
+
+  </sect2>
+
+  <sect2 id="c-pre-processor">
+    <title>Cプリプロセッサに影響するオプション</title>
+
+    <indexterm><primary>pre-processing: cpp</primary></indexterm>
+    <indexterm><primary>C pre-processor options</primary></indexterm>
+    <indexterm><primary>cpp, pre-processing with</primary></indexterm>
+
+    <variablelist>
+
+      <varlistentry>
+        <term>
+          <option>-cpp</option>
+          <indexterm><primary><option>-cpp</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>HaskellコードがCプリプロセッサ<command>cpp</command>に通されるのは、<option>-cpp</option>オプション<indexterm><primary>-cpp option</primary></indexterm>が与えられたときのみである。大量の条件コンパイルのある大きなシステムを構築しているのでない限り、これが必要になることはないはずである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-D</option><replaceable>symbol</replaceable><optional>=<replaceable>value</replaceable></optional>
+          <indexterm><primary><option>-D</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>通常の方法でマクロ<replaceable>symbol</replaceable>を定義する。注意: これはCを介してコンパイルするときにCコンパイラに渡される<option>-D</option>マクロには影響しない。それには、<option>-optc-Dfoo</option>というハックを使うこと。(<xref linkend="forcing-options-through"/>を見よ)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-U</option><replaceable>symbol</replaceable>
+          <indexterm><primary><option>-U</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>通常の方法でマクロ<replaceable>symbol</replaceable>を未定義にする。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-I</option><replaceable>dir</replaceable>
+          <indexterm><primary><option>-I</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><literal>&num;include</literal>ファイルを探すディレクトリを、通常のCでの方法で指定する。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>Haskellソースコード(<filename>.hs</filename>または<filename>.lhs</filename>ファイル)をプリプロセスするとき、GHCドライバはいくつかのマクロを事前定義する。</para>
+
+    <para>定義されるシンボルは以下に示されている。あなたのシステムにインストールされたGHCでどのシンボルが定義されているかを確かめるには、以下の小技が有用である。</para>
+
+<screen>$ ghc -E -optP-dM -cpp foo.hs
+$ cat foo.hspp</screen>
+
+    <para>(<filename>foo.hs</filename>というファイルが必要だが、実際に使われることはない)</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <constant>&lowbar;&lowbar;HASKELL98&lowbar;&lowbar;</constant>
+          <indexterm><primary><literal>&lowbar;&lowbar;HASKELL98&lowbar;&lowbar;</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>定義されていると、GHCがHaskell 98レポートで定義されている言語をサポートしていることを意味する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <constant>&lowbar;&lowbar;HASKELL&lowbar;&lowbar;=98</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;HASKELL&lowbar;&lowbar;=98</constant></primary></indexterm>
+        </term>
+        <listitem>
+          <para>GHC 4.04以降では、<constant>&lowbar;&lowbar;HASKELL&lowbar;&lowbar;</constant>マクロが値<constant>98</constant>を持つように定義されている。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <constant>&lowbar;&lowbar;HASKELL1&lowbar;&lowbar;</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;HASKELL1&lowbar;&lowbar;</constant></primary></indexterm>
+        </term>
+        <listitem>
+          <para>これが<replaceable>n</replaceable>に展開されるなら、GHCがHaskellレポートの<emphasis>1.n</emphasis>版で定義されたHaskell言語をサポートしていることを意味する。現在は5である。このマクロは廃止予定であり、将来の版ではおそらくなくなるだろう。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;&lowbar;</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;&lowbar;</constant></primary></indexterm>
+        </term>
+        <listitem>
+          <para>GHCのバージョン<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z</replaceable></literal>では、<constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;&lowbar;</constant>の値は定数<replaceable>xyy</replaceable>である。(<replaceable>y</replaceable>が一桁なら、前に0が追加される。例えばGHCのバージョン6.2では<literal>__GLASGOW_HASKELL__==602</literal>である)。詳しくは<xref linkend="version-numbering"/>を参照。</para>
+
+          <para>運が良ければ、<constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;&lowbar;</constant>は、C風プリプロセスをサポートする他の処理系では定義されていないだろう。</para>
+
+          <para>(参考までに、他のシステムで比較に使える名前は、Hugsは<constant>&lowbar;&lowbar;HUGS&lowbar;&lowbar;</constant>、nhc98は<constant>&lowbar;&lowbar;NHC&lowbar;&lowbar;</constant>、hbcは<constant>&lowbar;&lowbar;HBC&lowbar;&lowbar;</constant>である。)</para>
+
+          <para>注意。このマクロはHaskellソースとCソースの両方のプリプロセス時に有効である。これには、Haskellモジュールから生成されたCソースも含む。(つまり、<filename>.hs</filename>、<filename>.lhs</filename>、<filename>.c</filename>、<filename>.hc</filename>の各ファイルである)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+      <term>
+          <constant>&lowbar;&lowbar;CONCURRENT&lowbar;HASKELL&lowbar;&lowbar;</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;CONCURRENT&lowbar;HASKELL&lowbar;&lowbar;</constant></primary></indexterm>
+        </term>
+      <listitem>
+        <para>このシンボルはHaskell(入力)とC(GHCの出力)をプリプロセスするときに定義される。GHCはバージョン4.00以降並行Haskellをデフォルトでサポートするので、このシンボルは常に定義される。</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>
+          <constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant></primary></indexterm>
+        </term>
+	<listitem>
+          <para><option>-parallel</option>が使われているときのみ定義される。このシンボルはHaskell(入力)とC(GHCの出力)をプリプロセスするときに定義される。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <constant><replaceable>os</replaceable>_HOST_OS=1</constant>
+        </term>
+	<listitem>
+          <para>この定義を使ってOSに基づく条件コンパイルをすることができる。ただし、<replaceable>os</replaceable>は使われているOSの名前である。(例えば<literal>linux</literal>、Windowsでは<literal>mingw32</literal>、<literal>solaris</literal>など)</para>
+	</listitem>
+      </varlistentry>
+	
+      <varlistentry>
+	<term>
+          <constant><replaceable>arch</replaceable>_HOST_ARCH=1</constant>
+        </term>
+	<listitem>
+          <para>この定義を使ってホストのアーキテクチャに基づく条件コンパイルをすることができる。ただし、<replaceable>arch</replaceable>は使われているアーキテクチャの名前である。(例えば<literal>i386</literal>、<literal>x86_64</literal>、<literal>powerpc</literal>、<literal>sparc</literal>など)</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <sect3 id="cpp-string-gaps">
+      <title>CPPと文字列間隙</title>
+
+      <para>警告を少々。<option>-cpp</option>は「文字列間隙」との相性があまりよくない。<indexterm><primary>-cpp vs string gaps</primary></indexterm><indexterm><primary>string gaps vs -cpp</primary></indexterm>言い替えると、次のような文字列間隙は<option>-cpp</option>の使用下ではうまく動かない。</para>
+
+<programlisting>strmod = "\
+\ p \
+\ "</programlisting>
+      
+      <para><filename>/usr/bin/cpp</filename>がバックスラッシュと改行を消し去るからである。</para>
+
+      <para>一方、行末にスペースを加えれば、<command>cpp</command>(少なくともGNU <command>cpp</command>、他の<command>cpp</command>もそうかもしれない)はバックスラッシュと空白の対をそのまま残し、文字列間隙は期待どおりに働く。</para>
+    </sect3>
+  </sect2>
+
+  <sect2 id="pre-processor">
+    <title>Haskell前処理器に影響するオプション</title>
+    
+    <indexterm><primary>pre-processing: custom</primary></indexterm>
+    <indexterm><primary>Pre-processor options</primary></indexterm>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-F</option>
+          <indexterm><primary><option>-F</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Haskellソースファイルは、<option>-F</option>オプション<indexterm><primary>-F</primary></indexterm>が与えられたときのみ選んだ前処理器に通される。</para>
+
+          <para>選んだ前処理器をコンパイル時に走らせるのは、場合によっては適切で、便利である。<option>-F</option>オプションを使うと、前処理器はGHCの総合的なコンパイルパイプラインの一部として走る。このため、Haskell前処理器を別に走らせるのと比べると、解釈実行モードでもうまく動いたり、GHCの再コンパイル検査器の恩恵に浴することができるという点で有利である。</para>
+
+          <para>前処理器が走るのはHaskellコンパイラがHaskell入力を処理する直前、ただし文芸的マーク付けが落とされ、(場合によっては)Cプリプロセッサが入力を洗浄した後である。</para>
+
+          <para><option>-pgmF&nbsp;<replaceable>cmd</replaceable></option>を使って、前処理器として使うプログラムを選ぶことができる。起動されるとき、<replaceable>cmd</replaceable>前処理器はコマンド行から最低三つの引数を渡される。最初の引数は元のソースファイルの名前であり、二番目は入力の置かれているファイルの名前であり、三番目は<replaceable>cmd</replaceable>が出力を書き込むべきファイルの名前である。</para>
+
+          <para>前処理器への追加の引数は<option>-optF</option>オプションで渡すことができる。これらは、コマンド行において、三つの標準的な入出力引数の後に置かれる。</para>
+
+          <para>前処理器の例として、ソースファイルを、GHCが期待するエンコーディングに変換するというのがあげられる。つまり、以下のようなスクリプト<literal>convert.sh</literal>を作るのだ。</para>
+
+<screen>#!/bin/sh
+( echo "{-# LINE 1 \"$2\" #-}" ; iconv -f l1 -t utf-8 $2 ) > $3</screen>
+
+          <para>そして、GHCに<literal>-F -pgmF convert.sh</literal>を渡す。<literal>-f l1</literal>オプションはあなたのLatin-1ファイル(引数<literal>$2</literal>に与えられる)を変換するように指示し、「-t uft-8」オプションはUTF-8でエンコードされたファイルを返すように指示している。結果は引数<literal>$3</literal>にリダイレクトされる。<literal>echo "{-# LINE 1 \"$2\" #-}"</literal>は、エラーがあったとき、その位置を元のソースファイルの物として報告させるようにするためのものである。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+
+  <sect2 id="options-C-compiler">
+    <title>Cコンパイラ(もし使われているなら)に影響するオプション</title>
+
+    <indexterm><primary>include-file options</primary></indexterm>
+    <indexterm><primary>C compiler options</primary></indexterm>
+    <indexterm><primary>GCC options</primary></indexterm>
+
+    <para>大量の他言語呼び出しのあるソースをコンパイルしていると、Cコンパイラに<literal>&num;include</literal>ファイルについて伝える必要が出てくるかもしれない。これをするための「正しい方法」はソースファイルの先頭に<literal>INCLUDE</literal>プラグマを追加することである。(<xref linkend="include-pragma"/>)</para>
+
+<programlisting>{-# INCLUDE &lt;X/Xlib.h&gt; #-}</programlisting>
+      
+    <para>これが不便なこともある。そういう場合のために、同等のコマンド行オプションもある。</para>
+
+<screen>% ghc -c '-#include &lt;X/Xlib.h&gt;' Xstuff.lhs</screen>
+
+    <indexterm><primary><option>-#include</option></primary>
+    </indexterm>
+
+  </sect2>
+
+  <sect2 id="options-codegen">
+    <title>コード生成に影響するオプション</title>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-fasm</option>
+          <indexterm><primary><option>-fasm</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Cを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>は最適化が無効のときはデフォルトである。(<xref linkend="options-optimise"/>を見よ)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fvia-C</option>
+          <indexterm><primary><option>-fvia-C</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>ネイティブコード生成器を使わず、Cを介してコンパイルする。最適化コンパイルのとき、及びGHCにネイティブコード生成器のないアーキテクチャでは、これがデフォルトである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fno-code</option>
+          <indexterm><primary><option>-fno-code</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>コード生成(と、それ以降の段階全て)を完全に省略する。コンパイルの中間段階の出力を見たいだけのときには使い道があるかもしれない。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fPIC</option>
+          <indexterm><primary><option>-fPIC</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>位置独立なコード(共有ライブラリに置けるコード)を生成する。これは今のところMac OS Xで動作する。PowerPC Linuxではネイティブコード生成器を使っているとき(-fasm)には動作する。x86 Linuxではまだ十分に使える状態ではない。Windowsでは、位置独立コードが使われることはなく、PowerPC64 Linuxでは常に位置独立コードが使われるので、これらのプラットフォームではこのフラグは効力を持たない。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-dynamic</option>
+        </term>
+        <listitem>
+          <para>コードを生成するとき、別のパッケージからインポートされた実体は別の共有ライブラリ・バイナリにあると考える。これは今のところMac OS Xで動作する。PowerPC Linuxではネイティブコード生成器を使っているとき(-fasm)には動作する。<option>-fPIC</option>と同様に、x86 Linuxではまだ十分に使える状態ではない。Windowsではサポートされておらず、PowerPC64 Linuxでは効力を持たない。</para>
+          <para>このオプションはリンク時にGHCに共有ライブラリを使わせるという効果もあることに注意。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+
+  <sect2 id="options-linker">
+    <title>リンクに影響するオプション</title>
+
+    <indexterm><primary>linker options</primary></indexterm>
+    <indexterm><primary>ld options</primary></indexterm>
+
+
+    <para>GHCはあなたのコードをいろいろなライブラリとリンクしなければならない。これには、ユーザ供給のもの、GHC供給のもの、システム供給のもの(例えば<option>-lm</option>数学ライブラリ)が含まれ得る。</para>
+
+    <variablelist>
+
+      <varlistentry>
+        <term>
+          <option>-l</option><replaceable>lib</replaceable>
+          <indexterm><primary><option>-l</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>lib</replaceable>ライブラリをリンクする。Unixシステムでは、これはライブラリディレクトリパスのどこかにある<filename>lib<replaceable>lib</replaceable>.a</filename>または<filename>lib<replaceable>lib</replaceable>.so</filename>というファイルに置かれる。</para>
+
+          <para>大部分のUNIXリンカは悲しい状態にあって、こういうオプションの順序に意味がある。ライブラリ<replaceable>foo</replaceable>がライブラリ<replaceable>bar</replaceable>を必要とするなら、一般に、コマンド行中で、<option>-l</option><replaceable>foo</replaceable>は<option>-l</option><replaceable>bar</replaceable>よりも<emphasis>前に</emphasis>来なければならない。</para>
+
+          <para>外部ライブラリを使うときに心に留めた方がいい罠がもう一つある。もしライブラリに<literal>main()</literal>関数があるなら、これはGHCの<literal>main()</literal>関数よりも優先して使われるということである。(例えば、<literal>libf2c</literal>や<literal>libl</literal>には独自の<literal>main()</literal>がある)。これは、GHCの<literal>main()</literal>が<literal>HSrts</literal>ライブラリ由来であり、通常コマンド行中で他の全てのライブラリよりも<emphasis>後に</emphasis>置かれるからである。GHCの<literal>main</literal>が他の外部ライブラリ由来の<literal>main()</literal>よりも優先して使われるようにするには、単に<option>-lHSrts</option>オプションをコマンド行で他のライブラリよりも前に置けば良い。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-c</option>
+          <indexterm><primary><option>-c</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>リンクを省略する。<option>&ndash;&ndash;make</option>と併用して、プログラムに<literal>Main</literal>モジュールがあったときに行われる自動リンクを避けることができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-package</option> <replaceable>name</replaceable>
+          <indexterm><primary><option>-package</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Haskell「パッケージ」(<xref linkend="packages"/>を見よ)を使っているなら、関係する<option>-package</option>をリンク時にも忘れずに指定する必要がある。こうすることで、必要なライブラリがプログラムにリンクされる。<option>-package</option>を忘れると何ページにもわたるリンクエラーが起こるだろう。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-framework</option> <replaceable>name</replaceable>
+          <indexterm><primary><option>-framework</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Darwin/MacOS Xのみ。フレームワーク<replaceable>name</replaceable>をリンクする。このオプションはAppleのリンカの<option>-framework</option>オプションに相当する。フレームワークとパッケージは別々のものだということに注意してほしい。フレームワークはHaskellのコードを含まない。むしろ、これは共有ライブラリをパッケージ化するApple流のやりかたである。例えば、Appleの「Carbon」APIにリンクするには、<option>-framework Carbon</option>を使うことができる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-L</option><replaceable>dir</replaceable>
+          <indexterm><primary><option>-L</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>ユーザ供給のライブラリを探す場所。ディレクトリ<replaceable>dir</replaceable>をライブラリディレクトリパスの先頭に加える。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-framework-path</option><replaceable>dir</replaceable>
+          <indexterm><primary><option>-framework-path</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Darwin/MacOS Xのみ。ディレクトリ<replaceable>dir</replaceable>をフレームワークディレクトリパスの先頭に加える。これはAppleのリンカの<option>-F</option>オプションに相当する。(GHCでは<option>-F</option>は別の要素に使用済みである)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-split-objs</option>
+          <indexterm><primary><option>-split-objs</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>通常生成されるような単一のオブジェクトファイルを分割して、モジュール中のHaskell関数や型一つずつにオブジェクトファイルを生成するようにリンカに指示する。これはライブラリに対してのみ意味を持つ。この場合、そのライブラリにリンクされる実行ファイルは、必要なオブジェクトファイルとのみリンクされるので、よりファイルサイズが小さくなる。しかし、全てのセクションを別々に組み立てるのは高価なので、これはふつうにコンパイルするよりも遅い。我々はこの機能をGHCのライブラリをビルドするのに使っている。(警告: 自分が何をしているか分かっているのでない限り、このオプションを使わないように！)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-static</option>
+          <indexterm><primary><option>-static</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>可能なら共有Haskellライブラリを避けるようにリンカに指示する。これはデフォルトである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-dynamic</option>
+          <indexterm><primary><option>-dynamic</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>可能なら共有Haskellライブラリを使うようにリンカに指示する。(このオプションは現在のところMac OS Xのみでサポートされている。また、あなたの入手したGHC配布物に共有ライブラリがないかもしれない)</para>
+          <para>このオプションはコード生成にも影響を与えることに注意。(上記参照)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-main-is <replaceable>thing</replaceable></option>
+          <indexterm><primary><option>-main-is</option></primary></indexterm>
+          <indexterm><primary>specifying your own main function</primary></indexterm>
+        </term>
+        <listitem>
+          <para>Haskellの通常の規則では、プログラムは<literal>Main</literal>の<literal>main</literal>関数を供給する必要がある。テスト時には、どの関数が「主要な(main)」ものであるかを変えられると便利であり、これを可能にするのが<option>-main-is</option>フラグである。<replaceable>thing</replaceable>は次のうちいずれかである。</para>
+            <itemizedlist>
+      	<listitem><para>小文字で始まる識別子<literal>foo</literal>。GHCは<literal>Main.foo</literal>がmain関数だとみなす。</para></listitem>
+      	<listitem><para>モジュール名<literal>A</literal>。GHCは<literal>A.main</literal>がmain関数だとみなす。</para></listitem>
+      	<listitem><para>修飾名<literal>A.foo</literal>。GHCは<literal>A.foo</literal>がmain関数だとみなす。</para></listitem>
+      	</itemizedlist>
+          <para>厳密に言うと、<option>-main-is</option>はそもそもリンク時フラグではない。リンク段階ではなんの効果も及ぼさない。このフラグは、指定されたmain関数のあるモジュール(例えば上記のうち後ろ二つでは<literal>A</literal>である)をコンパイルするときに指定する必要がある。他のモジュールには影響がないので、<literal>ghc --make</literal>に与えても安全である。ただし、main関数の指定を変更したとき、どのモジュールにもそれ以外に変更がないなら、新旧両方の「main」のモジュールを強制的に再コンパイルさせないといけない。<literal>ghc</literal>はこれらが両方とも再コンパイルを要していると判断できるほど賢くないのである。再コンパイルを強制するには、オブジェクトファイルを削除しても良いし、<option>-fforce-recomp</option>フラグを使っても良い。</para>
+
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-no-hs-main</option>
+          <indexterm><primary><option>-no-hs-main</option></primary></indexterm>
+          <indexterm><primary>linking Haskell libraries with foreign code</primary></indexterm>
+        </term>
+        <listitem>
+          <para>ghcでコンパイルされたコードを別の(非Haskellの)プログラムの一部として使いたいときは、RTSは<function>main()</function>の定義をリンク時に供給せず、あなたが供給せねばならない。このことをリンク時にコンパイラに伝えるのが<option>-no-hs-main</option>である。<xref linkend="using-own-main"/>も見よ。</para>
+
+          <para>リンカにわたされるコマンド行はかなり複雑なので、複数言語のアプリケーションの最終リンクには<command>ghc</command>を使うのが良いだろう。ただしこれは必須ではない。ドライバがどんなオプションをリンカに渡しているかを見るには一度<option>-v</option>付きでリンクしてみるだけで良い。</para>
+
+          <para><option>-no-hs-main</option>フラグは、<option>--make</option>モードにおいて、Haskellの<literal>Main</literal>モジュールがないときでもコンパイラにリンクを行わせるために使うこともできる。(通常、<literal>Main</literal>がないときはコンパイラはリンクを試みない)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-debug</option>
+          <indexterm><primary><option>-debug</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>プログラムをデバッグ版のランタイムシステムにリンクする。デバッグランタイムは大量のアサーションと正気度チェックを有効にし、実行時にデバッグ出力を生成するためのオプションを提供する。(一覧を見るにはプログラムを<literal>+RTS&nbsp;-?</literal>付きで実行せよ)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-threaded</option>
+          <indexterm><primary><option>-threaded</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>プログラムを「スレッド化された」版のランタイムシステムにリンクする。スレッド化ランタイムシステムは複数のOSスレッドを管理するのでこう呼ばれる。これに対して、デフォルトのランタイムシステムは純粋に単一スレッドである。</para>
+
+          <para>並行性を使うのに<option>-threaded</option>は必要ない。単一スレッドのランタイムはHaskellスレッド間の並行性をちゃんと扱う。</para>
+
+          <para>スレッド化ランタイムシステムには次のような利点がある。</para>
+
+          <itemizedlist> 
+            <listitem>
+              <para>マルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>またはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械における並列性<indexterm><primary>parallelism</primary></indexterm>。<xref linkend="sec-using-smp"/>を見よ。</para>
+
+              <para>他のHaskellスレッドをブロックせずに他言語関数を呼び出す能力。</para>
+
+              <para>foreign exportされたHaskellの関数を複数のOSスレッドから呼び出す能力。</para>
+            </listitem>
+          </itemizedlist>
+
+          <para><option>-threaded</option>が与えられていると、他言語関数の呼び出しは、呼び出し元のHaskellスレッドを作ったのと同じOSスレッド(そのスレッドがforeign exportされたHaskellの関数によって作られた場合)または適当なOSスレッド(そのスレッドが<literal>forkIO</literal>で作られた場合)で実行される。</para>
+
+          <para>スレッド化ランタイムがどのように「束縛スレッド」を使うかについてのさらなる詳細は、<ulink url="../libraries/base/Control.Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールにある。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

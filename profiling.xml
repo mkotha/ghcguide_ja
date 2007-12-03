@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="profiling">
+  <title>プロファイルを取る</title>
+  <indexterm><primary>profiling</primary>
+  </indexterm>
+  <indexterm><primary>cost-centre profiling</primary></indexterm>
+
+  <para>Glasgow Haskellには時間及び空間のプロファイルをとるためのシステムが付属している。このシステムの目的は、プログラムの実行時の振る舞いをより良く理解できるようにし、ひいてはそれを改善できるようにすることである。</para>
+  
+  <para>あらゆる意見、提案、改善は歓迎される。おすすめの「プロファイル技」があるなら特に素晴らしい。</para>
+
+  <para>プログラムのプロファイルをとるのは三つの段階からなる。</para>
+
+  <orderedlist>
+    <listitem>
+      <para>プログラムをプロファイル用にコンパイルする。これには、<literal>-prof</literal>オプションと、多くの場合<literal>-auto</literal>と<literal>-auto-all</literal>オプションのいずれかを付ける。これらのオプションは<xref linkend="prof-compiler-options"/>でさらに詳しく解説されている。</para>
+      <indexterm><primary><literal>-prof</literal></primary>
+      </indexterm>
+      <indexterm><primary><literal>-auto</literal></primary>
+      </indexterm>
+      <indexterm><primary><literal>-auto-all</literal></primary>
+      </indexterm>
+    </listitem>
+
+    <listitem>
+      <para>プロファイルオプションのどれか(例えば<literal>+RTS -p -RTS</literal>)を付けてプログラムを実行する。プロファイル情報のファイルが生成される。</para>
+      <indexterm><primary><option>-p</option></primary><secondary>RTS
+      option</secondary></indexterm>
+    </listitem>
+      
+    <listitem>
+      <para>生成されたプロファイル情報を調べる。これにはGHCのプロファイルツールを使う。どれを使うかは生成されたプロファイル情報によって異なる。</para>
+    </listitem>
+    
+  </orderedlist>
+  
+  <sect1 id="cost-centres">
+    <title>コスト集約点とコスト集約点スタック</title>
+    
+    <para>GHCのプロファイルシステムでは<firstterm>コスト</firstterm>は<firstterm>コスト集約点</firstterm>に割り当てられる。コストとは式を評価するのに必要な時間と空間のことである。コスト集約点はプログラム上の注釈で、一定の範囲の式を支配する。注釈の付いた式が発生させたコストは全て、それを直接支配するコスト集約点に割り当てられる。さらに、GHCは任意の式についてそれを支配するコスト集約点のスタックを実行時に記憶していて、どこにどれだけコストが掛かったかという情報の付いた呼び出しグラフを生成する。<!--(訳注: この節では多少無理な翻訳をしているので語句の対応を示す。改善案募集。cost centre: コスト集約点、enclose: 支配、assign: 割り当てる、attribute: 割り当てる/配分する)--></para>
+
+    <para>例を一つ見てみよう。</para>
+
+    <programlisting>
+main = print (nfib 25)
+nfib n = if n &lt; 2 then 1 else nfib (n-1) + nfib (n-2)
+</programlisting>
+
+    <para>このプログラムを次のようにコンパイルし、実行する。</para>
+
+    <screen>
+$ ghc -prof -auto-all -o Main Main.hs
+$ ./Main +RTS -p
+121393
+$
+</screen>
+
+    <para>GHCでコンパイルされたプログラムは、<option>-p</option>というRTSオプション付きで実行されると、<filename>&lt;prog&gt;.prof</filename>というファイルを生成する。この場合、ファイルの内容は以下のようなものである。</para>
+
+<screen>
+          Fri May 12 14:06 2000 Time and Allocation Profiling Report  (Final)
+
+           Main +RTS -p -RTS
+
+        total time  =        0.14 secs   (7 ticks @ 20 ms)
+        total alloc =   8,741,204 bytes  (excludes profiling overheads)
+
+COST CENTRE          MODULE     %time %alloc
+
+nfib                 Main       100.0  100.0
+
+
+                                              individual     inherited
+COST CENTRE              MODULE      entries %time %alloc   %time %alloc
+
+MAIN                     MAIN             0    0.0   0.0    100.0 100.0
+ main                    Main             0    0.0   0.0      0.0   0.0
+ CAF                     PrelHandle       3    0.0   0.0      0.0   0.0
+ CAF                     PrelAddr         1    0.0   0.0      0.0   0.0
+ CAF                     Main             6    0.0   0.0    100.0 100.0
+  main                   Main             1    0.0   0.0    100.0 100.0
+   nfib                  Main        242785  100.0 100.0    100.0 100.0
+</screen>
+
+
+    <para>ファイルの最初の部分は、プログラムの名前、オプション、実行時に計測された合計実行時間と合計メモリ確保量を示している。(合計メモリ確保量はある一つの時点においてプログラムが必要とする<emphasis>生存</emphasis>メモリの量とは異なることに注意。後者はヒーププロファイルで量れるが、これについては後で説明する)</para>
+
+    <para>ファイルの二番目の部分は、プログラムの中でコストが高い関数をコスト集約点で分類したものである。この例では、プログラムにはコストの高い関数が一つ(<function>nfib</function>)しかなく、これがプログラムの時間と確保量の両方について100&percnt;のコストを占めている。</para>
+
+    <para>三番目の最後の節はコスト集約点スタックで分類されたプロファイルを表示している。これはプログラムの呼び出しグラフとだいたい同じである。上記の例では、コストの高い<function>nfib</function>の呼び出しが<function>main</function>由来のものであることが明らかになっている。</para>
+
+    <para>プログラムの特定の部分の時間と確保量は二種類が表示されている。「individual」はこのコスト集約点スタックに相当する部分のコードが消費したものだけを示す。「inherited」はこのノードの子が消費したものも全て含む。</para>
+
+    <para>例を少し変えると、コスト集約点スタックの有用性がより良く分かるようになる。</para>
+
+    <programlisting>
+main = print (f 25 + g 25)
+f n  = nfib n
+g n  = nfib (n `div` 2)
+nfib n = if n &lt; 2 then 1 else nfib (n-1) + nfib (n-2)
+</programlisting>
+
+    <para>このプログラムを前と同じようにコンパイル・実行し、新しいプロファイル結果を見てみる。</para>
+
+<screen>
+COST CENTRE              MODULE         scc  %time %alloc   %time %alloc
+
+MAIN                     MAIN             0    0.0   0.0    100.0 100.0
+ main                    Main             0    0.0   0.0      0.0   0.0
+ CAF                     PrelHandle       3    0.0   0.0      0.0   0.0
+ CAF                     PrelAddr         1    0.0   0.0      0.0   0.0
+ CAF                     Main             9    0.0   0.0    100.0 100.0
+  main                   Main             1    0.0   0.0    100.0 100.0
+   g                     Main             1    0.0   0.0      0.0   0.2
+    nfib                 Main           465    0.0   0.2      0.0   0.2
+   f                     Main             1    0.0   0.0    100.0  99.8
+    nfib                 Main        242785  100.0  99.8    100.0  99.8
+</screen>
+
+    <para><function>nfib</function>の呼び出しをプログラム中で二回行ったが、時間を食っているのが<function>f</function>経由の呼び出しだということが明らかだ。</para>
+
+    <para>出力の各列の実際の意味は以下の通りである。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>entries</term>
+	<listitem>
+          <para>呼び出しグラフのこの場所に入った回数。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>individual &percnt;time</term>
+	<listitem>
+          <para>呼び出しグラフ中のこの場所で消費された時間の、総時間に対する割合。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>individual &percnt;alloc</term>
+	<listitem>
+          <para>この呼び出しでなされたメモリ確保量(プロファイルによる余分は除く)の全体に占める割合。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>inherited &percnt;time</term>
+	<listitem>
+          <para>呼び出しグラフ中のこの点以下で消費された時間の、プログラムの総実行時間に占める割合。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>inherited &percnt;alloc</term>
+	<listitem>
+          <para>この呼び出しとその部分呼び出しでなされたメモリ確保量(プロファイルによる余分は除く)の全体に占める割合。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>加えて、RTSオプション<option>-P</option><indexterm><primary><option>-P</option></primary></indexterm>を使うと、下記の情報が追加される。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term><literal>ticks</literal></term>
+	<listitem>
+          <para>この集約点に割り当てられた生の時刻信号(tick)の数。上記の<literal>&percnt;time</literal>はこの値から得られている。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><literal>bytes</literal></term>
+	<listitem>
+          <para>この集約点の支配下でヒープ中に確保されたバイト数。これは上記の<literal>&percnt;alloc</literal>の数値の元となるものである。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>再帰的関数や相互に再帰的な一群の関数についてはどうだろうか。コストはどこに割り当てられるのか。答えはこうである。GHCは一群の関数が互いに再帰的に呼び合ったという情報は保持するが、時刻と確保の基本プロファイルにおいてはこの情報は表示されず、呼び出しグラフは平坦化されて木として表示される。XMLプロファイルツール(<xref linkend="prof-xml-tool"/>で説明する)は呼び出しグラフ中の輪を表示できるだろう。</para>
+
+    <sect2><title>コスト集約点を手動で挿入する</title>
+
+      <para>コスト集約点はプログラム上の注釈に過ぎない。コンパイラに<option>-auto-all</option>を指示すると、全ての最上位の関数の周りに自動的にコスト集約点が挿入される。しかし、自分でコスト集約点を挿入するのも完全に自由である。</para>
+
+      <para>コスト集約点の注釈の構文は以下である。</para>
+
+      <programlisting>
+     {-# SCC "name" #-} &lt;expression&gt;
+</programlisting>
+
+      <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。</para>
+
+    </sect2>
+
+    <sect2 id="prof-rules">
+      <title>コストの配分規則</title>
+
+      <para>プログラム中のそれぞれの式を評価するときに発生したコストは以下の規則にしたがってコスト集約点スタックに配分される。</para>
+
+      <itemizedlist>
+	<listitem>
+          <para>その式が、最上位の定義を評価するときの<firstterm>一回限りの</firstterm>コストの一部であるなら、コストが配分されるのは、その式が字句的に囲まれている<literal>SCC</literal>注釈のスタックを、<literal>CAF</literal>という特殊なコスト集約点の上に載せたものになる。</para>
+	</listitem>
+
+	<listitem>
+          <para>そうでない場合、コストが配分されるのは、その式が字句的に囲まれている<literal>SCC</literal>のスタックに、<firstterm>呼び出し地点</firstterm><footnote><para>呼び出し地点とは、その特定の関数や変数に言及している、ソースコード中の位置のことである。</para></footnote>でのコスト集約点スタックを連結したものになる。これが再帰的な定義であることに注意せよ。</para>
+	</listitem>
+
+	<listitem>
+          <para>他言語のコード(<xref linkend="ffi"/>を見よ)で経過した時間は常に、その他言語関数をHaskellから呼び出している地点でのコスト集約点に配分される。</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>一回限りのコストとは何か。Haskellは遅延言語であり、ある種の式はただ一回しか評価されない。例えば、次のように書いたとする。</para>
+
+      <programlisting>
+x = nfib 25
+</programlisting>
+
+      <para>すると<varname>x</varname>は(もし評価されるなら)ただ一回だけ評価され、それ以降<varname>x</varname>が必要になったときはキャッシュされた結果を使う。<varname>x</varname>のような引数のない定義はCAF(Constant Applicative Form; 定作用形)と呼ばれる。</para>
+
+      <para>プロファイルについて話すときは、「式<literal>nfib 25</literal>は<varname>x</varname>を評価するときの一回限りのコストに属している」という。</para>
+
+      <para>一回限りのコストは厳密にはプログラムの呼び出しグラフの一部ではないので、特別な最上位のコスト集約点である<literal>CAF</literal>に割り当てられる。<literal>CAF</literal>コスト集約点はモジュールに一つ(デフォルト)か、一回限りのコストのある全ての最上位の定義ごとに一つ(<option>-caf-all</option>をGHCに渡すことでこの挙動になる)ある。</para>
+
+      <indexterm><primary><literal>-caf-all</literal></primary>
+      </indexterm>
+
+      <para>プロファイルが変だと思ったときや、呼び出しグラフが思ったようになっていないときは、遠慮せずにそれ(とプログラム)を<email>glasgow-haskell-bugs@haskell.org</email>から我々に送ってほしい。</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="prof-compiler-options">
+    <title>プロファイルについてのコンパイルオプション</title>
+
+    <indexterm><primary>profiling</primary><secondary>options</secondary></indexterm>
+    <indexterm><primary>options</primary><secondary>for profiling</secondary></indexterm>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-prof</option>:
+          <indexterm><primary><option>-prof</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>プロファイルシステムを使うには、<emphasis>全ての</emphasis>モジュールが<option>-prof</option>オプション付きでコンパイルされ、<option>-prof</option>オプションつきでリンクされていなければならない。ソース中の全ての<literal>SCC</literal>注釈が意味を持つようになる。</para>
+
+          <para><option>-prof</option>オプションが与えられていないとき、<literal>SCC</literal>は無視される。このため、<literal>SCC</literal>を満載したコードを変更せずにコンパイルできる。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+      
+    <para>この他にもいくつかプロファイルに関連したコンパイルオプションがある。これらは<option>-prof</option>と<emphasis>併用</emphasis>すること。これらのオプションは全てのモジュールで一斉に使う必要はない。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-auto</option>:
+          <indexterm><primary><option>-auto</option></primary></indexterm>
+          <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>GHCが全ての最上位のエクスポートされた関数に<function>_scc_</function><!--訳注: SCCとすべき。以下同様-->を自動的に加える。</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>
+          <option>-auto-all</option>:
+          <indexterm><primary><option>-auto-all</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para><emphasis>全て</emphasis>の最上位の関数が、エクスポートされているかにかかわらず、自動的に<function>_scc_</function>化される。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-caf-all</option>:
+          <indexterm><primary><option>-caf-all</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>一つのモジュール内の全てのCAFのコストは通常一つの「大きな」CAFというコスト集約点に割り当てられる。このオプションを使うと、全てのCAFが独自のコスト集約点を持つようになる。「他のことがうまくいかなかったら」試すオプションである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ignore-scc</option>:
+          <indexterm><primary><option>-ignore-scc</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para><function>_scc_</function>を全て無視する。従って、既に<function>_scc_</function>のあるモジュールを注釈を無視したままプロファイル用にコンパイルすることができる。</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+
+  </sect1>
+
+  <sect1 id="prof-time-options">
+    <title>時間及び確保量のプロファイルを取る</title>
+
+    <para>時間及び確保量のプロファイルを生成するには、コンパイルされたプログラムを実行する際に以下のいづれかのRTSオプションを渡せば良い。(RTSオプションは通常と同じく<literal>+RTS...-RTS</literal>の間になければならない)</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-p</option> or <option>-P</option>:
+          <indexterm><primary><option>-p</option></primary></indexterm>
+          <indexterm><primary><option>-P</option></primary></indexterm>
+          <indexterm><primary>time profile</primary></indexterm>
+        </term>
+	<listitem>
+          <para><option>-p</option>オプションは標準的な<emphasis>時間プロファイル</emphasis>の報告を生成する。結果は<filename><replaceable>program</replaceable>.prof</filename>というファイルに出力される。</para>
+
+          <para><option>-P</option>はより詳細なプロファイル(実際の時間と確保量のデータを含む)を生成する。(あまり使われない)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-px</option>:
+          <indexterm><primary><option>-px</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para><option>-px</option>オプションは、プロファイル情報をXML形式で生成する。この形式は我々の新しいプロファイルツールで使用できる。<xref linkend="prof-xml-tool"/>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-xc</option>
+          <indexterm><primary><option>-xc</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>このオプションは、コスト集約点スタックプロファイラが持つ独自の情報を使って、実行時エラーの発生位置について有用な情報を提供する。<xref linkend="rts-options-debugging"/>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+    
+  </sect1>
+
+  <sect1 id="prof-heap">
+    <title>メモリ使用状況のプロファイルを取る</title>
+
+    <para>プログラムの時間的、及びメモリ確保の挙動についてプロファイルを取るのに加えて、プログラムのメモリ使用状況の時間的な変化を表したグラフを生成することができる。これは、プログラムが実行時に必要以上のメモリを使っているときに<firstterm>スペースリーク</firstterm>の原因を探るのに便利である。スペースリークはGCを酷使するので実行時間が長くなりがちであるし、場合によってはプログラムがメモリを使い果たすこともあり得る。</para>
+
+    <para>プログラムのヒーププロファイルを生成するには、以下の手順に従う。</para>
+
+    <orderedlist>
+      <listitem>
+	<para>プログラムをプロファイル用にコンパイルする。(<xref linkend="prof-compiler-options"/>)</para>
+      </listitem>
+      <listitem>
+        <para>下で解説されているヒーププロファイルオプションのどれかを付けて実行する。(例えば、基本的な生産者プロファイルなら<option>-hc</option>)。これで<filename><replaceable>prog</replaceable>.hp</filename>というファイルが生成される。</para>
+      </listitem>
+      <listitem>
+        <para><command>hp2ps</command>を実行して、Postscriptファイルである<filename><replaceable>prog</replaceable>.ps</filename>を作る。<command>hp2ps</command>ユーティリティは<xref linkend="hp2ps"/>で詳述されている。</para>
+      </listitem>
+      <listitem>
+        <para>できたヒーププロファイルを<application>Ghostview</application>のようなpostscript閲覧器を使って表示するか、Postscript対応のプリンタで印刷する。</para>
+      </listitem>
+    </orderedlist>
+
+    <sect2 id="rts-options-heap-prof">
+      <title>ヒーププロファイルのためのRTSオプション</title>
+
+      <para>生成できるヒーププロファイルの種類は複数ある。どの種類でも出力は時間に対する生存ヒープのグラフだが、生存ヒープを分類するときの内訳の取りかたが違う。分類の方法は以下のRTSオプションで選択する。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-hc</option>
+            <indexterm><primary><option>-hc</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>そのデータを生成したコスト集約点スタックで分類する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hm</option>
+            <indexterm><primary><option>-hm</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>そのデータを生成したコードの所属するモジュールで分類する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hd</option>
+            <indexterm><primary><option>-hd</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para><firstterm>クロージャの説明</firstterm>で分類する。実際のデータについては、説明とは構築子の名前のことである。それ以外のクロージャについてはそれを識別するコンパイラ生成の文字列である。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hy</option>
+            <indexterm><primary><option>-hy</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para><firstterm>型</firstterm>で分類する。型が不明/多相的な関数については、実際の型を近似する文字列が使われる。</para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>
+            <option>-hr</option>
+            <indexterm><primary><option>-hr</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para><firstterm>維持原因(retainer)集合</firstterm>で分類する。維持原因プロファイルは下で詳しく解説されている。(<xref linkend="retainer-prof"/>)</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hb</option>
+            <indexterm><primary><option>-hb</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para><firstterm>経歴</firstterm>で分類する。経歴プロファイルは以下でより詳しく説明されている。(<xref linkend="biography-prof"/>)</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>さらにプロファイルは特定の条件を満たすヒープデータに限って行うことができる。例えば、プロファイルを型ごとに表示したいが、これを特定のモジュールで生産されたデータについてのみ行いたい、あるいは、特定の型のデータについて維持原因のプロファイルを行いたい、ということがあるかもしれない。このような制限は以下のように指定できる。</para>
+      
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-hc</option><replaceable>name</replaceable>,...
+            <indexterm><primary><option>-hc</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>生産地点において「指定されたコスト集約点のいずれかがスタックの先頭にあった」クロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hC</option><replaceable>name</replaceable>,...
+            <indexterm><primary><option>-hC</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>生産地点において「指定されたコスト集約点のいずれかがスタックのどこかにあった」クロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hm</option><replaceable>module</replaceable>,...
+            <indexterm><primary><option>-hm</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>特定のモジュールで生産されたクロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hd</option><replaceable>desc</replaceable>,...
+            <indexterm><primary><option>-hd</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>説明文字列が指定されたものと一致するクロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hy</option><replaceable>type</replaceable>,...
+            <indexterm><primary><option>-hy</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>指定された型のクロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>
+            <option>-hr</option><replaceable>cc</replaceable>,...
+            <indexterm><primary><option>-hr</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>維持原因集合の中に「指定されたコスト集約点のいずれかを先頭とするスタックがある」クロージャのみを対象にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hb</option><replaceable>bio</replaceable>,...
+            <indexterm><primary><option>-hb</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>指定された経歴のいずれかに該当するクロージャのみを対象にする。<replaceable>bio</replaceable>は<literal>lag</literal>、<literal>drag</literal>、<literal>void</literal>、<literal>use</literal>のいずれかである。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>例として、以下のオプションでは、構築子<literal>Branch</literal>及び<literal>Leaf</literal>に限定した保持原因プロファイルが生成される。</para>
+
+<screen>
+<replaceable>prog</replaceable> +RTS -hr -hdBranch,Leaf
+</screen>
+
+      <para>「分類」オプション(上記の例では<option>-hr</option>)は一つしか与えられないが、適用できる制約の数に上限はない。全てのオプションは基本的に組み合わせ可能であるが、例外として、GHCは今のところ<option>-hr</option>と<option>-hb</option>オプションを併用するのをサポートしていない。</para>
+
+      <para>ヒーププロファイルに関するオプションがあとふたつある。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-i<replaceable>secs</replaceable></option>:
+            <indexterm><primary><option>-i</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>プロファイル間隔(標本取得間隔)を<replaceable>secs</replaceable>秒(デフォルトは0.1秒)に設定する。小数も使える。例えば<option>-i0.2</option>とすれば毎秒五回標本を取得する。これが影響するのはヒーププロファイルだけである。時間プロファイルでは常に1/50秒の周期で標本が取得される。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-xt</option>
+            <indexterm><primary><option>-xt</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>ヒーププロファイルに、スレッドが占めるメモリを含める。個々のスレッドは、スタック用の空間(スタックは通常小さい状態で開始し、必要に応じて成長する)と、それに加えてスレッド状態のための小さな領域を使う。</para>
+	    
+            <para>これには主スレッドも含まれるので、<option>-xt</option>はプログラムが使っているスタック空間の大きさを知るのに良い。</para>
+
+            <para>スレッドが占めるメモリとスタックは、クロージャの説明や型での分類に際しては「TSO」と表示される。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+    </sect2>
+    
+    <sect2 id="retainer-prof">
+      <title>維持原因プロファイル</title>
+
+      <para>維持原因プロファイルは<quote>なぜこのデータが回収されずに残っているのか</quote>という類の疑問に答えるように設計された。まず、維持原因オブジェクトとは何かを定義しよう。</para>
+
+      <blockquote>
+        <para>維持原因オブジェクトとは、システムスタックまたは未評価のクロージャ(サンク)である。</para>
+      </blockquote>
+
+      <para>特に、構築子は維持原因オブジェクト<emphasis>ではない</emphasis>。</para>
+
+      <para>オブジェクトBがオブジェクトAの維持原因であるのは、(i)Bが維持原因オブジェクトであって、(ii)Bから始めてポインタを再帰的にたどることで、途中で他の維持原因オブジェクトに出会うことなくAに到達できる場合である。全ての生存オブジェクトは一つ以上の維持原因によって維持されているが、これらの維持原因を総称して、そのオブジェクトの維持原因集合、または<firstterm>維持原因集合</firstterm>、または<firstterm>維持原因たち</firstterm>と呼ぶ。</para>
+
+      <para>プログラムに<option>-hr</option>オプションが与えられ、維持原因プロファイルが要請されると、維持原因集合で分類されたグラフが生成される。維持原因集合はコスト集約点スタックの集合として表示される。通常これはプロファイルグラフに載せるには大きすぎるので、維持原因集合には一つずつ番号が振られ、グラフ中では番号つきで短縮して表示される。そして、維持原因集合の完全な一覧は<filename><replaceable>prog</replaceable>.prof</filename>というファイルに出力される。</para>
+
+      <para>維持原因プロファイルでは、全てのオブジェクトについて維持原因集合を得るために生存ヒープを複数回走査しなければならず、これは場合によってはとても遅い。このため、維持原因集合の最大サイズが設定されていて、これよりも大きな維持原因集合は<literal>MANY</literal>という特殊な集合になる。この最大サイズはデフォルトでは8であり、RTSオプション<option>-R</option>で変更できる。</para>
+      
+      <variablelist>
+	<varlistentry>
+	  <term><option>-R</option><replaceable>size</replaceable></term>
+	  <listitem>
+            <para>維持原因集合の要素数を<replaceable>size</replaceable>に制限する。(デフォルト: 8)</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <sect3>
+	<title>維持原因プロファイルに関するヒント</title>
+
+        <para>維持原因オブジェクトの定義は、スペースリークの良くある原因を反映するようにしてある。つまり、大きな構造がある未評価の式によって保持され、これが評価され次第開放される、という状況である。一つの好例として、有限写像から値を見つけ出す(lookup)操作がある。このlookup操作がタイミング良く実行されないと、未評価のlookup操作が写像全体を生き長らえさせることになる。(訳注: もっと良い文章募集)。この種のスペースリークは、<literal>seq</literal>かデータ構築子のフィールドの正確性注釈を使って関連する計算を強制することで防げることが多い。</para>
+
+        <para>特定のデータ構造が一連の未評価のクロージャの列によって保持されているということが良くある。この場合、最も近いものだけが維持原因プロファイルで報告される。例えば、AがBを保持し、BがCを保持し、Cが大きな構造を保持しているとしよう。さらに、Bはたくさんあるが、Aは一つしかなく、従ってAを排除したいということがあるかもしれない。しかし、保持原因プロファイルはこの場合大きな構造の保持原因としてBを挙げる。そこで、この列を一つたどるために、Bのオブジェクトに絞ってもう一回維持原因プロファイルを取ることができる。こうすることで、Bの維持原因プロファイルが得られる。</para>
+
+<screen>
+<replaceable>prog</replaceable> +RTS -hr -hcB
+</screen>
+	
+        <para>この技は完璧ではない。無関係なBのクロージャがヒープ中にあるかもしれないからである。しかし、これで大抵の場合うまく行くということが判っている。</para>
+      </sect3>
+    </sect2>
+
+    <sect2 id="biography-prof">
+      <title>経歴プロファイル</title>
+
+      <para>典型的なヒープオブジェクトは、生存期間中の各時点において以下のいずれかの状態をとる。</para>
+
+      <itemizedlist>
+	<listitem>
+          <para><firstterm>lag(待機)</firstterm>段階。作られてから最初に使われるまでの間。</para>
+	</listitem>
+	<listitem>
+	  <para><firstterm>use(使用中)</firstterm>段階。最初に使われてから最後に使われるまでの間。</para>
+	</listitem>
+	<listitem>
+	  <para><firstterm>drag(惰性)</firstterm>段階。最後に使われてから参照されなくなるまでの間。</para>
+	</listitem>
+	<listitem>
+          <para>一回も使われないオブジェクトについては、生存期間中常に<firstterm>void(空虚)</firstterm>状態にあるとみなされる。</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>経歴ヒーププロファイルでは、上記の四状態にある生存ヒープの割合を表示する。通常、最も重要なのはvoid状態とdrag状態である。これらの状態にある生存ヒープはlag状態やuse状態にあるヒープよりも無駄である可能性が高い。</para>
+
+      <para>これらのうち一つまたは複数の状態にあるものについて、別の基準で分類することもできる。これには、プロファイルを経歴で制限すれば良い。例えば、drag状態またはvoid状態にあるヒープについて、割合を生産者別で表示するなら、以下のようにすれば良い。</para>
+
+<screen>
+<replaceable>prog</replaceable> +RTS -hc -hbdrag,void
+</screen>
+
+      <para>drag状態やvoid状態にあるヒープの生産者や型が分かったら、次にすることは維持原因を見つけることだろう。</para>
+
+<screen>
+<replaceable>prog</replaceable> +RTS -hr -hc<replaceable>cc</replaceable>...
+</screen>
+
+      <para>注意: このように二段階に分けて処理しないといけないのは、現在GHCがプロファイルを取るときに経歴と維持原因の両方を同時に使うことができないからである。</para>
+    </sect2>
+
+    <sect2 id="mem-residency">
+      <title>実際のメモリ使用量</title>
+
+      <para>ヒーププロファイルで報告されるメモリ使用量と、プログラムを実行したときの実際のメモリ使用量とはどう関係しているか。ヒーププロファイルで報告されるメモリ使用量と、システムのツール(Unixなら<literal>ps</literal>や<literal>top</literal>、Windowsならタスクマネージャなど)で報告されるメモリ使用量との間に大きな差があるのを目にするかも知れない。これにはいくつかの原因がある。</para>
+
+      <itemizedlist>
+	<listitem>
+          <para>プロファイル自体にオーバーヘッドがあるが、プロファイル時のメモリ使用量の数値からは引かれている。もちろん、このオーバーヘッドはプロファイルのサポートなしでコンパイルすれば消滅する。現在、空間オーバーヘッドはヒープオブジェクト一つあたり二ワードであり、この結果30%程度のオーバーヘッドになる。</para>
+	</listitem>
+
+	<listitem>
+          <para>GCには実際の使用量よりもたくさんのメモリが必要である。この比は使われているGCのアルゴリズムに依存する。標準である世代別コピーGCでは、Lを生存データの量として通常3Lバイトのメモリを必要とする。これは、デフォルトでは(<option>+RTS -F</option>オプションを見よ)古い世代が回収前の時点で二倍(2L)になり得、さらにコピー先としてLバイトの空間が必要だからである。コンパクト化GC(<option>+RTS -c</option>オプションを見よ)を使うときは、これは2Lに減り、<option>-F</option>を調整することでさらに減らせる。また、確保領域の大きさも加わる。(現在は512kbに固定されている)</para>
+	</listitem>
+
+	<listitem>
+          <para>デフォルトではヒーププロファイルにはスタックが含まれない。<option>+RTS -xt</option>オプションを見よ。</para>
+	</listitem>
+
+	<listitem>
+          <para>プログラムテキスト自体、Cスタック、あらゆるヒープ外データ(例えば、他言語のライブラリで確保されたデータやRTSが確保したデータ)、<literal>mmap()</literal>されたメモリはヒーププロファイルで考慮されない。</para>
+	</listitem>
+      </itemizedlist>
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="prof-xml-tool">
+    <title>グラフィカルな時間/確保量プロファイル</title>
+
+    <para>プログラムの時間と確保量についてのプロファイルグラフをグラフィカルに見ることができる。これには<command>ghcprof</command>を使う。これはGHC 4.08に付属する新しいツールであり、いずれはGHCのプロファイルを閲覧する道具としてデファクトスタンダードになるだろう。<footnote><para>実はこれはもはや正しくない。我々は今Gtk+HSを使ってヒーププロファイルを表示する新しいツールに取り組んでいるので、<command>ghcprof</command>は将来のある時点で消え去るかも知れない。</para></footnote></para>
+
+    <para><command>ghcprof</command>を実行するには、<productname>uDraw(Graph)</productname>をインストールしておかなければならない。これは<ulink url="http://www.informatik.uni-bremen.de/uDrawGraph/en/uDrawGraph/uDrawGraph.html"><citetitle>uDraw(Graph)</citetitle></ulink>から入手できる。バイナリ配布物のどれかをインストールし、環境変数<envar>UDG_HOME</envar>がインストールディレクトリを指すようにすること。</para>
+
+    <para><command>ghcprof</command>はXMLを使ったプロファイルログ形式を使うので、プログラムを実行するときには専用のオプション<option>-px</option>を渡さなければならない。この場合も生成ファイルの名前は<filename>&lt;prog&gt;.prof</filename>である。プロファイルを見るには、次のように<command>ghcprof</command>を実行する。</para>
+
+    <indexterm><primary><option>-px</option></primary></indexterm>
+
+<screen>
+$ ghcprof &lt;prog&gt;.prof
+</screen>
+
+    <para>これでウィンドウが現れ、プログラムの驚嘆すべき細部に渡る呼び出しグラフが表示されるはずである。<command>ghcprof</command>を使うことに関するさらなる情報は<ulink url="http://www.dcs.warwick.ac.uk/people/academic/Stephen.Jarvis/profiler/index.html"><citetitle>The Cost-Centre Stack Profiling Tool for GHC</citetitle></ulink>で得られる。</para>
+
+  </sect1>
+
+  <sect1 id="hp2ps">
+    <title><command>hp2ps</command>&ndash;&ndash;ヒーププロファイルをPostScriptへ</title>
+
+    <indexterm><primary><command>hp2ps</command></primary></indexterm>
+    <indexterm><primary>heap profiles</primary></indexterm>
+    <indexterm><primary>postscript, from heap profiles</primary></indexterm>
+    <indexterm><primary><option>-h&lt;break-down&gt;</option></primary></indexterm>
+    
+    <para>使いかた:</para>
+    
+<screen>
+hp2ps [flags] [&lt;file&gt;[.hp]]
+</screen>
+
+    <para><command>hp2ps</command><indexterm><primary>hp2ps program</primary></indexterm>は、RTSオプション<option>-h&lt;brak-down&gt;</option>を使って作られたヒーププロファイルをPostScriptのグラフに変換するプログラムである。<command>hp2ps</command>が処理するファイルの拡張子は慣習に従って<filename>.hp</filename>とされる。PostScript出力は<filename>&lt;file&gt;@.ps</filename>に書き込まれる。<filename>&lt;file&gt;</filename>が完全に省かれた場合は、このプログラムはフィルタとして動作する。</para>
+
+    <para><command>hp2ps</command>はGHCソース配布物中の<filename>ghc/utils/hp2ps</filename>にある。これはもともとHBC/LMLヒーププロファイラの一部としてDave Wakelingが開発したものである。</para>
+
+    <para>フラグは以下のものがある。</para>
+
+    <variablelist>
+      
+      <varlistentry>
+	<term><option>-d</option></term>
+	<listitem>
+          <para>グラフを見やすくするために、<command>hp2ps</command>は項目の帯をソートする。デフォルトのソート順では、面積の大きい帯が小さい帯の上に置かれる。<option>-d</option>を使うと、よりギザギザの(元の値の標準偏差が大きい)帯が上に置かれるようになる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-b</option></term>
+	<listitem>
+          <para>通常、<command>hp2ps</command>はグラフの表題をページの上部の小さいボックスの中に配置する。しかし、JOB文字列が長すぎて小さいボックスに収まらないとき(35文字より長いとき)は、<command>hp2ps</command>は代わりに大きいボックスを使う。<option>-b</option>は、<command>hp2ps</command>が大きいボックスを使うように強制する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-e&lt;float&gt;[in&verbar;mm&verbar;pt]</option></term>
+	<listitem>
+          <para>LaTex文書に含めるのに適したencapsulated PostScriptを生成する。通常、PostScriptのグラフは高さ6インチ幅9インチのランドスケープモードで描画され、<command>hp2ps</command>はこの領域をa4用紙のほぼ中心に配置する。これはグラフを精査するには良いが、LaTex文書に取り込むのには不向きである。<option>-e</option>オプションが指定されるとグラフはポートレートモードで描画され、幅は&lt;float&gt;で指定される。単位はインチ、ミリメートル、ポイント(デフォルト)のいずれかである。結果としてできるPostScriptファイルはEncapsulated PostScript(EPS)としての基準を満たしており、Rokickiのdvi-PostScript変換器である<command>dvips</command>を使ってLaTex文書に含めることができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-g</option></term>
+	<listitem>
+          <para>PostScriptプレビューワ<command>gs</command>(および類似品)に適した出力を作る。この場合グラフはスケーリングなしのポートレートモードで印刷される。この出力はレーザプリンタには向かない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-l</option></term>
+	<listitem>
+          <para>通常プロファイル中の帯の数は20に制限され、それ以外の識別子は全て<literal>OTHER</literal>という帯にまとめられる。<option>-l</option>フラグを使うとこの20個の制限は取り除かれ、必要なだけ帯を作るようにする。項目一覧はどうせ収まりきらないので生成されない。たくさんの帯のある時間プロファイルを作るのに便利である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-m&lt;int&gt;</option></term>
+	<listitem>
+          <para>通常プロファイル中の帯の数は20に制限され、それ以外の識別子は全て<literal>OTHER</literal>という帯にまとめられる。<option>-m</option>フラグを使うとこの個数制限を変更することができる。(最大20)</para>
+
+          <para><option>-m0</option>とすると帯の数は無制限になり、必要なだけ帯を作るようにする。項目一覧はどうせ収まりきらないので生成されない。たくさんの帯のある時間プロファイルを作るのに便利である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-p</option></term>
+	<listitem>
+          <para>前回のパラメタを使う。デフォルトではPostScriptグラフはページ全体を占めるように自動的に上下左右に伸縮される。しかし、一連のグラフを提示したいときには、新しいグラフを描くときに前回と同じ縮尺、色づけ、順序を使えると便利である。<option>-p</option>フラグは前回<command>hp2ps</command>を<filename>file</filename>に対して使ったときのパラメタを使ってグラフを描くようにする。これらのパラメタは<filename>file@.aux</filename>から得られる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-s</option></term>
+	<listitem>
+          <para>表題用に小さいボックスを使う。</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term><option>-t&lt;float&gt;</option></term>
+	<listitem>
+          <para>通常、合計してプロファイルの1%に満たないトレース要素はプロファイルに含められない。<option>-t</option>オプションを使うとこのパーセント値を変更することができる。(最大5%)</para>
+
+          <para><option>-t0</option>とすると、全てのトレース要素がプロファイルに含められる。この結果、全てのデータが表示されることが確かになる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-c</option></term>
+	<listitem>
+          <para>色付きの出力を生成する。</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term><option>-y</option></term>
+	<listitem>
+          <para>マークを無視する。</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term><option>-?</option></term>
+	<listitem>
+          <para>使いかたに関する情報を表示する。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+
+    <sect2 id="manipulating-hp">
+      <title>hpファイルを操作する</title>
+
+<para>(Jan-Willhem Maessenが提供してくれた覚え書き)</para>
+
+<para>プログラム<filename>FOO</filename>についてヒーププロファイルを行うと<filename>FOO.hp</filename>が生成されるが、これはとても単純な構造のテキストファイルである。以下に示すのは代表例だが、実際のデータは大部分省略されている。
+<screen>
+JOB "FOO -hC"
+DATE "Thu Dec 26 18:17 2002"
+SAMPLE_UNIT "seconds"
+VALUE_UNIT "bytes"
+BEGIN_SAMPLE 0.00
+END_SAMPLE 0.00
+BEGIN_SAMPLE 15.07
+  ... sample data ...
+END_SAMPLE 15.07
+BEGIN_SAMPLE 30.23
+  ... sample data ...
+END_SAMPLE 30.23
+... etc.
+BEGIN_SAMPLE 11695.47
+END_SAMPLE 11695.47
+</screen>
+最初の四行(<literal>JOB</literal>、<literal>DATE</literal>、<literal>SAMPLE_UNIT</literal>、<literal>VALUE_UNIT</literal>)はヘッダである。<literal>BEGIN_SAMPLE</literal>ではじまり<literal>END_SAMPLE</literal>で終わる行の塊が一つの標本(sample)である。(ヒーププロファイルのグラフを縦方向に切った断面だと思うと良い)。正しい書式のヘッダのあとに*完全な*標本がいくつか続くという形式であれば、hp2psはどんなファイルでも受け付けるはずである。 </para>
+</sect2>
+
+    <sect2>
+      <title>プロファイルの特定の部分に注目する</title>
+
+<para>プロファイルの特定の部分だけを見るには、<filename>.hp</filename>ファイルのコピーをテキストエディタで編集して不要な標本を削除してしまうだけで良い。できた<filename>.hp</filename>ファイルは<command>hp2ps</command>に通せるので、後は閲覧したり印刷したりできる。</para>
+</sect2>
+
+    <sect2>
+      <title>実行中のプログラムのヒーププロファイルを見る</title>
+
+<para><filename>.hp</filename>ファイルはプログラムの実行中に徐々に生成される。原理的には、この不完全なファイルに対して<command>hp2ps</command>を実行することでプログラムのヒープ使用の現況報告を生成することができる。しかし、このファイルの最後の標本が不完全かも知れず、その場合には<command>hp2ps</command>が失敗する。UNIXユーティリティのある機械を使っているならこの問題を回避するのはそんなに難しくない。(コマンドがちょっと複雑怪奇ではあるが)
+<screen>
+  head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+    | hp2ps > FOO.ps
+</screen>
+
+<command>fgrep -n END_SAMPLE FOO.hp</command>というコマンドは<filename>FOO.hp</filename>中で完全な標本が終わるところを全て列挙し、行番号を付加する。これを元に、<command>tail</command>と<command>cut</command>を使って最後の完全な標本の行番号を取得できる。これが<command>head</command>への引数として使わる。こうすることで、<filename>FOO.hp</filename>から末尾の不完全な標本を削除したのと同様の結果になる。できたものは正しい書式の.hpファイルであり、<command>hp2ps</command>に直接入力できる。</para>
+</sect2>
+    <sect2>
+      <title>ヒーププロファイルを実時間で閲覧する</title>
+
+<para>
+<command>gv</command>や<command>ghostview</command>といったプログラムには「ファイルを監視する」というオプションがあり、これを使ってプログラムの実行にあわせてその時点のヒーププロファイルを見ることができる。これには、徐々に伸長するプロファイルを前の節で解説した方法で作り、それに対して<command>gv</command>を次のように実行すれば良い。
+<screen>
+  gv -watch -seascape FOO.ps 
+</screen>
+<literal>-watch</literal>フラグを付け忘れた場合でも「State」メニューから「Watch File」を選べば良い。これで、<filename>FOO.ps</filename>が新しくなるごとに表示が自動的に更新される。</para>
+
+<para>
+これを全部一つのスクリプトにまとめることができる。
+<screen>
+  #!/bin/sh
+  head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+    | hp2ps > FOO.ps
+  gv -watch -seascape FOO.ps &amp;
+  while [ 1 ] ; do
+    sleep 10 # We generate a new profile every 10 seconds.
+    head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+      | hp2ps > FOO.ps
+  done
+</screen>
+不完全な状態の<filename>FOO.ps</filename>を読み込もうとして<command>gv</command>がフリーズすることがある。(これは、更新時で<command>hp2ps</command>が走っている最中だったからである)。スクリプトはもう少し複雑になるが、gvがSIGHUPを受け取ると入力ファイルを再読み込みするという事実を使うと、次のようにしてこの問題を回避できる。
+<screen>
+  #!/bin/sh
+  head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+    | hp2ps > FOO.ps
+  gv FOO.ps &amp;
+  gvpsnum=$!
+  while [ 1 ] ; do
+    sleep 10
+    head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+      | hp2ps > FOO.ps
+    kill -HUP $gvpsnum
+  done    
+</screen>
+</para>
+</sect2>
+
+
+  </sect1>
+
+  <sect1 id="ticky-ticky">
+    <title>「ticky-ticky」プロファイルを使う</title>
+    <indexterm><primary>ticky-ticky profiling</primary></indexterm>
+
+    <para>(ToDo: ちゃんと書く。)</para>
+
+    <para>ものすごい数のいろんな分かるとうれしいこと(例えば、更新の回数、データ構築子への進入の回数、などなど)を数えるようにGlasgow Haskellをコンパイルすることが可能である。我々はこれを「ticky-ticky」プロファイルと呼んでいる。<indexterm><primary>ticky-ticky profiling</primary></indexterm> <indexterm><primary>profiling, ticky-ticky</primary></indexterm>これは、Sun4がこれらの数を(<emphasis>ゆっくりと</emphasis>)数えているときにこういう音を発するからである。</para>
+
+    <para>ticky-tickyプロファイルは主に実装者向けである。通常のプロファイルシステムである「コスト集約点」式(これは全ての利用者があらゆる場合に使うように意図されている)とは大きく異なる。</para>
+
+    <para>ticky-tickyプロファイルを使えるようにするには、システムを作るときに適切なライブラリやいろんなものをビルドしておかなければならない。インストールの手引きの中の「Customising what libraries to build」を見よ。</para>
+
+    <para>プログラムにticky-tickyの数値を出力させるには、<option>-r</option>というRTSオプション<indexterm><primary>-r RTS option</primary></indexterm>を使う。<xref linkend="runtime-control"/>を見よ。</para>
+
+    <para>プログラムを<option>-ticky</option>スイッチつきでコンパイルすればこの計測を行う実行ファイルが得られる。以下に示すのはticky-ticky統計ファイルの例であり、<command>foo +RTS -rfoo.ticky</command>というコマンドで生成されたものである。</para>
+
+<screen>
+ foo +RTS -rfoo.ticky
+
+
+ALLOCATIONS: 3964631 (11330900 words total: 3999476 admin, 6098829 goods, 1232595 slop)
+                                total words:        2     3     4     5    6+
+  69647 (  1.8%) function values                 50.0  50.0   0.0   0.0   0.0
+2382937 ( 60.1%) thunks                           0.0  83.9  16.1   0.0   0.0
+1477218 ( 37.3%) data values                     66.8  33.2   0.0   0.0   0.0
+      0 (  0.0%) big tuples
+      2 (  0.0%) black holes                      0.0 100.0   0.0   0.0   0.0
+      0 (  0.0%) prim things
+  34825 (  0.9%) partial applications             0.0   0.0   0.0 100.0   0.0
+      2 (  0.0%) thread state objects             0.0   0.0   0.0   0.0 100.0
+
+Total storage-manager allocations: 3647137 (11882004 words)
+        [551104 words lost to speculative heap-checks]
+
+STACK USAGE:
+
+ENTERS: 9400092  of which 2005772 (21.3%) direct to the entry code
+                  [the rest indirected via Node's info ptr]
+1860318 ( 19.8%) thunks
+3733184 ( 39.7%) data values
+3149544 ( 33.5%) function values
+                  [of which 1999880 (63.5%) bypassed arg-satisfaction chk]
+ 348140 (  3.7%) partial applications
+ 308906 (  3.3%) normal indirections
+      0 (  0.0%) permanent indirections
+
+RETURNS: 5870443
+2137257 ( 36.4%) from entering a new constructor
+                  [the rest from entering an existing constructor]
+2349219 ( 40.0%) vectored [the rest unvectored]
+
+RET_NEW:         2137257:  32.5% 46.2% 21.3%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
+RET_OLD:         3733184:   2.8% 67.9% 29.3%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
+RET_UNBOXED_TUP:       2:   0.0%  0.0%100.0%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
+
+RET_VEC_RETURN : 2349219:   0.0%  0.0%100.0%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
+
+UPDATE FRAMES: 2241725 (0 omitted from thunks)
+SEQ FRAMES:    1
+CATCH FRAMES:  1
+UPDATES: 2241725
+      0 (  0.0%) data values
+  34827 (  1.6%) partial applications
+                  [2 in place, 34825 allocated new space]
+2206898 ( 98.4%) updates to existing heap objects (46 by squeezing)
+UPD_CON_IN_NEW:         0:       0      0      0      0      0      0      0      0      0
+UPD_PAP_IN_NEW:     34825:       0      0      0  34825      0      0      0      0      0
+
+NEW GEN UPDATES: 2274700 ( 99.9%)
+
+OLD GEN UPDATES: 1852 (  0.1%)
+
+Total bytes copied during GC: 190096
+
+**************************************************
+3647137 ALLOC_HEAP_ctr
+11882004 ALLOC_HEAP_tot
+  69647 ALLOC_FUN_ctr
+  69647 ALLOC_FUN_adm
+  69644 ALLOC_FUN_gds
+  34819 ALLOC_FUN_slp
+  34831 ALLOC_FUN_hst_0
+  34816 ALLOC_FUN_hst_1
+      0 ALLOC_FUN_hst_2
+      0 ALLOC_FUN_hst_3
+      0 ALLOC_FUN_hst_4
+2382937 ALLOC_UP_THK_ctr
+      0 ALLOC_SE_THK_ctr
+ 308906 ENT_IND_ctr
+      0 E!NT_PERM_IND_ctr requires +RTS -Z
+[... たくさん省略 ...]
+      0 GC_SEL_ABANDONED_ctr
+      0 GC_SEL_MINOR_ctr
+      0 GC_SEL_MAJOR_ctr
+      0 GC_FAILED_PROMOTION_ctr
+  47524 GC_WORDS_COPIED_ctr
+</screen>
+
+    <para>アスタリスクの行より上の部分の情報の書式は変更されるかもしれないが、人間可読な要約としては便利だろう、hopefully。アスタリスクより下にはticky-tickyシステムが管理する<emphasis>全ての計測結果</emphasis>がダンプされている。この形式は機械処理を意図したものである。零個以上のスペース、整数、一つのスペース、カウンタ名、改行。</para>
+
+    <para>実際には、<emphasis>全て</emphasis>のカウンタがダンプされる必要はない。コンパイル時や実行時のフラグがある種のカウンタを無効にすることがある。このような場合、そういうカウンタは現れないか、カウンタ名が変更されて(場合によっては省略原因の説明と一緒に)出現する。(上記で、<literal>ENT_PERM_IND_ctr</literal>が<literal>!</literal>を挿入された状態で現れているのを確認せよ)。この出力を解析するソフトウェアは予期したカウンタが存在するか常に検査しなければならない。もう一つ注意。カウンタには<emphasis>大きな</emphasis>値をとるものがあるからね！</para>
+
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

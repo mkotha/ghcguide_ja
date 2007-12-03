@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FFI docs as a chapter -->
+
+<chapter id="ffi">
+ <title>他言語関数インタフェース(FFI)</title>
+
+  <para>GHCは、Haskell 98の追補である他言語関数インタフェース1.0に(大部分)準拠している。これの定義は<ulink url="http://haskell.org/"><literal>http://haskell.org/</literal></ulink>から得られる。</para>
+
+  <para>GHCでFFI対応を有効にするには、<option>-fffi</option><indexterm><primary><option>-fffi</option></primary> </indexterm>フラグか、これを含意する<option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグを与えれば良い。</para>
+
+  <para>GHCでのFFI対応は、以下の点で追補から逸脱している。</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>後方互換性のために、FFIの初期の版で提案されていた構文形式やライブラリ関数にも引き続き対応している。</para>
+    </listitem>
+
+    <listitem>
+      <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="sec-ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
+    </listitem>
+  </itemizedlist>
+
+  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<literal>Foreign</literal>モジュールを見よ。</para>
+
+  <sect1 id="sec-ffi-ghcexts">
+    <title>FFI追補に対するGHCの拡張</title>
+
+    <para>この節で説明するFFIの機能はGHC特有のものである。これらを使うのは可能な限り避けて、コードの可搬性を損なわないようにするべきである。</para>
+
+    <sect2>
+      <title>非ボックス化型</title>
+
+      <para>基本他言語型(FFI追補の3.2節を見よ)として、以下の型を使える。<literal>Int#</literal>、<literal>Word#</literal>、<literal>Char#</literal>、<literal>Float#</literal>、<literal>Double#</literal>、<literal>Addr#</literal>、<literal>StablePtr# a</literal>、<literal>MutableByteArray#</literal>、<literal>ForeignObj#</literal>、<literal>ByteArray#</literal>。</para>
+    </sect2>
+
+    <sect2 id="ffi-newtype-io">
+      <title>IOモナドを包むnewtype</title>
+      <para>FFIの仕様は、種々の箇所にIOモナドが現れることを要求するが、次のようにIOモナドを<literal>newtype</literal>で包むのが便利なことがある
+<programlisting>
+  newtype MyIO a = MIO (IO a)
+</programlisting>
+      (このようなことをする理由としては、例えば、プログラムのある場所において、任意のIO手続きを呼ばれることを防ぎたい、というのが考えられる)
+</para>
+<para>Haskell FFIは既に、他言語にインポート・エクスポートされるものの引数や結果がnewtypeだった場合、それらは自動的に外される、としている(FFI追補の3.2節)。GHCはこれを拡張して、IOモナド自体を包むnewtypeも自動的に外す。より正確にいうと、FFIの仕様がIO型を要求しているところならどこでも、IO型をnewtypeで包んだ物も認める。例えば、以下の宣言は問題ない。
+<programlisting>
+   foreign import foo :: Int -> MyIO Int
+   foreign import "dynamic" baz :: (Int -> MyIO Int) -> CInt -> MyIO Int
+</programlisting>
+</para>
+      </sect2>
+
+  </sect1>
+
+  <sect1 id="sec-ffi-ghc">
+    <title>GHCでFFIを使う</title>
+
+    <para>以下の各節では、他言語関数インタフェースをGHCで使うに当たってのヒントを与える。</para>
+
+    <sect2 id="foreign-export-ghc">
+      <title>GHCで<literal>foreign export</literal>と<literal>foreign import ccall "wrapper"</literal>を使う</title>
+
+      <indexterm><primary><literal>foreign export
+      </literal></primary><secondary>with GHC</secondary>
+      </indexterm>
+
+      <para><literal>foreign export</literal>または<literal>foreign import "wrapper"</literal>を使ったモジュール(<filename>M.hs</filename>としよう)をコンパイルするとき、GHCは<filename>M_stub.c</filename>と<filename>M_stub.h</filename>の二つのファイルを生成する。同時に、GHCは、<filename>M_stub.c</filename>を自動的にコンパイルして、<filename>M_stub.o</filename>を生成する。</para>
+
+      <para>単純な<literal>foreign export</literal>の場合、<filename>M_stub.h</filename>にはforiegn exportされた関数のプロトタイプが入り、<filename>M_stub.c</filename>には定義が入る。例えば、以下のモジュールをコンパイルしたとする。</para>
+
+<programlisting>
+module Foo where
+
+foreign export ccall foo :: Int -> IO Int
+
+foo :: Int -> IO Int
+foo n = return (length (f n))
+
+f :: Int -> [Int]
+f 0 = []
+f n = n:(f (n-1))</programlisting>
+
+      <para>すると、<filename>Foo_stub.h</filename>の中身は大体次のようなものになる。</para>
+
+<programlisting>
+#include "HsFFI.h"
+extern HsInt foo(HsInt a0);</programlisting>
+
+      <para>そして、<filename>Foo_stub.c</filename>には、コンパイラによって生成された<literal>foo()</literal>の定義が置かれる。Cから<literal>foo()</literal>を呼ぶには、<literal>#include "Foo_stub.h"</literal>として<literal>foo()</literal>を呼ぶだけで良い。</para>
+
+      <para><filename>foo_stub.c</filename>と<filename>foo_stub.h</filename>は<option>-stubdir</option>を使って別の場所に生成するようにできる。<xref linkend="options-output"/>を見よ。</para>
+
+      <sect3 id="using-own-main"> 
+	<title>自分で用意した<literal>main()</literal>を使う</title>
+
+	<para>通常、GHCのランタイムシステムが<literal>main()</literal>を提供する。この<literal>main()</literal>はHaskellプログラムの<literal>Main.main</literal>を起動するように手配する。しかし、main関数を別の言語(例えばC)で書いて、そこにHaskellコードをリンクしなければならないこともあるだろう。これをするためには、明示的にHaskellランタイムシステムを初期化しなければならない。</para>
+
+	<para>上の例を使って、これをスタンドアローンのCプログラムから呼び出してみよう。以下がCコードである。</para>
+
+<programlisting>
+#include &lt;stdio.h&gt;
+#include "HsFFI.h"
+
+#ifdef __GLASGOW_HASKELL__
+#include "foo_stub.h"
+#endif
+
+#ifdef __GLASGOW_HASKELL__
+extern void __stginit_Foo ( void );
+#endif
+
+int main(int argc, char *argv[])
+{
+  int i;
+
+  hs_init(&amp;argc, &amp;argv);
+#ifdef __GLASGOW_HASKELL__
+  hs_add_root(__stginit_Foo);
+#endif
+
+  for (i = 0; i &lt; 5; i++) {
+    printf("%d\n", foo(2500));
+  }
+
+  hs_exit();
+  return 0;
+}</programlisting>
+
+	<para>GHC特有の部分は<literal>#ifdef __GLASGOW_HASKELL__</literal>で囲った。それ以外のコードは、FFI標準に対応したHaskell実装の間で可搬であるはずだ。</para>
+
+        <para><literal>hs_init()</literal>の呼び出しでGHCのランタイムシステムが初期化される。<literal>hs_init()</literal>を呼ぶ前にはいかなるHaskell関数も起動しようと*しない*ように。疑いの余地なく、奇妙なことが起こるだろう。</para>
+
+        <para><literal>hs_init()</literal>に<literal>argc</literal>と<literal>argv</literal>を渡している。これは、RTSへの引数(つまり、<literal>+RTS...-RTS</literal>の間の引数)を抽出できるようにするためである。</para>
+
+	<para>次に、<function>hs_add_root</function><indexterm><primary><function>hs_add_root</function></primary></indexterm>を呼ぶ。これは、プログラム中のHaskellモジュールを初期化するのに必要なGHC固有のインタフェースである。<function>hs_add_root</function>の引数としては、プログラムの「ルート」モジュールの初期化関数の名前を与えるべきである。ルートモジュールとは、プログラム中の全てのモジュールを直接・間接にインポートするモジュールのことである。スタンドアローンのHaskellプログラムではこれは通常<literal>Main</literal>であるが、ライブラリからHaskellコードを使っているならそうとは限らない。(訳注: ライブラリ由来のHaskellコードを使っているならそうとは限らない、と訳すべき？原文は、..., but when you are using Haskell code from a library it may not be.)。プログラムに複数のルートモジュールがあるときは、それぞれについて一回ずつ<function>hs_add_root</function>を呼べば良い。モジュール<replaceable>M</replaceable>の初期化関数の名前は<literal>__stginit_<replaceable>M</replaceable></literal>であり、上記のコードのように外部関数シンボルとして宣言することができる。シンボル名は以下に示すZ符号化に従って変換せねばならないことに注意。</para>
+
+	<informaltable>
+	 <tgroup cols="2" align="left" colsep="1" rowsep="1">
+	   <thead>
+	     <row>
+	       <entry>文字</entry>
+	       <entry>変換先</entry>
+	     </row>
+	   </thead>
+	   <tbody>
+	     <row>
+	       <entry><literal>.</literal></entry>
+	       <entry><literal>zd</literal></entry>
+	     </row>
+	     <row>
+	       <entry><literal>_</literal></entry>
+	       <entry><literal>zu</literal></entry>
+	     </row>
+	     <row>
+	       <entry><literal>`</literal></entry>
+	       <entry><literal>zq</literal></entry>
+	     </row>
+	     <row>
+	       <entry><literal>Z</literal></entry>
+	       <entry><literal>ZZ</literal></entry>
+	     </row>
+	     <row>
+	       <entry><literal>z</literal></entry>
+	       <entry><literal>zz</literal></entry>
+	     </row>
+	    </tbody>
+	  </tgroup>
+	</informaltable>
+
+        <para>Haskellの関数を呼び出し終えた後、<literal>hs_exit()</literal>を呼んでRTSを終了させることができる。<literal>hs_exit()</literal>は、残っている終了子を走らせ、依頼されていればプロファイルや統計情報を生成する。</para>
+
+        <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。</para></footnote>を呼ぶ必要がある。</para>
+
+	<para>参考: 最終的なプログラムをリンクする際、通常最も簡単なのは、GHCを使ってリンクすることである。(絶対に必要な訳ではないが)。GHCを使うなら、フラグ<option>-no-hs-main</option><indexterm><primary><option>-no-hs-main</option></primary></indexterm>を使うことを忘れないように。さもないと、GHCは<literal>Main</literal>というHaskellモジュールをリンクしようとする。</para>
+      </sect3>
+
+      <sect3 id="foreign-export-dynamic-ghc">
+	<title>GHCで<literal>foreign import ccall "wrapper"</literal>を使う</title>
+
+	<indexterm><primary><literal>foreign import
+	ccall "wrapper"</literal></primary><secondary>with GHC</secondary>
+	</indexterm>
+
+	<para>Haskellモジュールで<literal>foreign import ccall "wrapper"</literal>が使われると、GHCは<filename>M_stub.c</filename>というCのスタブファイルを生成する。このファイルにはインポートされたwrapperのために生成された小さなヘルパ関数があって、プログラムの最終的なリンクに含めなければならない。プログラムをリンクするとき、忘れずに<filename>M_stub.o</filename>を最終的なリンクのコマンド行に含めること。さもなくば足りない関数についてのリンクエラーが発生する。(これは、プログラムを<literal>ghc --make</literal>でビルドするときには必要ない。GHcが自動的に必要なものをリンクするからである)</para>
+      </sect3>
+    </sect2>
+    
+    <sect2 id="glasgow-foreign-headers">
+      <title>関数ヘッダを使う</title>
+
+      <indexterm><primary>C calls, function headers</primary></indexterm>
+
+      <para>Cを生成する(<option>-fvia-C</option>を使って)とき、<option>-&num;include</option>指令(<xref linkend="options-C-compiler"/>)を使って、関数ヘッダのある<filename>.h</filename>ファイルを使わせることで、Cコンパイラが型エラーを発見するのを助けることができる。</para>
+
+      <para>例を挙げる。</para>
+
+<programlisting>
+#include "HsFFI.h"
+
+void         initialiseEFS (HsInt size);
+HsInt        terminateEFS (void);
+HsForeignObj emptyEFS(void);
+HsForeignObj updateEFS (HsForeignObj a, HsInt i, HsInt x);
+HsInt        lookupEFS (HsForeignObj a, HsInt i);
+</programlisting>
+
+      <para><literal>HsInt</literal>、<literal>HsForeignObj</literal>などの型はH98 FFI追補に記されている。</para>
+
+      <para>これが<emphasis>絶対に必要</emphasis>なのは、<literal>float</literal>を返すとき(と、<literal>sizeof(int) != sizeof(int *)</literal>なとき)だけであるが、しっかりしたコードを書くことに興味のある人ならやっておくべきことだ。これをしないのは正気の沙汰じゃない。</para>
+
+<para>
+別のパッケージからモジュールをインポートしていて、モジュール間インライン化によって他言語呼び出しが露になったが、それが、対応する<option>-#include</option>を必要としている場合はどうだろう。インポート先のモジュールがコンパイル中のモジュールと同じパッケージにあるなら、インポート先のモジュールをコンパイルしたときに使った<option>-#include</option>を全て使うべきである。インポート先のモジュールが別のパッケージにあるときは、必要な<option>-#include</option>を把握しておく必要はない。この情報はパッケージ設定として記録されるので、GHCが知っているからである。このため、パッケージをビルドするときは、忘れずに全ての<option>-#include</option>オプションをパッケージ設定に記録しておかねばならない。<xref linkend="package-management"/>の<literal>c_includes</literal>フィールドを見よ。
+</para>
+
+<para>
+FFIの仕様によれば、<option>-#include</option>オプションをforeign import宣言自体に書くこともできる。
+<programlisting>
+  foreign import "foo.h f" f :: Int -> IO Int
+</programlisting>
+このモジュールをコンパイルするとき、GHCは指定された<option>-#include</option>をincludeするCファイルを生成する。しかし、このような他言語呼び出しに関しては、GHCはモジュール間インライン化を行わない。<option>-#include</option>の情報をモジュール境界を越えて受け渡すことをしないからである。(これには深刻な理由がある訳ではない。実装が面倒だっただけである。ラッパ(引数を非ボックス化したりする)はモジュールを跨いでインライン化される)。他言語呼び出しそのものをモジュールを跨いでインライン化させたい場合、コマンド行とパッケージ設定の<option>-#include</option>を使うべきだ。
+</para>
+
+      <sect3 id="finding-header-files">
+	<title>ヘッダファイルの探索</title>
+
+	<para><option>-#include</option>オプションや<literal>foreign import</literal>宣言で指定されたヘッダファイルは通常のCコンパイラの探索パスにしたがって探索される。<option>-I</option>を使えばこのパスにディレクトリを追加することができる。(<xref linkend="c-pre-processor"/>を見よ)</para>
+
+        <para>注意: ヘッダファイルが使われるのは、Cを介してコンパイルしているときだけである。コードをネイティブコード生成器(デフォルト)を使ってコンパイルしていて、突然Cを使うのに切り替えた場合、includeファイルが足りない旨のエラーが予期せず発生することがある。Cを介したコンパイルはある種のオプションによって自動的に有効になる。(例えば、<option>-O</option>と<option>-prof</option>はどちらも<option>fvia-C</option>を含意する)</para>
+      </sect3>
+
+    </sect2>
+
+    <sect2>
+      <title>メモリ確保</title>
+
+      <para>FFIで使うためのメモリ確保については、複数の方法がFFIライブラリで提供されていて、どれを使うのがいいかはっきりしないことがある。これを決めるには、個々の確保方法が特定のコンパイラ・プラットフォームでどの程度効率的かを勘案しなければならないことがあるので、この節では、GHCでのこれらの確保方法の性能がどれほどかをある程度明らかにすることを目標とする。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><literal>alloca</literal>とその仲間</term>
+	  <listitem>
+	    <para>特定の<literal>IO</literal>計算でのみ利用可能なものとして、短期的な確保をするときに便利である。この種の確保はFFI関数との間でデータをmarshalするときに良く使われる。</para>
+
+	    <para>GHCでは、<literal>alloca</literal>は<literal>MutableByteArray#</literal>で実装されているので、確保・開放は速いはずである。Cの<literal>malloc/free</literal>よりはずっと速いが、Cのスタック確保ほどには速くない。可能な限り<literal>alloca</literal>を使うと良い。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>mallocForeignPtr</literal></term>
+	  <listitem>
+	    <para>GCを必要とする、中長期にわたる確保に便利である。ただし、他言語のデータ構造の中にメモリへのポインタを保持したいなら、<literal>mallocForeignPtr</literal>は良い選択では<emphasis>ない</emphasis>。</para>
+
+            <para>GHCでは、<literal>mallocForeignPtr</literal>もまた<literal>MutableByteArray#</literal>で実装されている。メモリを指すのは<literal>ForeignPtr</literal>だが、実際には終了子が関係せず(<literal>addForeignPtrFinalizer</literal>で追加しない限り)、開放はGCが行うので、<literal>mallocForeignPtr</literal>は通常とても安価である。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>malloc/free</literal></term>
+	  <listitem>
+            <para>他が全て失敗したなら、<literal>Foreign.malloc</literal>と<literal>Foreign.free</literal>に頼る必要がある。これらは同名のC関数のラッパに過ぎない。よって、効率性は結局プラットフォームのCライブラリにあるこれらの関数の実装に依存する。我々の経験では通常、<literal>malloc</literal>と<literal>free</literal>は上に挙げた確保方法に比べてずっと遅い。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>Foreign.Marshal.Pool</literal></term>
+	  <listitem>
+	    <para>プールは今のところ<literal>malloc/free</literal>を使って実装されているので、メモリを構造化するという点では他の方法より便利かもしれないが、効率的だということはない。ただし、より高性能のプールの実装を計画はしている。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+  </sect1>
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

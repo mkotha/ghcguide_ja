@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="bugs-and-infelicities">
+  <title>既知のバグと問題点</title>
+
+  <sect1 id="vs-Haskell-defn">
+    <title>Haskell&nbsp;98とGlasgow&nbsp;Haskell、言語上の不準拠点
+</title>
+    
+    <indexterm><primary>GHC vs the Haskell 98 language</primary></indexterm>
+    <indexterm><primary>Haskell 98 language vs GHC</primary></indexterm>
+
+  <para>この節では、Haskell&nbsp;98の実装についてのGlasgow Haskellの問題点を列挙する。クラッシュ、スペースリークなどの良くない現象については「うまくいかないとき」の節(<xref linkend="wrong"/>)も参照せよ。</para>
+
+  <para>この制限一覧は、(大体)Haskellレポートの順で並んでいる。</para>
+
+  <sect2 id="haskell98-divergence">
+    <title>Haskell&nbsp;98からの逸脱</title>
+    
+      
+    <sect3 id="infelicities-lexical">
+      <title>字句的構文</title>
+      
+      <itemizedlist>
+	<listitem>
+	  <para>Haskellレポートでは、HaskellプログラムはUnicodeを使って書いても良いと規定されている。GHCは現在ISO-8859-1しか受け付けない。</para>
+	</listitem>
+
+	<listitem>
+          <para>GHCでは、修飾された識別子に関するある種の字句規則がHaskellレポートのものとわずかに異なる。<replaceable>module</replaceable><literal>.</literal><replaceable>reservedop</replaceable>という形のもの、例えば<literal>M.\</literal>があったとき、<literal>M</literal>と<literal>.\</literal>という二つの字句要素ではなく、一つの修飾された演算子と解釈される。</para>
+	</listitem>
+      </itemizedlist>
+    </sect3>
+      
+      <sect3 id="infelicities-syntax">
+	<title>文脈自由文法</title>
+	
+	<itemizedlist>
+	  <listitem>
+	    <para>GHCは、<literal>do</literal>式でのレイアウト規則について、多少寛容である。具体的には、「入れ子の内側の文脈は、外側の文脈よりも多くインデントされなければならない」という規則を緩和して、外側の文脈が<literal>do</literal>の場合、内側の文脈が外側の文脈と同じ水準でも良いとする。</para>
+
+	    <para>例えば、GHCは以下のコードを受け付ける。
+
+<programlisting>
+main = do args &lt;- getArgs
+	  if null args then return [] else do
+          ps &lt;- mapM process args
+          mapM print ps</programlisting>
+
+	      </para>
+	  </listitem>
+
+	<listitem>
+	  <para>GHCはパース中に式の中での結合性の解決を行わない。例えば、Haskellレポートによれば、以下のものは合法的なHaskellである。
+<programlisting>
+    let x = 42 in x == 42 == True</programlisting>
+        そして、これは以下のようにパースされるとする。
+<programlisting>
+    (let x = 42 in x == 42) == True</programlisting>
+
+          これは、レポートによれば、<literal>let</literal>式は<quote>できるだけ右へ拡張される</quote>からである。二番目の等号を越えて拡張しようとするとパースエラーが発生する(<literal>==</literal>は非結合的なので)ため、<literal>let</literal>式はそこで終わる。GHCは単純に式全部を飲み込む。パースは次のようになる。
+<programlisting>
+    (let x = 42 in x == 42 == True)</programlisting>
+
+          ここではおそらくHaskellレポートが間違っているが、それでもこれはGHCとHaskell 98との差異である。</para>
+	</listitem>
+      </itemizedlist>
+    </sect3>
+
+  <sect3 id="infelicities-exprs-pats">
+      <title>式とパターン</title>
+
+	<para>今のところなし。</para>
+    </sect3>
+
+    <sect3 id="infelicities-decls">
+      <title>宣言と束縛</title>
+
+      <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-fno-mono-pat-binds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
+    </sect3>
+      
+      <sect3 id="infelicities-Modules">
+	<title>モジュールシステムとインタフェースファイル</title>
+	
+	<para>今のところなし。</para>
+    </sect3>
+
+    <sect3 id="infelicities-numbers">
+      <title>数値、基本型、組込みクラス</title>
+
+      <variablelist>
+	<varlistentry>
+	  <term>配列要素の複数回定義は検査されない</term>
+	  <listitem>
+	    <para>以下のコード断片は致命的エラーを出すべきだが、実際にはそうならない。
+
+<programlisting>
+main = print (array (1,1) [(1,2), (1,3)])</programlisting>
+GHCの<literal>array</literal>の実装では、配列要素の値はリスト中に最後に現れた(index,value)の対から採られ、重複は検査されない。これは純粋単純に効率上の理由からである。
+            </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+      
+    </sect3>
+
+      <sect3 id="infelicities-Prelude">
+	<title><literal>Prelude</literal>サポートに関すること</title>
+
+      <variablelist>
+	<varlistentry>
+	  <term>任意の大きさのタプル</term>
+	  <listitem>
+	    <para>タプルの大きさは現在100までに制限されている。ただし、タプルに関する標準インスタンス(<literal>Eq</literal>、<literal>Ord</literal>、<literal>Bounded</literal>、<literal>Ix</literal> <literal>Read</literal>、<literal>Show</literal>)は16要素のタプルまでについて<emphasis>しか</emphasis>使えない。</para>
+
+            <para>この制限は簡単に覆せるので、これで困ることがあったら教えてほしい。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term>整数の<literal>Read</literal></term>
+	    <listitem>
+	      <para>整数型に関する<literal>Read</literal>クラスのGHCでの実装は、十六進と八進のリテラルにも対応している。(Haskell 98レポート中のコードは対応していない)。従って、GHCでは以下のものが動作する。</para>
+<programlisting>read "0xf00" :: Int</programlisting>
+              <para>こうなっている理由としては、<literal>readLitChar</literal>が十六進や八進のエスケープを受け付けるのに、整数についてそうしないのは整合性に欠けるというのが考えられる。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><literal>isAlpha</literal></term>
+	    <listitem>
+	      <para>Haskell 98での<literal>isAlpha</literal>の定義は以下のようになっている。</para>
+
+<programlisting>isAlpha c = isUpper c || isLower c</programlisting>
+
+	      <para>GHCでの実装では、Unicodeのアルファベット文字のうち、小文字でも大文字でもない文字についても、<literal>isAlpha</literal>はこれをアルファベットだとみなすが、この点でHaskell 98から逸脱している。</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+    </sect3>
+  </sect2>
+
+  <sect2 id="haskell98-undefined">
+    <title>Haskell&nbsp;98の未定義動作についてのGHCの解釈</title>
+
+    <para>この節では、Haskell 98で未定義、または実装固有とされている諸問題について、GHCの立場を解説する。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          型<literal>Char</literal>
+          <indexterm><primary><literal>Char</literal></primary><secondary>size of</secondary></indexterm>
+        </term>
+	<listitem>
+	  <para>ISO-10646標準に従って、GHCでの<literal>maxBound :: Char</literal>は<literal>0x10FFFF</literal>である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          大きさ付き整数型
+          <indexterm><primary><literal>Int</literal></primary><secondary>size of</secondary></indexterm>
+	</term>
+	<listitem>
+	  <para>GHCでは、<literal>Int</literal>型の精度はホストアーキテクチャでのアドレスの大きさと同じである。言い替えると、32ビットの機械では32ビットだし、64ビットの機械では64ビットである。</para>
+
+	  <para><literal>Int</literal>の数値演算はオーバーフロー<indexterm><primary>overflow</primary><secondary><literal>Int</literal></secondary></indexterm>の検査を行わない。従って、<literal>Int</literal>の全ての演算は2<superscript><replaceable>n</replaceable></superscript>を法として行われる。ただし<replaceable>n</replaceable>は<literal>Int</literal>型のビット数である。</para>
+
+	  <para><literal>fromInteger</literal><indexterm><primary><literal>fromInteger</literal></primary></indexterm>関数(従って<literal>fromIntegral</literal><indexterm><primary><literal>fromIntegral</literal></primary></indexterm>も)は、<literal>Int</literal>に変換する時は特別は場合である。<literal>fromIntegral x :: Int</literal>の値は、まず<literal>(abs x)</literal>の下位<replaceable>n</replaceable>ビットを採り、<literal>x</literal>の符号を掛ける(<replaceable>n</replaceable>ビットの2の補数演算で)ことで得られる。この振る舞いは、<literal>0xffffffff :: Int</literal>と書いた場合に、結果の<literal>Int</literal>にビットパターンが保存されるように選ばれた。</para>
+
+
+           <para>例えば<literal>-3</literal>のような負のリテラルは、Haskellレポートによれば(注意深く読めば)、<literal>Prelude.negate (Prelude.fromInteger 3)</literal>を意味する。従って<literal>-2147483648</literal>は<literal>negate (fromInteger 2147483648)</literal>である。<literal>fromInteger</literal>は表現の下位32ビットを採るので、<literal>fromInteger (2147483648::Integer)</literal>を型を<literal>Int</literal>として計算すると<literal>-2147483648::Int</literal>になる。次に<literal>negate</literal>演算はオーバーフローするが、これは検査されないので、<literal>negate (-2147483648::Int)</literal>は単に<literal>-2147483648</literal>になる。まとめると、<literal>minBound::Int</literal>をリテラルとして書いた場合、予期した通りの意味になる。(しかしこれは一般には保証されていない。)</para>
+
+          <para><literal>fromIntegral</literal>関数は、大きさ固定の整数型(<literal>Int8</literal>、<literal>Int16</literal>、<literal>Int32</literal>、<literal>Int64</literal>、および対応する符号なしの<literal>Word</literal>系の型)間で変換するときも、ビットパターンを保存する。ライブラリ説明書中の<literal>Data.Int</literal>と<literal>Data.Word</literal>モジュールを見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>検査なしの浮動小数演算</term>
+	<listitem>
+	  <para><literal>Float</literal>と<literal>Double</literal>の数値の演算は、オーバーフロー、アンダーフロー、その他の悲しい現象について検査されない。(ただし、アーキテクチャによっては、浮動小数オーバーフローや精度の損失を捉え、浮動小数例外として報告する場合がある。この場合おそらくプログラムは終了させられる)<indexterm><primary>floating-point exceptions</primary></indexterm></para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+      
+    </sect2>
+  </sect1>
+
+
+  <sect1 id="bugs">
+    <title>既知のバグと問題点</title>
+
+    <para>バグトラッカには、報告されたもののまだ修正されていないGHCのバグが列挙されている。<ulink url="http://sourceforge.net/projects/ghc/">SourceForge GHC page</ulink>を見よ。加えて、GHCには、既知のバグや問題点として以下のものがある。これらはより永続的である。つまり、これらはどれも短期的に修正される可能性が低い。</para>
+
+  <sect2 id="bugs-ghc">
+    <title>GHCのバグ</title>
+
+    <itemizedlist>
+      <listitem>
+	<para>GHCは、漏れのあるパターンや重複パターンについて警告することができる。(<xref linkend="options-sanity"/>を見よ)。これは大抵の場合正しく動作するが、そうでないこともある。文字列パターンやガードがあると混乱し、不要な警告を出力することがある。本当は重複検査のコード全体を総点検する必要がある。</para>
+      </listitem>
+
+      <listitem>
+	<para>GHCは、データ型の文脈に、そのデータ型のパラメタ以外の型変数が出現することを許していない。例を挙げる。
+<programlisting>
+  data C a b => T a = MkT a
+</programlisting>
+          <literal>MkT</literal>の型は以下のようになるはずである。
+<programlisting>
+  MkT :: forall a b. C a b => a -> T a
+</programlisting>
+        原理的には、関数従属を使った適切なクラス宣言があれば、この型が曖昧でないこともあり得る。それでもGHCはこれを受け付けない。データ型宣言の文脈中に現れる型変数はそのデータ型の型パラメタのどれかでなければならない。</para>
+      </listitem>
+
+      <listitem>
+	<para>再帰をデータ型にエンコードする標準的な方法を使うと、GHCのインライン化器を停止しないようにすることができる。</para>
+<programlisting>
+  data U = MkU (U -> Bool)
+       
+  russel :: U -> Bool
+  russel u@(MkU p) = not $ p u
+  
+  x :: Bool
+  x = russel (MkU russel)
+</programlisting>
+
+        <para>この不自然な例以外に、GHCを発散させるプログラムの形は見付かっていず、この問題を修正しようとするとあらゆるコンパイルにオーバーヘッドが掛かることになるので、このバグは修正されないままになっている。さらなる背景情報は<ulink url="http://research.microsoft.com/~simonpj/Papers/inlining">Secrets of the GHC inliner</ulink>にある。</para>
+      </listitem>
+
+      <listitem>
+	<para>インスタンス宣言が他のパッケージから取り込まれた場合、どれが「スコープにあるか」についてGHCは細かく管理しない。GHCがそのパッケージで見かけたインスタンス宣言は、そのパッケージ由来のモジュールがコマンド行の式で使われているかどうかに依らず、あらゆる場所でスコープに入る。このバグが影響するのは<option>--make</option>モードとGHCiだけである。</para>
+      </listitem>
+      
+      <listitem>
+        <para>「存在型を持つレコード」の拡張(<xref linkend="existential-records"/>を参照)を使う場合、モジュールの分割コンパイルが壊れている。回避方法としては、毎回cleanして<option>--make</option>付きでビルドするか、6.7開発スナップショットを使うという方法しかない。詳細は<ulink url="http://hackage.haskell.org/trac/ghc/ticket/933">trac bug #933</ulink>を見よ。</para>
+      </listitem>
+
+    </itemizedlist>
+  </sect2>
+
+  <sect2 id="bugs-ghci">
+    <title>GHCi(対話的GHC)のバグ</title>
+    <itemizedlist>
+      <listitem>
+	<para>GHCiは、利用中のスコープのモジュールにある<literal>default</literal>宣言を考慮せず、コマンド行に打ち込まれた式については、デフォルトのデフォルト化を行う。すなわち、<literal>default(Int,Double)</literal>である。</para>
+
+        <para>GHCiがそれぞれのモジュールのデフォルト設定を覚えておいて、「現在の」モジュール(どういう意味かは別にして)のものを使うようにした方が良いだろう。</para>
+      </listitem>
+
+      <listitem> 
+      <para>Windowsでは、GNU ld/BFDにバグがあり、0xffff個よりも多くの再配置のある、正しくないPEオブジェクトファイルを出力することがある。このバグに影響されたパッケージをGHCiがロードしようとすると、次のような形式のメッセージが得られる。
+<screen>
+Loading package javavm ... linking ... WARNING: Overflown relocation field (# relocs found: 30765)
+</screen>
+      我々が最後に確認したときはこのバグはまだBFDのコードベースにあり、2001年あたりにこのバグが報告されて以来、興味がもたれた様子もない。
+      </para>
+      <para>回避するには、パッケージを構成する.oファイルを複数個の.oに分ければ良い。これは「base」パッケージが行っていることである。</para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

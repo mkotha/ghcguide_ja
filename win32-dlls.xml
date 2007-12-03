@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="win32">
+<title>Win32システムでGHCを運用する</title>
+
+<sect1>
+<title>WindowsプラットフォームでGHCを起動する</title>
+
+<para>
+GHCのWin32用インストーラは、GHCをインストールすると同時に、ファイル接尾辞「.hs」と「.lhs」について関連付けを行い、ダブルクリックで<command>ghci</command>が起動するようにする。
+</para>
+<para>
+<command>ghc</command>と<command>ghci</command>は、空白を含むファイル名を扱うときには引用符でエスケープする必要があることに注意。
+<programlisting>
+  c:\ghc\bin\ghci "c:\\Program Files\\Haskell\\Project.hs"
+</programlisting>
+上記のコマンドで引用符を使わなかった場合、<command>ghci</command>はファイル名を"c:\\Program"と"Files\\Haskell\\Project.hs"の二つだと解釈する。
+</para>
+
+<!-- not clear whether there are current editions of Win32 OSes that
+     doesn't do this by default.
+
+<para> Solution: don't use "Open With...", avoid spaces in file names, 
+or fiddle with the appropriate registry setting:
+<programlisting>
+  HKEY_CLASSES_ROOT\Unknown\shell\openas\command
+</programlisting>
+Notice how the "%1" argument is quoted (or not).
+</para>
+<para> This problem doesn't occur when double-clicking.
+</para>
+-->
+
+</sect1>
+
+<sect1 id="ghci-windows">
+<title>WindowsでGHCiを実行する</title>
+
+  <para>我々は、GHCiを標準のWindowsコンソールで実行することを推奨する。インストーラが追加したスタートメニューの項目から<literal>GHCi</literal>を選ぶか、<literal>スタート→プログラムを指定して実行→cmd</literal>を使ってWindowsコンソールに入り、そこから<literal>ghci</literal>を起動すれば良い。(ただし、この場合、<literal>ghci</literal>が<literal>PATH</literal>に入っている必要がある)</para>
+
+  <para>GHCiをCygwinやMSYSのシェルから使うと、Ctrl-Cの振る舞いがおかしくなる。これらの環境ではGHCiを開始するのに<literal>ghcii.sh</literal>スクリプトを使うべきであり、そうでないとCtrl-Cを叩いたときにシェルのプロンプトに戻され、しかもGHCiのプロセスは走りつづけるという事態になる。ただし、<literal>ghcii.sh</literal>を使った場合でも、Ctrl-Cを叩いた場合、GHCiの中で走っているプログラムを中断することは(できるべきだが)できず、代わりにGHCiのプロセスが即座に殺される。この問題の原因は、CygwinとMSYSのシェル環境がCtrl-Cのイベントを非Cygwinの子プロセスに渡さない(それにはWindowsコンソールである必要があるので)ことである。</para>
+
+  <para>例外がひとつある。<literal>CYGWIN</literal>環境変数に<literal>tty</literal>が含まれない場合、Cygwinのシェルを使うことができる。このモードでは、CygwinのシェルはWindowsのコンソールシェルとして振る舞い、コンソールイベントは子プロセスに伝播される。<literal>CYGWIN</literal>環境変数はCygwinのシェルを起動する<emphasis>前</emphasis>に設定されねばならぬことに注意。後で変更してもシェルには何の影響も与えられない。</para>
+
+  <para>この問題が影響するのはGHCiだけでなく、コンソールイベントを補足したいあらゆるGHCでコンパイルされたプログラムにも影響する。 <ulink url="../libraries/base/GHC-ConsoleHandler.html">GHC.ConsoleHandler</ulink>モジュールを見よ。</para>
+</sect1>
+
+
+<sect1>
+<title>端末を使った対話</title>
+
+<para>デフォルトでは、GHCでビルドされたアプリケーションは開始時にコンソールウィンドウを開く。コンソールウィンドウなしのGUIのみのアプリケーションをビルドしたいなら、リンクの段階で<literal>--optl-mwindows</literal>を使えば良い。
+</para>
+
+<para>       <emphasis>警告:</emphasis>WindowsのGUIのみのプログラムにはstdin、stdout、stderrがないので、通常のHaskellのIO関数を使うと、次のようなIO例外でプログラムが失敗する。
+<screen>
+      Fail: &lt;stdout&gt;: hPutChar: failed (Bad file descriptor)
+</screen>
+ただし、Debug.Trace.traceは問題ない。Windowsのデバッグ出力サポートを利用するからである。</para>
+
+<para>Mingwには<literal>readline</literal>ライブラリが付属しているが、なぜか<literal>readline</literal>ヘッダは付属していない。このため、GHCは(Hugsと同様)Windowsでの対話的入力時に<literal>readline</literal>を使わない。emacsのシェルバッファを使うことで近いものを得ることはできる。
+</para>
+
+</sect1>
+
+<sect1>
+<title>ライブラリの振る舞いにおける差異</title>
+
+<para>
+標準Haskellライブラリには、Windowsで多少異なった振る舞いをするものがある。
+
+<itemizedlist>
+<listitem> <para>
+Windowsでは、文字<literal>^Z</literal>はファイル終端文字と解釈されるので、この文字を含んだファイルを読むとそこでファイルが終わっているように見える。これを避けるには、<literal>IOExts.openFileEx</literal>を使ってファイルをバイナリ(無変換)モードで開くか、既に開かれたハンドルを<literal>IOExts.hSetBinaryMode</literal>でバイナリモードにすれば良い。<literal>IOExts</literal>モジュールは<literal>lang</literal>パッケージにある。
+</para>
+</listitem>
+</itemizedlist>
+</para>
+</sect1>
+
+<sect1>
+<title>
+GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使う</title>
+
+<sect2>
+<title>背景</title> <para>cygwinツール群は、unixソフトウェアをwindowsに移植する作業を簡単にするために、windowsライブラリの上にunix風のAPIを提供するものである。このために、unix形式のディレクトリ階層をなんらかのルートディレクトリ(典型的には<filename>C:\cygwin\</filename>が<filename>/</filename>になる)の下に導入する。さらに、cygwin APIに対してビルドされたもの(cygwinのツール群やcygwinのghcでコンパイルされたプログラムを含む)は、/をファイルシステムの根だと認識し、典型的なunix環境で動作していると思い込む。そして、<filename>/bin</filename>や<filename>/usr/include</filename>などを、windowsシステム上での実際の位置(おそらく<filename>C:\cygwin\bin</filename>と<filename>C:\cygwin\usr\include</filename>)に構うことなく見つける。
+</para>
+</sect2>
+
+<sect2><title>問題</title>
+<para>GHCは、デフォルトで、もはやcygwinに依存しておらず、ネイティブのwindowsプログラムである。GHCはmingwでビルドされ、Haskellのソースをコンパイルするときにはmingwのghc<!-- gccの誤り? -->を使う。(cygwinのbashから呼んだ場合でもそうである)。しかし、問題は、通常のwindowsプログラムと同様、GHCも、GHCが生成したプログラムも、cygwinの疑似unix階層構造について知らないということである。GHCはディレクトリ区切りとして「/」と「\」の両方を喜んで受け付けるが、<filename>/home/joe/Main.hs</filename>や<filename>/bin/bash</filename>のようなものをどうやって見つけるかは知らない。このため、GHCをcygwinのbashから使ったり、cygwinで走っているmakeセッションから呼んだりすると、いろいろな楽しいことが起こる。
+</para>
+</sect2>
+
+<sect2><title>するべきこと</title>
+<itemizedlist>
+<listitem>
+<para>make、configure、coをするときに、GHC(またはGHCでコンパイルされたプログラム)に渡される可能性がある場面では、絶対パスを使ってはいけない。相対パスは、cygwinのツール群もうまく扱えるし、GHCは「/」をパス区切りとして受け付けるので、問題ない。さらに、相対パスは、cygwinのルートディレクトリがどこにあるかに依存しないし、ソースツリーがどのパーティション・ネットワークドライブにあるか、ということも、一旦そこに「cd」してしまえば関係ない。
+</para></listitem>
+
+<listitem>
+<para>絶対パスを使わなければならない場合(makefileの階層やconfigureスクリプト中の一見無害な<literal>ROOT=`pwd`</literal>に注意)のために、cygwinには<command>cygpath</command>というツールがあり、cygwinのunix形式のパスを実際のwindows形式のものに変換することができる。cygwinツールの大部分は実際にはwindows形式のパスも受け付ける(ただし「\」をエスケープするか「\」の代わりに「/」を使う必要がある)ので、常にこれを使っていて問題ないはずである。unix形式のパスに依存するなんらかのパス操作を行うツールを使いたい場合(一つの楽しい例は「:」がパス区切りとして解釈されてしまう場合である)でも、パスがGHCやその仲間たちに渡される直前に<command>cygpath</command>で変換することができる。
+</para></listitem>
+  
+<listitem>
+<para>もしあなたが<command>cygpath</command>を持っていないなら、おそらくあなたはcygwinを持っていないので、問題ない。ただし、複数のプラットフォームで使えるビルド過程を書きたいなら話は別である。この場合でも相対パスを使えば良いが、絶対パスを使う必要があり、しかもプラットフォームごとに異なるツールを使いたくない場合、短いHaskellプログラムを書いてカレントディレクトリを出力させるという方法がある。(この考えを出したGeorge Russellに感謝)。それをGHCでコンパイルして実行すれば、GHCが見ているファイルシステムの姿(これはGHCがcygwinのgccでコンパイルされたか、mingwのgccか、それとも本物のunixシステムのgccかに依存する)が分かる。その小さなプログラムにパス中の「\」をエスケープさせることもできる。バナーが表示されるのと、起動に時間がかかることを除けば、以下のようなものでも良い。
+<programlisting>
+  $ echo "Directory.getCurrentDirectory >>= putStrLn . init . tail . show " | ghci
+</programlisting>
+</para></listitem>
+</itemizedlist>
+</sect2>
+</sect1>
+
+
+<sect1 id="win32-dlls">
+<title>Win32のDLLをビルド・利用する
+</title>
+
+<para>
+<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。しかし、そのための機構は残されている。興味があるなら、GHCチームに問い合わせてほしい。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
+
+<!--
+<para>
+<indexterm><primary>Dynamic link libraries, Win32</primary></indexterm>
+<indexterm><primary>DLLs, Win32</primary></indexterm>
+On Win32 platforms, the compiler is capable of both producing and using
+dynamic link libraries (DLLs) containing ghc-compiled code. This
+section shows you how to make use of this facility.
+</para>
+
+<para>
+Until recently, <command>strip</command> didn't work reliably on DLLs, so you
+should test your version with care, or make sure you have the latest
+binutils. Unfortunately, we don't know exactly which version of binutils
+cured the problem (it was supposedly fixed some years ago).
+</para>
+
+
+<sect2 id="win32-dlls-link">
+<title>Linking with DLLs</title>
+
+<para>
+The default on Win32 platforms is to link applications in such a way
+that the executables will use the Prelude and system libraries DLLs,
+rather than contain (large chunks of) them. This is transparent at the
+command-line, so 
+</para>
+
+<para>
+<screen>
+sh$ cat main.hs
+module Main where
+main = putStrLn "hello, world!"
+sh$ ghc -o main main.hs
+ghc: module version changed to 1; reason: no old .hi file
+sh$ strip main.exe
+sh$ ls -l main.exe
+-rwxr-xr-x   1 544      everyone     4608 May  3 17:11 main.exe*
+sh$ ./main
+hello, world!
+sh$ 
+</screen>
+</para>
+
+<para>
+will give you a binary as before, but the <filename>main.exe</filename>
+generated will use the Prelude and RTS DLLs instead of linking them in
+statically.
+</para>
+
+<para>
+4K for a <literal>"hello, world"</literal> application&mdash;not bad, huh? :-)
+</para>
+
+</sect2>
+
+<sect2 id="win32-dlls-linking-static">
+<title>Not linking with DLLs
+<indexterm><primary>-static option (Win32)</primary></indexterm></title>
+
+<para>
+If you want to build an executable that doesn't depend on any
+ghc-compiled DLLs, use the <option>-static</option> option to link in
+the code statically.
+</para>
+
+<para>
+Notice that you cannot mix code that has been compiled with
+<option>-static</option> and not, so you have to use the <option>-static</option>
+option on all the Haskell modules that make up your application.
+</para>
+
+</sect2>
+-->
+
+<sect2 id="win32-dlls-create">
+<title>DLLを作成する</title>
+
+<para>
+<indexterm><primary>Creating a Win32 DLL</primary></indexterm>
+<indexterm><primary>&ndash;&ndash;mk-dll</primary></indexterm>
+HaskellライブラリをDLLに封じ込めるのは簡単な作業である。ライブラリを構成するオブジェクトファイルをコンパイルして作り、次のようなコマンドを発行することでDLLをビルドする。
+</para>
+
+<para>
+<screen>
+ghc &ndash;&ndash;mk-dll -o foo.dll bar.o baz.o wibble.a -lfooble
+</screen>
+</para>
+
+<para>
+GHCのコンパイラ駆動器に<option>&ndash;&ndash;mk-dll</option>を渡すと、実行ファイルを作る代わりにDLLをビルドする。そのDLLは、コマンド行で渡された全てのオブジェクトファイルとアーカイブから成る。
+</para>
+
+<!--
+<para>
+To create a `static' DLL, i.e. one that does not depend on the GHC DLLs,
+use the <option>-static</option> when compiling up your Haskell code and
+building the DLL.
+</para>
+-->
+
+<para>
+注意事項をいくつか。
+</para>
+
+<para>
+
+<itemizedlist>
+<!--
+<listitem>
+<para>
+Since DLLs correspond to packages (see <xref linkend="packages"/>) you need
+to use <option>-package-name dll-name</option> when compiling modules that
+belong to a DLL if you're going to call them from Haskell. Otherwise, Haskell
+code that calls entry points in that DLL will do so incorrectly, and crash.
+For similar reasons, you can only compile a single module tree into a DLL,
+as <function>startupHaskell</function> needs to be able to call its
+initialisation function, and only takes one such argument (see <xref
+linkend="win32-dlls-foreign"/>). Hence the modules
+you compile into a DLL must have a common root.
+</para>
+</listitem>
+-->
+
+<listitem>
+<para>
+<option>&ndash;&ndash;mk-dll</option>を使う際、デフォルトでは、全てのオブジェクトファイルのエントリポイントがDLLからエクスポートされる。これを制限したいなら、次のようにして、コマンド行中で<emphasis>モジュール定義ファイル</emphasis>を指定することができる。
+
+<screen>
+ghc &ndash;&ndash;mk-dll -o .... -optdll&ndash;&ndash;def -optdllMyDef.def
+</screen>
+
+詳細はMicrosoftの文書を参照してほしいが、モジュール定義ファイルは、エクスポートしたいエントリポイントの単なる羅列である。HaskellのCOMサーバDLLをビルドするのに使うものを挙げる。
+
+<programlisting>
+EXPORTS
+ DllCanUnloadNow     = DllCanUnloadNow@0
+ DllGetClassObject   = DllGetClassObject@12
+ DllRegisterServer   = DllRegisterServer@0
+ DllUnregisterServer = DllUnregisterServer@0
+</programlisting>
+</para>
+</listitem>
+
+<listitem>
+<para>
+<option>&ndash;&ndash;mk-dll</option>オプションは、DLLを作成するのに加え、インポートライブラリも作る。インポートライブラリの名前は、次のようにしてDLLの名前から作られる。
+
+<programlisting>
+DLL: HScool.dll  ==&#62; import lib: libHScool_imp.a
+</programlisting>
+
+このような名前の付け方は少々奇妙に見えるかもしれないが、これはインポートライブラリと通常の静的ライブラリが共存できるようにするためである。(例えば<filename>libHSfoo.a</filename>と<filename>libHSfoo&lowbar;imp.a</filename>)。さらに、コンパイラ駆動器が非静的モードの時、コマンド行中の<option>-lHSfoo</option>を<option>-lHSfoo&lowbar;imp</option>に書き換えるので、非静的リンクから静的リンクに切り替えるのは、単に<option>-static</option>をコマンド行に追加するだけで済む。
+
+</para>
+</listitem>
+</itemizedlist>
+</para>
+
+</sect2>
+
+
+<sect2 id="win32-dlls-foreign">
+<title>他の言語から呼ぶためのDLLを作る</title>
+
+<para>
+Haskellコードをまとめて、他の言語、例えばVisual BasicやC++から呼べるようにしたいなら、いくつか知っておくと良いことがある。この汚い部分は<emphasis>他言語関数インタフェース</emphasis>定義にあるが、これをDLLのビルドとどうやって組み合わせるかは簡単でないことがあるので、例を挙げる。
+
+</para>
+
+<itemizedlist>
+
+<listitem>
+<para>
+<literal>foreign export</literal>宣言を使って、外部から呼びたいHaskellの関数をエクスポートする。例を挙げる。
+
+<programlisting>
+module Adder where
+
+adder :: Int -> Int -> IO Int  &ndash;&ndash; 余計なIO
+adder x y = return (x+y)
+
+foreign export stdcall adder :: Int -> Int -> IO Int
+</programlisting>
+</para>
+</listitem>
+
+<listitem>
+<para>
+これをコンパイルする。
+
+<screen>
+ghc -c adder.hs -fglasgow-exts
+</screen>
+  
+これで、adder.oとadder_stub.oの二つのファイルができる。
+</para>
+</listitem>
+
+<listitem>
+<para>
+HaskellのRTSを起動する<function>DllMain()</function>をコンパイルする。実装の一例を示す。
+
+<programlisting>
+#include &lt;windows.h&gt;
+#include &lt;Rts.h&gt;
+
+extern void__stginit_Adder(void);
+
+static char* args[] = { "ghcDll", NULL };
+                       /* 注意: argvはNULLで終わっていなければならない */
+BOOL
+STDCALL
+DllMain
+   ( HANDLE hModule
+   , DWORD reason
+   , void* reserved
+   )
+{
+  if (reason == DLL_PROCESS_ATTACH) {
+      /* この時点でRTSのDLLはロードされているはずだが、起動する必要がある。*/
+      startupHaskell(1, args, __stginit_Adder);
+      return TRUE;
+  }
+  return TRUE;
+}
+</programlisting>
+
+ここで、<literal>Adder</literal>はモジュールの木の根をなすモジュールの名前である。(上述のように、根となるモジュールはただ一つなければならない。したがって、DLLには一つのモジュール木がなければならない)。これをコンパイルする。
+
+<screen>
+ghc -c dllMain.c
+</screen>
+</para>
+</listitem>
+
+<listitem>
+<para>
+DLLを構築する。
+
+<screen>
+ghc &ndash;&ndash;mk-dll -o adder.dll adder.o adder_stub.o dllMain.o
+</screen>
+
+</para>
+</listitem>
+
+<listitem>
+<para>
+これでVBAから<function>adder</function>を使える。これは私なら次のように<constant>Declare</constant>する。
+
+<programlisting>
+Private Declare Function adder Lib "adder.dll" Alias "adder@8"
+      (ByVal x As Long, ByVal y As Long) As Long
+</programlisting>
+
+このHaskell DLLはGHCに付属するいくつかのDLLに依存しているので、それらが可視であるように注意。
+</para>
+
+<para>
+静的にリンクされたDLLをビルドするのは前節の通りである。HaskellソースをコンパイルしてDLLをビルドするときに<option>-static</option>を加えるだけで良い。
+</para>
+
+</listitem>
+
+</itemizedlist>
+
+</sect2>
+
+</sect1>
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

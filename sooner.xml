@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="sooner-faster-quicker">
+<title>より早く、より高速で、より小さく、より慎ましくあるための助言</title>
+
+<para>ここに加えるのに良い「有用なヒント」があるなら、是非教えてください！</para>
+
+<sect1 id="sooner">
+<title>より早く: プログラムを素早く生成する</title>
+
+<indexterm><primary>compiling faster</primary></indexterm>
+<indexterm><primary>faster compiling</primary></indexterm>
+
+    <variablelist>
+      <varlistentry>
+        <term><option>-O</option>や(特に)<option>-O2</option>を使わない</term>
+	<listitem>
+          <para>これらのオプションを使うということは、より良い品質のコードのためなら長いコンパイル時間も甘受する、と言っているのに等しい。</para>
+
+          <para><option>-O</option>なしの通常のコンパイルではGHCは驚くほど速いですよ！</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>たくさんのメモリを使う</term>
+	<listitem>
+          <para>ヒープ空間のためにメモリを多く使う(合理的な範囲内で)と、GHCのGC回数を減らし、結果としてコンパイル時間を減らすことができる。<option>-Rghc-timing</option>オプションを使うと、GCの動作報告が得られる。(<option>+RTS -Sstderr -RTS</option>オプションを使ってGC統計情報を直接標準出力に送ることもできる。)</para>
+
+          <para>全体のうち20%以上の時間ををGCで使っているなら、メモリを増やすのが効果的だろう。</para>
+
+          <para>ヒープサイズが最大値(デフォルトでは64M)に近づいていて、メモリがたくさんあるなら、最大サイズを<option>-M&lt;size&gt;</option><indexterm><primary>-M&lt;size&gt; option</primary></indexterm>オプションで増やすと良いかもしれない。例えば、<command>ghc -c -O -M1024m Foo.hs</command>のようにする。</para>
+
+          <para>コンパイラのデフォルトの確保領域の大きさを増やすのも効果的かもしれない。これには、<option>-A&lt;size&gt;</option><indexterm><primary>-A&lt;size&gt; option</primary></indexterm>オプションを使う。</para>
+
+          <para>GHCのメモリの使いかたに改善が見られない場合は、バグとして報告してほしい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>あまりたくさんのメモリを使わないこと！</term>
+	<listitem>
+          <para>GHCとその「同僚たち」(機械中の他のプロセス)が機械の<emphasis>実メモリ</emphasis>の量を超えて使い始めると、機械は即座に「スラッシング」を始める。<emphasis>こうなるとみんな台無しである</emphasis>。コンパイル時間は考えられないくらい酷くなる。どれくらいのページフォールトを経験しているかを計るにはcshの組込みの<command>time</command>のようなものを使うと良い。</para>
+
+          <para>もしあなたが仮想メモリ、スラッシング、ページフォールトというものを知らないなら、あるいはあなたの機械のメモリ構成を知らないなら、メモリの使いかたに関して賢く振る舞おうとしては<emphasis>いけない</emphasis>。そんなことをしても人生(あなたのと、おそらく他人のも)がみじめになるだけである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>リンク時にはローカルのディスクを使う</term>
+	<listitem>
+          <para>Haskellのオブジェクトやライブラリは大きいものになる傾向があるので、リモートのファイルシステムとの間でビットをやりとりするのに多くの時間が掛かることがある。</para>
+
+          <para>リモートにマウントされたディスクを使って速い機械で<emphasis>コンパイル</emphasis>するのはとても理に適っている。そのあとで、ディスクが直接マウントされている遅い機械で<emphasis>リンク</emphasis>すればよいのだ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>不必要に<function>Read</function>を導出したり使ったりしない</term>
+	<listitem>
+	  <para>これは醜く、しかも遅い。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>GHCはある種の構造をコンパイルするときに遅くなる</term>
+	<listitem>
+          <para>深く入れ子にされたリスト内包表記がその一例であるようだ。過去には、大きな定数テーブルも良くなかった。</para>
+
+          <para>この種の振る舞いはバグとして報告するのが良いと考える。そうすれば修正を試みることができるからである。</para>
+
+          <para>コンパイラの中で長時間ふらふらしやすいのが正確性解析器である。<option>-fno-strictness</option><indexterm><primary>-fno-strictness anti-option</primary></indexterm>を使えば、これを単独で無効にできる。</para>
+	  
+          <para>コンパイラのどの部分が悪戯しているかを知るには、<option>-v2</option><indexterm><primary><option>-v</option></primary></indexterm>が便利だろう。</para>
+
+          <para>モジュールに大量の定数データがあると、巨大なbasic blockが生成され、このせいでネイティブコード生成器のレジスタ割り付け器がぶっ壊れることがある。こういうときは<option>-fvia-C</option><indexterm><primary>-fvia-C option</primary></indexterm>を持ち出せば良い。(これについてGCCが特に速いというわけでもないが)</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>明示的な<literal>import</literal>宣言</term>
+	<listitem>
+          <para><literal>import Foo</literal>と言う代わりに、<literal>import Foo (...欲しいもの...)</literal>と言おう。GHCを使って最小限必要なimportを調べることもできる。これには<option>-ddump-minimal-imports</option>を使う。(<xref linkend="hi-options"/>を見よ)</para>
+
+          <para>本当のことをいうと、これで削減できるコンパイル時間はとても少ない。しかし、思慮深く<literal>import</literal>を使うことでプログラムが理解しやすくなることがあるので、いずれにせよこれは良い考えである。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect1>
+
+  <sect1 id="faster">
+    <title>より速く: 高速に動作するプログラムを作る</title>
+
+    <indexterm><primary>faster programs, how to produce</primary></indexterm>
+
+    <para>あなたのHaskellプログラムを速くするのにあたって、鍵となる道具はGHCのプロファイル機能である。これは別途<xref linkend="profiling"/>で説明されている。プログラムが時間/空間をどこで使っているのかについて<emphasis>実際の</emphasis>こと(あなたがどんな風に想像しているかではなくて)を知ることにおいて、プロファイルを取ることに<emphasis>代わるものは存在しない</emphasis>。</para>
+
+    <para>もう一つ銘記すべきことだが、プログラムの性能を<emphasis>劇的に</emphasis>向上させるための圧倒的に良い方法は、より良いアルゴリズムを使うことである。プロファイルによってどこが時間を食っているかが分かったら、下に書いてあるもろもろの調整を試みる前に、プログラムについて再考した方が良いだろう。</para>
+
+    <para>プログラムを速くするためのもう一つの極めて効率的な方法は、誰か別の人によって真剣に調整されたライブラリコードを使うことである。<literal>Data.List</literal>にあるのよりも良いクイックソートを書くことはできる<emphasis>かもしれない</emphasis>が、それは<literal>import Data.List</literal>とタイプするのに比べてずっと大きな時間が掛かるだろう。</para>
+
+    <para>GHCでコンパイルされたプログラムが過度に遅いときは、どんなものであれ報告してほしい。近頃は速度に関してGHCにまともな競争相手がいなく、過度に遅いとはどういうことかはっきりしないので、自分の判断を使ってほしい。もちろん、GHCでコンパイルされたプログラムが、同じプログラムをNHCやHugsでコンパイルしたものよりも遅いなら、それは間違いなくバグである。</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>最適化(<option>-O</option>または<option>-O2</option>を使う)</term>
+	<listitem>
+          <para>これはプログラムを速くするにあたって最も基本的な方法である。コンパイル時間は遅くなる。特に<option>-O2</option>のときに顕著である。</para>
+
+          <para>現在、<option>-O2</option>は<option>-O</option>とほとんど区別が付かない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>Cを介してコンパイルし、GCCに頑張ってもらう</term>
+	<listitem>
+          <para>ネイティブコード生成器は素早く動作するように設計されていて、ものすごく賢く動作するように設計されている訳ではない。GCCの方がレジスタ割り付けなどをずっと真剣に行うので、GCCにやらせた方が良い。</para>
+
+          <para>現在のところ、<option>-O</option>を有効にするとGCCが代わりに使われるようになる。これは将来変わるかもしれない。</para>
+
+          <para>よって、とても速いコードが必要な時は、<option>-O -fvia-C</option>を使っている。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>多重定義関数に気を付けよ</term>
+	<listitem>
+          <para>Haskellの(型クラスを使った)多重定義は洗練されているし、趣味が良いし、美点を挙げればきりがないが、これが内側のループに残ったままになると性能には致命的である。これをつぶすには次のような方法がある。</para>
+
+	  <variablelist>
+	    <varlistentry>
+              <term>明示的な型シグネチャを与える</term>
+	      <listitem>
+                <para>シグネチャを書くというのが基本的な技である。そもそも、エクスポートされた最上位の関数に型シグネチャを書くのはソフトウェア工学上の良い習慣である。(ヒント: <option>-fwarn-missing-signatures</option><indexterm><primary>-fwarn-missing-signatures option</primary></indexterm>を使うと、シグネチャに関して良い習慣を保つのが楽になる)</para>
+
+                <para>エクスポートされていない、あるいは局所的に定義された多重定義関数については、自動特殊化(<option>-O</option>で有効になる)が面倒を見てくれるはずである。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+              <term><literal>SPECIALIZE</literal>プラグマを使う</term>
+	      <listitem>
+		<indexterm><primary>SPECIALIZE pragma</primary></indexterm>
+		<indexterm><primary>overloading, death to</primary></indexterm>
+
+                <para>プログラム中で鍵となる関数について、多重定義を特殊化すると良い。<xref linkend="specialize-pragma"/>および<xref linkend="specialize-instance-pragma"/>を見よ。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+              <term>どこに多重定義が隠れているか知る方法</term>
+	      <listitem>
+                <para>原始的な方法だが、インタフェースファイル上で多重定義された型シグネチャをgrep(検索)すると良い。インタフェースファイルは<option>--show-iface</option>オプションで見ることができる。(<xref linkend="hi-options"/>を見よ)
+
+<programlisting>
+% ghc --show-iface Foo.hi | egrep '^[a-z].*::.*=&#62;'
+</programlisting>
+</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>正格な関数は心強い味方</term>
+	<listitem>
+          <para>であり、特に遅延パターン照合は敵である。</para>
+
+          <para>(「正格な関数」とは何かを知らないなら、関数型プログラミングの教科書を参照してほしい。ここで一言二言説明してもあまり役に立たないだろうから)</para>
+
+          <para>次のふたつの例を考える。
+
+<programlisting>
+f (Wibble x y) =  ... # 正格
+
+f arg = let { (Wibble x y) = arg } in ... # lazy
+</programlisting>
+
+           前者の方が良いコードが生成される。</para>
+
+          <para>もう少し自然な例として、より正格なコード(目指すべきもの)のために<literal>let</literal>の代わりに<literal>case</literal>を使うというのがある。
+
+<programlisting>
+f (Wibble x y)  # 美しいが、遅い
+  = let
+        (a1, b1, c1) = unpackFoo x
+        (a2, b2, c2) = unpackFoo y
+    in ...
+
+f (Wibble x y)  # 醜いが、それで良い
+  = case (unpackFoo x) of { (a1, b1, c1) -&#62;
+    case (unpackFoo y) of { (a2, b2, c2) -&#62;
+    ...
+    }}
+</programlisting>
+
+          </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>単一構築子の型はGHCとの相性が良い</term>
+	<listitem>
+          <para>関数が、単一構築子の型(ただ一つのデータ構築子を持つ型のこと。例えば、タプルは単一構築子の型である)について正格ならなお良い。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>newtypeはdataよりも良い</term>
+	<listitem>
+          <para>データ型に構築子が一つしかなく、その構築子にフィールドが一つしかない場合、<literal>data</literal>宣言ではなく<literal>newtype</literal>宣言を使うと良い。<literal>newtype</literal>は大抵の場合最適化によって排除される。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>関数が正格かどうか知るにはどうしたら良い？</term>
+	<listitem>
+          <para>推測しようとしてはいけない。問い合わせるのだ。</para>
+
+          <para>インタフェースファイル中でその関数を探し、そのプラグマ中の第三フィールドを探す。<literal>__S &lt;strng&gt;</literal>となっているはずである。<literal>&lt;string&gt;</literal>の部分がこの関数の引数の正確性を表している。<function>L</function>はlazy(良くない)であり、<function>S</function>と<function>E</function>は正格(良い)であり、<function>P</function>は「プリミティブ」(良い)である。<function>U(...)</function>は正格かつアンパック可能(非常に良い)であり、<function>A</function>は存在しないこと(非常に良い)を表す。</para>
+
+          <para>アンパック可能な<function>U(...)</function>引数については、構成要素の正格性が括弧内に書かれる。つまり、もし引数が二要素のタプルで、<function>U(AU(LSS))</function>と書かれていたなら、これが意味するのは「このタプルの第一要素は使われない。第二要素は再びアンパック可能で、三つの構成要素(第一要素についてはlazy、第二・第三要素については正格)から成っている」ということである。</para>
+
+          <para>関数がエクスポートされていないなら、<option>-ddump-simpl</option>フラグを追加してコンパイルすれば良い。全ての定義について、型シグネチャの隣に、インタフェースファイルにあるのと全く同じプラグマ情報が表示される。(それから、コア表現は見ていて面白いですよ)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>鍵となる関数が<literal>INLINE</literal>化されるようにする(特にモナド)</term>
+	<listitem>
+          <para>頻繁に使われるある種の関数に対して<literal>INLINE</literal>プラグマを使うことで劇的な効果を期待できることがある。<xref linkend="inline-pragma"/>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>明示的なエクスポートリスト</term>
+	<listitem>
+          <para>モジュールに明示的なエクスポートリストがないと、GHCはモジュール中の全てがエクスポートされていると考えざるを得ない。これは様々な悪影響を引き起こす。例えば、あるコードが実際には(もしかしたら展開の結果)<emphasis>使われていなく</emphasis>ても、それはエクスポートされていて、他のモジュールに必要とされているかもしれないので、捨て去ることができない。</para>
+
+          <para>GHCは、エクスポートされていないと分かっているコードに対してはかなり攻撃的になることができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>コアを読もう</term>
+	<listitem>
+          <para>(コアとは、GHCがコードを操作する際に用いる形式のこと) <option>-ddump-simpl</option>付きでコンパイルすれば良い。(<option>-O</option>を付けるのを忘れないように)</para>
+
+          <para>プロファイルによってコストの高い関数が見付かったら、その関数のコア形式のコードを見てみると良い。<literal>let</literal>は良くない。<literal>case</literal>は良い。辞書(<literal>d.&lt;Class&gt;.&lt;Unique&gt;</literal>)は良くない。入れ子になったラムダは良くない。明示的なデータ構築子は良い。プリミティブ演算(<literal>eqInt&num;</literal>など)は良い。…</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>正格性注釈を使え</term>
+	<listitem>
+          <para>正格性注釈('!')を構築子フィールドに付けるのにはふたつの利点がある。第一に、プログラムがより正格になるので、正格性解析器のできる仕事が多くなる。第二に、スペースリークを減らすのに役立つことがある。</para>
+
+          <para>場合によっては三番目の利点もある。<option>-funbox-strict-fields</option>(<xref linkend="options-f"/>)が使われているとき、正格なフィールドは構築子中にアンパックあるいは非ボックス化され、一つまたは複数の間接参照の階層が取り除かれることがある。アンパックは単一構築子のデータ型にしか作用しない。(<literal>Int</literal>が良い例である)</para>
+
+          <para><option>-O</option>なしに<option>-funbox-strict-fields</option>を使うのはあまり良い考えではない。発生するパックとアンパックが最適化によって取り除かれないからである。実際、<option>-O</option>を<emphasis>使っているとき</emphasis>でさえ<option>-funbox-strict-fields</option>が性能を悪化させることがあり得る。しかしこの可能性は低い。(もし起こったら知らせてほしい)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>非ボックス化された型(GHC拡張)を使え</term>
+	<listitem>
+          <para>もし<emphasis>本気で</emphasis>速度を望むなら、そして「生の」部分を理解したいと思うなら、<xref linkend="glasgow-unboxed"/>に非ボックス化型の使いかたの情報がある。</para>
+
+          <para>明示的な非ボックス化型に訴える前に、正格な構築子フィールドと<option>-funbox-strict-fields</option>を使う(上記参照)のを試した方がいいだろう。この方法なら、コードの可搬性を失わずに済む。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>foreign import</literal>(GHC拡張(訳注: 嘘))を使って、速いライブラリとリンクする</term>
+	<listitem>
+          <para>これは大変だが、それでも、世の中には激しくチューンされたライブラリコードがたくさんあり、正しい道はそれらと競うのではなく、それらとリンクすることである。</para>
+
+          <para><xref linkend="ffi"/>に他言語関数インタフェースの説明がある。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>Float</literal>を使うな</term>
+	<listitem>
+          <para><literal>Complex</literal>を使うなら、間違いなく<literal>Complex Double</literal>を使うべきであり、<literal>Complex Float</literal>を使うべきではない。(前者は大いに特殊化されているが、後者はそうでない)</para>
+
+          <para><literal>Float</literal>(おそらく32ビット)を使うのは、自分が何をしているか本当に分かっているのでない限り、大抵の場合悪い考えである。<literal>Double</literal>を使うべきだ。速度上の欠点は滅多にない。現代の機械はどちらにも同じ浮動小数点数演算ユニットを使うからだ。<literal>Double</literal>を使えば、数値的な誤差で自分の首を締める可能性がずいぶん少なくなる。</para>
+
+          <para><literal>Float</literal>を使うのが良案である場合の一つは、それが<emphasis>大量に</emphasis>必要な場合、例えば<literal>Float</literal>の巨大な配列である。これは<literal>Double</literal>の場合と比べて半分の領域しか必要としない。ただし、64ビットの機械ではこれは成り立たない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>非ボックス化配列(<literal>UArray</literal>)を使え</term>
+	<listitem>
+          <para>GHCは、<literal>Int</literal>や<literal>Char</literal>などの基本的な算術要素型に対して、非ボックス化された値を要素に持つ配列をサポートしている。詳細は<literal>Data.Array.Unboxed</literal>ライブラリを見よ。これらの配列は、<literal>Data.Array</literal>の標準Haskell98配列よりもずっと速いことが期待できる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>より大きいヒープを使え</term>
+	<listitem>
+          <para>プログラムのGC統計情報(<option>-S</option><indexterm><primary>-S RTS option</primary></indexterm> RTSオプション)がプログラムが多くのGC(例えば実行時間の20%以上)をしていると報告する場合、より多くのメモリを使うことが有効かもしれない。これには、<option>-M&lt;size&gt;</option><indexterm><primary>-M&lt;size&gt; RTS option</primary></indexterm>または<option>-A&lt;size&gt;</option><indexterm><primary>-A&lt;size&gt; RTS option</primary></indexterm> RTSオプションを使う。(<xref linkend="rts-options-gc"/>を見よ)</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+</sect1>
+
+<sect1 id="smaller">
+<title>より小さく: 小さいプログラムを作る
+</title>
+
+<para>
+<indexterm><primary>smaller programs, how to produce</primary></indexterm>
+</para>
+
+<para>
+小さめの式を展開するに際して「ゴーサイン」を出す閾値を小さくする。<option>-funfolding-use-threshold0</option><indexterm><primary>-funfolding-use-threshold0 option</primary></indexterm>オプションを使うのが極端な場合(コスト0の展開のみが行われる)である。警告: ある種の特化された場合(Happyパーサなど)を除き、これは実際にはプログラムの大きさを<emphasis>増す</emphasis>可能性が高い。これは、通常では展開によってより多くの単純化を伴う最適化が可能になるためである。</para>
+
+<para>
+<function>Read</function>を避けよ。
+</para>
+
+<para>
+実行ファイルに<literal>strip</literal>を使え。
+</para>
+
+</sect1>
+
+<sect1 id="thriftier">
+<title>より慎ましく: 少ないヒープで動作するプログラムを作る
+</title>
+
+<para>
+<indexterm><primary>memory, using less heap</primary></indexterm>
+<indexterm><primary>space-leaks, avoiding</primary></indexterm>
+<indexterm><primary>heap space, using less</primary></indexterm>
+</para>
+
+<para>
+&ldquo;I think I have a space leak&hellip;&rdquo; Re-run your program
+with <option>+RTS -Sstderr</option>, and remove all doubt!  (You'll
+see the heap usage get bigger and bigger&hellip;)
+&lsqb;Hmmm&hellip;this might be even easier with the
+<option>-G1</option> RTS option; so&hellip; <command>./a.out +RTS
+-Sstderr -G1</command>...]
+<indexterm><primary>-G RTS option</primary></indexterm>
+<indexterm><primary>-Sstderr RTS option</primary></indexterm>
+</para>
+
+<para>
+ここでも、プログラムの空間的振る舞いを明らかにするための基本的な道具はプロファイル機能(<xref linkend="profiling"/>)である。
+</para>
+
+<para>
+前節で正格な関数は速いプログラムを作る上で有益だと述べたが、空間利用についても正格な関数は良い。正格な関数はすぐに仕事に取りかかり、ヒープをクロージャ(何かが必要になったときにどうやって評価するかをシステムが覚えておくためのメモ)で埋めつくすことがない。</para>
+
+</sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->

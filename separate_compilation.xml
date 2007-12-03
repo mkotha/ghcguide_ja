@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <sect1 id="separate-compilation">
+    <title>ファイル名と分割コンパイル</title>
+
+    <indexterm><primary>separate compilation</primary></indexterm>
+    <indexterm><primary>recompilation checker</primary></indexterm>
+    <indexterm><primary>make and recompilation</primary></indexterm>
+
+    <para>この節では、GHCがどんなファイルを見つけ、どんなファイルを作るか、それらのファイルはどこに置かれるか、この振る舞いに影響を与えるオプションは何か、を解説する。</para>
+
+    <para>この節は<firstterm>階層的モジュール</firstterm>を念頭において書かれていることに注意。(<xref linkend="hierarchical-modules"/>を見よ) 階層的モジュールはHaskell98への拡張で、モジュール名がドット「.」を含むことができるようにする。したがって、非階層的なモジュールは、モジュール名がドットを含まないという特別の場合になる。</para>
+
+    <para>パス名に関する慣習はシステムごとに異なる。特に、ディレクトリの区切りはUnixシステムでは「<literal>/</literal>」であり、Windowsシステムでは「<literal>\</literal>」である。以降の節では、一貫して「<literal>/</literal>」をディレクトリ区切りとして用いる。あなたのシステムにおける適切な文字に置き換えて読んでほしい。</para>
+
+    <sect2 id="source-files">
+      <title>Haskellソースファイル</title>
+
+      <indexterm><primary>filenames</primary></indexterm>
+
+      <para>全てのHaskellソースモジュールは専用のファイルに置かれているべきである。</para>
+
+      <para>ふつう、ファイル名は、モジュール名をもとにして、ドットをディレクトリ区切りに置き換えたものにされるべきである。例えば、Unixシステムでは、<literal>A.B.C</literal>というモジュールは、なんらかの基底ディレクトリからの相対パスで<literal>A/B/C.hs</literal>というファイルに置かれるべきである。他のモジュールからインポートされる予定がないモジュールには(例えば<literal>Main</literal>)、どんな名前をつけても構わない。</para>
+
+      <indexterm><primary>unicode</primary></indexterm>
+
+      <para>GHCはソースファイルがASCII<indexterm><primary>ASCII</primary></indexterm>またはUTF-8<indexterm><primary>UTF-8</primary></indexterm>のみだと推定し、他のエンコード方式<indexterm><primary>encoding</primary></indexterm>は認識されない。しかし、UTF-8として不正な並びはコメント内部では無視されるので、Latin-1<indexterm><primary>Latin-1</primary></indexterm>のような他のエンコード方式を、コメント以外の部分がASCIIのみから成ることを条件に使うことができる。</para>
+    </sect2>
+
+    <sect2 id="output-files">
+      <title>出力ファイル</title>
+
+      <indexterm><primary>interface files</primary></indexterm>
+      <indexterm><primary><literal>.hi</literal> files</primary></indexterm>
+      <indexterm><primary>object files</primary></indexterm>
+      <indexterm><primary><literal>.o</literal> files</primary></indexterm>
+
+      <para>ソースファイルをコンパイルするとき、GHCはふつう二つのファイルを出力する。<firstterm>オブジェクトファイル</firstterm>と<firstterm>インタフェースファイル</firstterm>である。</para>
+
+      <para>オブジェクトファイルは通常<literal>.o</literal>で終わり、そのモジュールのコンパイル済みコードを含む。</para>
+
+      <para>インタフェースファイルはふつう<literal>.hi</literal>で終わり、そのモジュールに依存するモジュールをコンパイルするときに必要な情報を含む。エクスポートされた関数の型や、データ型の定義といったものが含まれる。バイナリ形式なので、読もうとしないように。代わりに<option>&mdash;-show-iface</option>オプションを使うことができる。(<xref linkend="hi-options"/>を見よ)</para>
+
+      <para>オブジェクトファイルとインタフェースファイルは対になっていると考えるべきである。なぜなら、インタフェースファイルには、ある意味で、対応するオブジェクトファイルの説明が、コンパイラ可読の形で含まれているからである。なんらかの理由でインタフェースファイルとオブジェクトファイルの間に不整合ができると、コンパイラがオブジェクトファイルについて誤った仮定を置くことになるかもしれない。こうなると、まず間違いなく厄介なことになる。このため、オブジェクトファイルとインタフェースファイルは同じ場所に置くことを推奨する。(GHCはデフォルトでこれを行うが、すぐ下で説明するようにこれを変更することもできる)</para>
+
+      <para>全てのモジュールには、ソースコード中で定義(<literal>module A.B.C where ...</literal>)された<emphasis>モジュール名</emphasis>がある。</para>
+
+      <para>GHCが生成するオブジェクトファイルの名前は次の規則によって決められる。ただし<replaceable>osuf</replaceable>はオブジェクトファイルの接尾辞(これは<option>-osuf</option>で変えられる)である。</para>
+
+      <itemizedlist>
+	<listitem>
+          <para><option>-odir</option>オプションが指定されていないとき(デフォルト)は、オブジェクトファイルの名前は、ソースファイルの名前(モジュール名は無視される)をもとに、接尾辞を<replaceable>osuf</replaceable>に付け替えることで得られる。</para>
+	</listitem>
+	<listitem>
+          <para><option>-odir</option>&nbsp;<replaceable>dir</replaceable>が指定されているときは、オブジェクトファイルの名前は<replaceable>dir</replaceable>/<replaceable>mod</replaceable>.<replaceable>osuf</replaceable>になる。ここで<replaceable>mod</replaceable>はモジュールの名前のドットをスラッシュで置き換えたものである。</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>インタフェースファイルの名前も同じ規則で得られるが、<replaceable>osuf</replaceable>の代わりに<replaceable>hisuf</replaceable>(デフォルトは<literal>.hi</literal>)が使われ、オプションは<option>-odir</option>と<option>-osuf</option>ではなく<option>-hidir</option>と<option>-hisuf</option>である。</para>
+
+      <para>例えば、GHCが<filename>src/A/B/C.hs</filename>にある<literal>A.B.C</literal>モジュールを、<literal>-odir</literal>および<literal>-hidir</literal>フラグなしにコンパイルすると、インタフェースファイルは<literal>src/A/B/C.hi</literal>に置かれ、オブジェクトファイルは<literal>src/A/B/C.o</literal>に置かれる。</para>
+
+      <para>全てのインポートされたモジュールについて、インポート文におけるモジュールの名前は、<xref linkend="search-path"/>で説明されている方法で見付かったインタフェースファイル(またはソースファイル)に書かれているモジュールの名前と一致しなければならない。このため、大部分のモジュールでは、ソースファイル名とモジュール名は一致している必要がある。</para>
+
+      <para><literal>Main</literal>モジュールを<filename>foo.hs</filename>という名前のファイルに置くことは問題ない。ただし、これはGHCが<literal>Main</literal>モジュールのインタフェースファイルを探すことがない(<literal>Main</literal>モジュールはインポートされないので)からうまくゆくに過ぎないということに注意。これのおかげで、単一のディレクトリに複数の<literal>Main</literal>モジュールを持つことができ、GHCがこれによって混乱するということもない。</para>
+
+      <para>一括コンパイルモードでは、出力ファイルの名前を<option>-o</option>で指定することができるし、インタフェースファイルの名前も<option>-ohi</option>オプションで直接指定できる。</para>
+    </sect2>
+
+    <sect2 id="search-path">
+      <title>探索パス</title>
+
+      <indexterm><primary>search path</primary>
+      </indexterm>
+      <indexterm><primary>interface files, finding them</primary></indexterm>
+      <indexterm><primary>finding interface files</primary></indexterm>
+
+      <para>プログラム中では、<literal>import Foo</literal>と言うことによってモジュール<literal>Foo</literal>をインポートする。<option>--make</option>モードとGHCiでは、GHCは<literal>Foo</literal>のソースファイルを探し、そちらを先にコンパイルするようにする。<literal>--make</literal>が与えられなかったときは、<literal>Foo</literal>のインタフェースファイルを探す。これは、あらかじめ<literal>Foo</literal>をコンパイルすることで作られていなければならない。どの場合でも、GHCが適切なファイルを見つけるのに使う戦略は同じである。</para>
+
+      <para>戦略とはこうである。GHCは<firstterm>探索パス</firstterm>と呼ばれるディレクトリの一覧を保持している。これらのディレクトリ一つずつに対して、<replaceable>basename</replaceable><literal>.</literal><replaceable>extension</replaceable>を後置し、そのファイルが存在するか調べる。<replaceable>basename</replaceable>の値はモジュール名のドットをディレクトリ区切り(システムによって「/」または「\」)で置換したものであり、<replaceable>extension</replaceable>は、<option>--make</option>モードとGHCiではソース拡張子(<literal>hs</literal>、<literal>lhs</literal>)であり、その他では<replaceable>hisuf</replaceable>である。</para>
+
+      <para>例えば、探索パスに<literal>d1</literal>、<literal>d2</literal>、<literal>d3</literal>の各ディレクトリがある状況で、<literal>--make</literal>モードで<literal>A.B.C</literal>というモジュールのソースファイルを探しているとしよう。GHCが探すのは<literal>d1/A/B/C.hs</literal>、<literal>d1/A/B/C.lhs</literal>、<literal>d2/A/B/C.hs</literal>等々である。</para>
+
+      <para>デフォルトでは探索パスにはただ一つのディレクトリ<quote>.</quote>(つまりカレントディレクトリ)が含まれる。以下のオプションを使って、探索パスの内容を追加したり変更したりできる。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><option>-i<replaceable>dirs</replaceable></option></term>
+	  <listitem>
+            <para><indexterm><primary><option>-i<replaceable>dirs</replaceable></option></primary></indexterm><filename>dirs</filename>(コロン区切りの一覧)を探索パスの後ろに連結する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-i</option></term>
+	  <listitem>
+            <para>探索パスを空にする。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>以上のことが全てではない。GHCはコンパイル済みライブラリ(パッケージと呼ばれる)からもモジュールを探す。詳細はパッケージについての節(<xref linkend="packages"/>)を見よ。</para>
+    </sect2>
+
+    <sect2 id="options-output">
+      <title>コンパイルの出力先を変える</title>
+
+      <indexterm><primary>output-directing options</primary></indexterm>
+      <indexterm><primary>redirecting compilation output</primary></indexterm>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-o</option> <replaceable>file</replaceable>
+            <indexterm><primary><option>-o</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>通常、GHCでのコンパイル結果は、<filename>.hc</filename>、<filename>.o</filename>などのファイルに出力される。どれが選ばれるかは、最後に走ったコンパイル段階に依る。<option>-o <replaceable>file</replaceable></option>というオプションは、その最終段階の出力先を<replaceable>file</replaceable>に変更する。</para>
+
+            <para>注意: この「仕様」は直観に反することがある。<command>ghc -C -o foo.o foo.hs</command>では、中間のCコードがファイル<filename>foo.o</filename>に(名前に反して)出力される。</para>
+
+            <para>このオプションがもっともよく使われるのは、実行ファイルを作るときに、その名前を指定するためである。例えば、
+<screen>   ghc -o prog --make Main</screen>
+              は<literal>Main</literal>モジュールからはじまるプログラムをコンパイルし、実行ファイルを<literal>prog</literal>に置く。</para>
+
+            <para>注意: Windowsでは、結果が実行ファイルのとき、指定されたファイル名に拡張子「<filename>.exe</filename>」がなければ、追加される。つまり、
+<programlisting>
+   ghc -o foo Main.hs
+</programlisting>
+            は<filename>Main.hs</filename>というモジュールをコンパイル・リンクし、生成された実行ファイルを<filename>foo.exe</filename>(<filename>foo</filename>ではなく)に置く。</para>
+
+          <para><command>ghc --make</command>を<option>-o</option>なしに使うと、実行ファイルの名前は<literal>Main</literal>モジュールを含むファイルの名前を元にして決まる。GHCでは<literal>Main</literal>モジュールが<filename>Main.hs</filename>に置かれている必要はないということに注意せよ。よって、
+<programlisting>
+   ghc --make Prog
+</programlisting>
+            と
+<programlisting>
+   ghc --make Prog.hs
+</programlisting>
+            はどちらも<filename>Prog</filename>(あるいはWindowsなら<filename>Prog.exe</filename>)を生成する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-odir</option> <replaceable>dir</replaceable>
+            <indexterm><primary><option>-odir</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>オブジェクトファイルの出力先を<replaceable>dir</replaceable>に変更する。例えば以下のように。</para>
+
+<screen>
+$ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
+</screen>
+
+            <para><filename>Foo.o</filename>、<filename>Bar.o</filename>、<filename>Bumble.o</filename>の各オブジェクトファイルは、実行中の機械のアーキテクチャの名前(<filename>x86</filename>、<filename>mips</filename>など)のサブディレクトリに置かれる。</para>
+
+            <para><option>-odir</option>オプションはインタフェースファイルがどこに置かれるかに影響しないことに注意。それには<option>-hidir</option>オプションを使うこと。上の例では、インタフェースファイルは相変わらず<filename>parse/Foo.hi</filename>、<filename>parse/Bar.hi</filename>、<filename>gurgle/Bumble.hi</filename>に置かれる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-ohi</option>  <replaceable>file</replaceable>
+            <indexterm><primary><option>-ohi</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>インタフェースの出力先を<filename>bar2/Wurble.iface</filename>にするには、<option>-ohi bar2/Wurble.iface</option>を使えば良い。(非推奨)</para>
+
+            <para>警告: インタフェースファイルの出力先を変更して、GHCがそれを見付けられない場合、再コンパイル検査器が混乱するかもしれない(少なくとも、再コンパイルを避けることはできなくなる)。代わりに、可能なら<option>-hidir</option>と<option>-hisuf</option>オプションを組み合わせることを推奨する。</para>
+
+            <para>そもそもインタフェースファイルを出力させたくない場合、このオプションを使ってインタフェースファイルの出力先にビットバケツを指定することができる。例えば、<literal>-ohi /dev/null</literal>のように。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-hidir</option>  <replaceable>dir</replaceable>
+            <indexterm><primary><option>-hidir</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>生成されるインタフェースファイルの出力先を<replaceable>dir</replaceable>に変更する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-stubdir</option>  <replaceable>dir</replaceable>
+            <indexterm><primary><option>-stubdir</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>生成されるFFIのスタブファイルの出力先を<replaceable>dir</replaceable>に変更する。スタブファイルは、Haskellソースが<literal>foreign export</literal>または<literal>foreign import "&amp;wrapper"</literal>という宣言を含むときに生成される(<xref linkend="foreign-export-ghc"/>を見よ)。階層的モジュール名に関しては、<option>-stubdir</option>オプションは<option>-odir</option>や<option>-hidir</option>と全く同様に振る舞う。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-osuf</option> <replaceable>suffix</replaceable>
+            <indexterm><primary><option>-osuf</option></primary></indexterm>
+          </term>
+	  <term>
+            <option>-hisuf</option> <replaceable>suffix</replaceable>
+            <indexterm><primary><option>-hisuf</option></primary></indexterm>
+          </term>
+	  <term>
+            <option>-hcsuf</option> <replaceable>suffix</replaceable>
+            <indexterm><primary><option>-hcsuf</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><option>-osuf</option> <replaceable>suffix</replaceable>はオブジェクトファイルの接尾辞を<literal>.o</literal>から指定された物に変える。我々は、ライブラリをコンパイルするとき、プロファイル版のオブジェクトファイルが通常版のものを破壊するのを防ぐためにこれを使っている。</para>
+
+            <para>同様に、<option>-hisuf</option> <replaceable>suffix</replaceable>は非システムのインタフェースファイルの<literal>.hi</literal>接尾辞を別のものに変える。(<xref linkend="hi-options"/>を見よ)</para>
+
+            <para>最後に、<option>-hcsuf</option> <replaceable>suffix</replaceable>オプションは、コンパイラに生成される中間Cファイルの<literal>.hc</literal>接尾辞を変更する。</para>
+
+            <para><option>-hisuf</option>/<option>-osuf</option>は、あるプログラムについて、プロファイルの有効なものと無効なものの両方を一つのディレクトリでコンパイルしたいときに特に有用である。通常版を得るには
+	    <screen>
+	      ghc ...</screen>
+              とすればよく、プロファイル版を得るには
+	    <screen>
+	      ghc ... -osuf prof.o -hisuf prof.hi -prof -auto-all</screen>
+              とすればよい。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+  
+    <sect2 id="keeping-intermediates">
+      <title>中間ファイルをそのままにする</title>
+      <indexterm><primary>intermediate files, saving</primary>
+      </indexterm>
+      <indexterm><primary><literal>.hc</literal> files, saving</primary>
+      </indexterm>
+      <indexterm><primary><literal>.s</literal> files, saving</primary>
+      </indexterm>
+
+      <para>以下のオプションは、ある種の中間ファイルをそのままにしておくのに有用である。通常、これらのファイルはコンパイル終了後にGHCによって破棄される。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-keep-hc-files</option>
+            <indexterm><primary><option>-keep-hc-files</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをCを介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.hc</literal>ファイルは生成されない。生成されるようにするのに<option>-fvia-C</option>を使う必要があるかもしれない)</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-keep-s-files</option>
+            <indexterm><primary><option>-keep-s-files</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>中間の<literal>.s</literal>ファイルを消さない。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-keep-raw-s-files</option>
+            <indexterm><primary><option>-keep-raw-s-files</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>中間の<literal>.raw-s</literal>ファイルを消さない。これはCコンパイラが直接出力したものであり、GHCが「アセンブリ・マングリング」(これの結果が<literal>.s</literal>ファイルである)を行う前のものである。このファイルもネイティブコード生成器が使われているときには作られない。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-keep-tmp-files</option>
+            <indexterm><primary><option>-keep-tmp-files</option></primary></indexterm>
+            <indexterm><primary>temporary files</primary><secondary>keeping</secondary></indexterm>
+          </term>
+	  <listitem>
+            <para>GHCドライバに対して、一時ファイルを削除しないように指示する。一時ファイルはふつう<literal>/tmp</literal>に置かれる(別の場所かもしれない。<xref linkend="temp-files"/>を見よ)。GHCを<option>-v</option>付きで実行すればどういう一時ファイルが作られているかを見ることができる。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="temp-files">
+      <title>一時ファイルの場所を変更する</title>
+
+      <indexterm>
+	<primary>temporary files</primary>
+	<secondary>redirecting</secondary>
+      </indexterm>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-tmpdir</option>
+            <indexterm><primary><option>-tmpdir</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><filename>/tmp</filename>(インストールの仕方によっては別の場所かもしれない。とにかく一時ファイルを置くところ)の空き容量が足らなくて困っているなら、<option>-tmpdir &lt;dir&gt;</option><indexterm><primary>-tmpdir &lt;dir&gt; option</primary></indexterm>オプションを使って別のディレクトリを指定することができる。例えば、<option>-tmpdir .</option>とすれば、一時ファイルは現在の作業ディレクトリに置かれる。</para>
+
+            <para>別の方法として、<constant>TMPDIR</constant>環境変数を使うこともできる。<indexterm><primary>TMPDIR</primary></indexterm>これを一時ファイルを置くべき場所に設定する。GCCその他のプログラムも<constant>TMPDIR</constant>変数を尊重する。</para>
+
+            <para>さらに良い方法は、GHCをビルドするときに<constant>DEFAULT_TMPDIR</constant>というmake変数を設定することである。こうすれば、二度と<constant>TMPDIR</constant>の心配をする必要がない。(ビルド説明書を見よ)</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="hi-options">
+      <title>インタフェースファイルに関連するその他のオプション</title>
+      <indexterm><primary>interface files, options</primary></indexterm>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-ddump-hi</option>
+            <indexterm><primary><option>-ddump-hi</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>新しいインタフェースを標準出力に表示する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-ddump-hi-diffs</option>
+            <indexterm><primary><option>-ddump-hi-diffs</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>一般に、新しい<filename>.hi</filename>が既存のものと同じなら、上書きは行われない。これは<command>make</command>とうまく協調する。インタフェースが実際に変更されたとき、これはしばしば知るに値することである。<option>-ddump-hi-diffs</option>が与えられると、GHCは新旧の<filename>.hi</filename>ファイルに対して<command>diff</command>を走らせる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-ddump-minimal-imports</option>
+            <indexterm><primary><option>-ddump-minimal-imports</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>モジュールをコンパイルするとき、そのモジュールの「最小の」インポート宣言を「M.imports」(ただしMはモジュール名)というファイルに出力する。「M.hs」にあるインポート宣言を「M.imports」にあるものに置き換えても安全である。こうすることの利点は、(1)「最小の」インポート宣言は全てを明示的にインポートする (2)不要なものは全くインポートしない ことである。この特徴を手で維持するのは非常な苦痛であり得るので、その作業を軽減するためにこのフラグがある。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>--show-iface</option> <replaceable>file</replaceable>
+            <indexterm><primary><option>--show-iface</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>インタフェースファイルの中身を人間可読(っぽいよう)な形式で表示する。ただし<replaceable>file</replaceable>はそのファイルの名前である。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="recomp">
+      <title>再コンパイル検査器</title>
+
+      <indexterm><primary>recompilation checker</primary></indexterm>
+
+      <variablelist>
+	<varlistentry>
+	  <term>
+            <option>-fforce-recomp</option>
+            <indexterm><primary><option>-fforce-recomp</option></primary></indexterm>
+            <indexterm><primary><option>-fno-force-recomp</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>再コンパイル検査を無効にする。(デフォルトでは有効である)。再コンパイル検査が有効だと、あるモジュールが再コンパイルの必要無しと判断された場合、コンパイルは早期に停止し、既存の<filename>.o</filename>はそのまま残される。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>昔、GHCは新しく生成された<filename>.hi</filename>を前の版と比較し、それらが同一なら、前の版をそのままにして、変更日時を変えることもしなかった。この結果、<filename>.hi</filename>が変更されていないモジュールをインポートしたモジュールは再コンパイルされなかった。</para>
+
+      <para>これはもはやうまく行かない。モジュール<literal>C</literal>がモジュール<literal>B</literal>をインポートし、<literal>B</literal>がモジュール<literal>A</literal>をインポートしているとしよう。このとき、モジュール<literal>A</literal>が変更されたなら、モジュール<literal>C</literal>を再コンパイルしなければならないかもしれない。したがって、<filename>A.hi</filename>が変更されたときは<literal>C</literal>が再コンパイルされるべきか確かめねばならない。しかし、<literal>C</literal>の依存関係一覧に載るのは<literal>B.hi</literal>だけであって、<literal>A.hi</literal>ではない。そのため、<literal>A</literal>になんらかの変更(例えば、ある関数の定義が変更され、<literal>B</literal>がエクスポートする関数のインライン展開結果にその関数が現れる場合)が加えられても<literal>B.hi</literal>には一切の変化がないということも考えられる。そういうわけで&hellip;</para>
+
+      <para>GHCは、インタフェースファイルそれぞれ、およびその中の型シグネチャそれぞれについて版数を覚えておく。さらに、全てのインタフェースファイルに、最後にコンパイルされたときに使われたもの全ての版数一覧を記録しておく。ソースファイルの変更日時が<filename>.o</filename>よりも古く(つまり最後にコンパイルされたときからソースが変更されていない)、再コンパイル検査が有効なら、GHCは賢い振る舞いをする。今回必要なものの版数一覧と前回必要とされたものの版数一覧(これはコンパイルされているモジュールのインタフェースファイルから拾ってくる)を比較し、全て同じなら「Compilation IS NOT required」と言ってコンパイルをかなり早い段階で中断するのである。何と美しい眺めであろうか！</para>
+
+      <para>Partick Sansomはこれら全てがどういう仕組みかについての研究会論文を書いた(ただし細部はかなり変更されているが)。コピーが欲しければ<ulink url="mailto:sansom@dcs.gla.ac.uk">彼に頼む</ulink>こと。</para>
+
+    </sect2>
+
+    <sect2 id="mutual-recursion">
+      <title>相互再帰的なモジュールをコンパイルするには</title>
+
+      <indexterm><primary>module system, recursion</primary></indexterm>
+      <indexterm><primary>recursion, between modules</primary></indexterm>
+
+      <para>GHCでは相互再帰的なモジュールをコンパイルすることができる。この節ではその方法を説明する。</para>
+
+      <para>モジュールのインポート関係が成すグラフにおけるサイクルは全て<filename>hs-boot</filename>ファイルを使って解消しなければならない。<filename>A.hs</filename>と<filename>B.hs</filename>がHaskellのソースファイルだとしよう。つまり、
+<programlisting>
+module A where
+    import B( TB(..) )
+    
+    newtype TA = MkTA Int
+    
+    f :: TB -&#62; TA
+    f (MkTB x) = MkTA x
+
+module B where
+    import {-# SOURCE #-} A( TA(..) )
+    
+    data TB = MkTB !Int
+    
+    g :: TA -&#62; TB
+    g (MkTA x) = MkTB x
+</programlisting>
+<indexterm><primary><literal>hs-boot</literal>
+      files</primary></indexterm> <indexterm><primary>importing,
+      <literal>hi-boot</literal> files</primary></indexterm>
+ここで<filename>A</filename>は<filename>B</filename>をインポートしているが、<filename>B</filename>は<filename>A</filename>を<literal>{-# SOURCE #-}</literal>プラグマ付きでインポートしているので、環状の依存性が解消されている。このように<literal>{-# SOURCE #-}</literal>付でインポートされる全てのモジュール<filename>A.hs</filename>に対して、<filename>A.hs-boot</filename>というソースファイルが存在しなければならない。このファイルは<filename>A.hs</filename>の縮訳版を含む。つまり、
+<programlisting>
+module A where
+    newtype TA = MkTA Int
+</programlisting>
+</para>
+<para>これらの三つのファイルをコンパイルするには、次のコマンドを発行すれば良い。
+<programlisting>
+  ghc -c A.hs-boot    -- A.hi-bootとA.o-bootを作る
+  ghc -c B.hs         -- A.hi-bootを使ってB.hiとB.oを作る
+  ghc -c A.hs	      -- B.hiを使ってA.hiとA.oを作る
+  ghc -o foo A.o B.o  -- プログラムをリンクする
+</programlisting>
+</para>
+<para>ここで、いくつか注意すべきことがある。
+<itemizedlist>
+<listitem>
+  <para><filename>A.hs-boot</filename>はプログラマが書くソースファイルである。これは、親ソースファイルである<filename>a.hs</filename>と同じディレクトリになければいけない。現在のところ、<filename>A.lhs</filename>という文芸形式のソースファイルを使うなら、ブートファイルも<filename>A.lhs-boot</filename>と文芸形式でなければならない。逆も同様である。</para>
+  </listitem>
+
+<listitem><para>
+  <filename>hs-boot</filename>は、<filename>hs</filename>ファイルと同じようにGHCでコンパイルされる。
+<programlisting>
+  ghc -c A.hs-boot
+</programlisting>
+<filename>A.hs-boot</filename>というhs-bootファイルがコンパイルされると、通用範囲と型に関するエラーがないかどうか検査される。親モジュールである<filename>A.hs</filename>がコンパイルされるとき、この二つが比較され、不整合があればエラーが報告される。
+   </para></listitem>
+   
+	<listitem>
+          <para><filename>A.hs</filename>をコンパイルすると<filename>A.hi</filename>というインタフェースファイルと<filename>A.o</filename>というオブジェクトファイルが生成されるが、これと同様に<filename>A.hs-boot</filename>をコンパイルすると<filename>A.hi-boot</filename>というインタフェースファイルと<filename>A.o-boot</filename>という疑似オブジェクトファイルが生成される。</para>
+
+	  <itemizedlist>
+	    <listitem>
+              <para>疑似オブジェクトファイル<filename>A.o-boot</filename>は空である(リンクしないように！)が、Makefileを使っているときにはとても便利である。これを使って、いつ<filename>A.hi-boot</filename>が最新の状態を反映するようになったかが記録できるからである。(<xref linkend="using-make"/>を見よ)</para>
+	    </listitem>
+
+	    <listitem>
+              <para><filename>hs-boot</filename>ファイルをコンパイルすることで得られる<filename>hi-boot</filename>は、他のGHCのインタフェースファイル(例えば<filename>B.hi</filename>)と同じ、機械生成のバイナリ形式である。中身は<command>ghc --show-iface</command>で表示できる。インタフェースファイルのディレクトリを指定した場合(<option>-ohidir</option>フラグ)、<filename>hi-boot</filename>ファイルにも効果がある。</para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+
+   <listitem><para>hs-bootファイルは親ファイルとは別のものであると考え、<literal>{-# SOURCE #-}</literal>付きのインポートはhs-bootファイルを対象としていると考えたとき、モジュールのインポート関係が成すグラフにサイクルがあってはならない。<command>ghc -M</command>コマンドはサイクルを見つけるとエラーを報告する。
+   </para></listitem>
+
+   <listitem><para>モジュール<literal>M</literal>が<literal>{-# SOURCE #-}</literal>付でインポートされているなら、ふつう、プログラムの他の場所から通常の形式でもインポートされているはずである。そうでないとき、<command>ghc --make</command>は自動的にコンパイル・リンクの対象モジュールに<literal>M</literal>を含める。これは、<literal>M</literal>の実装が最終的なプログラムに含まれるようにするためである。
+   </para></listitem>
+</itemizedlist>
+</para>
+<para>
+hs-bootファイルにはブートストラップのための最小限の情報があれば良い。例えば、<literal>A</literal>がエクスポートするもの<emphasis>全て</emphasis>の宣言を含んでいる必要はなく、<literal>A</literal>を再帰的にインポートするモジュールが必要とするものだけで良い。</para>
+<para>hs-bootファイルはHaskellのサブセットで書かれる。
+<itemizedlist>
+<listitem><para>モジュールヘッダ(エクスポート一覧を含む)、インポート文、有効範囲規則は、Haskellと全く同じである。したがって、プレリュード以外で定義された型やクラスに言及するには、それをインポートしなければならない。</para></listitem>
+   
+<listitem><para>値の宣言があってはならない。しかし、値の型シグネチャはあっても良い。例えば、
+<programlisting>
+  double :: Int -&#62; Int
+</programlisting>
+</para></listitem>
+<listitem><para>結合性宣言はHaskellと同じである。</para></listitem>
+<listitem><para>型同義名の宣言はHaskellと同じである。</para></listitem>
+<listitem><para>データ型の宣言はHaskellと同じように完全な形で与えても良いし、「=」記号以下を省略して抽象的に与えても良い。例えば、
+<programlisting>
+  data T a b
+</programlisting>
+            <emphasis>ソース</emphasis>プログラムにおいては、これはTAが構築子を持たないという宣言である(GHC拡張。<xref linkend="nullary-types"/>を見よ)が、hi-bootファイルでは「どんな構築子があるか知らない・気にしない」という意味である。この方式は間違えにくいので、よく使われる。構築子を書くことも確かにできるが、その時は、本物の定義と全く同じように書かなければならない。</para>
+
+          <para>構築子をいちいち書かないときは、型変数の類が「*」でない場合、類注釈(<xref linkend="sec-kinding"/>)を与えてその旨をGHCに伝えないといけないかもしれない。(ソースファイルでは、その型変数が構築子中でどのように使われているかを基にして推測される)。例えば、
+<programlisting>
+  data R (x :: * -&#62; *) y
+</programlisting>
+
+<literal>deriving</literal>をデータ型宣言で使うことはできない。代わりに<literal>instance</literal>宣言を使うこと。
+</para></listitem>
+<listitem><para>クラス宣言はHaskellと同じであるが、メソッドのデフォルト宣言を置いてはならない。全てのスーパークラスとクラスメソッドを完全に省略することもできる。ただし、全て省略するか全く省略しないかのいずれかでなければならない。
+</para></listitem>
+<listitem><para>Haskellと同じようにインスタンス宣言を含めることができる。ただし「where」部は含めないこと。
+ </para></listitem>
+</itemizedlist>
+</para>
+    </sect2>
+
+
+    <sect2 id="using-make">
+      <title><command>make</command>を使う</title>
+
+      <indexterm><primary><literal>make</literal></primary></indexterm>
+
+      <para>GHCと併用するための<filename>Makefile</filename>を用意するのは単純である。ただし、ソースファイル名とモジュール名が一致していることが前提である。</para>
+
+<programlisting>
+HC      = ghc
+HC_OPTS = -cpp $(EXTRA_HC_OPTS)
+
+SRCS = Main.lhs Foo.lhs Bar.lhs
+OBJS = Main.o   Foo.o   Bar.o
+
+.SUFFIXES : .o .hs .hi .lhs .hc .s
+
+cool_pgm : $(OBJS)
+        rm -f $@
+        $(HC) -o $@ $(HC_OPTS) $(OBJS)
+
+# 標準的なサフィックスルール
+.o.hi:
+        @:
+
+.lhs.o:
+        $(HC) -c $&#60; $(HC_OPTS)
+
+.hs.o:
+        $(HC) -c $&#60; $(HC_OPTS)
+
+.o-boot.hi-boot:
+        @:
+
+.lhs-boot.o-boot:
+        $(HC) -c $&#60; $(HC_OPTS)
+
+.hs-boot.o-boot:
+        $(HC) -c $&#60; $(HC_OPTS)
+
+# モジュール間の依存関係
+Foo.o Foo.hc Foo.s    : Baz.hi          # FooはBazをインポートしている
+Main.o Main.hc Main.s : Foo.hi Baz.hi   # MainはFooとBazをインポートしている
+</programlisting>
+
+      <para>(洗練された<command>make</command>なら上記のことがもっと優雅にできるかもしれない。特に、<command>gmake</command>のパターンルールを使えば、以下のようにより判り易く書くことができる。</para>
+
+<programlisting>
+%.o : %.lhs
+        $(HC) -c $&#60; $(HC_OPTS)
+</programlisting>
+
+      <para>上記の方法はどの<command>make</command>でもうまく行くはずである。</para>
+
+      <para>嘘臭い<literal>.o.hi</literal>ルールに注意: これはインタフェース(<filename>.hi</filename>)ファイルがソースに依存していることを記している。このルールは、<filename>.hi</filename>ファイルが<filename>.o</filename>ファイルから「何もしない」ことで生成されると述べている。これは実際その通りである。</para>
+      <para>サフィックスルールはHaskellソースファイルに一回、<filename>hs-boot</filename>ファイル(<xref linkend="mutual-recursion"/>を見よ)に一回で計二回繰り返されている。</para>
+
+      <para>Makefileの最後にモジュール間の依存関係が書かれているが、これは次のような形をしている。
+
+<programlisting>
+Foo.o Foo.hc Foo.s    : Baz.hi          # Foo imports Baz
+</programlisting>
+
+      これが言っているのは、もし<literal>Foo.o</literal>か<literal>Foo.hc</literal>か<literal>Foo.s</literal>のどれかついて、最終更新日時が<literal>Baz.hi</literal>よりも前ならば、そのファイルは古くなっているので更新されなければならない、ということである。更新するということになると、<literal>make</literal>はそのためのルールを探す。そして、あらかじめ定義しておいたサフィックスルールのいずれかがうまく働く。これらの依存関係は<command>ghc</command>を使って自動的に生成することもできる。<xref linkend="sec-makefile-dependencies"/>を見よ。</para>
+
+ </sect2>
+
+      <sect2 id="sec-makefile-dependencies">
+	<title>依存関係を生成する</title>
+	<indexterm><primary>dependencies in Makefiles</primary></indexterm>
+	<indexterm><primary>Makefile dependencies</primary></indexterm>
+
+        <para><literal>Foo.o : Bar.hi</literal>のようなモジュール間の依存関係を手で<filename>Makefile</filename>に書き込むのはかなり間違いやすい作業である。しかし安心してほしい。GHCは再ビルドの依存関係を自動的に生成することができる。これには、まず、以下のものを<filename>Makefile</filename>に加える。</para>
+
+<programlisting>
+depend :
+        ghc -M $(HC_OPTS) $(SRCS)
+</programlisting>
+
+        <para>次に、初めてコンパイルする前、およびプログラムの<literal>import</literal>を変更したときは、<command>make cool&lowbar;pgm</command>する前に<command>make depend</command>する。これで、<command>ghc -M</command>が必要な依存関係を<filename>Makefile</filename>の末尾に加える。</para>
+
+        <para>一般に、<command>ghc -M Foo</command>は次のことをする。<literal>Foo</literal>の各要素、および<literal>Foo</literal>の要素から直接・間接にインポートされている各モジュールに対して(このモジュールを<literal>M</literal>と呼ぶ)、以下のものをMakefileに加える。
+	<itemizedlist>
+	<listitem><para>オブジェクトファイルがソースファイルに依存していることを示す行。
+<programlisting>
+M.o : M.hs
+</programlisting>
+(または、<literal>M.lhs</literal>を使っているならこちら)
+       </para></listitem>
+       <listitem><para>全ての<literal>M</literal>中のインポート宣言<literal>import X</literal>に対して、<literal>M</literal>が<literal>X</literal>に依存していることを示す行。
+<programlisting>
+M.o : X.hi
+</programlisting></para></listitem>
+       <listitem><para>全ての<literal>M</literal>中のインポート宣言<literal>import {-# SOURCE #-} X</literal>に対して、<literal>M</literal>が<literal>X</literal>に依存していることを示す行。
+<programlisting>
+M.o : X.hi-boot
+</programlisting>
+       (<literal>hi-boot</literal>様式のインタフェースファイルについて詳しくは<xref linkend="mutual-recursion"/>を見よ。)
+      </para></listitem>
+        </itemizedlist> 
+        <literal>M</literal>が複数のモジュールをインポートしているなら、<filename>M.o</filename>をターゲットとする行が複数できることになる。</para>
+       <para><command>ghc -M</command>コマンドの引数として全てのモジュールを列挙する必要はない。<command>ghc</command>が依存性を追跡する。これは<command>ghc --make</command>の場合と同様である。(GHC 6.4の新機能)</para>
+
+    <para><literal>ghc -M</literal>が依存性グラフのそれぞれのモジュールの<emphasis>ソースコード</emphasis>を見つける必要があることに注意せよ。そうでないと、インポート宣言をパースして依存関係を追跡することができない。したがって、ソースファイルのないコンパイル済みモジュールは全てパッケージに属していなければならない<footnote><para>これは6.2以前の挙動とは異なる。</para></footnote>。</para>
+
+        <para>デフォルトでは、<command>ghc -M</command>は全ての依存関係を生成し、それを<filename>makefile</filename>(存在しなければ<filename>Makefile</filename>)の末尾に連結する。この時、追加部分は「<literal>&num; DO NOT DELETE: Beginning of Haskell dependencies</literal>」と「<literal>&num; DO NOT DELETE: End of Haskell dependencies</literal>」の二行で囲われる。これらの行がすでに存在するときは、先に古い依存関係が消去される。</para>
+
+        <para>コンパイル時に使うのと同じ<option>-package</option>オプションを<literal>ghc -M</literal>にも渡すのを忘れないように。こうすることで、依存関係生成器がパッケージ由来の被インポートモジュールの場所を把握できるようになる。ただし、パッケージモジュールは生成される依存関係には含まれない。(しかし下記の<option>&ndash;&ndash;include-pkg-deps</option>オプションを見よ)</para>
+
+        <para>GHCの依存関係生成の段階にいくつかのオプションを渡すことができるので、活用すると便利かもしれない。歴史的な理由から、GHCのコマンド行から依存関係生成器に渡されるオプションには一つ一つ<literal>-optdep</literal>を前置しなければならない。例えば、依存関係生成器に<literal>-f .depend</literal>を渡すには、次のようにする。
+
+<screen>
+ghc -M -optdep-f -optdep.depend ...
+</screen>
+
+        依存関係生成器に影響を与えるオプションは以下のものである。</para>
+
+	<variablelist>
+	  <varlistentry>
+	    <term><option>-w</option></term>
+	    <listitem>
+              <para>インタフェースファイルの隠蔽(訳注: 現在のディレクトリにあるインタフェースファイルが探索パスにある同名のインタフェースファイルを隠すことだと思われる)に関する警告を無効にする。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>-v2</option></term>
+	    <listitem>
+              <para>モジュールの依存関係の完全な一覧を標準出力に印字する。(これは通常の多弁さフラグなので、この一覧は<option>-v3</option>や<option>-v4</option>でも表示される。<xref linkend="options-help"/>参照)</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>-f</option> <replaceable>file</replaceable></term>
+	    <listitem>
+              <para><filename>makefile</filename>や<filename>Makefile</filename>の代わりに<replaceable>file</replaceable>をmakefileとして使う。もし<replaceable>file</replaceable>が存在しないなら、<command>mkdependHS</command><!-- 訳注: これはもはや存在しない。作るのはおそらくGHC -->が作る。我々はしばしば、<option>-f .depend</option>として依存関係を<filename>.depend</filename>に置き、それを<filename>Makefile</filename>に<command>include</command>する、ということを行う。</para>
+	    </listitem>
+	  </varlistentry>
+
+<!-- Retired with the move away from 'mkdependHS'.
+	  <varlistentry>
+	    <term><option>-o &lt;osuf&gt;</option></term>
+	    <listitem>
+	      <para>Use <filename>.&lt;osuf&gt;</filename> as the
+              "target file" suffix ( default: <literal>o</literal>).
+              Multiple <option>-o</option> flags are permitted
+              (GHC2.05 onwards).  Thus "<option>-o hc -o o</option>"
+              will generate dependencies for <filename>.hc</filename>
+              and <filename>.o</filename> files.</para>
+	    </listitem>
+	  </varlistentry>
+-->
+	  <varlistentry>
+	    <term><option>-s &lt;suf&gt;</option></term>
+	    <listitem>
+              <para>追加の依存関係として、接尾辞<filename>.&lt;suf&gt;&lowbar;&lt;osuf&gt;</filename>のファイルから接尾辞<filename>.&lt;suf&gt;&lowbar;hi</filename>のファイルまたは(<literal>&lcub;-&num; SOURCE &num;-&rcub;</literal>インポートなら)<filename>.hi-boot</filename>への依存性を宣言する。複数の<option>-s</option>フラグを指定しても良い。例えば、<option>-o hc -s a -s b</option><!-- 訳注: -oはもはや存在しない。代わりにghcのオプション-osufを使う -->とすると、<filename>.hc</filename>から<filename>hi</filename>へ、<filename>.a&lowbar;hc</filename>から<filename>.a&lowbar;hi</filename>へ、<filename>.b&lowbar;hc</filename>から<filename>.b&lowbar;hi</filename>への依存性が作られる。(これはNoFibの「way」を使うときに便利である)</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>&ndash;&ndash;exclude-module=&lt;file&gt;</option></term>
+	    <listitem>
+              <para><filename>&lt;file&gt;</filename>が「安定して」いるとみなす。つまり、このファイルへの依存性を含めない。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>-x</option></term>
+	    <listitem>
+              <para><option>&ndash;&ndash;exclude-module</option>と同じ。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>&ndash;&ndash;exclude-directory=&lt;dirs&gt;</option></term>
+	    <listitem>
+              <para>コロン区切りのディレクトリ<filename>&lt;dirs&gt;</filename>が安定したファイルを含んでいるとみなし、そこにあるモジュールへの依存性を生成しない。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>&ndash;&ndash;include-module=&lt;file&gt;</option></term>
+	    <listitem>
+              <para><filename>&lt;file&gt;</filename>が「安定して」いないとみなす。つまり、このファイルへの依存性が(もしあれば)生成される。このオプションはふつう<option>&ndash;&ndash;exclude-directory</option>と同時に使われる。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
+	    <term><option>&ndash;&ndash;include-pkg-deps</option></term>
+	    <listitem>
+              <para>パッケージからインポートされているモジュールを不安定だとみなす。つまり、インポートされたパッケージモジュールへの依存性を全て生成する。(これには<literal>Prelude</literal>や、その他の標準Haskellライブラリも含まれる)。依存関係がパッケージの中身まで再帰的に追跡されることはない。生成されるのは、ホームパッケージのモジュールから、それが直接インポートするパッケージ外のモジュールへの依存性だけである。このオプションは通常、各種のシステムライブラリによってのみ使われる。</para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+    </sect2>
+
+    <sect2 id="orphan-modules">
+      <title>孤立モジュールと孤立インスタンス宣言</title>
+
+<para>Haskellの規定によると、モジュールMをコンパイルするとき、M「以下」の全てのモジュールの全てのインスタンス宣言が可視である。(モジュールAがM「以下」であるとは、Aが直接Mにインポートされているか、または直接MにインポートされているモジュールBが存在して、AがB以下であることである)。したがって、理論上は、GHCはM以下の全てのモジュールのインタフェースファイルを読まなければならない。それらにMに関係するインスタンス宣言が含まれているかもしれないからである。しかし実際的にはこれは最悪なので、GHCはより賢く振る舞おうとする。</para>
+
+<para>特に、あるインスタンス宣言について、その宣言の頭部で言及されている型やクラスのいずれかが、そのインスタンス宣言があるのと同じモジュールで定義されているなら、GHCはいずれにせよそのインタフェースファイルを訪れねばならない。例えば、以下のような場合である。</para>
+<programlisting>
+  module A where
+    instance C a =&gt; D (T a) where ...
+    data T a = ...
+</programlisting>
+<para>このインスタンス宣言は型Tが使われているときのみ関係する。そして、もしTが使われているなら、GHCはTの定義を見つけるためにAのインタフェースファイルを訪れているはずである。</para>
+
+<para>唯一問題になるのは、あるモジュールにインスタンス宣言があって、しかもGHCがそのモジュールを訪れる理由が他にない場合である。例えば、
+<programlisting>
+  module Orphan where
+    instance C a =&gt; D (T a) where ...
+    class C a where ...
+</programlisting>
+ここでは、DもTもOrphanモジュールで宣言されていない。このようなモジュールは孤立モジュールと呼ばれる。これは次のように定義される。</para>
+<itemizedlist>
+  <listitem><para><emphasis>孤立モジュール</emphasis><indexterm><primary>orphan module</primary></indexterm>は、一つ以上の<emphasis>孤立インスタンス</emphasis>または一つ以上の<emphasis>孤立規則</emphasis>を含む。</para></listitem>
+
+  <listitem><para>モジュールMにあるインスタンス宣言が<emphasis>孤立インスタンス</emphasis>なのは、<indexterm><primary>orphan instance</primary></indexterm>インスタンスの頭部(「<literal>=&gt;</literal>」より後の部分)で言及されている型構築子やクラスがどれもMで定義されていないときである。</para>
+
+  <para>考慮されるのはインスタンスの頭部だけである。上記の例では、Cの宣言がモジュールAにあるが、これでは十分でない。DかTの宣言でなければならない。</para>
+  </listitem>
+
+  <listitem><para>モジュールMにある書き換え規則が<emphasis>孤立規則</emphasis>なのは、<indexterm><primary>orphan rule</primary></indexterm>規則の左辺に自由変項として現れる変数、型構築子、クラスがどれもMで宣言されていないときである。</para></listitem>
+ </itemizedlist>
+
+<para>GHCは孤立モジュールを認識し、モジュールをコンパイルするときにはそのモジュール以下の全ての孤立モジュールのインタフェースファイルを訪れる。これは通常無駄な作業だが、回避する方法はない。したがって、孤立モジュールの数をなるべく減らすように努力するべきである。</para>
+
+<para>孤立モジュールをそれと知るには、<option>--show-iface</option>を使ってそのインタフェースファイル<filename>M.hi</filename>を見れば良い。最初の行に「!」があれば、GHCはそれを孤立モジュールだと判断している。</para>
+</sect2>
+
+  </sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

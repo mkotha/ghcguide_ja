@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="runtime-control">
+  <title>コンパイル済みプログラムを実行する</title>
+
+  <indexterm><primary>runtime control of Haskell programs</primary></indexterm>
+  <indexterm><primary>running, compiled program</primary></indexterm>
+  <indexterm><primary>RTS options</primary></indexterm>
+
+  <para>実行可能なプログラムを作るとき、GHCシステムはコードをコンパイルし、それを自明でないランタイムシステム(RTS)とリンクする。これは、記憶領域の管理や、プロファイルの取得などを行う。</para>
+
+  <para>特別なコマンド行引数をプログラムに渡すことで、RTSの振る舞いをいくらか制御することができる。</para>
+
+  <para>Haskellプログラムの実行が開始されるとき、RTSはコマンド行引数から<option>+RTS</option><indexterm><primary><option>+RTS</option></primary></indexterm>と<option>-RTS</option><indexterm><primary><option>-RTS</option></primary></indexterm>で囲まれた部分を自分用に抽出する。以下のような例を考える。</para>
+
+<screen>
+% ./a.out -f +RTS -p -S -RTS -h foo bar
+</screen>
+
+  <para>RTSは<option>-p</option> <option>-S</option>を横取りし、プログラムが<function>System.getArgs</function>を読んだときには残りの引数である<literal>-f -h foo bar</literal>が渡される。</para>
+
+  <para>次の例のように、ランタイムシステムへのオプションがコマンド行の最後まで続くときは、<option>-RTS</option>オプションは必要ない。</para>
+
+<screen>
+% hls -ltr /usr/etc +RTS -A5m
+</screen>
+
+  <para>残りのオプションを問答無用で(RTSでなく)プログラムに渡したいなら、<option>&ndash;&ndash;RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>を使うことができる。</para>
+
+  <para>いつもと同様、<replaceable>size</replaceable>を取るRTSオプションについては、以下が適用される。<replaceable>size</replaceable>の最後の文字がKまたはkなら、数値は1000倍される。Mまたはmなら、1,000,000倍される。GまたはG<!-- 訳注: たぶん誤り -->なら、1,000,000,000倍される。(カウンタのオーバーフローは<emphasis>あなたの</emphasis>責任である)</para>
+
+  <para><literal>+RTS -f</literal><indexterm><primary><option>-f</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
+
+  <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンドラインに加えれば良い。</para>
+
+  <sect2 id="rts-optinos-environment">
+    <title>大域的なRTSオプションを設定する</title>
+
+    <indexterm><primary>RTS options</primary><secondary>from the environment</secondary></indexterm>
+    <indexterm><primary>environment variable</primary><secondary>for
+    setting RTS options</secondary></indexterm>
+
+    <para>RTSオプションは環境変数<envar>GHCRTS</envar><indexterm><primary><envar>GHCRTS</envar></primary></indexterm>からも採られる。例えば、GHCでコンパイルされた全てのプログラムについて最大ヒープサイズを128Mにするなら、次のようにすれば良い。(<literal>sh</literal>系のシェルを使っていると仮定する)</para>
+
+<screen>
+   GHCRTS='-M128m'
+   export GHCRTS
+</screen>
+
+    <para><envar>GHCRTS</envar>環境変数から採られたRTSオプションはコマンド行からオプションを与えることで上書きできる。</para>
+
+  </sect2>
+
+  <sect2 id="rts-options-misc">
+    <title>いろいろなRTSオプション</title>
+
+    <variablelist>
+     <varlistentry>
+       <term><option>-V<replaceable>secs</replaceable></option></term>
+       <indexterm><primary><option>-V</option></primary><secondary>RTS
+       option</secondary></indexterm>
+       <listitem>
+         <para>RTSの時計が進行する時間間隔を設定する。ランタイムは単一のタイマシグナルを使って時計を進行させる。コンテクストスイッチのタイマ(<xref linkend="sec-using-concurrent"/>)およびヒーププロファイル時のタイマ(<xref linkend="rts-options-heap-prof"/>)を制御するのにはこれが使われる。また、時間プロファイルをとるときは、プロファイルの標本を記録するのにRTSのタイマシグナルを直接使うことになる。</para>
+
+         <para>通常、<option>-V</option>オプションを直接指定する必要はない。<option>-C</option>や<option>-i</option>オプションで短い間隔が指定されたときは、自動的にRTSタイマの分解能も調整されるからである。しかし、時間プロファイルの分解能を増したいときには、<option>-V</option>を設定することが必要になる。</para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>--install-signal-handlers=<replaceable>yes|no</replaceable></option>
+       <indexterm><primary><option>--install-signal-handlers</option></primary><secondary>RTS
+       option</secondary></indexterm></term>
+       <listitem>
+         <para>yes(デフォルト)なら、RTSはctrl-Cの類を補足するためのシグナルハンドラを設置する。このオプションは、HaskellコードをDLLとして使っていて、自分でシグナルハンドラを設定したいときに特に有用である。</para>
+       </listitem>
+     </varlistentry>
+    </variablelist>
+  </sect2>
+
+  <sect2 id="rts-options-gc">
+    <title>ガベッジコレクタを制御するためのRTSオプション</title>
+
+    <indexterm><primary>garbage collector</primary><secondary>options</secondary></indexterm>
+    <indexterm><primary>RTS options</primary><secondary>garbage collection</secondary></indexterm>
+
+    <para>ガベッジコレクタの挙動を精密に制御するために、いくつかのオプションが存在する。通常時には、これらはどれも使う必要がない(といいのだが)。それでも、最高の性能を得たいときのために、いくつかの箇所を調整することができるようになっている。</para>
+
+    <variablelist>
+
+      <varlistentry>
+	<term>
+          <option>-A</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-A</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>allocation area, size</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 256k&rsqb;ガベッジコレクタが使う確保領域の大きさを設定する。確保領域(実際には世代0・段階0)は固定されており、大きさが変わることはない。(<option>-H</option>を使った場合はこの限りでない。下記参照)</para>
+
+          <para>確保領域の大きさを増すことは、性能の向上につながるかもしれないし、そうでないかもしれない。(より大きい確保領域を使うと、キャッシュの振舞は悪化するが、ガベッジコレクションの回数は減り、昇格(promotion)も少なくなる)</para>
+
+          <para>世代数が一しかないとき(<option>-G1</option>)は、<option>-A</option>オプションは最小の確保領域を指定する。これは、実際の確保領域の大きさがヒープ中のデータの量によって変動するからである。(下記の<option>-F</option>を見よ)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-c</option>
+          <indexterm><primary><option>-c</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>garbage collection</primary><secondary>compacting</secondary></indexterm>
+          <indexterm><primary>compacting garbage collection</primary></indexterm>
+        </term>
+	<listitem>
+          <para>もっとも古い世代を回収するときにコンパクト化アルゴリズムを使う。デフォルトでは最古世代はコピーアルゴリズムで回収されるが、このオプションが使われると、その場でコンパクト化されるようになる。コンパクト化アルゴリズムはコピーアルゴリズムより遅いが、相当量のメモリを節約できることがある。</para>
+
+          <para>ヒープの大きさ(これは<option>-H</option>オプションで変えられる)が一定のとき、コンパクト化を使うことでかえってGCのコストが削減できるということがあり得る(GCの回数が減らせるかもしれないので)。ヒープの大きさに対する生存データの比が高いとき(>30%、例えば)には特にその傾向が強い。</para>
+
+          <para>注意: 現在、コンパクト化は、<option>-G1</option>で単一世代が指定されているときには動作しない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-c</option><replaceable>n</replaceable></term>
+
+	<listitem>
+          <para>&lsqb;デフォルト: 30&rsqb; 生存データがヒープの大きさの上限(<option>-M</option>オプションを見よ)の<replaceable>n</replaceable>%を超えたときに自動的にコンパクト化を有効にする。デフォルトではヒープの大きさに上限はないので、<option>-M</option><replaceable>size</replaceable>でヒープの大きさの上限が指定されない限り、このオプションには効果がない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-F</option><replaceable>factor</replaceable>
+          <indexterm><primary><option>-F</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>heap size, factor</primary></indexterm>
+        </term>
+	<listitem>
+
+          <para>&lsqb;デフォルト: 2&rsqb; このオプションは、古い世代のために予約されるメモリの量(two-space GCのときは確保領域の大きさ)を、生存データの量との比で指定する。例えば、最後に最も古い世代が回収されたときに生存データが2Mあったとすると、デフォルトでは、4Mにまでなるのを待ってから再び回収する。</para>
+
+          <para>これについてはデフォルトがうまく働いているようである。潤沢なメモリがあるなら、通常、<option>-F</option><replaceable>factor</replaceable>を増やすよりも<option>-H</option><replaceable>size</replaceable>を使った方が良い。</para>
+
+          <para><option>-F</option>の値は、ヒープの最大の大きさ(<option>-M</option><replaceable>size</replaceable>で設定する)に近づいたときには、ガベッジコレクタによって自動的に減らされる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-G</option><replaceable>generations</replaceable>
+          <indexterm><primary><option>-G</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>generations, number of</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 2&rsqb; ガベッジコレクタが使う世代の数を設定する。デフォルトの2は良い選択のようだが、ガベッジコレクタは任意の数の世代をサポートしている。プログラムが<emphasis>長い</emphasis>時間に渡って実行されるのでない限り、4程度より大きな値はおそらく良くない。最古の世代が一回も回収されないということになるからである。</para>
+
+          <para><option>+RTS -G1</option>で一世代を指定すると、当然、単純な2-spaceコレクタになる。2-spaceコレクタでは、<option>-A</option>オプション(上記参照)が指定するのは確保領域の<emphasis>最小の</emphasis>大きさである。これは、ヒープ中の生存データの量が増えるに従って確保領域も拡大されるからである。複数世代のコレクタでは確保領域の大きさは固定である。(<option>-H</option>オプションを使う場合はこの限りでない。下を見よ)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-H</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-H</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>heap size, suggested</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 0&rsqb; このオプションはガベッジコレクタに「推奨されるヒープの大きさ」を提示する。プログラムのメモリ使用量が増加し、性能を保つためにヒープの大きさを増す必要が発生するまでは、ガベッジコレクタは指定された大きさの程度のメモリを使う。</para>
+
+          <para>デフォルトでは、ヒープは小さい状態から開始し、必要に応じて伸長・収縮する。これは性能に悪影響を及ぼすので、メモリが潤沢にあるなら、<option>-H</option><replaceable>size</replaceable>に大きな値を指定すると良い。GCの性能を向上させるには、通常、<option>-A</option><replaceable>size</replaceable>よりも<option>-H</option><replaceable>size</replaceable>を使った方が良い。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <option>-I</option><replaceable>seconds</replaceable>
+	  <indexterm><primary><option>-I</option></primary>
+	    <secondary>RTS option</secondary>
+	  </indexterm>
+	  <indexterm><primary>idle GC</primary>
+	  </indexterm>
+	  </term>
+	<listitem>
+          <para>(デフォルト: 0.3) スレッド化された、またはSMP版のRTS(<option>-threaded</option>を見よ。<xref linkend="options-linker"/>)においては、ランタイムが一定期間待機状態である(Haskellの計算が実行されていない)とき、自動的にメジャーGCが実行される。GCが実行されるまでの時間を指定するのが<option>-I</option><replaceable>seconds</replaceable>オプションである。<option>-I0</option>を指定すると待機状態でのGCが無効になる。</para>
+
+          <para>対話的アプリケーションでは、待機時GCが多くの場合有効である。これは、Haskellの計算が起こっていない待機状態の間に、終了子を走らせたりデッドロックしたスレッドを感知したりできるからである。さらに、アプリケーションが忙しいときにGCが起こる可能性が減るので、反応性が向上するかもしれない。しかし、ヒープ中の生存データの割合があまりに高いと、待機時GCが重大な遅れを引き起こすことがある。また、時間間隔が短すぎると、対話的な反応性に悪影響を及ぼすことになるかもしれない。</para>
+
+          <para>これは実験的な機能である。問題が起きたり、改善案があるなら、知らせてほしい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+         <option>-k</option><replaceable>size</replaceable>
+         <indexterm><primary><option>-k</option></primary><secondary>RTS option</secondary></indexterm>
+         <indexterm><primary>stack, minimum size</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 1k&rsqb; スレッドの初期スタックサイズを設定する。スレッドのスタック(主スレッドのスタックも含めて)はヒープ上にとられ、必要に応じて成長する。デフォルト値はたくさんの小さなスレッドを使う並行アプリケーションに適している。あなたのプログラムがこれに沿わないなら、このオプションを増加させると性能が向上するかもしれない。</para>
+
+          <para>通常、主スレッドはやや大きめのヒープで開始される。これは、プログラムが開始するときに起こる不必要なスタックの伸長を低減するためである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-K</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-K</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>stack, maximum size</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 8M&rsqb; 個々のスレッドの最大スタックサイズを<replaceable>size</replaceable>に設定する。このオプションは、プログラムが無限ループに陥ったときに利用可能なメモリを使い果たすことがないようするためだけに存在している。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-m</option><replaceable>n</replaceable>
+          <indexterm><primary><option>-m</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>heap, minimum free</primary></indexterm>
+        </term>
+	<listitem>
+          <para>ヒープのうち確保可能な(訳注: 未使用な)部分の最小%を指定する。デフォルトは3%である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-M</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-M</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>heap size, maximum</primary></indexterm>
+        </term>
+	<listitem>
+          <para>&lsqb;デフォルト: 無制限&rsqb; 最大ヒープサイズを<replaceable>size</replaceable>に設定する。ヒープは通常プログラムのメモリ要求に従って伸長したり収縮したりする。このオプションの唯一の存在理由は、ヒープが際限なく膨張してスワップ空間を使い果たす(結果として、少なくともプログラムが即座にOSに殺されることになる)のを防ぐことである。</para>
+
+          <para>ヒープの最大サイズは他のGCパラメタにも影響する。ヒープ中の生存データが最大ヒープサイズに対して一定の割合を越えると、最古の世代に対して自動的にコンパクト化回収が有効になり、最大ヒープサイズを越えることがないように<option>-F</option>パラメタが減少せしめられる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-s</option><replaceable>file</replaceable>
+          <indexterm><primary><option>-s</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<term>
+          <option>-S</option><replaceable>file</replaceable>
+          <indexterm><primary><option>-S</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>GCに関する簡潔な(<option>-s</option>)または詳細な(<option>-S</option>)統計情報をファイル<replaceable>file</replaceable>に書く。<replaceable>file</replaceable>のデフォルトは<filename><replaceable>progam</replaceable>.stat</filename>である。<replaceable>file</replaceable>に<constant>stderr</constant>と指定すると特別に扱われ、出力は本当に<constant>stderr</constant>に送られる。</para>
+
+          <para>このオプションは、記憶域管理器がどのように現在の生存データの量に基づいてヒープの大きさを調整しているか見るのに便利である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-t<replaceable>file</replaceable></option>
+          <indexterm><primary><option>-t</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>プログラムを走らせた後、GCの統計情報の一行要約を書き出す。出力は<option>-Rghc-timing</option>オプションで出力される物と同じ書式である。</para>
+
+          <para><option>-s</option>と同様に、デフォルトでは<replaceable>file</replaceable>は<filename><replaceable>program</replaceable>.stat</filename>である。<replaceable>file</replaceable>に<constant>stderr</constant>と指定すると特別に扱われ、出力は本当に<constant>stderr</constant>に送られる。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </sect2>
+
+  <sect2>
+    <title>プロファイルと並列性に関するRTSオプション</title>
+
+    <para>プロファイルに関するRTSオプションは<xref linkend="rts-options-heap-prof"/>で、並行実行に関わる物は<xref linkend="sec-using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
+  </sect2>
+
+  <sect2 id="rts-options-debugging">
+    <title>ハックする者、デバッグする者、及び好奇心過剰な魂のためのRTSオプション</title>
+
+    <indexterm><primary>RTS options, hacking/debugging</primary></indexterm>
+
+    <para>これらのRTSオプションは、(a)&nbsp;GHCのバグを回避するために、(b)&nbsp;「何が実際に起きているか」を知るために、(c)&nbsp;なんとなくそうしたいから、という理由で使うことができる。素人にはおすすめできない。</para>
+
+    <variablelist>
+
+      <varlistentry>
+	<term>
+          <option>-B</option>
+          <indexterm><primary><option>-B</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>GC(メジャー)が始まるたびにベルを鳴らす。</para>
+
+          <para>実に奇妙なことだが、実際にこのオプションを使う人々が存在する。ダラム(イギリス)にいる我々の仲間、ポール・キャラハンは次のように書いている。「ここには色んな目的のためにこれを使う人々がいる&mdash;これは本当だ&mdash;例えば、コード/機械が何かをしているということを確認したり、無限ループを発見したり、最近付け加えたコードのコストを量ったりだ。ある種の人々はビープのパターンからプログラムがどの段階にいるかを聞き分けることさえできる。しかし最も重要な使いかたは、同じオフィスにいる他の人を鬱陶しがらせることである&hellip;」</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-D</option><replaceable>num</replaceable>
+          <indexterm><primary>-D</primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>RTSのデバッグフラグ。<replaceable>num</replaceable>のどのビットが立っているかによって出力の量が異なる。RTSが<option>DEBUG</option>オプション付きでコンパイルされているときのみ効果がある。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-r</option><replaceable>file</replaceable>
+          <indexterm><primary><option>-r</option></primary><secondary>RTS option</secondary></indexterm>
+          <indexterm><primary>ticky ticky profiling</primary></indexterm>
+          <indexterm><primary>profiling</primary><secondary>ticky ticky</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>プログラムの実行終了時に「ticky-ticky」統計情報を生成する。<replaceable>file</replaceable>の扱いは<option>-S</option>RTSオプション(上にある)の場合と同じである。</para>
+
+          <para>「ticky-ticky」統計情報とは、種々のプログラムの動作(update、enter、など)の回数である。プログラムは<option>-ticky</option><indexterm><primary><option>-ticky</option></primary></indexterm>付きでコンパイルされていなければならなず、また、まともに使うには、適切なシステムライブラリとリンクされていなければならない。これは簡単な作業ではない。簡単に「ticky-ticky」プロファイルを使えるようにする方法についてはインストールの手引きを参照せよ。さらなる情報は、<xref linkend="ticky-ticky"/>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-xc</option>
+          <indexterm><primary><option>-xc</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>(プログラムがプロファイルを取れるようにコンパイルしてある場合のみ利用可能) プログラム中で例外が発生したとき、このオプションが指定されていると、現在のコスト集約点スタックが<literal>stderr</literal>に出力される。</para>
+
+          <para>これは特にデバッグ時に有用である。プログラムが<literal>head []</literal>エラーを起こすが、コードのどの部分が原因か分からないとき、<literal>-prof -auto-all</literal>を付けてコンパイルし、<literal>+RTS -xc -RTS</literal>を付けて実行すれば、エラーが発生した地点の呼び出しスタックが正確に分かる。</para>
+
+          <para>発生した例外一つにつき一行が出力される。(プログラムは、実行を通して、例外を複数回発生させたり捕捉したりし得る)。各行は以下の形を取る。</para>
+
+<screen>
+&lt; cc<subscript>1</subscript>, ..., cc<subscript>n</subscript> &gt;
+</screen>
+          <para>それぞれの<literal>cc</literal><subscript>i</subscript>はプログラム中のコスト集約点(<xref linkend="cost-centres"/>を見よ)であり、この列は例外が発生した地点での「呼び出しスタック」を表している。最も右にあるのが最も外側の関数である。</para>
+
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-Z</option>
+          <indexterm><primary><option>-Z</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+	<listitem>
+          <para>GC時の「update-frame-squeezing」を<emphasis>無効に</emphasis>する。(There's no particularly good reason to turn it off, except to ensure the accuracy of certain data collected regarding thunk entry counts.(訳注: 訳せません。助けて))</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+  </sect2>
+
+  <sect2 id="rts-hooks">
+    <title>RTSの振る舞いを変更するためのフック</title>
+
+    <indexterm><primary>hooks</primary><secondary>RTS</secondary></indexterm>
+    <indexterm><primary>RTS hooks</primary></indexterm>
+    <indexterm><primary>RTS behaviour, changing</primary></indexterm>
+
+    <para>GHCでは、ランタイムシステムから呼ばれるフックをコンパイル時に含めることで、任意のプログラムのRTS設定をある程度制御することができる。RTSにはこれら全てのフックのスタブ定義が含まれているが、自分の版を書いてGHCのコマンド行からリンクすることで、デフォルトと異なるものを使える。</para>
+
+    <para>DLLリンクの気まぐれのせいで、これらのフックはWindowsでプログラムが動的リンクでビルドされるときには働かない。</para>
+
+    <para><literal>ghc_rts_opts</literal><indexterm><primary><literal>ghc_rts_opts</literal></primary></indexterm>というフックを使うと、特定のプログラムのRTSオプションを恒久的に設定することができる。よくある使いかたは、プログラムのヒープやスタックをデフォルトより大きくすることである。例えば、<literal>-H128m -K1m</literal>を設定するには、まず以下の定義をCソースファイルに置く。</para>
+
+<programlisting>
+char *ghc_rts_opts = "-H128m -K1m";
+</programlisting>
+
+    <para>このCファイルをコンパイルし、できたオブジェクトファイルを、Haskellプログラムをリンクするときのコマンド行に加えれば良い。</para>
+
+    <para>これらのフラグは、<literal>GHCRTS</literal>環境変数やコマンド行のフラグよりも先に解釈される。</para>
+
+    <para>ランタイムシステムがどうしようもなくなったとき(例えばスタックオーバーフロー)に表示される文言を変更することもできる。このためのフックは以下である。</para>
+
+    <variablelist>
+
+      <varlistentry>
+	<term>
+          <function>void OutOfHeapHook (unsigned long, unsigned long)</function>
+          <indexterm><primary><function>OutOfHeapHook</function></primary></indexterm>
+        </term>
+	<listitem>
+          <para>ヒープオーバーフローのメッセージ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <function>void StackOverflowHook (long int)</function>
+          <indexterm><primary><function>StackOverflowHook</function></primary></indexterm>
+        </term>
+	<listitem>
+          <para>スタックオーバーフローのメッセージ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <function>void MallocFailHook (long int)</function>
+          <indexterm><primary><function>MallocFailHook</function></primary></indexterm>
+        </term>
+	<listitem>
+          <para><function>malloc</function>が失敗したときに表示されるメッセージ。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
+  </sect2>
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

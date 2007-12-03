@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="lang-parallel">
+  <title>Concurrent HaskellおよびParallel Haskell</title>
+  <indexterm><primary>parallelism</primary>
+  </indexterm>
+
+  <para>GHCは、並行プログラミングおよび並列プログラミングに対応するための、Haskellへの大規模な拡張をいくつか実装している。まず用語をはっきりさせておこう。
+  <itemizedlist>
+    <listitem><para><emphasis>並列性</emphasis>(parallelism)とは、実行性能の向上を目的として、Haskellプログラムを複数のプロセッサ上で走らせることである。理想的には、これは不可視に、意味を変更することなく為されるべきである。</para></listitem>
+
+    <listitem><para><emphasis>並行性</emphasis>(concurrency)とは、それぞれIOを行う複数のスレッドを使ってプログラムを実装することである。確かに並行Haskellプログラムは並列な機械上で走らせることが<emphasis>できる</emphasis>が、並行性を使うのは、第一目的として実行性能を得るためではなく、それが当該プログラムを書くための最も単純で最も直接的な方法だからである。スレッドは入出力を行うので、プログラムの意味は必然的に非決定的なものになる。</para></listitem>
+  </itemizedlist>
+  GHCは並行性と並列性の両方に対応している。</para>
+
+  <sect2 id="concurrent-haskell">
+    <title>Concurrent Haskell</title>
+
+  <para>Concurrent HaskellとはGHCの並行性拡張に付けられた名前である。これはデフォルトで有効になっており、特別なフラグは必要ない。<ulink url="http://research.microsoft.com/copyright/accept.asp?path=/users/simonpj/papers/concurrent-haskell.ps.gz">Concurrent Haskellの論文</ulink>は今でも素晴らしいリソースであるし、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/marktoberdorf">Tackling the awkward squad</ulink>もそうである。
+  </para><para>
+  プログラマに対しては、Concurrent Haskellでは新しい言語要素は導入されず、単なるライブラリ(<ulink url="../libraries/base/Control-Concurrent.html">Control.Concurrent</ulink>)の形を取る。このライブラリからは例えば次のような関数がエクスポートされている。
+  <itemizedlist>
+<listitem><para>スレッドのforkやkill。</para></listitem>
+<listitem><para>スリープ。</para></listitem>
+<listitem><para><literal>MVar</literal>と呼ばれる、同期化された変更可能変数</para></listitem>
+<listitem><para>bound threadの補助関数。<ulink url="http://research.microsoft.com/%7Esimonpj/Papers/conc-ffi/index.htm">Extending the FFI with concurrency</ulink>を見よ。</para></listitem>
+</itemizedlist>
+</para>
+</sect2>
+
+   <sect2><title>Software Transactional Memory</title>
+
+    <para>GHCは、Concurrent Haskellのスレッドの動作を統括するための新しい方法をサポートするようになった。これはSoftware Transactional Memory(STM)と呼ばれる。<ulink url="http://research.microsoft.com/%7Esimonpj/papers/stm/index.htm">STMの論文</ulink>は、STMとは何か、どう使うのか、についての素晴らしい入門文書である。</para> 
+   <para>STMを使うのに必要な主ライブラリは<ulink url="../libraries/stm/Control-Concurrent-STM.html">Control.Concurrent.STM</ulink>である。サポートされる主な機能は以下の通り。
+<itemizedlist>
+<listitem><para>分割不能ブロック。</para></listitem>
+<listitem><para>トランザクション変数</para></listitem>
+<listitem><para>トランザクションを組み合わせるための演算(<literal>retry</literal>と<literal>orElse</literal>)。</para></listitem>
+<listitem><para>データの不変条件。</para></listitem>
+</itemizedlist>
+これらの機能は全て先に述べた論文に記述されている。
+</para>
+</sect2>
+
+<sect2><title>Parallel Haskell</title>
+
+  <para>GHCには、対称的・メモリ共有型のマルチプロセッサ(SMP)<indexterm><primary>SMP</primary></indexterm>上でHaskellプログラムを並列実行することのサポートが含まれている。デフォルトでは、プログラムはひとつのプロセッサ上で走る。並列実行されてほしい場合、プログラムを<option>-threaded</option>付きでリンクし、RTSの<option>-N</option>オプション付きで実行せねばならない。(<xref linkend="sec-using-smp" />を見よ)。OSスレッドはRTSオプション<option>-N</option>で指定された数だけ並列に実行され、ランタイムはこれらに対して実行中のHaskellスレッドをスケジュールする。</para>
+
+  <para>GHCが並列実行に対応しているのはメモリ共有型のマルチプロセッサだけである。Glasgow Parallel Haskell<indexterm><primary>Glasgow Parallel Haskell</primary></indexterm>は、Parallel Haskellのプログラムを、複数の機械からなるクラスタ、および単一のマルチプロセッサの両方で動かす。GPHはGHCとは別に開発・配布されている。(<ulink url="http://www.cee.hw.ac.uk/~dsg/gph/">The GPH Page</ulink>を見よ)。ただしGPHの現在の版はかなり古いGHC(4.06)を元にしている。</para>
+  </sect2>
+  
+  <sect2>
+    <title>純粋なコードに並列計算用の注釈を加える</title>
+
+  <para>通常の単一スレッドのHaskellプログラムは、SMP並列性を有効にしただけではその恩恵を被ることができない。並列性をコンパイラから見えるようにしてやる必要があるのだ。これには、Concurrent Haskell(<xref linkend="concurrent-haskell"/>)を使ってスレッドをforkするという方法もあるが、純粋なコードから並列性を取り出す場合、最も単純な方法は<literal>par</literal>コンビネータを使うことである。これは、<literal>seq</literal>と強く関連している(また、良く一緒に使われる)。これらはどちらも<ulink url="../libraries/base/Control-Parallel.html"><literal>Control.Parallel</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Parallel.html">web上の最新版</ulink>)にある。</para>
+
+<programlisting>
+infixr 0 `par`
+infixr 1 `seq`
+
+par :: a -&#62; b -&#62; b
+seq :: a -&#62; b -&#62; b</programlisting>
+
+    <para>式<literal>(x `par` y)</literal>は、<literal>x</literal>の(弱頭部正規形までの)評価を<emphasis>発火</emphasis>させ、<literal>y</literal>を返す。発火したものはFIFO順に実行待ちに入るが、すぐには実行されない。ランタイムが待機状態のCPUを見つけると、発火したものはスレッドにされ、その新しいスレッドが待機状態のCPUで走らされる。この方法で、利用可能な並列性が実CPU間で分散されることになる。</para>
+
+    <para>例として、我々の宿敵である<function>nfib</function>の並列版を考えよう。</para>
+
+<programlisting>
+import Control.Parallel
+
+nfib :: Int -&#62; Int
+nfib n | n &#60;= 1 = 1
+       | otherwise = par n1 (seq n2 (n1 + n2 + 1))
+                     where n1 = nfib (n-1)
+                           n2 = nfib (n-2)</programlisting>
+
+    <para><varname>n</varname>の値が1より大きいときは、<function>par</function>を使って、<literal>nfib (n-1)</literal>を評価するスレッドを発火させる。次に、<function>seq</function>を使って、親スレッドで<literal>nfib (n-2)</literal>を評価し、その後でこれらの二つの部分式を加算するようにする。この分割統治法において、計算の枝の一方だけに新しいスレッドを発火させている。(一方の枝は親が評価する)。また、親が式<literal>(n1 + n2 + 1)</literal>中の<varname>n1</varname>を評価する<emphasis>前</emphasis>に<varname>n2</varname>を評価することを保証するために<function>seq</function>を使わなければならない。式を<literal>(n2 + n1 + 1)</literal>と並べ替えるだけでは不十分である。コンパイラが加数を左から順に評価するコードを生成するとは限らないからである。</para>
+
+    <para><literal>par</literal>を使うとき、一般的な経験則としては、発火させる計算は後で必要とされるものであるべきだが、一方、あまりすぐ必要とされるものであるべきではない。また、あまり小さい計算を発火させるべきではない。得られる並列性に比べてそれをforkするコストが比較的高いからである。実際には、これらの比率を正しく把握するのは難しい。</para>
+
+    <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="../libraries/base/Control-Parallel-Strategies.html"><literal>Control.Parallel.Strategies</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Parallel-Strategies.html">web上の最新版</ulink>)モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
+  </sect2>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

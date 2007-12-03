@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="options-debugging">
+  <title>コンパイラをデバッグする</title>
+
+  <indexterm><primary>debugging options (for GHC)</primary></indexterm>
+
+  <para>ここより先はハックする者の領域である。繰り返す。ここより先はハックする者の領域である。(警告したよ)</para>
+
+  <sect2 id="dumping-output">
+    <title>コンパイラの中間構造を出力する</title>
+    
+    <indexterm><primary>dumping GHC intermediates</primary></indexterm>
+    <indexterm><primary>intermediate passes, output</primary></indexterm>
+    
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-ddump-</option><replaceable>pass</replaceable>
+          <indexterm><primary><option>-ddump</option> options</primary></indexterm>
+        </term>
+	<listitem>
+          <para>過程<literal>&lt;pass&gt;</literal>(頻繁に使われるものについては短縮形がある)の後にデバッグ情報を出力する。<option>-v5</option>を使うことでこれら全てを一遍に得られる。(<emphasis>大量の</emphasis>出力になる)。あるいは、<option>-v4</option>を使うことで大部分を得られる。特に重要なのは下記の通りである。</para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-parsed</option>:
+                <indexterm><primary><option>-ddump-parsed</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>パーサの出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-rn</option>:
+                <indexterm><primary><option>-ddump-rn</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>名前変更器(renamer)の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-tc</option>:
+                <indexterm><primary><option>-ddump-tc</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>型検査器の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-tc</option>:
+                <indexterm><primary><option>-ddump-tc</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>型検査器の出力</para>
+                <!-- 訳注: 重複 -->
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-splices</option>:
+                <indexterm><primary><option>-ddump-splices</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>接合するTemplate Haskellの式と、その評価結果のHaskellコードを出力する。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-types</option>:
+                <indexterm><primary><option>-ddump-types</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>モジュールのトップレベルで定義されている全ての値について型シグネチャを出力する。この一覧は辞書順にソートされている。<option>-dppr-debug</option>を使うと、インポートされたもの及びシステム定義のものの型シグネチャも出力する。これはコンパイラをデバッグするときに便利である。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-deriv</option>:
+                <indexterm><primary><option>-ddump-deriv</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>導出インスタンス</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-ds</option>:
+                <indexterm><primary><option>-ddump-ds</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>脱糖器の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-spec</option>:
+                <indexterm><primary><option>-ddump-spec</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>特殊化過程の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-rules</option>:
+                <indexterm><primary><option>-ddump-rules</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>書き換え規則を全て出力する(特殊化過程で生成されたものも含む)</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-simpl</option>:
+                <indexterm><primary><option>-ddump-simpl</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>単純化器の出力(「コアからコアへ」の過程)</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-inlinings</option>:
+                <indexterm><primary><option>-ddump-inlinings</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>単純化器からのインライン化情報</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-cpranal</option>:
+                <indexterm><primary><option>-ddump-cpranal</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>CPR解析の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-stranal</option>:
+                <indexterm><primary><option>-ddump-stranal</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>正格性解析器の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-cse</option>:
+                <indexterm><primary><option>-ddump-cse</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>CSE過程の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-workwrap</option>:
+                <indexterm><primary><option>-ddump-workwrap</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>ワーカ/ラッパ分割の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-occur-anal</option>:
+                <indexterm><primary><option>-ddump-occur-anal</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>「出現解析」の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-prep</option>:
+                <indexterm><primary><option>-ddump-prep</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>コアpreparation過程の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-stg</option>:
+                <indexterm><primary><option>-ddump-stg</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>「STGからSTGへ」過程の出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-flatC</option>:
+                <indexterm><primary><option>-ddump-flatC</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para><emphasis>平坦化された</emphasis>(flattened)抽象C</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-cmm</option>:
+                <indexterm><primary><option>-ddump-cmm</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>C--のコードを表示する。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-opt-cmm</option>:
+                <indexterm><primary><option>-ddump-opt-cmm</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>C--からC--への最適化過程の結果を表示する。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-asm</option>:
+                <indexterm><primary><option>-ddump-asm</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>ネイティブコード生成器が出力するアセンブリ言語</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-bcos</option>:
+                <indexterm><primary><option>-ddump-bcos</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>バイトコードコンパイラの出力</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-foreign</option>:
+                <indexterm><primary><option>-ddump-foreign</option></primary></indexterm>
+	      </term>
+	      <listitem>
+                <para>foreign exportのスタブを出力</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>
+          <option>-ddump-simpl-iterations</option>:
+          <indexterm><primary><option>-ddump-simpl-iterations</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>単純化器の毎回の<emphasis>繰り返し</emphasis>毎の出力を見せる。(単純化器の一回の実行に対して繰り返し回数の最大値が決まっている。通常4)。Used when even <option>-dverbose-simpl</option> doesn't cut it.</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-simpl-stats</option>
+          <indexterm><primary><option>-ddump-simpl-stats option</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>変換の種類毎に、何回実行されたかの統計情報を出力する。<option>-dppr-debug</option>を追加すればより詳細な情報が得られる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-if-trace</option>
+          <indexterm><primary><option>-ddump-if-trace</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>インタフェースローダが自分のやっていることを*事細かに*報告するようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-tc-trace</option>
+          <indexterm><primary><option>-ddump-tc-trace</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>型検査器が自分のやっていることを*事細かに*報告するようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-rn-trace</option>
+          <indexterm><primary><option>-ddump-rn-trace</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>名前変更器が自分のやっていることを*事細かに*報告するようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-rn-stats</option>
+          <indexterm><primary><option>-dshow-rn-stats</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>名前変更器がどんな種類の情報を収集しなければならなかったかについての要約を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dverbose-core2core</option>
+          <indexterm><primary><option>-dverbose-core2core</option></primary></indexterm>
+        </term>
+	<term>
+          <option>-dverbose-stg2stg</option>
+          <indexterm><primary><option>-dverbose-stg2stg</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>中間の「コアからコアへ」および「STGからSTGへ」過程の出力をそれぞれ表示する。(<emphasis>たくさん</emphasis>の出力になるよ！)。なので、本当に自暴自棄になったときには、次のように打つ。</para>
+
+	  <screen>
+% ghc -noC -O -ddump-simpl -dverbose-simpl -dcore-lint Foo.hs
+</screen>
+
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>
+          <option>-dshow-passes</option>
+          <indexterm><primary><option>-dshow-passes</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>それぞれの過程を、発生するごとに表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dfaststring-stats</option>
+          <indexterm><primary><option>-dfaststring-stats</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>コンパイラによるfast stringの使用についての統計情報を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dppr-debug</option>
+          <indexterm><primary><option>-dppr-debug</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>デバッグ出力にはいくつかの「様式」がある。例えば型を表示する場合、「利用者」様式(デフォルト)では、コンパイラが内部的に持っている型についての情報をできる限りHaskellソースファイルの構文に従って表す。「デバッグ」様式で型が表示されるときには、明示的なforallが付き、変数には固有IDが添付される。(このため、一見同じだが実は異なるものを見分けることができる)。このフラグは、デバッグ出力を、より多弁なデバッグ様式で行うようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dppr-user-length</option>
+          <indexterm><primary><option>-dppr-user-length</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>エラーメッセージ中では、式はある「深さ」までしか印字されず、それよりも深い部分式は省略符号で表される。このフラグはその深さを決定する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dshow-unused-imports</option>
+          <indexterm><primary><option>-dshow-unused-imports</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>名前変更器が無意味なインポートを報告するようにする。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+
+  <sect2 id="checking-consistency">
+    <title>整合性の検査</title>
+
+    <indexterm><primary>consistency checks</primary></indexterm>
+    <indexterm><primary>lint</primary></indexterm>
+
+    <variablelist>
+
+      <varlistentry>
+	<term>
+          <option>-dcore-lint</option>
+          <indexterm><primary><option>-dcore-lint</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>GHC中の重量級パス内正気度チェックをコア水準で有効にする。(これがチェックするのはGHCの正気であって、あなたのではない)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dstg-lint</option>:
+          <indexterm><primary><option>-dstg-lint</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>同じことをSTG水準で行う。(注意: 現在機能していない)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dcmm-lint</option>:
+          <indexterm><primary><option>-dcmm-lint</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>同じことをC--水準で行う。</para>
+	</listitem>
+      </varlistentry>
+
+    </variablelist>
+  </sect2>
+
+  <sect2>
+    <title>コア構文(<option>-ddump</option>系フラグ由来の)の読み方</title>
+
+    <indexterm><primary>reading Core syntax</primary></indexterm>
+    <indexterm><primary>Core syntax, how to read</primary></indexterm>
+
+    <para>例を通して見ていくことにしよう。以下のコードに対して<option>-ddump-ds</option>することを考える。
+
+<programlisting>
+skip2 m = m : skip2 (m+2)
+</programlisting>
+
+    始める前に、名前について少々。GHC内部では、変数や型構築子などは「固有子(unique)」によって識別される。固有子は「文字」と「数値」(両方とも広く解釈する)をつなげた形をしている。「文字」部分はその固有子がどういう由来を持つのかを示す。例えば、<literal>&lowbar;</literal>は「組込みの型変数」を意味し、<literal>t</literal>は「型検査器由来」、<literal>s</literal>は「単純化器由来」という具合である。「数値」部分は「base-62」形式でとてもコンパクトに表示されるが、私(WDP)以外の皆はこれが嫌いなようだ。</para>
+
+    <para>もう一度言うが、あらゆるものは「固有子」を持っていて、これは通常デバッグ時になんらかの形で出力される。ではいってみよう&hellip;</para>
+
+<programlisting>
+Desugared:
+Main.skip2{-r1L6-} :: _forall_ a$_4 =&#62;{{Num a$_4}} -&#62; a$_4 -&#62; [a$_4]
+
+--# 「r1L6」はMain.skip2の固有子
+--# 「_4」は型変数(テンプレート)「a」の固有子
+--# 「{{Num a$_4}}」は辞書引数
+
+_NI_
+
+--# 「_NI_」は「まだ(実質的に)情報がない」を意味する。これは後に
+--# GHC_PRAGMA情報になり、インタフェースファイルに行く。
+
+Main.skip2{-r1L6-} =
+    /\ _4 -&#62; \ d.Num.t4Gt -&#62;
+        let {
+          {- CoRec -}
+          +.t4Hg :: _4 -&#62; _4 -&#62; _4
+          _NI_
+          +.t4Hg = (+{-r3JH-} _4) d.Num.t4Gt
+
+          fromInt.t4GS :: Int{-2i-} -&#62; _4
+          _NI_
+          fromInt.t4GS = (fromInt{-r3JX-} _4) d.Num.t4Gt
+
+--# クラスメソッド「+」(固有子: r3JH)は辞書「Num」(今や明示的にラ
+--# ムダで導入される引数である)から加算のコードを選択する。コアは
+--# 二階のラムダ計算なので、型適用と型ラムダ(/\)は明示的である。
+--# そのため、「+」は、まず型(「_4」)に適用され、次に辞書に適用さ
+--# れている。この適用の結果が実際の加法関数であり、後で使われる。
+
+--# (非標準の)クラスメソッド「fromInt」についても全く同じことを行
+--# う。驚くに値しないが、型「Int」はコンパイラに結わえつけられて
+--# いる。
+
+          lit.t4Hb :: _4
+          _NI_
+          lit.t4Hb =
+              let {
+                ds.d4Qz :: Int{-2i-}
+                _NI_
+                ds.d4Qz = I#! 2#
+              } in  fromInt.t4GS ds.d4Qz
+
+--# 「I# 2#」というのは単なるリテラルのInt「2」のことである。これ
+--# は、GHCが「data Int = I# Int#」と定義していることを反映してい
+--# る。ここで、Int#はプリミティブの非ボックス化型である。(非ボッ
+--# クス化型の関連情報についてはどこか別のところを見よ)
+
+--# 「I#」の後の「!」は、データ構築子「I#」の適用が*飽和*している
+--# (つまり、部分的用ではない)ことを示す。
+
+          skip2.t3Ja :: _4 -&#62; [_4]
+          _NI_
+          skip2.t3Ja =
+              \ m.r1H4 -&#62;
+                  let { ds.d4QQ :: [_4]
+                        _NI_
+                        ds.d4QQ =
+                    let {
+                      ds.d4QY :: _4
+                      _NI_
+                      ds.d4QY = +.t4Hg m.r1H4 lit.t4Hb
+                    } in  skip2.t3Ja ds.d4QY
+                  } in
+                  :! _4 m.r1H4 ds.d4QQ
+
+          {- end CoRec -}
+        } in  skip2.t3Ja
+</programlisting>
+
+    <para>(「これは一つの単純な関数型言語に過ぎない」はPeyton Jones Enterprises, plc.の非レジスタ化商標です。)</para>
+
+  </sect2>
+
+  <sect2 id="unreg">
+    <title>非レジスタ化コンパイル</title>
+    <indexterm><primary>unregisterised compilation</primary></indexterm>
+
+    <para>「非レジスタ化」という用語は実際には「純粋なCを介してコンパイルする」ということを意味している。つまり、通常GHCがプログラムを速くするために使うプラットフォーム固有の技を一部使わないということである。非レジスタ化コンパイルするときは、GHCは単純にgccでコンパイルできるCファイルを生成する。</para>
+
+    <para>非レジスタ化コンパイルはGHCを新しい機械に移植するときに便利である。これを使うと、予め必要なツールは<command>gcc</command>、<command>as</command>、<command>ld</command>だけになるし、さらに、非レジスタ化コンパイルが動作するようにするために書かなければならないプラットフォーム固有のコードは通常かなり少ないからである。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-unreg</option>:
+          <indexterm><primary><option>-unreg</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>純粋なCのみを介してコンパイルし、プラットフォーム固有の最適化を無効にする。注意: <option>-unreg</option>を使うには、非レジスタ化コンパイルのためにビルドされたライブラリ群(RTSを含む)が必要である。これはGHCをウェイ「u」を有効にしてビルドすることに相当する。</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->

@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="utils">
+  <title>その他のHaskellユーティリティプログラム</title>
+  <indexterm><primary>utilities, Haskell</primary></indexterm>
+
+  <para>この節では、配布物に含まれるその他のプログラムについて述べる。これらは、大いなるHaskellでのプログラミング作業に役立つものである。</para>
+
+<!-- comment: hasktags documentation loosely based on that for hstags -->
+
+<sect1  id ="hasktags">
+	<title>Haskell用Ctags/Etags: <command>hasktags</command></title>
+	<indexterm><primary><command>hasktags</command></primary></indexterm>
+	<indexterm><primary>CTAGS for Haskell</primary></indexterm>
+
+	<para><command>hasktags</command>は、非常に単純なHaskellプログラムであり、Haskellプログラムに対して、ctagsの「tags」ファイルや、egagsの「TAGS」ファイルを生成する。</para>
+
+        <para>これをNEditやVim、Emacsなどのエディタにロードすると、複数ファイルからなるプログラムで、関数、型、構築子の定義を探し、簡単に移動することができる。</para>
+
+	<para>起動構文</para>
+
+<screen>
+hasktags files
+</screen>
+
+<para>
+これで、<option>files</option>中のファイルが全て読まれ、ctagsの「tags」ファイルとetagsの「TAGS」ファイルとがカレントディレクトリに生成される。</para>
+
+	<para>使用例</para>
+
+<screen>
+find -name \*.\*hs | xargs hasktags
+</screen>
+
+<para>この場合、カレントディレクトリ以下の全てのHaskellソースが探索され、それらを目録化したタグファイルがカレントディレクトリに生成される。</para>
+
+	<para><command>hasktags</command>は単純なプログラムであり、関数や構築子や型の定義を見つけるのにも単純な規則を使っている。全てを見つけることは保証されていないし、存在しないものに対して項目を作ることもあるが、通常はかなりよく働く。特に、関数は、型シグネチャが与えられているときにのみ項目化される。</para>
+
+	<para>hasktagsの前、<command>fptags</command>と<command>hstags</command>があった。これらは基本的には同じことをするものだが、どちらももはや保守されていないようである。</para>
+
+<sect2>
+<title>エディタからタグを使う</title>
+
+<para>NEditでは、「File/Load Tags File」でタグをロードし、「Ctrl-D」でタグを検索する。</para>
+
+<para>XEmacsでは、「visit-tags-table」で「TAGS」ファイルをロードし、「M-.」でタグを検索する。</para>
+
+
+</sect2>
+
+</sect1>
+
+<!-- comment: hstags doesn't work anymore
+
+  <sect1 id="hstags">
+    <title>Emacs `TAGS' for Haskell: <command>hstags</command></title>
+    <indexterm><primary><command>hstags</command></primary></indexterm>
+    <indexterm><primary>TAGS for Haskell</primary></indexterm>
+
+    <para>`Tags' is a facility for indexing the definitions of
+    programming-language things in a multi-file program, and then
+    using that index to jump around among these definitions.</para>
+
+    <para>Rather than scratch your head, saying &ldquo;Now where did
+    we define `foo'?&rdquo;, you just do (in Emacs) <Literal>M-. foo
+    RET</Literal>, and You're There!  Some people go wild over this
+    stuff&hellip;</para>
+
+    <para>GHC comes with a program <command>hstags</command>, which
+    build Emacs-able TAGS files.  The invocation syntax is:</para>
+
+<screen>
+hstags [GHC-options] file [files...]
+</screen>
+
+    <para>The best thing is just to feed it your GHC command-line
+    flags.  A good Makefile entry might be:</para>
+
+<programlisting>
+tags:
+        $(RM) TAGS
+        hstags $(GHC_FLAGS) *.lhs
+</programlisting>
+
+    <para>The only flags of its own are: <Option>-v</Option> to be
+    verbose; <Option>-a</Option> to <Emphasis>APPEND</Emphasis> to the
+    TAGS file, rather than write to it.</para>
+
+    <para>Shortcomings: (1)&nbsp;Instance declarations don't get into
+    the TAGS file (but the definitions inside them do); as instances
+    aren't named, this is probably just as well.
+    (2)&nbsp;Data-constructor definitions don't get in.  Go for the
+    corresponding type constructor instead.</para>
+
+    <para>Actually, GHC also comes with <command>etags</command>
+    &lsqb;for C&rsqb;, and <command>perltags</command> &lsqb;for You
+    Know What&rsqb;.  And&mdash;I cannot tell a lie&mdash;there is
+    Denis Howe's <command>fptags</command> &lsqb;for Haskell,
+    etc.&rsqb; in the <Filename>ghc/CONTRIB</Filename>
+    section&hellip;)</para>
+
+  </sect1>
+-->
+
+  <sect1 id="happy">
+    <title>&ldquo;Haskell用Yacc&rdquo;: <command>happy</command></title>
+
+    <indexterm><primary>Happy</primary></indexterm>
+    <indexterm><primary>Yacc for Haskell</primary></indexterm>
+    <indexterm><primary>parser generator for Haskell</primary></indexterm>
+
+    <para>Andy GillとSimon Marlowが<command>happy</command>呼ばれるHaskell用パーサジェネレータを書いた。<indexterm><primary>happy parser generator</primary></indexterm><command>happy</command>は、<command>Yacc</command>がCで行うことをHaskellで行うものである。</para>
+
+    <para><command>happy</command>は<ulink url="http://www.haskell.org/happy/">the Happy Homepage</ulink>で手に入る。</para>
+
+    <para><command>happy</command>はGHCでコンパイルされたときに最大の力を発揮する。</para>
+
+  </sect1>
+
+<!-- we don't distribute this anymore
+  <sect1 id="pphs">
+    <title>Pretty-printing Haskell: <command>pphs</command></title>
+    <indexterm><primary>pphs</primary></indexterm>
+    <indexterm><primary>pretty-printing Haskell code</primary></indexterm>
+
+    <para>Andrew Preece has written
+    <command>pphs</command>,<indexterm><primary>pphs</primary></indexterm><indexterm><primary>pretty-printing
+    Haskell</primary></indexterm> a utility to pretty-print Haskell
+    code in LaTeX documents.  Keywords in bolds, variables in
+    italics&mdash;that sort of thing.  It is good at lining up program
+    clauses and equals signs, things that are very tiresome to do by
+    hand.</para>
+
+    <para>The code is distributed with GHC in
+    <Filename>ghc/CONTRIB/pphs</Filename>.</para>
+  </sect1>
+-->
+
+  <sect1 id="hsc2hs">
+    <title>CコードへのHaskellインタフェースを書く: <command>hsc2hs</command></title>
+    <indexterm><primary><command>hsc2hs</command></primary>
+    </indexterm>
+
+    <para><command>hsc2hs</command>コマンドを使うと、CコードのHaskellバインディングを書く作業を一部自動化することができる。このコマンドは、特別な構文要素の埋め込まれたHaskellのコードを読み、Cのヘッダから得た情報を使ってこれらの要素を処理し、本当のHaskellファイルを出力する。この特別な構文要素は、CのデータをHaskellからアクセスするにあたって必要なことを扱う。</para>
+
+    <para><command>hsc2hs</command>はCファイルとCヘッダを出力することもある。Cファイルには、プログラムにリンクすべき追加のC関数が置かれ、ヘッダファイルは、そのHaskellモジュールがコンパイルされてできるCコードからincludeされるものである。この二つのファイルは<literal>#def</literal>という構文要素(下記参照)が使われたときに作られる。</para>
+
+    <para><command>hsc2hs</command>は実際には直接Haskellコードを出力するわけではない。問題のヘッダをインクルードするCプログラムを作り、自動的にコンパイル・実行する。このプログラムがHaskellコードを生成する。</para>
+
+    <para>以下では、「Haskellファイル」は主たる出力ファイル(通常<literal>.hs</literal>)であり、「Haskellファイルのコンパイル結果」は、<command>ghc</command>がHaskellファイルをコンパイルしてできたもの(<literal>.hc</literal>ファイル)であり、「Cプログラム」はHaskellファイルを出力するプログラムであり、「Cファイル」は場合によって出力されるCファイルであり、「Cヘッダ」はそのヘッダファイルである。</para>
+
+    <sect2>
+      <title>コマンド行構文</title>
+
+      <para><command>hsc2hs</command>は、引数として、入力ファイルと、振る舞いを変更するフラグを受け付ける。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><literal>-o FILE</literal>または<literal>&ndash;&ndash;output=FILE</literal></term>
+	  <listitem>
+	    <para>Haskellファイルの名前。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-t FILE</literal>または<literal>&ndash;&ndash;template=FILE</literal></term>
+	  <listitem>
+	    <para>テンプレートファイル(下記参照)。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-c PROG</literal>または<literal>&ndash;&ndash;cc=PROG</literal></term>
+	  <listitem>
+	    <para>利用するCコンパイラ(デフォルト: <command>ghc</command>)。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-l PROG</literal>または<literal>&ndash;&ndash;ld=PROG</literal></term>
+	  <listitem>
+	    <para>利用するリンカ(デフォルト: <command>gcc</command>)。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-C FLAG</literal>または<literal>&ndash;&ndash;cflag=FLAG</literal></term>
+	  <listitem>
+	    <para>Cコンパイラに渡す追加のフラグ。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-I DIR</literal></term>
+	  <listitem>
+	    <para>Cコンパイラに渡される。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-L FLAG</literal>または<literal>&ndash;&ndash;lflag=FLAG</literal></term>
+	  <listitem>
+	    <para>リンカに渡す追加のフラグ。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-i FILE</literal>または<literal>&ndash;&ndash;include=FILE</literal></term>
+	  <listitem>
+	    <para>適切な<literal>#include</literal>がソース中に置かれたのと同様。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-D NAME[=VALUE]</literal>または<literal>&ndash;&ndash;define=NAME[=VALUE]</literal></term>
+	  <listitem>
+	    <para>ソース中に適切な<literal>#define</literal>が置かれたのと同様。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>&ndash;&ndash;no-compile</literal></term>
+	  <listitem>
+	    <para>中間のCプログラムをディスクに書き込んだ後停止する。中間Cファイルの名前は、入力ファイル名の<literal>.hsc</literal>を<literal>_hsc_make.c</literal>で置き換えたものである。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-?</literal>または<literal>&ndash;&ndash;help</literal></term>
+	  <listitem>
+	    <para>利用可能なフラグの要約を表示し、成功裡に終了する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-V</literal>または<literal>&ndash;&ndash;version</literal></term>
+	  <listitem>
+	    <para>バージョン情報を表示し、成功裡に終了する。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>入力ファイルは.hscで終わっていなければならない。(これは素のHaskellソースでなければならない。文芸Haskellは未対応である)。出力ファイルはデフォルトでは<literal>.hsc</literal>接尾辞を次のもので置き換えた名前になる。</para>
+
+      <informaltable>
+	<tgroup cols="2">
+	  <tbody>
+	    <row>
+	      <entry><literal>.hs</literal></entry>
+	      <entry>Haskellファイル</entry>
+	    </row>
+	    <row>
+	      <entry><literal>_hsc.h</literal></entry>
+	      <entry>Cヘッダ</entry>
+	    </row>
+	    <row>
+	      <entry><literal>_hsc.c</literal></entry>
+	      <entry>Cファイル</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+
+      <para>CプログラムはHaskellコンパイラでコンパイルされる。これにより、<filename>HsFFI.h</filename>が使える。これは、自動的にCプログラムにincludeされる。</para>
+
+    </sect2>
+    <sect2><title>入力の構文</title>
+
+      <para>特殊な処理は全て<literal>#</literal>演算子で起動される。<literal>#</literal>を文字どおり出力したい場合は、<literal>##</literal>と二回書けば良い。文字列リテラルおよびコメントの中の<literal>#</literal>は処理されない。</para>
+
+      <para><literal>#</literal>の後にはスペースやタブ(省略可能)が続き、その後に、アルファベットと数字からなる、処理の種類を示すキーワードが書かれ、その後に引数が置かれる。引数は、Cの式をコンマで区切ったような形をしている(括弧では囲まない)。引数が終わるのは、対応するもののない<literal>)</literal>、<literal>]</literal>、<literal>}</literal>が現れるか、行の終わりに達したとき(ただし、<literal>() [] {} '' "" /**/</literal>のいずれにも囲まれておらず、バックスラッシュが前置されてもいない場合に限る)である。バックスラッシュと改行の対は消される。</para>
+
+      <para>さらに、<literal>#{何か}</literal>は<literal>#何か</literal>と同様だが、終わりが明確なので、行の最後に置いたり括弧の中に置いたりする必要がない。</para>
+
+      <para>個々のキーワードの意味は次の通り。</para>
+
+      <variablelist>
+
+	<varlistentry>
+	  <term><literal>#include &lt;file.h&gt;</literal></term>
+	  <term><literal>#include "file.h"</literal></term>
+	  <listitem>
+	    <para>指定されたファイルが、Cプログラム、Haskellプログラムのコンパイル結果、Cヘッダにそれぞれincludeされる。<literal>&lt;HsFFI.h&gt;</literal>は自動的にincludeされる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#define 名前</literal></term>
+	  <term><literal>#define 名前 値</literal></term>
+	  <term><literal>#undef 名前</literal></term>
+	  <listitem>
+            <para><literal>#include</literal>に似ている。<literal>#include</literal>と<literal>#define</literal>は一つのファイルに二回置かれることがあることに注意。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#let 名前 引数列 = "定義"</literal></term>
+	  <listitem>
+            <para>Haskellソースに適用されるマクロを定義する。引数名はコンマで区切り、括弧では囲まない。このようなマクロは、<literal>#名前</literal>で始まる構文要素で起動される。この定義は、Cプログラムにおいて、括弧で囲んで<literal>printf</literal>の引数として使われる。引数を参照するには、引用符を閉じ、引数を置き、再び引用符を開くことでCの文字列リテラルの連結を利用する。あるいは<literal>printf</literal>の書式指定子を使っても良い。引数は、Cプリプロセッサの<literal>#引数</literal>記法を使って明示的に文字列化するのでない限り、文字列として渡されなければならない。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#def Cの定義</literal></term>
+	  <listitem>
+	    <para>この定義(関数定義、変数定義、構造体定義、typedef)がCファイルに書かれ、そのプロトタイプかextern宣言がCヘッダに書かれる。インライン関数も正しく扱われる。構造体定義とtypedefはCプログラムにも書き込まれる。<literal>inline</literal>、<literal>struct</literal>、<literal>typedef</literal>の各キーワードは<literal>def</literal>の直後に来なければならない。</para>
+
+	    <note><para>Cの関数の<literal>foreign import</literal>はモジュール境界を越えてインライン化されることがある。この場合、インポートする側のモジュールが<command>hsc2hs</command>の生成したCヘッダファイルを<literal>#include</literal>するようにしなければならない。(<xref linkend="glasgow-foreign-headers"/>を見よ)。このため、我々は、ライブラリ中で<literal>#def</literal>することを避けている。</para></note>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#if 条件 </literal></term>
+	  <term><literal>#ifdef 名前</literal></term>
+	  <term><literal>#ifndef 名前</literal></term>
+	  <term><literal>#elif 条件</literal></term>
+	  <term><literal>#else</literal></term>
+	  <term><literal>#endif</literal></term>
+	  <term><literal>#error メッセージ</literal></term>
+	  <term><literal>#warning メッセージ</literal></term>
+	  <listitem>
+	    <para>条件コンパイルディレクティブは、Cプログラム、Cファイル、Cヘッダに変更なしで渡される。Cプログラムにも置かれるので、Haskellファイルの適当な部分が飛ばされることになる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#const Cの式</literal></term>
+	  <listitem>
+	    <para>式は<literal>long</literal>または<literal>unsigned long</literal>に変換可能でなければならない。その値(リテラル、またはリテラルを符号反転したもの)が出力される。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#const_str Cの式</literal></term>
+	  <listitem>
+	    <para>式はcharへの定数ポインタに変換可能でなければならない。その値(文字列リテラル)が出力される。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#type Cの型</literal></term>
+	  <listitem>
+	    <para>Cの数値型に対応する、Haskellでの同等の型が出力される。これは、<literal>{Int,Word}{8,16,32,64}</literal>、<literal>Float</literal>、<literal>Double</literal>、<literal>LDouble</literal>のいずれかである。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#peek 構造体型, フィールド</literal></term>
+	  <listitem>
+	    <para>Cの構造体のフィールドを読み出す関数が出力される。型は<literal>Storable b => Ptr a -> IO b</literal>である。<literal>#peek</literal>と<literal>#poke</literal>を使って、与えられたCの構造体についての<literal>Storable</literal>クラスの演算を定義できるようにする、という意図である。(ライブラリ説明書の<literal>Foreign.Storable</literal>参照)</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#poke 構造体型, フィールド</literal></term>
+	  <listitem>
+	    <para>pokeについても同様。型は<literal>Storable b => Ptr a -> b -> IO ()</literal>になる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#ptr 構造体型, フィールド</literal></term>
+	  <listitem>
+	    <para>構造体のフィールドへのポインタを作る。型は<literal>Ptr a -> Ptr b</literal>になる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#offset 構造体型, フィールド</literal></term>
+	  <listitem>
+	    <para><literal>構造体型</literal>中での<literal>フィールド</literal>のオフセットをバイト単位で計算する。型は<literal>Int</literal>になる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#size 構造体型</literal></term>
+	  <listitem>
+		<para><literal>構造体型</literal>の大きさを、バイト単位で計算する。型は<literal>Int</literal>になる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>#enum 型, 構築子, 値, 値, ...</literal></term>
+	  <listitem>
+	    <para><literal>#const</literal>を使った複数の定義の代替となる略記法。それぞれの<literal>値</literal>はCの整定数(例えば列挙値)の名前である。この名前は、アンダースコアの次の文字を大文字にし、それ以外を小文字にし、アンダースコアを取り去ることで、Haskellの名前として使われる。<literal>値</literal>と書く代わりに<literal>Haskellでの名前 = Cの値</literal>と書くことで、自分で変換を指定することができる。この場合、<literal>Cの値</literal>は任意の式であって良い。<literal>Haskellでの名前</literal>は、指定された<literal>型</literal>を持つものとして定義される。定義は、指定された<literal>構築子</literal>(実際には式でも良いし、空でも良い)を、適当な整数値に適用したものである。一つの<literal>型</literal>に対して複数の<literal>#enum</literal>定義があっても良い。この構文要素は型定義自体を出力するわけではないからである。</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+
+    </sect2>
+
+    <sect2>
+      <title>自分で構文要素を用意する</title>
+
+      <para><literal>#const</literal>、<literal>#type</literal>、<literal>#peek</literal>、<literal>#poke</literal>、<literal>#ptr</literal>は<command>hsc2hs</command>と結びつけられておらず、CプログラムにincludeされるCテンプレートである<filename>template-hsc.h</filename>で定義されている。自分で構文要素やテンプレートを用意し、それを使うこともできる。<literal>#</literal>要素で、キーワードが未知であるものは、全てCテンプレートが対応するものとみなされる。</para>
+
+      <para>Cテンプレートでは、名前に<literal>hsc_</literal>を前置したマクロまたは関数を定義する。この関数は、構文要素を処理し、展開結果を標準出力に書き出す。例として<filename>template-hsc.h</filename>を参照せよ。</para>
+
+      <para>このようなマクロはソース中で直接定義することもできる。これは、<literal>#let</literal>マクロを使ったものに展開される<literal>#let</literal>風マクロを作るのに便利である。通常の<literal>#let</literal>では、マクロ名に<literal>hsc_</literal>を前置し、定義を<literal>printf</literal>の呼び出しで包む。</para>
+
+    </sect2>
+
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->
