@@ -49,16 +49,6 @@
 	      </term>
 	      <listitem>
                 <para>型検査器の出力</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
-	        <option>-ddump-tc</option>:
-                <indexterm><primary><option>-ddump-tc</option></primary></indexterm>
-	      </term>
-	      <listitem>
-                <para>型検査器の出力</para>
                 <!-- 訳注: 重複 -->
 	      </listitem>
 	    </varlistentry>
@@ -391,7 +381,7 @@
           <indexterm><primary><option>-dppr-user-length</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>エラーメッセージ中では、式はある「深さ」までしか印字されず、それよりも深い部分式は省略符号で表される。このフラグはその深さを決定する。</para>
+          <para>エラーメッセージ中では、式はある「深さ」までしか印字されず、それよりも深い部分式は省略符号で表される。このフラグはその深さを決定する。デフォルト値は5。</para>
 	</listitem>
       </varlistentry>
 
