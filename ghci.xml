@@ -503,7 +503,7 @@ it &lt;- <replaceable>e</replaceable>
             <listitem><para><literal>Ci</literal>のうち、少なくとも一つが数値クラスである<emphasis>か、
             <literal>Show</literal>であるか、<literal>Eq</literal>であるか、<literal>Ord</literal>である</emphasis>。</para></listitem>
       </itemizedlist>
-   <literal>-fextended-default-rules</literal>フラグを使うと、これと同じデフォルト化を通常のHaskellモジュールに対して有効にすることができる。
+   <literal>-XExtendedDefaultRules</literal>フラグを使うと、これと同じデフォルト化を通常のHaskellモジュールに対して有効にすることができる。
    </para>
     </sect2>
   </sect1>

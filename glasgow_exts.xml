@@ -77,8 +77,8 @@
 
       <varlistentry>
 	<term>
-          <option>-fextended-default-rules</option>:
-          <indexterm><primary><option>-fextended-default-rules</option></primary></indexterm>
+          <option>-XExtendedDefaultRules</option>:
+          <indexterm><primary><option>-XExtendedDefaultRules</option></primary></indexterm>
         </term>
 	<listitem>
           <para>通常のモジュールに対してGHCiの拡張デフォルト化規則を使う。(<xref linkend="extended-default-rules"/>)。<option>-fglasgow-exts</option>とは独立。</para>

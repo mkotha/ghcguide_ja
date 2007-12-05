@@ -686,10 +686,10 @@
               <entry><option>-XNoRelaxedPolyRec</option><entry>
             </row>
 	    <row>
-	      <entry><option>-fextended-default-rules</option></entry>
+	      <entry><option>-XExtendedDefaultRules</option></entry>
 	      <entry>GHCiの<link linkend="extended-default-rules">拡張デフォルト化規則</link>を通常のモードで使う</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-extended-default-rules</option></entry>
+	      <entry><option>-XNoExtendedDefaultRules</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fscoped-type-variables</option></entry>
