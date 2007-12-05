@@ -626,10 +626,10 @@
 	      <entry></entry>
 	    </row>
 	    <row>
-	      <entry><option>-farrows</option></entry>
+	      <entry><option>-XArrows</option></entry>
 	      <entry><link linkend="arrow-notation">アロー記法</link>拡張を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-arrows</option></entry>
+	      <entry><option>-XNoArrows</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-ffi</option> or <option>-fffi</option></entry>

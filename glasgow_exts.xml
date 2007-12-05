@@ -120,8 +120,8 @@
 
       <varlistentry>
 	<term>
-          <option>-farrows</option>
-          <indexterm><primary><option>-farrows</option></primary></indexterm>
+          <option>-XArrows</option>
+          <indexterm><primary><option>-XArrows</option></primary></indexterm>
         </term>
 	<listitem>
 	  <para><xref linkend="arrow-notation"/>を見よ。<option>-fglasgow-exts</option>とは独立。</para>
@@ -3095,7 +3095,7 @@ Palgrave, 2003.
 </listitem>
 
 </itemizedlist>
-また、<ulink url="http://www.haskell.org/arrows/"><literal>http://www.haskell.org/arrows/</literal></ulink>にアローのウェブページがある。<option>-farrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。この記法は、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。
+また、<ulink url="http://www.haskell.org/arrows/"><literal>http://www.haskell.org/arrows/</literal></ulink>にアローのウェブページがある。<option>-XArrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。この記法は、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。
 </para>
 
 <para>この拡張によって、アローを定義するための新しい種類の式が追加される。
