@@ -692,6 +692,24 @@
 	      <entry><option>-XNoExtendedDefaultRules</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XOverloadedStrings</option></entry>
+	      <entry><link linkend="overloaded-strings">文字列リテラルの多重定義</link>を有効にする。</entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-XNoOverloadedStrings</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XGADTs</option></entry>
+	      <entry><link linkend="gadt">一般化代数データ型</link>を有効にする。</entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-XNoGADTs</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XTypeFamilies</option></entry>
+	      <entry><link linkend="type-families">型ファミリ</link>を有効にする。</entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-XNoTypeFamilies</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-fscoped-type-variables</option></entry>
 	      <entry><link linkend="scoped-type-variables">レキシカルスコープの型変数</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる。</entry>
 	      <entry>動</entry>
