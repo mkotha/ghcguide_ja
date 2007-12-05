@@ -716,10 +716,10 @@
 	      <entry><option>-XNoScopedTypeVariables</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fth</option></entry>
+	      <entry><option>-XTemplateHaskell</option></entry>
 	      <entry><link linkend="template-haskell">Template Haskell</link>を有効にする。もはや<option>-fglasgow-exts</option>によって有効にはならない</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-th</option></entry>
+	      <entry><option>-XNoTemplateHaskell</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fbang-patterns</option></entry>

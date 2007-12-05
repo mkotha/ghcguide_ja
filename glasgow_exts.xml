@@ -170,7 +170,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fth</option></term>
+	<term><option>-XTemplateHaskell</option></term>
 	<listitem>
           <para>Template Haskellを有効にする。(<xref linkend="template-haskell"/>を見よ)。このフラグは明示的に与えねばならない。<option>-fglasgow-exts</option>が使われていても、もはや自動的には有効にならない。</para>
 
@@ -2914,7 +2914,7 @@ Template Haskellに関するwikiページが<ulink url="http://haskell.org/haske
     <sect2>
       <title>構文</title>
 
-      <para>Template Haskellには以下に述べる新しい構文要素がある。これらの構文的拡張を有効にするにはフラグ<option>-fth</option><indexterm><primary><option>-fth</option></primary></indexterm>を使う必要がある。(<option>-fth</option>は、<option>-fglasgow-exts</option>を使っていても、もはや自動的に有効にならない)</para>
+      <para>Template Haskellには以下に述べる新しい構文要素がある。これらの構文的拡張を有効にするにはフラグ<option>-XTemplateHaskell</option><indexterm><primary><option>-XTemplateHaskell</option></primary></indexterm>を使う必要がある。(<option>-XTemplateHaskell</option>は、<option>-fglasgow-exts</option>を使っていても、もはや自動的に有効にならない)</para>
 
 	<itemizedlist>
 	      <listitem><para>接合は、<literal>$x</literal>(「<literal>x</literal>」は識別子)または<literal>$(...)</literal>(「...」は任意の式)と書く。「$」と識別子や括弧の間には空白があってはならない。「$」のこの使いかたは中置演算子としての意味より優先される。「MM.x」が中置演算子としての「.」よりも優先されるのと同じである。中置演算子が必要なら、周りにスペースを置くこと。
@@ -3028,7 +3028,7 @@ pr s      = gen (parse s)
 <para>次にコンパイラを走らせる。(これはWindows上のCygwinプロンプトである)
 </para>
 <programlisting>
-$ ghc --make -fth main.hs -o main.exe
+$ ghc --make -XTemplateHaskell main.hs -o main.exe
 </programlisting>
 
 <para>「main.exe」を走らせれば出力が得られる。</para>
