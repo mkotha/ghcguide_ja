@@ -722,10 +722,10 @@
 	      <entry><option>-XNoTemplateHaskell</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fbang-patterns</option></entry>
+	      <entry><option>-XBangPatterns</option></entry>
 	      <entry><link linkend="bang-patterns">びっくりパターン</link>を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-bang-patterns</option></entry>
+	      <entry><option>-XNoBangPatterns</option></entry>
 	    </row>
 	  </tbody>
 	</tgroup>

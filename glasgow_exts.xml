@@ -3416,7 +3416,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 <para>GHCは<emphasis>びっくりパターン</emphasis>と呼ばれるパターン照合の拡張をサポートしている。びっくりパターンはHaskell Primeへの採用が検討されている。<ulink url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell primeの特徴まとめ</ulink>には、以下にあるのよりも多くの議論と例が載っている。
 </para>
 <para>
-びっくりパターンはフラグ<option>-fbang-patterns</option>で有効になる。
+びっくりパターンはフラグ<option>-XBangPatterns</option>で有効になる。
 </para>
 
 <sect2 id="bang-patterns-informal">
