@@ -608,10 +608,10 @@
 	      <entry><option>-XNoOverlappingInstances</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fallow-incoherent-instances</option></entry>
+	      <entry><option>-XIncoherentInstances</option></entry>
 	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-XOverlappingInstances</option>も有効になる</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-allow-incoherent-instances</option></entry>
+	      <entry><option>-XNoIncoherentInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fallow-undecidable-instances</option></entry>
