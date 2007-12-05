@@ -638,7 +638,7 @@
 	      <entry><option>-fno-disambiguate-record-fields</option></entry>
  	    </row>
 	    <row>
-	      <entry><option>-ffi</option> or <option>-fffi</option></entry>
+	      <entry><option>-ffi</option>または<option>-fffi</option></entry>
 	      <entry><link linkend="ffi">他言語関数インタフェース</link> (<option>-fglasgow-exts</option>によっても有効になる)</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-ffi</option></entry>
