@@ -8,24 +8,14 @@
 
   <para>GHCでFFI対応を有効にするには、<option>-fffi</option><indexterm><primary><option>-fffi</option></primary> </indexterm>フラグか、これを含意する<option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグを与えれば良い。</para>
 
-  <para>GHCでのFFI対応は、以下の点で追補から逸脱している。</para>
+  <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
 
-  <itemizedlist>
-    <listitem>
-      <para>後方互換性のために、FFIの初期の版で提案されていた構文形式やライブラリ関数にも引き続き対応している。</para>
-    </listitem>
+  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<ulink url="../libraries/base/Control-Concurrent.html"><literal>Foreign</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールを見よ。</para>
 
-    <listitem>
-      <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="sec-ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
-    </listitem>
-  </itemizedlist>
-
-  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<literal>Foreign</literal>モジュールを見よ。</para>
-
-  <sect1 id="sec-ffi-ghcexts">
+  <sect1 id="ffi-ghcexts">
     <title>FFI追補に対するGHCの拡張</title>
 
-    <para>この節で説明するFFIの機能はGHC特有のものである。これらを使うのは可能な限り避けて、コードの可搬性を損なわないようにするべきである。</para>
+    <para>この節で説明するFFIの機能はGHC特有のものである。これらを使った場合、他のコンパイラに対する可搬性がなくなる。</para>
 
     <sect2>
       <title>非ボックス化型</title>
@@ -51,7 +41,7 @@
 
   </sect1>
 
-  <sect1 id="sec-ffi-ghc">
+  <sect1 id="ffi-ghc">
     <title>GHCでFFIを使う</title>
 
     <para>以下の各節では、他言語関数インタフェースをGHCで使うに当たってのヒントを与える。</para>
@@ -88,6 +78,8 @@ extern HsInt foo(HsInt a0);</programlisting>
       <para>そして、<filename>Foo_stub.c</filename>には、コンパイラによって生成された<literal>foo()</literal>の定義が置かれる。Cから<literal>foo()</literal>を呼ぶには、<literal>#include "Foo_stub.h"</literal>として<literal>foo()</literal>を呼ぶだけで良い。</para>
 
       <para><filename>foo_stub.c</filename>と<filename>foo_stub.h</filename>は<option>-stubdir</option>を使って別の場所に生成するようにできる。<xref linkend="options-output"/>を見よ。</para>
+
+      <para>プログラムをリンクするとき、最終的なリンクのコマンド行に<filename>M_stub.o</filename>を含めるのを忘れないように。これをしないと、関数が足りない旨のエラーが発生する。(これは、<literal>ghc &ndash;&ndash;make</literal>でプログラムをビルドする時には不要である。GHCが自動的に必要なものをリンクするので)</para>
 
       <sect3 id="using-own-main"> 
 	<title>自分で用意した<literal>main()</literal>を使う</title>
@@ -127,9 +119,9 @@ int main(int argc, char *argv[])
 
 	<para>GHC特有の部分は<literal>#ifdef __GLASGOW_HASKELL__</literal>で囲った。それ以外のコードは、FFI標準に対応したHaskell実装の間で可搬であるはずだ。</para>
 
-        <para><literal>hs_init()</literal>の呼び出しでGHCのランタイムシステムが初期化される。<literal>hs_init()</literal>を呼ぶ前にはいかなるHaskell関数も起動しようと*しない*ように。疑いの余地なく、奇妙なことが起こるだろう。</para>
+        <para><literal>hs_init()</literal>の呼び出しでGHCのランタイムシステムが初期化される。<literal>hs_init()</literal>を呼ぶ前にはいかなるHaskell関数も起動しようと*しない*ように。疑いの余地なく、悪いことが起こるだろう。</para>
 
-        <para><literal>hs_init()</literal>に<literal>argc</literal>と<literal>argv</literal>を渡している。これは、RTSへの引数(つまり、<literal>+RTS...-RTS</literal>の間の引数)を抽出できるようにするためである。</para>
+        <para><literal>hs_init()</literal>に<literal>argc</literal>と<literal>argv</literal>への参照を渡している。これは、RTSへの引数(つまり、<literal>+RTS...-RTS</literal>の間の引数)を抽出できるようにするためである。</para>
 
 	<para>次に、<function>hs_add_root</function><indexterm><primary><function>hs_add_root</function></primary></indexterm>を呼ぶ。これは、プログラム中のHaskellモジュールを初期化するのに必要なGHC固有のインタフェースである。<function>hs_add_root</function>の引数としては、プログラムの「ルート」モジュールの初期化関数の名前を与えるべきである。ルートモジュールとは、プログラム中の全てのモジュールを直接・間接にインポートするモジュールのことである。スタンドアローンのHaskellプログラムではこれは通常<literal>Main</literal>であるが、ライブラリからHaskellコードを使っているならそうとは限らない。(訳注: ライブラリ由来のHaskellコードを使っているならそうとは限らない、と訳すべき？原文は、..., but when you are using Haskell code from a library it may not be.)。プログラムに複数のルートモジュールがあるときは、それぞれについて一回ずつ<function>hs_add_root</function>を呼べば良い。モジュール<replaceable>M</replaceable>の初期化関数の名前は<literal>__stginit_<replaceable>M</replaceable></literal>であり、上記のコードのように外部関数シンボルとして宣言することができる。シンボル名は以下に示すZ符号化に従って変換せねばならないことに注意。</para>
 
@@ -166,21 +158,54 @@ int main(int argc, char *argv[])
 	  </tgroup>
 	</informaltable>
 
-        <para>Haskellの関数を呼び出し終えた後、<literal>hs_exit()</literal>を呼んでRTSを終了させることができる。<literal>hs_exit()</literal>は、残っている終了子を走らせ、依頼されていればプロファイルや統計情報を生成する。</para>
+        <para>Haskellの関数を呼び出し終えた後、<literal>hs_exit()</literal>を呼んでRTSを終了させることができる。</para>
 
         <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。</para></footnote>を呼ぶ必要がある。</para>
 
 	<para>参考: 最終的なプログラムをリンクする際、通常最も簡単なのは、GHCを使ってリンクすることである。(絶対に必要な訳ではないが)。GHCを使うなら、フラグ<option>-no-hs-main</option><indexterm><primary><option>-no-hs-main</option></primary></indexterm>を使うことを忘れないように。さもないと、GHCは<literal>Main</literal>というHaskellモジュールをリンクしようとする。</para>
       </sect3>
 
-      <sect3 id="foreign-export-dynamic-ghc">
-	<title>GHCで<literal>foreign import ccall "wrapper"</literal>を使う</title>
+      <sect3 id="ffi-library">
+        <title>他言語のコードから呼べるようなHaskellライブラリを作る</title>
 
-	<indexterm><primary><literal>foreign import
-	ccall "wrapper"</literal></primary><secondary>with GHC</secondary>
-	</indexterm>
+        <para><xref linkend="using-own-main"/>とよく似た状況だが、完全なプログラムをリンクするのが目的ではなく、Haskellコードからライブラリを作って、Cのコードでできたライブラリと同じように使えるようにしたいという場合である。</para>
 
-	<para>Haskellモジュールで<literal>foreign import ccall "wrapper"</literal>が使われると、GHCは<filename>M_stub.c</filename>というCのスタブファイルを生成する。このファイルにはインポートされたwrapperのために生成された小さなヘルパ関数があって、プログラムの最終的なリンクに含めなければならない。プログラムをリンクするとき、忘れずに<filename>M_stub.o</filename>を最終的なリンクのコマンド行に含めること。さもなくば足りない関数についてのリンクエラーが発生する。(これは、プログラムを<literal>ghc --make</literal>でビルドするときには必要ない。GHcが自動的に必要なものをリンクするからである)</para>
+        <para>この場合、まず、Haskellコードが最初に呼ばれる前にランタイムが初期化される必要がある。このため、初期化と脱初期化のためのエントリポイントをCかC++で実装し、ライブラリ内に用意するべきである。例えば以下のように。</para>
+
+<programlisting>
+ HsBool mylib_init(void){
+   int argc = ...
+   char *argv[] = ...
+
+   // Initialize Haskell runtime
+   hs_init(&amp;argc, &amp;argv);
+
+   // Tell Haskell about all root modules
+   hs_add_root(__stginit_Foo);
+
+   // do any other initialization here and
+   // return false if there was a problem
+   return HS_BOOL_TRUE;
+ }
+
+ void mylib_end(void){
+   hs_exit();
+ }
+</programlisting>
+
+        <para>この初期化ルーチン<literal>mylib_init</literal>は、通常どおり<literal>hs_init()</literal>と<literal>hs_add_root()</literal>を呼んでHaskellランタイムを初期化する。これに対応する脱初期化関数<literal>mylib_end()</literal>は<literal>hs_exit()</literal>を呼んでランタイムを終了させる。</para>
+      </sect3>
+
+      <sect3 id="hs-exit">
+        <title><literal>hs_exit()</literal>の使用について</title>
+
+        <para>通常、<literal>hs_exit()</literal>によって、そのシステムで実行中のすべてのHaskellスレッドは終了し、<literal>hs_exit()</literal>が返る時点では、もはやHaskellスレッドは一つも走っていない。この後、ランタイムは、必要ならプロファイル出力や統計情報を生成したり、持っているメモリをすべて開放したりして、システムを規則正しく終了させる。</para>
+
+        <para>Haskellスレッドを強制的に終了させることができない場合もある。例えば、スレッドが他言語呼び出しを実行中かもしれないが、他言語の呼び出しを終了させる方法はない。さらに、ランタイムは、Haskellコードとランタイムがメモリから削除予定であるという最悪の場合を想定しなければならない。(例えば、<link linkend="win32-dlls">WindowsのDLL</link>では、<literal>hs_exit()</literal>が呼ばれるのは、通常そのDLLをアンロードする前である)。そのため、<literal>hs_exit()</literal>は、実行中のすべての他言語呼び出しが返るまで待ってからでないと、自分自身返ることができない。</para>
+
+        <para>要するに、他言語呼び出しでブロックしているHaskellスレッドがあるなら、その呼び出しが返るまで<literal>hs_exit()</literal>はハングする(場合によってはビジーウェイト)ということだ。よって、<literal>hs_exit()</literal>を呼び出すときにそのようなスレッドがシステム中にないようにするのが良い。これには、I/Oをしているあらゆるスレッドも含まれる。I/Oはブロックする他言語呼び出しを使って実装されているかもしれない(プラットフォームとI/Oの種類によってはそうでないかもしれない)からである。</para>
+
+        <para>GHCのランタイムは、プログラムが終了する場合を特別扱いして、スタンドアローンの実行ファイルが終了するときにブロックしているスレッドを待つ必要がないようにしている。コードがメモリから取り除かれるのと同時にプログラムとそのすべてのスレッドが終了するのだから、スレッドが先に終了するように保証する必要がない。(非公式だが、この、早くていい加減な<literal>hs_exit()</literal>が欲しいなら、代わりに<literal>shutdownHaskellAndExit()</literal>を呼ぶと良い)</para>
       </sect3>
     </sect2>
     
@@ -208,7 +233,7 @@ HsInt        lookupEFS (HsForeignObj a, HsInt i);
       <para>これが<emphasis>絶対に必要</emphasis>なのは、<literal>float</literal>を返すとき(と、<literal>sizeof(int) != sizeof(int *)</literal>なとき)だけであるが、しっかりしたコードを書くことに興味のある人ならやっておくべきことだ。これをしないのは正気の沙汰じゃない。</para>
 
 <para>
-別のパッケージからモジュールをインポートしていて、モジュール間インライン化によって他言語呼び出しが露になったが、それが、対応する<option>-#include</option>を必要としている場合はどうだろう。インポート先のモジュールがコンパイル中のモジュールと同じパッケージにあるなら、インポート先のモジュールをコンパイルしたときに使った<option>-#include</option>を全て使うべきである。インポート先のモジュールが別のパッケージにあるときは、必要な<option>-#include</option>を把握しておく必要はない。この情報はパッケージ設定として記録されるので、GHCが知っているからである。このため、パッケージをビルドするときは、忘れずに全ての<option>-#include</option>オプションをパッケージ設定に記録しておかねばならない。<xref linkend="package-management"/>の<literal>c_includes</literal>フィールドを見よ。
+別のパッケージからモジュールをインポートしていて、モジュール間インライン化によって他言語呼び出しが露になったが、それが、対応する<option>-#include</option>を必要としている場合はどうだろう。インポート先のモジュールがコンパイル中のモジュールと同じパッケージにあるなら、インポート先のモジュールをコンパイルしたときに使った<option>-#include</option>を全て使うべきである。インポート先のモジュールが別のパッケージにあるときは、必要な<option>-#include</option>を把握しておく必要はない。この情報はパッケージ設定として記録されるので、GHCが知っているからである。このため、パッケージをCabalでビルドするなら、忘れずに全てのインクルードファイルをパッケージ記述中に記さなければならない。(Cabal説明書の<literal>includes</literal>フィールドを参照)
 </para>
 
 <para>
