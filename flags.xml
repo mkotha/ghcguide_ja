@@ -614,10 +614,10 @@
 	      <entry><option>-XNoIncoherentInstances</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fallow-undecidable-instances</option></entry>
+	      <entry><option>-XUndecidableInstances</option></entry>
 	      <entry><link linkend="undecidable-instances">決定不能インスタンス</link>を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-allow-undecidable-instances</option></entry>
+	      <entry><option>-XNoUndecidableInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fcontext-stack=N</option><replaceable>n</replaceable></entry>

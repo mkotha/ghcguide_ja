@@ -92,8 +92,8 @@
           <indexterm><primary><option>-XOverlappingInstances</option></primary></indexterm>
         </term>
 	<term>
-          <option>-fallow-undecidable-instances</option>
-          <indexterm><primary><option>-fallow-undecidable-instances</option></primary></indexterm>
+          <option>-XUndecidableInstances</option>
+          <indexterm><primary><option>-XUndecidableInstances</option></primary></indexterm>
         </term>
 	<term>
           <option>-XIncoherentInstances</option>
@@ -1530,7 +1530,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 </programlisting>
 </para>
 <para>
-これにもかかわらず、GHCは、より自由な規則の下で実験することを許している。<option>-fallow-undecidable-instances</option> <indexterm><primary>-fallow-undecidable-instances option</primary></indexterm>という実験的なフラグを使えば、インスタンス宣言の文脈と頭部の両方において任意の型を使うことができる。停止性は、深さ固定の再帰スタックを使うことで保証される。スタックの深さを超過した場合、バックトレースのようなものが表示される。この時、<option>-fcontext-stack=</option><emphasis>N</emphasis>で、スタックをより深くすることもできる。
+これにもかかわらず、GHCは、より自由な規則の下で実験することを許している。<option>-XUndecidableInstances</option> <indexterm><primary>-XUndecidableInstances option</primary></indexterm>という実験的なフラグを使えば、インスタンス宣言の文脈と頭部の両方において任意の型を使うことができる。停止性は、深さ固定の再帰スタックを使うことで保証される。スタックの深さを超過した場合、バックトレースのようなものが表示される。この時、<option>-fcontext-stack=</option><emphasis>N</emphasis>で、スタックをより深くすることもできる。
 </para>
 
 </sect3>
