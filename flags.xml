@@ -644,10 +644,10 @@
 	      <entry><option>-XNoForeignFunctionInterface</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fgenerics</option></entry>
+	      <entry><option>-XGenerics</option></entry>
 	      <entry><link linkend="generic-classes">総称クラス</link>を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-fgenerics</option></entry>
+	      <entry><option>-XNoGenerics</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fimplicit-params</option></entry>

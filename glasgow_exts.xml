@@ -133,8 +133,8 @@
 
       <varlistentry>
 	<term>
-          <option>-fgenerics</option>
-          <indexterm><primary><option>-fgenerics</option></primary></indexterm>
+          <option>-XGenerics</option>
+          <indexterm><primary><option>-XGenerics</option></primary></indexterm>
         </term>
 	<listitem>
 	  <para><xref linkend="generic-classes"/>を見よ。<option>-fglasgow-exts</option>とは独立。</para>
@@ -4576,7 +4576,7 @@ r) ->
       <para>総称性を使うには以下のものが必要である。</para>
       <itemizedlist>
 	<listitem>
-	  <para>フラグとして、<option>-fglasgow-exts</option>(拡張文法を有効にする)と<option>-fgenerics</option>(データ型毎の追加コードを生成する)と<option>-package lang</option>(<literal>Generics</literal>ライブラリを利用可能にする)を使う。</para>
+	  <para>フラグとして、<option>-fglasgow-exts</option>(拡張文法を有効にする)と<option>-XGenerics</option>(データ型毎の追加コードを生成する)と<option>-package lang</option>(<literal>Generics</literal>ライブラリを利用可能にする)を使う。</para>
 	</listitem>
 	<listitem>
           <para><literal>lang</literal>パッケージの<literal>Generics</literal>モジュールをインポートする。これによって、<literal>Unit</literal>、<literal>:*:</literal>、<literal>:+:</literal>の各データ型がスコープに導入される。(これらの型に明示的に言及しないならインポートは必要ない。インスタンス宣言を行うだけの場合など)</para>
