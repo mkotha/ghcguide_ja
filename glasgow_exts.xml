@@ -56,9 +56,8 @@
 
       <varlistentry>
 	<term>
-          <option>-ffi</option> and <option>-fffi</option>:
-          <indexterm><primary><option>-ffi</option></primary></indexterm>
-          <indexterm><primary><option>-fffi</option></primary></indexterm>
+          <option>-XForeignFunctionInterface</option> and <option>-XForeignFunctionInterface</option>:
+          <indexterm><primary><option>-XForeignFunctionInterface</option></primary></indexterm>
         </term>
 	<listitem>
           <para>このオプションは、Haskell 98への追補である「Foreign Function Interface」で定義されている言語拡張を有効にする。</para>
