@@ -650,10 +650,10 @@
 	      <entry><option>-XNoGenerics</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fimplicit-params</option></entry>
+	      <entry><option>-XImplicitParams</option></entry>
 	      <entry><link linkend="implicit-parameters">暗黙パラメタ</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-implicit-params</option></entry>
+	      <entry><option>-XNoImplicitParams</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-firrefutable-tuples</option></entry>

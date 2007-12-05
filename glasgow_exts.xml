@@ -154,7 +154,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fimplicit-params</option></term>
+	<term><option>-XImplicitParams</option></term>
 	<listitem>
           <para>暗黙パラメータを有効にする。(<xref linkend="implicit-parameters"/>を見よ)。現在、<option>-fglasgow-exts</option>が使われていると自動的に有効になる。</para>
 
@@ -1748,7 +1748,7 @@ GHCは、型シグネチャに関して以下の制限を課す。次の型を�
 
 <para>(以下の文書(まだかなり不完全だが)はJeff Lweisによる)</para>
 
-<para>暗黙パラメタのサポートは<option>-fimplicit-params</option>オプションで有効になる。</para>
+<para>暗黙パラメタのサポートは<option>-XImplicitParams</option>オプションで有効になる。</para>
 
 <para>
 変数は、それが関数の呼び出し元の文脈によって束縛されているとき<emphasis>動的に束縛されている</emphasis>と言い、呼ばれた関数の文脈によって束縛されているとき<emphasis>静的に束縛されている</emphasis>と言う。Haskellでは全ての変数が静的に束縛される。変数の動的束縛の概念はLispにまで遡るが、Schemeのような現代的な現れにおいては捨てられることとなった。動的束縛は型のない言語においては非常に混乱的であるし、残念なことに、型のある言語においてもそうである。特に、HaskellのようにHindley-Milterの型システムの付けられた言語は、変数について静的スコープしか認めない。
