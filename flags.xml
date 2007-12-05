@@ -662,10 +662,10 @@
 	      <entry><option>-fno-irrefutable-tuples</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fno-implicit-prelude</option></entry>
+	      <entry><option>-XNoImplicitPrelude</option></entry>
 	      <entry>暗黙に<literal>import Prelude</literal>しない</entry>
 	      <entry>動</entry>
-	      <entry><option>-fimplicit-prelude</option></entry>
+	      <entry><option>-XImplicitPrelude</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fno-monomorphism-restriction</option></entry>

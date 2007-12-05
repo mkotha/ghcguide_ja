@@ -142,14 +142,14 @@
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fno-implicit-prelude</option></term>
+	<term><option>-XNoImplicitPrelude</option></term>
 	<listitem>
-	  <para><indexterm><primary>-fno-implicit-prelude
-          option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-fno-implicit-prelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならない)</para>
+	  <para><indexterm><primary>-XNoImplicitPrelude
+          option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-XNoImplicitPrelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならない)</para>
 
           <para>Preludeをインポートしない場合でさえ、組込み構文の大部分は相変わらず組込みのHaskell Preludeを参照する。これはHaskellレポートで定義された振る舞いである。例えば、<literal>[Int]</literal>という型の意味は相変わらず<literal>Prelude.[] Int</literal>であり、タプルは標準Preludeのタプルのままであり、リスト内包表記を展開するときは<literal>Prelude.map</literal>が使われる、という具合である。</para>
 
-          <para>一方で、<option>-fno-implicit-prelude</option>が組込み構文の扱いを変える部分もある。<xref linkend="rebindable-syntax"/>を見よ。</para>
+          <para>一方で、<option>-XNoImplicitPrelude</option>が組込み構文の扱いを変える部分もある。<xref linkend="rebindable-syntax"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -560,7 +560,7 @@ List、Maybe、IOについては<literal>MonadFix</literal>のインスタンス
 
       <para>GHCでは大部分の組込み構文が利用者によって再束縛できるようになっている。これは例えば自家製の<literal>Prelude</literal>を使うのを楽にするためである。</para>
 
-            <para>自分で数値クラスの階層を定義したいと思うことがあるかもしれない。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、このような定義をしてもまったく役に立たない。このため、<option>-fno-implicit-prelude</option>フラグを使うと、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
+            <para>自分で数値クラスの階層を定義したいと思うことがあるかもしれない。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、このような定義をしてもまったく役に立たない。このため、<option>-XNoImplicitPrelude</option>フラグを使うと、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
 
 	    <itemizedlist>
 	      <listitem>

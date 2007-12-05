@@ -39,7 +39,7 @@
       <varlistentry>
 	<term><filename>.hi</filename>インタフェースファイルに関する鋭敏性</term>
 	<listitem>
-	  <para>GHCはインタフェースファイルについてとても敏感である。例えば、非標準の<filename>Prelude.hi</filename>を掴まされると、実に酷いことが起こるだろう。<option>-fno-implicit-prelude</option><indexterm><primary>-fno-implicit-prelude option</primary></indexterm>を、自分で何をしているか分からずに有効にすると、コンパイラはほとんど間違いなく死ぬ。</para>
+	  <para>GHCはインタフェースファイルについてとても敏感である。例えば、非標準の<filename>Prelude.hi</filename>を掴まされると、実に酷いことが起こるだろう。<option>-XNoImplicitPrelude</option><indexterm><primary>-XNoImplicitPrelude option</primary></indexterm>を、自分で何をしているか分からずに有効にすると、コンパイラはほとんど間違いなく死ぬ。</para>
 
 	  <para>さらに、下にあるように、不安定なインタフェースを使ってコンパイルされたプログラムは、走らせる時に大いに困難を招く。</para>
 	</listitem>
