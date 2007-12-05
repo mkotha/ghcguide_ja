@@ -163,7 +163,7 @@
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fscoped-type-variables</option></term>
+	<term><option>-XScopedTypeVariables</option></term>
 	<listitem>
           <para>字句的なスコープを持つ型変数を有効にする。(<xref linkend="scoped-type-variables"/>を見よ)。<option>-fglasgow-exts</option>が使われていると自動的に有効になる。</para>
 	</listitem>
