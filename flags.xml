@@ -631,6 +631,12 @@
 	      <entry>動</entry>
 	      <entry><option>-XNoArrows</option></entry>
 	    </row>
+ 	    <row>
+	      <entry><option>-fdisambiguate-record-fields</option></entry>
+	      <entry><link linkend="disambiguate-fields">レコードフィールドの曖昧性除去</link>を有効にする</entry>
+ 	      <entry>dynamic</entry>
+	      <entry><option>-fno-disambiguate-record-fields</option></entry>
+ 	    </row>
 	    <row>
 	      <entry><option>-ffi</option> or <option>-fffi</option></entry>
 	      <entry><link linkend="ffi">他言語関数インタフェース</link> (<option>-fglasgow-exts</option>によっても有効になる)</entry>
