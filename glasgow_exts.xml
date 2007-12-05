@@ -3762,7 +3762,7 @@ key_function :: Int -> String -> (Bool, Double)
     <sect2 id="rules">
       <title>RULESプラグマ</title>
 
-      <para>RULESプラグマを使うと書き換え規則を指定することができる。これは<xref linkend="rewrite-rles"/>で解説されている。</para>
+      <para>RULESプラグマを使うと書き換え規則を指定することができる。これは<xref linkend="rewrite-rules"/>で解説されている。</para>
     </sect2>
 
     <sect2 id="specialize-pragma">
