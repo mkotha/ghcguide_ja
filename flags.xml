@@ -621,9 +621,9 @@
 	    </row>
 	    <row>
 	      <entry><option>-fcontext-stack=N</option><replaceable>n</replaceable></entry>
-	      <entry><link linkend="undecidable-instances">文脈簡約の制限値</link>を設定する</entry>
+	      <entry><link linkend="undecidable-instances">文脈簡約の制限値</link>を設定する。デフォルトは20。</entry>
 	      <entry>動</entry>
-	      <entry><option>20</option></entry>
+	      <entry></entry>
 	    </row>
 	    <row>
 	      <entry><option>-farrows</option></entry>
