@@ -1539,7 +1539,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 <sect3 id="instance-overlap">
 <title>重複インスタンス</title>
 <para>
-一般に、<emphasis>GHCでは、型クラス制約を解決するのにどのインスタンス宣言を使えば良いかが曖昧さなく決まることが要求される</emphasis>。この挙動を変更するフラグが二つある。<option>-XOverlappingInstances</option> <indexterm><primary>-fallow-overlapping-instances </primary></indexterm>と<option>-XIncoherentInstances</option> <indexterm><primary>-XIncoherentInstances </primary></indexterm>である。この節ではこれらを扱う。これらは両方とも動的フラグであり、(望むなら<literal>OPTIONS_GHC</literal>プラグマを使って)モジュール単位で設定することができる。(<xref linkend="source-file-options"/>)</para>
+一般に、<emphasis>GHCでは、型クラス制約を解決するのにどのインスタンス宣言を使えば良いかが曖昧さなく決まることが要求される</emphasis>。この挙動を変更するフラグが二つある。<option>-XOverlappingInstances</option> <indexterm><primary>-XOverlappingInstances </primary></indexterm>と<option>-XIncoherentInstances</option> <indexterm><primary>-XIncoherentInstances </primary></indexterm>である。この節ではこれらを扱う。これらは両方とも動的フラグであり、(望むなら<literal>OPTIONS_GHC</literal>プラグマを使って)モジュール単位で設定することができる。(<xref linkend="source-file-options"/>)</para>
 <para>
 例えば、<literal>C Int Bool</literal>という制約を解決しようとするときは、全てのインスタンス宣言について、その頭部を具体化して、この制約と照合しようと試みられる。例として、以下のようなインスタンス宣言があったとしよう。
 <programlisting>
@@ -1575,7 +1575,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 これらの規則によって、ライブラリの作者は、重複インスタンスに依存したライブラリを、利用者がそれについて知らなくても良いように設計することができる。
 </para>
 <para>
-あるインスタンスが<option>-XOverlappingInstances</option>なしでコンパイルされると、より特殊性の高いインスタンスでそのインスタンスを部分的に覆い隠すことは不可能である。場合によってはこれは不便かもしれない。もしかしたら、<emphasis>覆い隠される</emphasis>方のインスタンスではなく<emphasis>覆い隠す</emphasis>方のインスタンスがフラグ付きでコンパイルされなければならない、という規則にした方が良いのかもしれない。あるいは、利用地点で<option>-fallow-overlapping-instances</option>フラグが使われていれば、元のインスタンス宣言がどのようにコンパイルされたかにかかわらず、利用地点においてそれを覆い隠すインスタンスを宣言し、使うことを認めるべきかもしれない。(ただし、利用地点の正確な位置を特定するのは難しいことがあるのに注意)。我々はこれらの点に関するフィードバックを待っている。
+あるインスタンスが<option>-XOverlappingInstances</option>なしでコンパイルされると、より特殊性の高いインスタンスでそのインスタンスを部分的に覆い隠すことは不可能である。場合によってはこれは不便かもしれない。もしかしたら、<emphasis>覆い隠される</emphasis>方のインスタンスではなく<emphasis>覆い隠す</emphasis>方のインスタンスがフラグ付きでコンパイルされなければならない、という規則にした方が良いのかもしれない。あるいは、利用地点で<option>-XOverlappingInstances</option>フラグが使われていれば、元のインスタンス宣言がどのようにコンパイルされたかにかかわらず、利用地点においてそれを覆い隠すインスタンスを宣言し、使うことを認めるべきかもしれない。(ただし、利用地点の正確な位置を特定するのは難しいことがあるのに注意)。我々はこれらの点に関するフィードバックを待っている。
 </para>
 <para><option>-XIncoherentInstances</option>フラグを使うと、<option>-XOverlappingInstances</option>フラグは自動的に有効になる。逆は真でない。
 </para>
