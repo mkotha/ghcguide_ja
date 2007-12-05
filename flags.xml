@@ -602,14 +602,14 @@
 	      <entry><option>-fno-glasgow-exts</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fallow-overlapping-instances</option></entry>
+	      <entry><option>-XOverlappingInstances</option></entry>
 	      <entry><link linkend="instance-overlap">重複インスタンス</link>を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-allow-overlapping-instances</option></entry>
+	      <entry><option>-XNoOverlappingInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fallow-incoherent-instances</option></entry>
-	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-fallow-overlapping-instances</option>も有効になる</entry>
+	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-XOverlappingInstances</option>も有効になる</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-allow-incoherent-instances</option></entry>
 	    </row>

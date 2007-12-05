@@ -88,8 +88,8 @@
 
       <varlistentry>
 	<term>
-          <option>-fallow-overlapping-instances</option>
-          <indexterm><primary><option>-fallow-overlapping-instances</option></primary></indexterm>
+          <option>-XOverlappingInstances</option>
+          <indexterm><primary><option>-XOverlappingInstances</option></primary></indexterm>
         </term>
 	<term>
           <option>-fallow-undecidable-instances</option>
@@ -1539,7 +1539,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 <sect3 id="instance-overlap">
 <title>重複インスタンス</title>
 <para>
-一般に、<emphasis>GHCでは、型クラス制約を解決するのにどのインスタンス宣言を使えば良いかが曖昧さなく決まることが要求される</emphasis>。この挙動を変更するフラグが二つある。<option>-fallow-overlapping-instances</option> <indexterm><primary>-fallow-overlapping-instances </primary></indexterm>と<option>-fallow-incoherent-instances</option> <indexterm><primary>-fallow-incoherent-instances </primary></indexterm>である。この節ではこれらを扱う。これらは両方とも動的フラグであり、(望むなら<literal>OPTIONS_GHC</literal>プラグマを使って)モジュール単位で設定することができる。(<xref linkend="source-file-options"/>)</para>
+一般に、<emphasis>GHCでは、型クラス制約を解決するのにどのインスタンス宣言を使えば良いかが曖昧さなく決まることが要求される</emphasis>。この挙動を変更するフラグが二つある。<option>-XOverlappingInstances</option> <indexterm><primary>-fallow-overlapping-instances </primary></indexterm>と<option>-fallow-incoherent-instances</option> <indexterm><primary>-fallow-incoherent-instances </primary></indexterm>である。この節ではこれらを扱う。これらは両方とも動的フラグであり、(望むなら<literal>OPTIONS_GHC</literal>プラグマを使って)モジュール単位で設定することができる。(<xref linkend="source-file-options"/>)</para>
 <para>
 例えば、<literal>C Int Bool</literal>という制約を解決しようとするときは、全てのインスタンス宣言について、その頭部を具体化して、この制約と照合しようと試みられる。例として、以下のようなインスタンス宣言があったとしよう。
 <programlisting>
@@ -1552,7 +1552,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 </para>
 
 <para>
-<option>-fallow-overlapping-instances</option>フラグは、最も特殊性の高いインスタンスが存在することを条件に、複数のインスタンスの適合を認めるものである。例えば、<literal>C Int [Int]</literal>には(A)、(C)、(D)の各インスタンスが適合するが、最後のものの特殊性が最も高いので、これが選ばれる。最も特殊性の高いものがない場合は、プログラムが拒絶される。
+<option>-XOverlappingInstances</option>フラグは、最も特殊性の高いインスタンスが存在することを条件に、複数のインスタンスの適合を認めるものである。例えば、<literal>C Int [Int]</literal>には(A)、(C)、(D)の各インスタンスが適合するが、最後のものの特殊性が最も高いので、これが選ばれる。最も特殊性の高いものがない場合は、プログラムが拒絶される。
 </para>
 <para>
 ただし、GHCは重複インスタンスから特定のものを選ぶことに関しては保守的である。例。
@@ -1563,10 +1563,10 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 <literal>f</literal>の右辺から、<literal>C Int [b]</literal>という制約を得たとしよう。しかし、GHCはインスタンス(C)を使うことはない。なぜなら、<literal>f</literal>の呼び出しによっては、<literal>b</literal>が<literal>Int</literal>に実体化するかも知れず、その場合は(D)が最も特殊性の高いインスタンスになるからである。よって、GHCはこのプログラムを拒絶する。<option>-fallow-incoherent-instances</option>フラグを追加すると、GHCは、後々のインスタンス化についての問題を指摘することなく、(C)を選ぶようになる。
 </para>
 <para>
-重複インスタンスや非整合(incoherent)インスタンスになるかどうかは、<emphasis>インスタンス宣言</emphasis>の性質であり、そのモジュールがコンパイルされるときに<option>-fallow-overlapping-instances</option>と<option>-fallow-incoherent-instances</option>が有効になっていたかどうかで決まる。インスタンス宣言をインポートし、利用するモジュールでは、フラグはどちらも必要ない。特に、インスタンス発見の過程では、以下が成り立つ。
+重複インスタンスや非整合(incoherent)インスタンスになるかどうかは、<emphasis>インスタンス宣言</emphasis>の性質であり、そのモジュールがコンパイルされるときに<option>-XOverlappingInstances</option>と<option>-fallow-incoherent-instances</option>が有効になっていたかどうかで決まる。インスタンス宣言をインポートし、利用するモジュールでは、フラグはどちらも必要ない。特に、インスタンス発見の過程では、以下が成り立つ。
 <itemizedlist>
 <listitem><para>
-この過程で、あるインスタンス宣言が無視されるのは、(a)より特殊性の高いものが見付かった、かつ(b)そのインスタンス宣言が<option>-fallow-overlapping-instances</option>付きでコンパイルされていた場合である。特殊性の高い方のインスタンスがコンパイルされたときのフラグは関係ない。
+この過程で、あるインスタンス宣言が無視されるのは、(a)より特殊性の高いものが見付かった、かつ(b)そのインスタンス宣言が<option>-XOverlappingInstances</option>付きでコンパイルされていた場合である。特殊性の高い方のインスタンスがコンパイルされたときのフラグは関係ない。
 </para></listitem>
 <listitem><para>
 問題となっている制約に対して、あるインスタンス宣言が、適合はしないものの単一化する場合を考えてみよう。この場合、制約がさらに具体化すると、そのインスタンス宣言が適合する可能性がある。通常、GHCは、これを理由として、他の制約<!-- 訳注: インスタンスの誤り? -->を採用しない。しかし、もしそのインスタンス宣言が<option>-fallow-incoherent-instances</option>付きでコンパイルされているなら、GHCはこの「単一化するか？」の検査を行わない。
@@ -1575,9 +1575,9 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 これらの規則によって、ライブラリの作者は、重複インスタンスに依存したライブラリを、利用者がそれについて知らなくても良いように設計することができる。
 </para>
 <para>
-あるインスタンスが<option>-fallow-overlapping-instances</option>なしでコンパイルされると、より特殊性の高いインスタンスでそのインスタンスを部分的に覆い隠すことは不可能である。場合によってはこれは不便かもしれない。もしかしたら、<emphasis>覆い隠される</emphasis>方のインスタンスではなく<emphasis>覆い隠す</emphasis>方のインスタンスがフラグ付きでコンパイルされなければならない、という規則にした方が良いのかもしれない。あるいは、利用地点で<option>-fallow-overlapping-instances</option>フラグが使われていれば、元のインスタンス宣言がどのようにコンパイルされたかにかかわらず、利用地点においてそれを覆い隠すインスタンスを宣言し、使うことを認めるべきかもしれない。(ただし、利用地点の正確な位置を特定するのは難しいことがあるのに注意)。我々はこれらの点に関するフィードバックを待っている。
+あるインスタンスが<option>-XOverlappingInstances</option>なしでコンパイルされると、より特殊性の高いインスタンスでそのインスタンスを部分的に覆い隠すことは不可能である。場合によってはこれは不便かもしれない。もしかしたら、<emphasis>覆い隠される</emphasis>方のインスタンスではなく<emphasis>覆い隠す</emphasis>方のインスタンスがフラグ付きでコンパイルされなければならない、という規則にした方が良いのかもしれない。あるいは、利用地点で<option>-fallow-overlapping-instances</option>フラグが使われていれば、元のインスタンス宣言がどのようにコンパイルされたかにかかわらず、利用地点においてそれを覆い隠すインスタンスを宣言し、使うことを認めるべきかもしれない。(ただし、利用地点の正確な位置を特定するのは難しいことがあるのに注意)。我々はこれらの点に関するフィードバックを待っている。
 </para>
-<para><option>-fallow-incoherent-instances</option>フラグを使うと、<option>-fallow-overlapping-instances</option>フラグは自動的に有効になる。逆は真でない。
+<para><option>-fallow-incoherent-instances</option>フラグを使うと、<option>-XOverlappingInstances</option>フラグは自動的に有効になる。逆は真でない。
 </para>
 </sect3>
 
