@@ -68,7 +68,7 @@
 
       <varlistentry>
 	<term>
-          <option>-fno-monomorphism-restriction</option>,<option>-fno-mono-pat-binds</option>:
+          <option>-XNoMonomorphismRestriction</option>,<option>-fno-mono-pat-binds</option>:
         </term>
 	<listitem>
           <para>このフラグはどのように一般化が行われるかを制御する。<xref linkend="monomorphism"/>を見よ。</para>
@@ -4748,9 +4748,9 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
 
 <sect2>
 <title>恐怖の単相性限定を無効にする</title>
-          <indexterm><primary><option>-fno-monomorphism-restriction</option></primary></indexterm>
+          <indexterm><primary><option>-XNoMonomorphismRestriction</option></primary></indexterm>
 
-<para>Haskellの単相性限定(Haskellレポートの<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.5">4.5.5節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.5">和訳</ulink>)を見よ)は、<option>-fno-monomorphism-restriction</option>で完全に無効にできる。
+<para>Haskellの単相性限定(Haskellレポートの<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.5">4.5.5節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.5">和訳</ulink>)を見よ)は、<option>-XNoMonomorphismRestriction</option>で完全に無効にできる。
 </para>
 </sect2>
 

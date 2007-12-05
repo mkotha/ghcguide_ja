@@ -668,10 +668,10 @@
 	      <entry><option>-XImplicitPrelude</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fno-monomorphism-restriction</option></entry>
+	      <entry><option>-XNoMonomorphismRestriction</option></entry>
 	      <entry><link linkend="monomorphism">単相性限定</link>を無効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-fmonomorphism-restriction</option></entry>
+	      <entry><option>-XMonomorphismRestriction</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fno-mono-pat-binds</option></entry>
