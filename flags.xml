@@ -56,6 +56,18 @@
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
+            <row>
+              <entry><option>&ndash;&ndash;supported-languages</option></entry>
+              <entry>対応している言語拡張を表示</entry>
+              <entry>モード</entry>
+              <entry>-</entry>
+            </row>
+            <row>
+              <entry><option>&ndash;&ndash;info</option></entry>
+              <entry>コンパイラに関する情報を表示</entry>
+              <entry>モード</entry>
+              <entry>-</entry>
+            </row>
 	    <row>
 	      <entry><option>&ndash;&ndash;version</option></entry>
 	      <entry>GHCのバージョンを表示</entry>
@@ -71,6 +83,12 @@
 	    <row>
 	      <entry><option>&ndash;&ndash;print-libdir</option></entry>
 	      <entry>GHCのライブラリディレクトリを表示</entry>
+	      <entry>モード</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>&ndash;&ndash;print-docdir</option></entry>
+	      <entry>GHCの文書ディレクトリを表示</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
@@ -166,25 +184,25 @@
 	  <tbody>
 	    <row>
 	      <entry><option>--interactive</option></entry>
-	      <entry>対話モード。通常これを使うときは単に<command>ghci</command>を走らせる。</entry>
+	      <entry>対話モード。通常これを使うときは単に<command>ghci</command>を走らせる。詳細は<xref linkend="ghci"/>を見よ。</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>--make</option></entry>
-              <entry>複数モジュールからなるHaskellプログラムを、依存性を自動的に解決しながらビルドする。<command>make</command>を使うのよりもずっと簡単で、速いことが期待できる。</entry>
+              <entry>複数モジュールからなるHaskellプログラムを、依存性を自動的に解決しながらビルドする。<command>make</command>を使うのよりもずっと簡単で、速いことが期待できる。詳細は<xref linkend="make-mode"/>を見よ。</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-e <replaceable>expr</replaceable></option></entry>
-	      <entry><replaceable>expr</replaceable>を評価する</entry>
+	      <entry><replaceable>expr</replaceable>を評価する。詳細は<xref linkend="eval-mode"/>を見よ。</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-M</option></entry>
-	      <entry><filename>Makefile</filename>で使うのに適した依存性情報を生成する。</entry>
+	      <entry><filename>Makefile</filename>で使うのに適した依存性情報を生成する。詳細は<xref linkend="makefile-dependencies"/>を見よ。</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
@@ -279,19 +297,19 @@
 	  </thead>
 	  <tbody>
 	    <row>
-	      <entry><option>-keep-hc-file</option></entry>
+	      <entry><option>-keep-hc-file</option>または<option>-keep-hc-files</option></entry>
               <entry>中間の<literal>.hc</literal>ファイルを保持する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-keep-s-file</option></entry>
+	      <entry><option>-keep-s-file</option>または<option>-keep-s-files</option></entry>
 	      <entry>中間の<literal>.s</literal>ファイルを保持する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-keep-raw-s-file</option></entry>
+	      <entry><option>-keep-raw-s-file</option>または<option>-keep-raw-s-files</option></entry>
 	      <entry>中間の<literal>.raw_s</literal>ファイルを保持する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
@@ -405,9 +423,7 @@
 	    </row>
 	    <row>
 	      <entry><option>--show-iface</option> <replaceable>file</replaceable></entry>
-	      <entry><replaceable>file</replaceable>からインタフェースを読み、テキストとして<literal>stdout</literal>に出力する。</entry>
-	      <entry>モード</entry>
-	      <entry>-</entry>
+              <entry><xref linkend="modes"/>を見よ。</entry>
 	    </row>
 	  </tbody>
 	</tgroup>
@@ -468,6 +484,31 @@
 	      <entry><option>-read-dot-ghci</option></entry>
 	      <entry><filename>.ghci</filename>ファイルを読むのを有効にする</entry>
 	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fbreak-on-exception</option></entry>
+	      <entry><link linkend="ghci-debugger-exceptions">例外が投げられる度にブレークする</link></entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-fno-break-on-exception</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fbreak-on-error</option></entry>
+	      <entry><link linkend="ghci-debugger-exceptions">例外やエラーがキャッチされなかった場合にブレークする</link></entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-fno-break-on-error</option></entry>
+	    </row>
+            <row>
+              <entry><option>-fprint-evld-with-show</option></entry>
+              <entry><link linkend="breakpoints"><literal>:print</literal>でShowのインスタンスを使うのを有効にする</link></entry>
+              <entry>dynamic</entry>
+              <entry><option>-fno-print-evld-with-show</option></entry>
+            </row>
+	    <row>
+	    <row>
+	      <entry><option>-fno-print-bind-result</option></entry>
+	      <entry><link linkend="ghci-stmts">GHCiで束縛の結果を表示するのを無効にする</link></entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -555,6 +596,12 @@
 	  </thead>
 	  <tbody>
 	    <row>
+	      <entry><option>-fglasgow-exts</option></entry>
+	      <entry>大部分の言語拡張を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-glasgow-exts</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-fallow-overlapping-instances</option></entry>
 	      <entry><link linkend="instance-overlap">重複インスタンス</link>を有効にする</entry>
 	      <entry>動</entry>
@@ -595,12 +642,6 @@
 	      <entry><link linkend="generic-classes">総称クラス</link>を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-fgenerics</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-fglasgow-exts</option></entry>
-	      <entry>大部分の言語拡張を有効にする</entry>
-	      <entry>動</entry>
-	      <entry><option>-fno-glasgow-exts</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fimplicit-params</option></entry>
