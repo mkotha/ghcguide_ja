@@ -71,7 +71,7 @@ main = do args &lt;- getArgs
     <sect3 id="infelicities-decls">
       <title>宣言と束縛</title>
 
-      <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-fno-mono-pat-binds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
+      <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-XNoMonoPatBinds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
     </sect3>
       
       <sect3 id="infelicities-Modules">

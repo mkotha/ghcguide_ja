@@ -674,10 +674,10 @@
 	      <entry><option>-XMonomorphismRestriction</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fno-mono-pat-binds</option></entry>
+	      <entry><option>-XNoMonoPatBinds</option></entry>
 	      <entry><link linkend="monomorphism">パターン束縛を多相的に</link>する。</entry>
 	      <entry>動</entry>
-	      <entry><option>-fmono-pat-binds</option></entry>
+	      <entry><option>-XMonoPatBinds</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fextended-default-rules</option></entry>

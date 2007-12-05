@@ -68,7 +68,7 @@
 
       <varlistentry>
 	<term>
-          <option>-XNoMonomorphismRestriction</option>,<option>-fno-mono-pat-binds</option>:
+          <option>-XNoMonomorphismRestriction</option>,<option>-XNoMonoPatBinds</option>:
         </term>
 	<listitem>
           <para>このフラグはどのように一般化が行われるかを制御する。<xref linkend="monomorphism"/>を見よ。</para>
@@ -4756,8 +4756,8 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
 
 <sect2>
 <title>単相的パターン束縛</title>
-          <indexterm><primary><option>-fno-mono-pat-binds</option></primary></indexterm>
-          <indexterm><primary><option>-fmono-pat-binds</option></primary></indexterm>
+          <indexterm><primary><option>-XNoMonoPatBinds</option></primary></indexterm>
+          <indexterm><primary><option>-XMonoPatBinds</option></primary></indexterm>
 
 	  <para>実験的な変更として、我々はパターン束縛を単相的にする可能性を探っている。単相的というのは、全く一般化されないということである。パターン束縛とは、左辺に関数引数がなく、かつ、左辺が単純な変数でないものである。例を示す。
 <programlisting>
@@ -4769,7 +4769,7 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
   (f) = e                    -- パターン束縛
   [x] = e                    -- パターン束縛
 </programlisting>
-実験的に、GHCは<emphasis>デフォルトで</emphasis>パターン束縛を単相的にする。標準の振る舞いに戻すには<option>-fno-mono-pat-binds</option>を使うこと。
+実験的に、GHCは<emphasis>デフォルトで</emphasis>パターン束縛を単相的にする。標準の振る舞いに戻すには<option>-XNoMonoPatBinds</option>を使うこと。
 </para>
 </sect2>
 </sect1>
