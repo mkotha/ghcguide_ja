@@ -679,6 +679,12 @@
 	      <entry>動</entry>
 	      <entry><option>-XMonoPatBinds</option></entry>
 	    </row>
+            <row>
+              <entry><option>-XRelaxedPolyRec</option><entry>
+              <entry><link linkend="typing-binds">相互再帰的な多相関数</link>の検査を緩める</entry>
+              <entry>dynamic</entry>
+              <entry><option>-XNoRelaxedPolyRec</option><entry>
+            </row>
 	    <row>
 	      <entry><option>-fextended-default-rules</option></entry>
 	      <entry>GHCiの<link linkend="extended-default-rules">拡張デフォルト化規則</link>を通常のモードで使う</entry>
