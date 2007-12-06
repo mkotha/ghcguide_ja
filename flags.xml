@@ -762,7 +762,7 @@
 	  </row>
 	  <row>
 	    <entry><option>-Wall</option></entry>
-	    <entry>全ての警告を有効にする</entry>
+	    <entry>ほぼ全ての警告を有効にする</entry>
 	    <entry>動</entry>
 	    <entry><option>-w</option></entry>
 	  </row>
@@ -770,9 +770,14 @@
 	    <entry><option>-Werror</option></entry>
 	    <entry>警告を致命的にする</entry>
 	    <entry>動</entry>
-	    <entry></entry>
+	    <entry>-Wwarn</entry>
 	  </row>
-
+	  <row>
+	    <entry><option>-Wwarn</option></entry>
+	    <entry>警告を致命的でなくする</entry>
+	    <entry>動</entry>
+	    <entry>-Werror</entry>
+	  </row>
 	  <row>
 	    <entry><option>-fwarn-deprecations</option></entry>
 	    <entry>非推奨の関数・型が使われているときに警告する</entry>
@@ -793,6 +798,13 @@
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-hi-shadowing</option></entry>
 	  </row>
+
+          <row>
+            <entry><option>-fwarn-implicit-prelude</option></entry>
+            <entry>Preludeが暗黙にimportされるときに警告する</entry>
+            <entry>dynamic</entry>
+            <entry><option>-fno-warn-implicit-prelude</option></entry>
+          </row>
 
 	  <row>
 	    <entry><option>-fwarn-incomplete-patterns</option></entry>
@@ -838,7 +850,7 @@
 
 	  <row>
 	    <entry><option>-fwarn-orphans</option></entry>
-	    <entry>モジュールに孤立したインスタンス宣言や書き換え規則があるときに警告する</entry>
+	    <entry>モジュールに<link linkend="orphan-modules">孤立したインスタンス宣言や書き換え規則</link>があるときに警告する</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-orphans</option></entry>
 	  </row>
@@ -858,10 +870,24 @@
 	  </row>
 
 	  <row>
+	    <entry><option>-fwarn-tabs</option></entry>
+	    <entry>ソースファイル中にタブがあったときに警告する</entry>
+	    <entry>dynamic</entry>
+	    <entry><option>-fno-warn-tabs</option></entry>
+	  </row>
+
+	  <row>
 	    <entry><option>-fwarn-type-defaults</option></entry>
 	    <entry>デフォルト化が起きたときに警告する</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-type-defaults</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-monomorphism-restriction</option></entry>
+	    <entry>単相性限定が適用された時に警告する</entry>
+	    <entry>dynamic</entry>
+	    <entry><option>-fno-warn-monomorphism-restriction</option></entry>
 	  </row>
 
 	  <row>
@@ -941,7 +967,7 @@
 	  <tbody>
 	    <row>
 	      <entry><option>-fcase-merge</option></entry>
-	      <entry>case-mergingを有効にする</entry>
+	      <entry>case-mergingを有効にする。<option>-O</option>オプションによって有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-case-merge</option></entry>
 	    </row>
@@ -955,7 +981,7 @@
 
 	    <row>
 	      <entry><option>-fdo-eta-reduction</option></entry>
-	      <entry>イータ簡約を有効にする</entry>
+	      <entry>イータ簡約を有効にする。<option>-O</option>によって有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-do-eta-reduction</option></entry>
 	    </row>
@@ -975,13 +1001,6 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-frules-off</option></entry>
-              <entry>全ての書き換え規則を無効にする(多重定義関数の自動特殊化で生成されたものも含める)</entry>
-	      <entry>静</entry>
-	      <entry><option>-frules-off</option></entry>
-	    </row>
-
-	    <row>
 	      <entry><option>-fignore-asserts</option></entry>
 	      <entry>ソース中のアサーションを無視する</entry>
 	      <entry>動</entry>
@@ -993,13 +1012,6 @@
 	      <entry>インタフェースファイル中のプラグマを無視する</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-ignore-interface-pragmas</option></entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-fliberate-case-threshold</option></entry>
-	      <entry>liberate-case最適化を調整する(デフォルト: 10)</entry>
-	      <entry>静</entry>
-	      <entry><option>-fno-liberate-case-threshold</option></entry>
 	    </row>
 
 	    <row>
@@ -1031,33 +1043,54 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fno-cse</option></entry>
-              <entry>共通部分式を無効にする</entry>
+	      <entry><option>-fcse</option></entry>
+              <entry>共通部分式削除を使う。<option>-O</option>によって有効になる。</entry>
 	      <entry>動</entry>
-	      <entry>-</entry>
+	      <entry>-fno-cse</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fno-full-laziness</option></entry>
-              <entry>完全遅延(束縛を外側に向かって浮遊させる)を無効にする。</entry>
+	      <entry><option>-ffull-laziness</option></entry>
+              <entry>完全遅延(束縛を外側に向かって浮遊させる)を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
-	      <entry>-ffull-laziness</entry>
+	      <entry>-fno-full-laziness</entry>
+	    </row>
+
+            <row>
+	      <entry><option>-frewrite-rules</option></entry>
+	      <entry>全ての書き換え規則(多重定義関数の自動特殊化で生成されたものも含む)を有効にする。<option>-O</option>によっても有効になる。<entry>
+	      <entry>dynamic</entry>
+	      <entry><option>-fno-rewrite-rules</option></entry>
+ 	    </row>
+
+	    <row>
+	      <entry><option>-fstrictness</option></entry>
+              <entry>正格性解析を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-strictness</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fno-pre-inlining</option></entry>
-              <entry>pre-inliningを無効にする</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
+	      <entry><option>-fspec-constr</option></entry>
+	      <entry>SpecConstr変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
+	      <entry>dynamic</entry>
+	      <entry>-fno-spec-constr</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fno-strictness</option></entry>
-              <entry>正確性解析を無効にする</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
+	      <entry><option>-fliberate-case</option></entry>
+	      <entry>liberate-case変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
+	      <entry>dynamic</entry>
+	      <entry>-fno-liberate-case</entry>
 	    </row>
 
+	    <row>
+	      <entry><option>-fspec-threshold</option>=<replaceable>n</replaceable></entry>
+	      <entry>liberate-caseとSpecConstrの両変換について、関数特殊化に関するサイズの閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
+	      <entry>static</entry>
+	      <entry><option>-</option></entry>
+ 	    </row>
+ 
 	    <row>
 	      <entry><option>-funbox-strict-fields</option></entry>
               <entry>構築子の正格なフィールドを平坦化する</entry>
@@ -1098,6 +1131,13 @@
               <entry>展開の設定を調整する</entry>
 	      <entry>静</entry>
 	      <entry><option>-fno-unfolding-use-threshold</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fno-pre-inlining</option></entry>
+              <entry>pre-inliningを無効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
 	    </row>
 	  </tbody>
 	</tgroup>
@@ -1761,7 +1801,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-ddump-stranal</option></entry>
-	      <entry>正確性解析器の出力を表示</entry>
+	      <entry>正格性解析器の出力を表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
