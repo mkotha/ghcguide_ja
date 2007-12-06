@@ -505,7 +505,6 @@
               <entry><option>-fno-print-evld-with-show</option></entry>
             </row>
 	    <row>
-	    <row>
 	      <entry><option>-fno-print-bind-result</option></entry>
 	      <entry><link linkend="ghci-stmts">GHCiで束縛の結果を表示するのを無効にする</link></entry>
 	      <entry>動</entry>
