@@ -5,72 +5,21 @@
   <indexterm><primary>interpreter</primary><see>GHCi</see></indexterm>
   <indexterm><primary>interactive</primary><see>GHCi</see></indexterm>
   
-  <para>GHCi<footnote><para>「i」はinteractiveのiである</para></footnote>はGHCの対話環境であり、Haskellの式を対話的に評価したりプログラムを解釈実行したりできる。もしあなたが<ulink url="http://www.haskell.org/hugs/">Hugs</ulink><indexterm><primary>Hugs</primary></indexterm>に慣れ親しんでいるなら、GHCiの扱いにもすぐに慣れるだろう。しかしながら、GHCiはコンパイル済みコードをロードすることができ、また、GHCが提供する言語拡張の全て<footnote><para>ただし、現在のところ、<literal>foreign export</literal>を除く</para></footnote>をサポートする。</para>
-  <indexterm><primary>FFI</primary><secondary>GHCi support</secondary></indexterm>
-  <indexterm><primary>Foreign Function Interface</primary><secondary>GHCi support</secondary></indexterm>
+  <para>GHCi<footnote><para>「i」はinteractiveのiである</para></footnote>はGHCの対話環境であり、Haskellの式を対話的に評価したりプログラムを解釈実行したりできる。もしあなたが<ulink url="http://www.haskell.org/hugs/">Hugs</ulink><indexterm><primary>Hugs</primary></indexterm>に慣れ親しんでいるなら、GHCiの扱いにもすぐに慣れるだろう。しかしながら、GHCiはコンパイル済みコードをロードすることができ、また、GHCが提供する言語拡張の全て<footnote><para>ただし、現在のところ、<literal>foreign export</literal>を除く</para></footnote>をサポートする。<indexterm><primary>FFI</primary><secondary>GHCi support</secondary></indexterm><indexterm><primary>Foreign Function Interface</primary><secondary>GHCi support</secondary></indexterm>また、GHCiには対話的デバッガが含まれている。(<xref linkend="ghci-debugger"/>を見よ)</para>
 
-  <sect1>
+  <sect1 id="ghci-introduction">
     <title>GHCiの紹介</title>
 
     <para>GHCiセッションの例を見ていくことから始めよう。GHCiは<literal>ghci</literal>コマンドで起動することができる。</para>
 
 <screen>
 $ ghci
-   ___         ___ _
-  / _ \ /\  /\/ __(_)
- / /_\// /_/ / /  | |      GHC Interactive, version 6.6, for Haskell 98.
-/ /_\\/ __  / /___| |      http://www.haskell.org/ghc/
-\____/\/ /_/\____/|_|      Type :? for help.
-
+GHCi, version 6.8.1: http://www.haskell.org/ghc/  :? for help
 Loading package base ... linking ... done.
 Prelude> 
 </screen>
 
-    <para>GHCiがプレリュードと標準ライブラリをロードするのに少し時間が掛かるかもしれない。その後、プロンプトが表示される。指示にしたがって<literal>:?</literal>と打ち込むと、次が得られる。(訳注：以下には和訳を示す)</para>
-
-<screen>
- プロンプトから使えるコマンド:
-
-   &lt;stmt&gt;                      &lt;stmt&gt;を評価/実行する
-   :add &lt;filename&gt; ...         現在のターゲットにモジュールを追加する
-   :browse [*]&lt;module&gt;         &lt;module&gt;で定義されている名前を表示する
-   :cd &lt;dir&gt;                   ディレクトリを&lt;dir&gt;に変更する
-   :def &lt;cmd&gt; &lt;expr&gt;           :&lt;cmd&gt;というコマンドを定義する
-   :edit &lt;file&gt;                ファイルを編集する
-   :edit                       直近のモジュールを編集する
-   :help, :?                   このコマンド一覧を表示する
-   :info [&lt;name&gt; ...]          指定された名前についての情報を表示する
-   :load &lt;filename&gt; ...        モジュールと、その依存関係をロードする
-   :module [+/-] [*]&lt;mod&gt; ...  式を評価する上での文脈を設定する
-   :main [&lt;arguments&gt; ...]     main関数を指定された引数で実行する
-   :reload                     現在のモジュール群をリロードする
-
-   :set &lt;option&gt; ...           オプションを有効にする
-   :set args &lt;arg&gt; ...         System.getArgsによって返される引数を設定する
-   :set prog &lt;progname&gt;        System.getProgNameによって返される値を設定する
-   :set prompt &lt;prompt&gt;        GHCiの使うコマンドプロンプトを設定する
-   :set editor &lt;cmd&gt;        :editで使われるコマンドを設定する
-
-   :show modules               現在ロードされているモジュールを表示する
-   :show bindings              プロンプトでなされた束縛を表示する
-
-   :ctags [&lt;file&gt;]             Viのタグファイルを作る(デフォルト: "tags")
-   :etags [&lt;file&gt;]             Emacsのタグファイルを作る(デフォルト: "TAGS")
-   :type &lt;expr&gt;                &lt;expr&gt;の型を表示する
-   :kind &lt;type&gt;                &lt;type&gt;の類を表示する
-   :undef &lt;cmd&gt;                ユーザー定義コマンド:&lt;cmd&gt;を未定義にする
-   :unset &lt;option&gt; ...         オプションを無効にする
-   :quit                       GHCiを抜ける
-   :!&lt;command&gt;                 シェルのコマンド&lt;command&gt;を実行する
-
- ':set'と':unset'で使えるオプション:
-
-    +r            評価のたびに毎回トップレベルの式を復元する
-    +s            評価のたびに時間/メモリの統計情報を印字する
-    +t            評価の後に型を印字する
-    -&lt;flags&gt;      GHCコマンド行フラグの大部分はここでもセットできる
-                         (例えば、-v2、-fglasgow-extsなど)
-</screen>
+    <para>GHCiがプレリュードと標準ライブラリをロードするのに少し時間が掛かるかもしれない。その後、プロンプトが表示される。バナーにある通り、<literal>:?</literal>と打ち込めば利用可能なコマンド一覧と、それぞれの短い説明が得られる。</para>
 
     <para>これらのコマンドの大部分はこれから説明する。Hugsの利用者へ: 多くのことがHugsと同じように動作するので、すぐに使えるようになるはずである。</para>
 
@@ -89,7 +38,7 @@ Prelude>
     <para>GHCiは行全体を一つの式だと解釈し、それを評価する。式は複数の行に渡っていてはいけない。エンターキーが押されると、GHCiは即座にそれを評価しようとする。</para>
   </sect1>
 
-  <sect1>
+  <sect1 id="loading-source-files">
     <title>ソースファイルをロードする</title>
 
     <para>次のようなHaskellソースコードが<filename>Main.hs</filename>というファイルに置かれているとしよう。</para>
@@ -174,15 +123,14 @@ Ok, modules loaded: Main.
 <screen>
 Prelude> :! ghc -c D.hs
 Prelude> :load A
-Skipping  D                ( D.hs, D.o )
-Compiling C                ( C.hs, interpreted )
 Compiling B                ( B.hs, interpreted )
+Compiling C                ( C.hs, interpreted )
 Compiling A                ( A.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
 *Main>
 </screen>
 
-    <para>コンパイラのメッセージから、Dの処理が省かれ、オブジェクトファイル<filename>D.o</filename>が使われたことが分かる。<literal>Skipping</literal><replaceable>module</replaceable>は、<replaceable>module</replaceable>のソースや依存関係が、最後にコンパイルされたときから変更されていないため、コンパイルが必要ないということを示している。</para>
+    <para>コンパイラのメッセージ中に、<literal>D</literal>についての行がない。これは、ソースファイルとその依存関係が、最後にコンパイルされたときから変更されていないため、コンパイルする必要ないからである。</para>
 
     <para>いつでも、<literal>:show modules</literal>コマンドを使って、その時点でロードされているモジュールの一覧を表示することができる。</para>
 
@@ -200,9 +148,6 @@ A                ( A.hs, interpreted )
 *Main> :! touch D.hs
 *Main> :reload
 Compiling D                ( D.hs, interpreted )
-Skipping  C                ( C.hs, interpreted )
-Skipping  B                ( B.hs, interpreted )
-Skipping  A                ( A.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
 *Main> 
 </screen>
@@ -215,8 +160,8 @@ Ok, modules loaded: A, B, C, D.
 *Main> :! ghc -c C.hs
 *Main> :load A
 Compiling D                ( D.hs, interpreted )
-Compiling C                ( C.hs, interpreted )
 Compiling B                ( B.hs, interpreted )
+Compiling C                ( C.hs, interpreted )
 Compiling A                ( A.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
 </screen>
@@ -233,18 +178,16 @@ Ok, modules loaded: A, B, C, D.
 
 <screen>
 *Main> :load A
-Skipping  D                ( D.hs, D.o )
-Skipping  C                ( C.hs, C.o )
 Compiling B                ( B.hs, interpreted )
 Compiling A                ( A.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
 </screen>
 
-    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc &ndash;&ndash;make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前に　笑)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、新しいモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
+    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc &ndash;&ndash;make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前にね)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、変更されたモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
 
   </sect1>
 
-  <sect1>
+  <sect1 id="interactive-evaluation">
     <title>プロンプトで対話的に評価する</title>
 
     <para>プロンプトに式を入力すると、GHCiは即座に評価して結果を印字する。
@@ -379,7 +322,7 @@ hello
 Prelude IO>
 </screen>
 
-      <para>(注意: <literal>:module</literal>は<literal>:m</literal>に短縮できる)<literal>:module</literal>コマンドの完全な構文は次の通り。</para>
+      <para>(注意: <literal>:module +M</literal>の代わりに<literal>import M</literal>を使うこともできる。また、<literal>:module</literal>は<literal>:m</literal>に短縮できる)<literal>:module</literal>コマンドの完全な構文は次の通り。</para>
 
 <screen>
 :module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable>
@@ -392,7 +335,7 @@ Prelude IO>
       <para>複数のモジュールがスコープにあるとき、特に複数の<literal>*</literal>形式のモジュールがあるときは、名前の衝突が起こりやすい。Haskellでは、名前の衝突は曖昧な識別子が使われたときのみ報告されると定められており、GHCiもプロンプトで入力される式についてこれに倣っている。</para>
 
       <para>
-        ヒント: GHCiはスコープにある名前についてタブ補完を行う。例えば、GHCiを起動して<literal>J&lt;tab&gt;</literal>と打つと、GHCiはそれを<literal>Just </literal>に展開する。
+        ヒント: GHCiはスコープにある名前についてタブ補完を行う。例えば、GHCiを起動して<literal>J&lt;tab&gt;</literal>と打つと、GHCiはそれを&ldquo;<literal>Just </literal>&rdquo;に展開する。
       </para>
 
       <sect3>
@@ -492,19 +435,508 @@ it &lt;- <replaceable>e</replaceable>
   []
 </programlisting>
     のようになる。しかし、利用者が型を指定しなければならないというのは面倒なので、GHCiはHaskellの型デフォルト化規則(Haskell 98 改訂レポートのセクション4.3.4)を以下のように拡張している。標準の規則では、個々の型変数<literal>a</literal>について制約の集まり<literal>(C1 a, C2 a, ..., Cn a)</literal>を考え、次の条件が満たされたとき、この型変数をデフォルト化する。
-	<itemizedlist>
+    <orderedlist>
 	    <listitem><para>型変数<literal>a</literal>が他のどの制約にも現れない。</para></listitem>
             <listitem><para><literal>Ci</literal>が全て標準のクラスである。</para></listitem>
             <listitem><para><literal>Ci</literal>のうち、少なくとも一つが数値クラスである。</para></listitem>
-      </itemizedlist>
-   GHCiのプロンプトでは、二番目と三番目の規則が次のように緩和されている。(相異点は強調書体で示した)
+    </orderedlist>
+GHCiのプロンプトでは、あるいはGHCで<literal>-XExtendedDefaultRules</literal>フラグが与えられている場合、以下の変更が適用される。
 	<itemizedlist>
-            <listitem><para><literal>Ci</literal>が<emphasis>全て</emphasis>単引数の型クラスである。</para></listitem>
-            <listitem><para><literal>Ci</literal>のうち、少なくとも一つが数値クラスである<emphasis>か、
-            <literal>Show</literal>であるか、<literal>Eq</literal>であるか、<literal>Ord</literal>である</emphasis>。</para></listitem>
+            <listitem><para>上の規則2が次のように緩和される: <literal>Ci</literal>が<emphasis>全て</emphasis>単引数の型クラスである。</para></listitem>
+            <listitem><para>上の規則3が次のように緩和される: <literal>Ci</literal>のうち、少なくとも一つが数値クラスである<emphasis>か、<literal>Show</literal>であるか、<literal>Eq</literal>であるか、<literal>Ord</literal>である</emphasis>。</para></listitem>
+            <listitem><para>単位型<literal>()</literal>が、型のデフォルト化の際に通常試す型のリストの先頭に追加される。</para></listitem>
       </itemizedlist>
-   <literal>-XExtendedDefaultRules</literal>フラグを使うと、これと同じデフォルト化を通常のHaskellモジュールに対して有効にすることができる。
-   </para>
+    最後の点は、例えば、このプログラムに影響する。
+<programlisting>
+main :: IO ()
+main = print def
+
+instance Num ()
+
+def :: (Num a, Enum a) => a
+def = toEnum 0
+</programlisting>
+    これが、<literal>0</literal>ではなく<literal>()</literal>を表示する。型が<literal>Integer</literal>でなく<literal>()</literal>にデフォルト化されるためである。</para>
+   <para>
+    この変更の理由は、これによって<literal>IO a</literal>の動作が<literal>IO ()</literal>にデフォルト化されるので、ghciがこれらを走らせたときに結果を表示する必要がなくなることである。これは<literal>printf</literal>の場合に特に重要である。<literal>printf</literal>には<literal>IO a</literal>を返すインスタンスがあるが、これが返せるのは<literal>undefined</literal>だけである。(インスタンスがこの型なのは、printfがクラスシステムの拡張を必要としないようにである)。このため、もし型が<literal>Integer</literal>にデフォルト化されるなら、ghciはprintfを実行する時にエラーを発生させることになる。</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="ghci-debugger">
+    <title>GHCiデバッガ</title>
+    <indexterm><primary>debugger</primary><secondary>in GHCi</secondary>
+    </indexterm>
+
+    <para>GHCiは単純な命令的スタイルのデバッガを搭載していて、実行中の計算を停めて変数の値を確かめることができる。このデバッガはGHCiに統合されており、デフォルトで有効になっている。デバッグ機能を使うのにフラグは必要ない。一つ、重要な制限があって、ブレークポイントとステップ実行は<emphasis>解釈実行</emphasis>されているモジュールでしか使えない。コンパイル済みコードはデバッガからは見えない。</para>
+
+    <para>このデバッガは以下のものを提供する。
+    <itemizedlist>
+        <listitem>
+          <para>プログラム中の関数定義や式に<firstterm>ブレークポイント</firstterm>を設定する能力。その関数が呼ばれたとき、あるいはその式が評価されたとき、GHCiは実行を中断してプロンプトに戻る。そこで、実行を続ける前に、局所変数の値を調べることができる。</para>
+        </listitem>
+        <listitem>
+          <para><firstterm>ステップ実行</firstterm>ができる。評価器は、簡約をだいたい一回行うごとに実行を一時停止し、局所変数を調べることができるようにする。これはプログラムのあらゆる地点にブレークポイントを設定するのと同様である。</para>
+        </listitem>
+        <listitem>
+          <para>実行を<firstterm>追跡モード</firstterm>で行うことができる。この場合、評価器は、発生した評価ステップをすべて記憶するが、実際のブレークポイントに達するまで実行を停止しない。一旦停止した後で、この評価ステップの履歴を調べることができる。</para>
+        </listitem>
+        <listitem>
+          <para>例外(パターン照合の失敗や<literal>error</literal>など)をブレークポイントとして扱うことができる。これによって、プログラム中の例外の発生源を突き止めることが容易になる。</para>
+        </listitem>
+      </itemizedlist>
+    </para>
+      
+    <para>現在のところ、&ldquo;スタックトレース&rdquo;を得る手段は提供されていないが、追跡と履歴の機能が有用な次善策になっていて、これらで十分エラー発生時の状況を知ることができることがしばしばある。</para>
+      
+    <sect2 id="breakpoints">
+      <title>ブレークポイントと変数内容の表示</title>
+      
+      <para>全体を通した例としてクイックソートを使おう。コードは以下の通り。</para>
+
+<programlisting>
+qsort [] = [] 
+qsort (a:as) = qsort left ++ [a] ++ qsort right
+  where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
+
+main = print (qsort [8, 4, 0, 3, 1, 23, 11, 18])
+</programlisting>
+
+      <para>まず、このモジュールをGHCiにロードする。</para>
+
+<screen>
+Prelude> :l qsort.hs
+[1 of 1] Compiling Main             ( qsort.hs, interpreted )
+Ok, modules loaded: Main.
+*Main>
+      </screen>       
+
+      <para>ここで、qsortの二番目の等式の右辺にブレークポイントを設定する。</para>
+
+<programlisting>
+*Main> :break 2
+Breakpoint 0 activated at qsort.hs:2:15-46
+*Main>
+</programlisting>
+      
+      <para><literal>:break 2</literal>というコマンドは、直近にロードされたモジュール(この場合<literal>qsort.hs</literal>)の2行目にブレークポイントを設定するものである。詳しく言うと、その行にある完全な部分式のうちもっとも左側にあるものが選ばれる。この場合<literal>(qsort left ++ [a] ++ qsort right)</literal>である。</para>
+
+      <para>さて、プログラムを実行してみる。</para>
+
+<programlisting>
+*Main> main
+Stopped at qsort.hs:2:15-46
+_result :: [a]
+a :: a
+left :: [a]
+right :: [a]
+[qsort.hs:2:15-46] *Main>
+</programlisting>
+
+      <para>ブレークポイントのところで実行が中断した。プロンプトが変わって、現在ブレークポイントで停止していることと、その場所が<literal>[qsort.hs:2:15-46]</literal>であることを示している。場所をさらに明確にするには、<literal>:list</literal>コマンドが使える。</para>
+
+<programlisting>
+[qsort.hs:2:15-46] *Main> :list 
+1  qsort [] = [] 
+2  qsort (a:as) = qsort left ++ [a] ++ qsort right
+3    where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
+</programlisting>
+
+      <para><literal>:list</literal>コマンドは、現在のブレークポイントのまわりのコードを表示する。出力デバイスが対応しているなら、注目している部分式が太字で強調される。</para>
+
+      <para>ブレークポイントの置かれた式の各自由変数(<literal>a</literal>と<literal>left</literal>と<literal>right</literal>)について、その束縛がGHCiに用意されている<footnote><para>元々、自由変数だけでなくスコープにあるあらゆる変数の束縛を用意していたが、これが性能にかなりの影響を与えることが分かった。そのため、現在は自由変数のみに制限している。</para></footnote>。さらに、この式の結果についての束縛(<literal>_result</literal>)も用意される。これらの変数は、GHCi上で普通に定義する変数と同じである。つまり、プロンプトに打ち込む式の中で使ったり、<literal>:type</literal>を使って型を問うたりできる。ただし、一つ重要な相違点があって、これらの変数は不完全な型しか持たないかもしれない。例えば、<literal>left</literal>の値を表示しようとすると次のようになる。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> left
+
+&lt;interactive&gt;:1:0:
+    Ambiguous type variable `a' in the constraint:
+      `Show a' arising from a use of `print' at &lt;interactive&gt;:1:0-3
+    Cannot resolve unknown runtime types: a
+    Use :print or :force to determine these types
+</screen>
+
+      <para>原因は、<literal>qsort</literal>が多相関数であって、GHCiが型情報を実行時に保持しないので、型変数に関係した自由変数の実行時の型を決定することができないことだ。これにより、プロンプトで<literal>left</literal>を表示しようとすると、GHCiは<literal>Show</literal>のどのインスタンスを使うべきか判断できず、上のエラーを出力する。</para>
+
+      <para>幸いにも、デバッガには<literal>:print</literal>という汎用印字コマンドが搭載されている。このコマンドで、変数の実行時の値を調べ、その型を再構築することができる。これを<literal>left</literal>に対して試してみると次のようになる。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :set -fprint-evld-with-show
+[qsort.hs:2:15-46] *Main> :print left
+left = (_t1::[a])
+</screen>
+
+      <para>これでは大したことは分からない。何が起きたかというと、<literal>left</literal>が未評価の計算(中断された計算、<firstterm>サンク</firstterm>ともいう)に束縛されていて、<literal>:print</literal>は決して評価を強制しないのだ。これは、ブレークポイントで<literal>:print</literal>を使って値を調べるとき、望ましくない副作用を起こさずに済むようにするためだ。評価を強制しないので、プログラムが通常と異なる結果を与えることもないし、例外が発生することもないし、無限ループや別のブレークポイント(<xref linkend="nested-breakpoints"/>)に遭遇することもない。<literal>:print</literal>は、サンクをforceする代わりに、各サンクをアンダースコアから始まる新しい変数(ここでは<literal>_t1</literal>)に束縛する。</para>
+
+        <para><literal>-fprint-evld-with-show</literal>というフラグは、<literal>:print</literal>が可能な限り既存の<literal>Show</literal>インスタンスを再利用するようにするものである。これが起こるのは、対象の変数の中身が完全に評価済みの時だけである。</para>
+
+        <para>変数の評価状態を変えても構わない場合、<literal>:print</literal>の代わりに<literal>:force</literal>を使うことができる。<literal>:force</literal>コマンドは、サンクに遭遇する度に評価を強制するが、この点を除いて<literal>:print</literal>とまったく同じように振る舞う。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :force left
+left = [4,0,3,1]
+</screen>
+
+      <para>ここで、<literal>:force</literal>が<literal>left</literal>の実行時の値を調べたので、この型が再構築された。この再構築の結果は次のようにして見ることができる。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :show bindings
+_result :: [Integer]
+a :: Integer
+left :: [Integer]
+right :: [Integer]
+_t1 :: [Integer]
+</screen>
+
+      <para><literal>left</literal>の型が分かっただけでなく、他の部分的な型もすべて解決されている。よって、例えば<literal>a</literal>の値を問い合わせることができる。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> a
+8
+</screen>
+      
+      <para>式全体の評価を<literal>:force</literal>で強制するのでなく、個々のサンクを評価したい場合、Haskellの<literal>seq</literal>が便利かもしれない。例えば以下のように使う。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :print right
+right = (_t1::[Integer])
+[qsort.hs:2:15-46] *Main> seq _t1 ()
+()
+[qsort.hs:2:15-46] *Main> :print right
+right = 23 : (_t2::[Integer])
+</screen>
+
+      <para>ここでは、サンク<literal>_t1</literal>だけを評価し、これでリストの頭部が分かった。尾部は別のサンクで、<literal>_t2</literal>に束縛された。ここでは<literal>seq</literal>関数は少々使いにくいので、<literal>:def</literal>を使ってもっと良いインタフェースをつけると良いかもしれない。(後は読者への練習問題としよう！)</para>
+
+      <para>最後に、現在の実行を再開することができる。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :continue
+Stopped at qsort.hs:2:15-46
+_result :: [a]
+a :: a
+left :: [a]
+right :: [a]
+[qsort.hs:2:15-46] *Main> 
+</screen>
+
+      <para>実行は、前に停止した点から再開し、同じブレークポイントで再び停止した。</para>
+
+      <sect3 id="setting-breakpoints">
+        <title>ブレークポイントを設定する</title>
+
+        <para>ブレークポイントを設定する方法はいくつかある。おそらくもっとも簡単な方法は最上位の関数の名前を使うことだろう。</para>
+
+<screen>
+   :break <replaceable>identifier</replaceable>
+</screen>
+
+      <para><replaceable>identifier</replaceable>は最上位の関数の名前(修飾名も使える)である。ただし、この関数の定義されているモジュールが、現在GHCiにロードされており、さらに解釈実行されていなければならない。ブレークポイントは関数の本体、関数が完全に適用され、パターン照合が行われる前の点に設定される。</para>
+
+      <para>行番号(と列番号)でブレークポイントを設定することもできる。</para>
+
+<screen>
+   :break <replaceable>line</replaceable>
+   :break <replaceable>line</replaceable> <replaceable>column</replaceable>
+   :break <replaceable>module</replaceable> <replaceable>line</replaceable>
+   :break <replaceable>module</replaceable> <replaceable>line</replaceable> <replaceable>column</replaceable> 
+</screen>
+
+      <para>ブレークポイントを特定の行に設定する場合、GHCiは、その行で始まりその行で終わる部分式の中でもっとも左側にあるものを選ぶ。二つの完全な部分式が同じカラムから始まっているなら長い方が選ばれる。その行に完全な部分式が無い場合、その行で始まっている部分式の中でもっとも左側にあるものが選ばれる。それも失敗したら、その行を一部か全部覆う式の中でもっとも右側にあるものが選ばれる。</para>
+
+      <para>ブレークポイントを特定の行の特定のカラムに設定する場合、GHCiはその地点を含む式の中で最小のものを選ぶ。注意: GHCは、TAB文字を、現れた場所に関わらず幅1とみなす。言い換えれば、カラム数を数えるのではなく文字を数えている。これはある種のエディタの振る舞いと整合するが、そうでないエディタもある。最善なのはそもそもソースコード中でタブ文字を使わないことである。(<xref linkend="options-sanity"/>中の<option>-fwarn-tabs</option>を見よ)</para>
+
+      <para>モジュールが省略された場合、直近にロードされたモジュールが使われる。</para>
+
+      <para>ブレークポイントを設定できない部分式もある。単一の変数は通常ブレークポイント位置とはみなされない。(ただし、その変数が関数定義かラムダかcaseの選択肢の右辺である場合は除く)。大まかに、ブレークポイントであるのは、全ての簡約基と、関数やラムダの本体、caseの選択肢、束縛文である。通常let式はブレークポイントでないが、その本体は常にブレークポイントである。そのletで束縛された変数の値を調べたいと思うのが普通だからである。</para>
+
+      </sect3>
+      <sect3>
+        <title>ブレークポイントを一覧・削除する</title>
+
+        <para>現在有効にされているブレークポイントの一覧は<literal>:show&nbsp;breaks</literal>で表示できる。</para>
+<screen>
+*Main> :show breaks
+[0] Main qsort.hs:1:11-12
+[1] Main qsort.hs:2:15-46
+</screen>
+
+        <para>ブレークポイントを削除するには、<literal>:show&nbsp;breaks</literal>コマンドの出力にある数字を与えて<literal>:delete</literal>コマンドを使えば良い。</para>
+<screen>
+*Main> :delete 0
+*Main> :show breaks
+[1] Main qsort.hs:2:15-46
+</screen>        
+
+        <para>全てのブレークポイントを一度に削除するには、<literal>:delete *</literal>とすれば良い。</para>
+
+    </sect3>
+    </sect2>
+
+    <sect2 id="single-stepping">
+      <title>ステップ実行</title>
+
+      <para>ステップ実行は、プログラムの実行を可視化する偉大な方法であり、バグの原因を同定する手段としても有用である。<literal>:step</literal>コマンドを使うと、プログラム中の全てのブレークポイントが有効にされ、次のブレークポイントに達するまで実行される。<literal>:steplocal</literal>とすれば、現在のトップレベル関数の中にあるブレークポイントのみ有効にする。同様に、<literal>:stepmodule</literal>とすると現在のモジュール中にあるブレークポイントのみ有効にする。例えば以下のようになる。</para>
+
+<screen>
+*Main> :step main
+Stopped at qsort.hs:5:7-47
+_result :: IO ()
+</screen>
+
+      <para><literal>:step <replaceable>expr</replaceable></literal>コマンドは、<replaceable>expr</replaceable>のステップ実行を開始する。<replaceable>expr</replaceable>が省略された時は、現在のブレークポイントからステップ実行する。<literal>:stepover</literal>も同様に動作する。</para>
+
+      <para>ステップ実行中には<literal>:list</literal>が特に便利で、自分がどこにいるか知ることができる。</para>
+
+<screen>
+[qsort.hs:5:7-47] *Main> :list
+4  
+5  main = print (qsort [8, 4, 0, 3, 1, 23, 11, 18])
+6  
+[qsort.hs:5:7-47] *Main>
+</screen>
+
+      <para>実際、GHCiには、ブレークポイントに達したときに決まったコマンドを実行する方法があるので、自動的に<literal>:list</literal>するようにできる。</para>
+
+<screen>
+[qsort.hs:5:7-47] *Main> :set stop :list
+[qsort.hs:5:7-47] *Main> :step
+Stopped at qsort.hs:5:14-46
+_result :: [Integer]
+4  
+5  main = print (qsort [8, 4, 0, 3, 1, 23, 11, 18])
+6  
+[qsort.hs:5:14-46] *Main>
+</screen>
+    </sect2>
+
+    <sect2 id="nested-breakpoints">
+      <title>ブレークポイントのネスト</title>
+      <para>GHCiがブレークポイントで停止したときに、プロンプトに入力された式が別のブレークポイントを起動した場合、この新しいブレークポイントが「現在の」ブレークポイントになり、古いものはスタックに保存される。このようにして、任意の数のブレークポイント文脈を作り上げることができる。例えば以下のように。</para>
+
+<screen>
+[qsort.hs:2:15-46] *Main> :st qsort [1,3]
+Stopped at qsort.hs:(1,0)-(3,55)
+_result :: [a]
+... [qsort.hs:(1,0)-(3,55)] *Main>
+</screen>
+
+      <para>前に設定した2行目のブレークポイントで停止したところで、<literal>:step qsort [1,3]</literal>として新しい評価を開始した。この新しい評価は一ステップの後に(<literal>qsort</literal>の定義で)停止した。ここで、プロンプトが変わって先頭に<literal>...</literal>が付き、現在のブレークポイントの他に保存されたブレークポイントがあることを示している。この文脈スタックを見るには、<literal>:show context</literal>を使えば良い。</para>
+
+<screen>
+... [qsort.hs:(1,0)-(3,55)] *Main> :show context
+--> main
+  Stopped at qsort.hs:2:15-46
+--> qsort [1,3]
+  Stopped at qsort.hs:(1,0)-(3,55)
+... [qsort.hs:(1,0)-(3,55)] *Main>
+</screen>
+
+        <para>現在の評価を放棄するには、<literal>:abandon</literal>が使える。</para>
+
+<screen>
+... [qsort.hs:(1,0)-(3,55)] *Main> :abandon
+[qsort.hs:2:15-46] *Main> :abandon
+*Main>
+</screen>
+    </sect2>
+
+    <sect2 id="ghci-debugger-result">
+      <title><literal>_result</literal>という変数</title>
+      <para>ブレークポイントで停止したときやステップ実行するとき、GHCiは<literal>_result</literal>という変数を用意して、現在注目されている式の結果に束縛する。<literal>_result</literal>の値はおそらくまだ存在しない(その評価を止めたのだから)が、その評価を強制することはできる。その型が既知でshowできるなら、<literal>_result</literal>とプロンプトに入力するだけで表示できる。ただし、これを行うに当たって警告が一つある。<literal>_result</literal>を評価すると、さらにブレークポイントを起動する可能性が高いということだ。特に、<literal>:step</literal>でなく真のブレークポイントで停止していたなら、このブレークポイントが最初に起動する。このため、<literal>_result</literal>を評価する時には、おそらく即座に<literal>:continue</literal>を発行する必要がある。別の方法として、<literal>:force</literal>はブレークポイントを無視するので、これを使うこともできる。</para>
+    </sect2>
+
+    <sect2 id="tracing">
+      <title>追跡と履歴</title>
+
+      <para>プログラムをデバッグしている時にしばしば問われる問いの一つに、「どうやってここに来たんだ？」というものがある。伝統的な命令的デバッガは通常何らかのスタックトレースの機能を持っていて、それを使ってアクティブな関数呼び出しのスタック(字句的呼び出しスタックと呼ばれることもある)を確認することができる。このスタックによって、現在の地点に至るまでのコード上の道のりが分かる。残念なことに、これをHaskellで用意するのは難しい。正格な言語と違って、実行は深さ優先ではなく必要に応じて進むからである。GHCの実行エンジンにある「スタック」は字句的呼び出しスタックとは大きく異なる。理想的には、GHCが、この動的な呼び出しスタックに加えて、別に字句的呼び出しスタックを管理すれば良く、事実、我々のプロファイルシステム(<xref linkend="profiling"/>)はまさにこれを行っており、他のHaskellデバッガにもこれをしているものがある。しかし、現在のところ、GHCiは字句的呼び出しスタックを管理しない。(克服せねばならない技術的困難がいくつかある)。代わりに、ブレークポイントから直前の評価ステップに戻る方法を用意している。これは要するにステップ実行を逆向きにするのと同じで、多くの場合「どうやってここに来たんだ？」という疑問を解決するのに十分な情報を与える。</para>
+
+      <para>追跡機能を使うには、式を<literal>:trace</literal>コマンドで評価する。例えば、<literal>qsort</literal>のベースケースにブレークポイントを設定する。</para>
+<screen>
+*Main&gt; :list qsort
+1  qsort [] = [] 
+2  qsort (a:as) = qsort left ++ [a] ++ qsort right
+3    where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
+4  
+*Main&gt; :b 1
+Breakpoint 1 activated at qsort.hs:1:11-12
+*Main&gt; 
+</screen>
+
+      <para>そして、小さな<literal>qsort</literal>を追跡付きで実行する。</para>
+
+<screen>
+*Main> :trace qsort [3,2,1]
+Stopped at qsort.hs:1:11-12
+_result :: [a]
+[qsort.hs:1:11-12] *Main>
+</screen>
+
+      <para>これで、評価ステップの履歴を確かめることができる。</para>
+
+<screen>
+[qsort.hs:1:11-12] *Main> :hist
+-1  : qsort.hs:3:24-38
+-2  : qsort.hs:3:23-55
+-3  : qsort.hs:(1,0)-(3,55)
+-4  : qsort.hs:2:15-24
+-5  : qsort.hs:2:15-46
+-6  : qsort.hs:3:24-38
+-7  : qsort.hs:3:23-55
+-8  : qsort.hs:(1,0)-(3,55)
+-9  : qsort.hs:2:15-24
+-10 : qsort.hs:2:15-46
+-11 : qsort.hs:3:24-38
+-12 : qsort.hs:3:23-55
+-13 : qsort.hs:(1,0)-(3,55)
+-14 : qsort.hs:2:15-24
+-15 : qsort.hs:2:15-46
+-16 : qsort.hs:(1,0)-(3,55)
+&lt;end of history&gt;
+</screen>
+
+      <para>履歴中の特定のステップを調べるには、<literal>:back</literal>を使う。</para>
+
+<screen>
+[qsort.hs:1:11-12] *Main> :back
+Logged breakpoint at qsort.hs:3:24-38
+_result :: [a]
+as :: [a]
+a :: a
+[-1: qsort.hs:3:24-38] *Main> 
+</screen>
+
+      <para>履歴中の各ステップで局所変数が保存されており、通常同様に調べることができる。また、プロンプトが変わって、<literal>-1</literal>と、履歴中の最初のステップを調べていることを示している。<literal>:forward</literal>コマンドを使うと履歴中を前方に移動することができる。</para>
+
+      <para><literal>:trace</literal>コマンドには式を与えても与えなくても良い。与えなかった場合、<literal>:step</literal>の場合と同様、追跡は現在のブレークポイントから始まる。</para>
+
+      <para>履歴は<literal>:trace</literal>を使ったときしか記録されない。これは、全てのブレークポイントを履歴に記録することで性能が二倍以上悪化することが分かったからである。GHCiは最後の50ステップを履歴に記憶する。(将来、これを可変にするかもしれない)</para>
+    </sect2>
+
+    <sect2 id="ghci-debugger-exceptions">
+      <title>例外をデバッグする</title>
+      <para>もう一つデバッグ中によく発生する疑問として、「この例外はどこから来たんだ？」というものがある。<literal>error</literal>や<literal>head []</literal>によって発生する例外には文脈情報が付属していない。プログラム中のどの<literal>head</literal>の呼び出しがエラーの原因になったかを調べるのは骨の折れる作業であり、通常<literal>Debug.Trace.trace</literal>を使ったり、プロファイル付きでコンパイルして<literal>+RTS -xc</literal>(<xref linkend="prof-time-options"/>を見よ)を使ったりすることになる。</para>
+
+      <para>GHCiデバッガの提供する方法を使うと、このようなエラーを素早く、かつコードを再コンパイルすることなしに突き止めることが、うまくすればできるかもしれない。一つの方法は、ソースコード中で例外を投げた場所にブレークポイントを設定し、<literal>:trace</literal>と<literal>:history</literal>を使って文脈を把握することだろう。しかし、<literal>head</literal>はライブラリ中にあり、そこに直接ブレークポイントを設定する訳にはいかない。このために、GHCiには<literal>-fbreak-on-exceptin</literal>フラグが用意されていて、これを使うと、例外が投げられた時に評価器が停止するようにできる。<literal>-fbreak-on-error</literal>も同様だが、これは例外が捕捉されなかった場合のみ停止する。例外によって停止したときは、GHCiはちょうどブレークポイントに当ったのと同じように振る舞うが、違いとして、ソースコード中の位置が表示されない。したがって、<literal>:trace</literal>と組み合わせて、例外が発生する直前のステップを記録するようにしないと、これらのコマンドはあまり有用でない。例えば次のように。</para>
+
+<screen>
+*Main> :set -fbreak-on-exception
+*Main> :trace qsort ("abc" ++ undefined)
+"Stopped at &lt;exception thrown&gt;
+_exception :: e
+[&lt;exception thrown&gt;] *Main&gt; :hist
+-1  : qsort.hs:3:24-38
+-2  : qsort.hs:3:23-55
+-3  : qsort.hs:(1,0)-(3,55)
+-4  : qsort.hs:2:15-24
+-5  : qsort.hs:2:15-46
+-6  : qsort.hs:(1,0)-(3,55)
+&lt;end of history&gt;
+[&lt;exception thrown&gt;] *Main&gt; :back
+Logged breakpoint at qsort.hs:3:24-38
+_result :: [a]
+as :: [a]
+a :: a
+[-1: qsort.hs:3:24-38] *Main&gt; :force as
+*** Exception: Prelude.undefined
+[-1: qsort.hs:3:24-38] *Main&gt; :print as
+as = 'b' : 'c' : (_t1::[Char])
+</screen>
+
+      <para>投げられた例外そのものは、<literal>_exception</literal>という新しい変数に束縛される。</para>
+
+      <para>例外発生時にブレークする機能は、プログラムが無限ループしているとき、それが何をしているかを調べるのに特に便利である。単にCtrl-Cを叩いて、履歴を見て、何が起こっていたかを調べれば良い。</para>
+    </sect2>
+
+    <sect2><title>例: 関数を調べる</title>
+      <para>
+        このデバッガを使って関数値を調べることは可能である。ブレークポイントで停止しており、スコープに関数があるとき、デバッガでその関数のソースコードを表示させることはできない。しかし、それを何らかの引数に適用して結果を観察することで、いくらかの情報を得ることはできる。
+      </para>
+
+      <para>
+        束縛が多相的な場合、この手順は少し複雑になる。例を使って示すことにしよう。単純のために、良く知られた<literal>map</literal>関数を使う。
+<programlisting>
+import Prelude hiding (map)
+
+map :: (a->b) -> a -> b
+map f [] = []
+map f (x:xs) = f x : map f xs
+</programlisting>
+      </para>
+
+      <para>
+        <literal>map</literal>にブレークポイントを設定し、呼ぶ。
+<screen>
+*Main> :break 5
+Breakpoint 0 activated at  map.hs:5:15-28
+*Main> map Just [1..5]
+Stopped at map.hs:(4,0)-(5,12)
+_result :: [b]
+x :: a
+f :: a -> b
+xs :: [a]
+</screen>
+GHCiの伝えるところによって、<literal>f</literal>がスコープにあることが分かる。しかし、これの型はまだ完全には分かっていないので、これを何か引数に適用することはできない。それでも、最初の引数の型が<literal>x</literal>の型と同じで、結果の型が<literal>_result</literal>の型と関係していることは分かる。(訳注: 原文は、Nevertheless, observe that the type of its first argument is the
+      same as the type of <literal>x</literal>, and its result type is shared
+        with <literal>_result</literal>.) </para>
+
+      <para>
+        先に示した(<xref linkend="breakpoints"/>)ように、このデバッガはある程度賢く作ってあって、<literal>x</literal>や<literal>_result</literal>の型が解明されたときには<literal>f</literal>の型を更新することができる。よって、この例ですべきことは、<literal>x</literal>を少しだけforceして、その型と、ひいては<literal>f</literal>の引数部分の型を復元することである。
+<screen>
+*Main> seq x ()
+*Main> :print x
+x = 1
+</screen>
+      </para>
+      <para>
+        これで、<literal>x</literal>の型が再構築され、それによって<literal>f</literal>の型も再構築されたことを確認できる。</para>
+<screen>
+*Main> :t x
+x :: Integer
+*Main> :t f
+f :: Integer -> b
+</screen>
+      <para>
+        この時点で、好きなInteger型の引数にfを適用して、その結果を観察することができる。
+<screen><![CDATA[
+*Main> let b = f 10
+*Main> :t b
+b :: b
+*Main> b
+<interactive>:1:0:
+    Ambiguous type variable `b' in the constraint:
+      `Show b' arising from a use of `print' at <interactive>:1:0
+*Main> :p b
+b = (_t2::a)
+*Main> seq b ()
+()
+*Main> :t b
+b :: a
+*Main> :p b
+b = Just 10
+*Main> :t b
+b :: Maybe Integer
+*Main> :t f
+f :: Integer -> Maybe Integer
+*Main> f 20
+Just 20
+*Main> map f [1..5]
+[Just 1, Just 2, Just 3, Just 4, Just 5]
+]]></screen>
+      最初の<literal>f</literal>の適用では、<literal>f</literal>の結果の型を復元するために、型の再構築をもう少し行わなければならなかった。しかし、それ以降は、<literal>f</literal>を通常の方法で自由に使うことができる。
+     </para>
+    </sect2>
+
+    <sect2><title>制約</title>
+      <itemizedlist>
+        <listitem>
+          <para>ブレークポイントで停止したとき、既に評価中の変数を評価しようとすると、二番目の評価はハングする。この理由は、その変数が評価中であることをGHCが知っているため、新しい評価では、先に進む前にその結果を待つが、最初の評価はブレークポイントで停止しているのだから、もちろん結果は得られない、ということにある。評価がハングしたときはCtrl-Cで中断してプロンプトに戻ることができる。</para>
+          <para>これがもっともよく起こるのは、CAF(例えばmain)を評価していて、ブレークポイントで停止し、そのCAFの値を再びプロンプトで要求した場合である。</para>
+        </listitem>
+	<listitem><para>
+          暗黙パラメタ(<xref linkend="implicit-parameters"/>)がブレークポイントで利用できるのは、明示的な型シグネチャがある場合だけである。
+	</para>
+        </listitem>
+      </itemizedlist>
     </sect2>
   </sect1>
 
@@ -513,13 +945,13 @@ it &lt;- <replaceable>e</replaceable>
     <indexterm><primary>invoking</primary><secondary>GHCi</secondary></indexterm>
     <indexterm><primary><option>&ndash;&ndash;interactive</option></primary></indexterm>
 
-    <para>GHCiは<literal>ghci</literal>または<literal>ghc &ndash;&ndash;interactive</literal>というコマンドで起動される。一つまたは複数のモジュールやファイル名をコマンド行から指定することもできる。そうすると、GHCiは、プロンプトで<literal>:load <replaceable>module</replaceable></literal>と入力されたときと同じように(<xref linkend="ghci-commands"/>を見よ)、指定されたモジュールやファイル(と、それらが依存するモジュール)をロードする。例えば、GHCiを起動して、プログラム(<literal>Main.hs</literal>に最上位モジュールがある)をロードするには、次のように打てば良い。</para>
+    <para>GHCiは<literal>ghci</literal>または<literal>ghc &ndash;&ndash;interactive</literal>というコマンドで起動される。一つまたは複数のモジュールやファイル名をコマンド行から指定することもできる。そうすると、GHCiは、プロンプトで<literal>:load <replaceable>module</replaceable></literal>と入力されたときと同じように(<xref linkend="ghci-commands" />を見よ)、指定されたモジュールやファイル(と、それらが依存するモジュール)をロードする。例えば、GHCiを起動して、プログラム(<literal>Main.hs</literal>に最上位モジュールがある)をロードするには、次のように打てば良い。</para>
 
 <screen>
 $ ghci Main.hs
 </screen>
 
-    <para>GHCが受け付けるコマンド行オプション(<xref linkend="using-ghc"/>を見よ)の大部分は対話的モードでも有効であり、そうでないオプションは大抵明らかである。例えば、GHCiはインタフェースファイルを生成しないので、インタフェースファイルの生成に関するオプションはなんの効果もない。</para>
+    <para>GHCが受け付けるコマンド行オプション(<xref linkend="using-ghc"/>を見よ)の大部分は対話的モードでも有効であり、そうでないオプションは大抵明らかである。</para>
 
     <sect2>
       <title>パッケージ</title>
@@ -527,16 +959,11 @@ $ ghci Main.hs
 
       <para>大部分のパッケージ(<xref linkend="using-packages"/>を見よ)は追加のフラグを指定することなく利用可能であり、初めて必要になったときに自動的にロードされる。</para>
 
-      <para>一方で、自動的にロードされないパッケージについては、<literal>-package</literal>フラグを使ってロードを依頼する必要がある。</para>
+      <para>一方で、隠されたパッケージについては、<literal>-package</literal>フラグを使ってロードを依頼する必要がある。</para>
 
 <screen>
 $ ghci -package readline
-   ___         ___ _
-  / _ \ /\  /\/ __(_)
- / /_\// /_/ / /  | |      GHC Interactive, version 6.6, for Haskell 98.
-/ /_\\/ __  / /___| |      http://www.haskell.org/ghc/
-\____/\/ /_/\____/|_|      Type :? for help.
-
+GHCi, version 6.8.1: http://www.haskell.org/ghc/  :? for help
 Loading package base ... linking ... done.
 Loading package readline-1.0 ... linking ... done.
 Prelude> 
@@ -588,6 +1015,16 @@ $ ghci -lm
 
     <variablelist>
       <varlistentry>
+        <term>
+          <literal>:abandon</literal>
+          <indexterm><primary><literal>:abandon</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>実行中の評価を捨てる。(ブレークポイントでの停止中のみ有効)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term>
           <literal>:add</literal> <replaceable>module</replaceable> ...
           <indexterm><primary><literal>:add</literal></primary></indexterm>
@@ -599,11 +1036,34 @@ $ ghci -lm
 
       <varlistentry>
 	<term>
-          <literal>:browse</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
+          <literal>:back</literal>
+          <indexterm><primary><literal>:back</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para>履歴中を一つ戻る。<xref linkend="tracing" />を見よ。<literal>:trace</literal>、<literal>:history</literal>、<literal>:forward</literal>も参照。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:break [<replaceable>identifier</replaceable> |
+            [<replaceable>module</replaceable>] <replaceable>line</replaceable>
+            [<replaceable>column</replaceable>]]</literal>
+        </term>
+          <indexterm><primary><literal>:break</literal></primary></indexterm>
+	<listitem>
+          <para>指定された関数、または指定された行の指定された位置にブレークポイントを設定する。<xref linkend="setting-breakpoints" />を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:browse</literal> <optional><optional><literal>*</literal></optional><replaceable>module</replaceable></optional> ...
           <indexterm><primary><literal>:browse</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>module</replaceable>で定義されている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>で定義された<emphasis>全ての</emphasis>識別子が表示される。そうでない場合、一覧は<replaceable>module</replaceable>がエクスポートしたものに限定される。<literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。</para>
+          <para><replaceable>module</replaceable>で定義されている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<replaceable>module</replaceable>が省略された場合、直近にロードされたモジュールが使われる。</para>
+          <para><literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>でスコープにある<emphasis>全ての</emphasis>識別子が表示される。そうでない場合、一覧は<replaceable>module</replaceable>がエクスポートしたものに限定される。<literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。</para>
 	</listitem>
       </varlistentry>
 
@@ -616,6 +1076,40 @@ $ ghci -lm
           <para>作業ディレクトリを<replaceable>dir</replaceable>に変更する。<replaceable>dir</replaceable>の先頭が「<literal>&tilde;</literal>」記号の場合、それは<literal>HOME</literal>環境変数の内容で置き換えられる。</para>
 
           <para>注意: ディレクトリを変更すると、ロードされているモジュールは全て未ロードになる。これは、探索パスがふつう相対ディレクトリを使って表されており、また、セッションの途中で探索パスを変更することがサポートされていないためである。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:cmd</literal> <replaceable>expr</replaceable>
+          <indexterm><primary><literal>:cmd</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para><replaceable>expr</replaceable>を<literal>IO String</literal>型の計算として実行し、その結果の文字列をGHCiコマンドのリストとして実行する。複数のコマンドは改行で区切る。<literal>:cmd</literal>コマンドは<literal>:def</literal>および<literal>:set stop</literal>と組み合わせて使うのに便利である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:continue</literal> 
+          <indexterm><primary><literal>:continue</literal></primary></indexterm>
+        </term>
+	<listitem><para>ブレークポイントで停止しているとき、実行中の評価を再開する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <literal>:ctags</literal> <optional><replaceable>filename</replaceable></optional>
+	  <literal>:etags</literal> <optional><replaceable>filename</replaceable></optional>
+	  <indexterm><primary><literal>:etags</literal></primary>
+	  </indexterm>
+	  <indexterm><primary><literal>:etags</literal></primary>
+	  </indexterm>
+	</term>
+	<listitem>
+          <para>Vi風のエディタ用(<literal>:ctags</literal>)またはEmacs風エディタ用(<literal>:etags</literal>)のタグファイルを生成する。ファイル名が指定されなかった場合は、それぞれデフォルトの<filename>tags</filename>または<filename>TAGS</filename>が使われる。ロードされているモジュール内の全ての関数、構築子、型のタグが作られる。これらのコマンドが働くには、全てのモジュールが解釈実行されていなければならない。</para>
+          <para><xref linkend="hasktags"/>も見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -663,11 +1157,50 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
+          <literal>:delete * | <replaceable>num</replaceable> ...</literal> 
+          <indexterm><primary><literal>:delete</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para>ブレークポイントを番号で指定して削除する。(それぞれのブレークポイントの番号を見るには<literal>:show breaks</literal>を使う)。<literal>*</literal>の形式では、ブレークポイントを全て削除する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:edit <optional><replaceable>file</replaceable></optional></literal>
           <indexterm><primary><literal>:edit</literal></primary></indexterm>
         </term>
 	<listitem>
           <para>エディタを開いて、<replaceable>file</replaceable>、それが省略されたときは直近にロードされたモジュールを編集する。起動されるエディタは<literal>EDITOR</literal>環境変数から採られるか、<literal>EDITOR</literal>が設定されていないときはシステムのデフォルトエディタが使われる。使われるエディタは<literal>:set editor</literal>で変更することができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:etags</literal> 
+        </term>
+	<listitem>
+	  <para><literal>:ctags</literal>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:force <replaceable>identifier</replaceable> ...</literal>
+          <indexterm><primary><literal>:force</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para><replaceable>identifier</replaceable>の値を<literal>:print</literal>と同じ方法で表示する。<literal>:print</literal>と異なり、<literal>:force</literal>は、値をたどっていく間に出会ったサンクを評価する。これによって、例外や無限ループが発生したり、別のブレークポイント(これは無視されるが、その旨表示される)に当ったりするかもしれない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:forward</literal>
+          <indexterm><primary><literal>:forward</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>履歴中で前進する。<xref linkend="tracing" />を見よ。<literal>:trace</literal>、<literal>:history</literal>、<literal>:back</literal>も参照。</para>
 	</listitem>
       </varlistentry>
 
@@ -687,11 +1220,32 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
+          <literal>:history [<replaceable>num</replaceable>]</literal>
+          <indexterm><primary><literal>:history</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>評価ステップの履歴を表示する。数値が与えられると、その数のステップを表示する(デフォルト: 20)。<literal>:trace</literal>と組み合わせて使う。<xref linkend="tracing" />を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:info</literal> <replaceable>name</replaceable> ...
           <indexterm><primary><literal>:info</literal></primary></indexterm>
         </term>
 	<listitem>
           <para>与えられた名前についての情報を表示する。例えば、もし<replaceable>name</replaceable>がクラスなら、クラスメソッドとその型が印字される。もし<replaceable>name</replaceable>が型構築子なら、その定義が印字される。もし<replaceable>name</replaceable>が関数なら、その型が印字される。<replaceable>name</replaceable>がソースファイルからロードされたものであった場合、GHCiはその定義のソースコード中の位置も表示する。</para>
+          <para>型およびクラスについては、それに言及するインスタンスもまとめて示す。無関係な情報を見せることがないように、インスタンスは、(a)その頭部が<replaceable>name</replaceable>に言及している、かつ(b)そのインスタンスで言及されているものが全て、<literal>:load</literal>または<literal>:module</literal>コマンドの結果としてスコープにある(修飾されていてもそうでなくても良い)、場合にのみ表示される。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:kind</literal> <replaceable>type</replaceable>
+          <indexterm><primary><literal>:kind</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para><replaceable>type</replaceable>の類を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。</para>
 	</listitem>
       </varlistentry>
 
@@ -749,8 +1303,21 @@ Prelude> :main foo bar
           <literal>:module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable></literal>
           <indexterm><primary><literal>:module</literal></primary></indexterm>
         </term>
+        <term>
+          <literal>import <replaceable>mod</replaceable></literal>
+        </term>
 	<listitem>
-          <para>プロンプトに入力される文のための文脈を設定または改変する。詳しくは<xref linkend="ghci-scope"/>を見よ。</para>
+          <para>プロンプトに入力される文のための文脈を設定または改変する。<literal>import <replaceable>mod</replaceable></literal>の形式は<literal>:module +<replaceable>mod</replaceable></literal>と等価である。詳しくは<xref linkend="ghci-scope"/>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:print </literal> <replaceable>names</replaceable> ...
+          <indexterm><primary><literal>:print</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para>評価を強制せずに値を表示する。<literal>:print</literal>は、型が不明、または部分的にしか分かっていない値に対して使うことができる。ブレークポイントにおける、多相型を持った局所変数がこれに当たる。<literal>:print</literal>は、実行時の値を調査しつつ、その値の型を再構築しようとし、可能ならGHCiの環境中でその型を精密にする。未評価の部分(サンク)に遭遇すると、<literal>:print</literal>は、それぞれのサンクに対して、<literal>_t</literal>で始まる名前の新しい変数を束縛する。さらなる情報は<xref linkend="breakpoints" />を見よ。<literal>:sprint</literal>コマンドも参照。これは<literal>:print</literal>と同様だが、新しい変数を束縛しない。</para>
 	</listitem>
       </varlistentry>
 
@@ -824,11 +1391,48 @@ Prelude> :main foo bar
 
       <varlistentry>
 	<term>
+           <literal>:set</literal> <literal>stop</literal>
+          [<replaceable>num</replaceable>] <replaceable>cmd</replaceable>
+        </term>
+	<listitem>
+	  <para>ブレークポイントに当たったとき、または履歴中で新しい項目が選択されたときに実行されるコマンドを設定する。<literal>:set :stop</literal>の最も一般的な使われ方は、現在位置のソースコードを表示することである。例えば<literal>:set stop :list</literal>のようにする。</para>
+
+          <para>コマンドの前に数値が与えられた場合、指定されたブレークポイント(だけ)に到達した場合に実行される。これは場合によって非常に便利である。例えば、<literal>:set stop 1 :continue</literal>とすると、ブレークポイント1に到達した場合必ず<literal>:continue</literal>が実行されるので、実質的にこのブレークポイントを無効化している。(但し、ブレークポイントに到達した場合のメッセージは出力される)。さらには、<literal>:def</literal>と<literal>:cmd</literal>を巧妙に使って、<literal>:set stop</literal>で条件付きブレークポイントを実装することができる。</para>
+<screen>
+*Main> :def cond \expr -> return (":cmd if (" ++ expr ++ ") then return \"\" else return \":continue\"")
+*Main> :set stop 0 :cond (x &lt; 3)
+</screen>
+          <para>同様の技法を使えば、指定した回数だけブレークポイントを無視することもできる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:show bindings</literal>
           <indexterm><primary><literal>:show bindings</literal></primary></indexterm>
         </term>
 	<listitem>
           <para>プロンプトで導入された束縛と、その型を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:show breaks</literal>
+          <indexterm><primary><literal>:show breaks</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>有効になっているブレークポイントの一覧を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:show context</literal>
+          <indexterm><primary><literal>:show context</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para>ブレークポイントで停止している、継続中の評価の一覧を表示する。</para>
 	</listitem>
       </varlistentry>
 
@@ -844,16 +1448,40 @@ Prelude> :main foo bar
 
       <varlistentry>
 	<term>
-	  <literal>:ctags</literal> <optional><replaceable>filename</replaceable></optional>
-	  <literal>:etags</literal> <optional><replaceable>filename</replaceable></optional>
-	  <indexterm><primary><literal>:etags</literal></primary>
-	  </indexterm>
-	  <indexterm><primary><literal>:etags</literal></primary>
-	  </indexterm>
-	</term>
+          <literal>:show [args|prog|prompt|editor|stop]</literal>
+          <indexterm><primary><literal>:show</literal></primary></indexterm>
+        </term>
 	<listitem>
-          <para>Vi風のエディタ用(<literal>:ctags</literal>)またはEmacs風エディタ用(<literal>:etags</literal>)のタグファイルを生成する。ファイル名が指定されなかった場合は、それぞれデフォルトの<filename>tags</filename>または<filename>TAGS</filename>が使われる。ロードされているモジュール内の全ての関数、構築子、型のタグが作られる。これらのコマンドが働くには、全てのモジュールが解釈実行されていなければならない。</para>
-          <para><xref linkend="hasktags"/>も見よ。</para>
+	  <para>指定された設定を表示する(<literal>:set</literal>を見よ)。</para>
+	</listitem>
+      </varlistentry>
+
+       <varlistentry>
+ 	<term>
+          <literal>:sprint</literal>
+          <indexterm><primary><literal>:sprint</literal></primary></indexterm>
+         </term>
+ 	<listitem>
+	  <para>評価を強制せずに値を表示する。<literal>:sprint</literal>は<literal>:print</literal>に似ているが、違いは、未評価の部分項が新しい変数に束縛されず、単に「_」と表されることである。</para>
+ 	</listitem>
+       </varlistentry>
+      <varlistentry>
+	<term>
+          <literal>:step [<replaceable>expr</replaceable>]</literal> 
+          <indexterm><primary><literal>:step</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>直近のブレークポイントから一ステップ実行する。引数として式を与えられた場合、その式の評価のステップ実行を開始する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:trace [<replaceable>expr</replaceable>]</literal>
+          <indexterm><primary><literal>:trace</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>与えられた式を評価(式を与えられなかった場合は直近のブレークポイントから再開)するが、後で<literal>:history</literal>で観察できるように評価ステップのログを残す。<xref linkend="tracing" />を見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -864,16 +1492,6 @@ Prelude> :main foo bar
         </term>
 	<listitem>
           <para><replaceable>expression</replaceable>の型を推論し、印字する。多相型には明示的な全称量化が加えられる。推論に際して、単相性制限は適用されない。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <literal>:kind</literal> <replaceable>type</replaceable>
-          <indexterm><primary><literal>:kind</literal></primary></indexterm>
-        </term>
-	<listitem>
-          <para><replaceable>type</replaceable>の類を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。</para>
 	</listitem>
       </varlistentry>
 
@@ -987,7 +1605,6 @@ Prelude> :set -fno-glasgow-exts
       <indexterm><primary>static</primary><secondary>options</secondary></indexterm>
     </sect2>
   </sect1>
-
   <sect1 id="ghci-dot-files">
     <title><filename>.ghci</filename>ファイル</title>
     <indexterm><primary><filename>.ghci</filename></primary><secondary>file</secondary>
@@ -995,7 +1612,7 @@ Prelude> :set -fno-glasgow-exts
     <indexterm><primary>startup</primary><secondary>files, GHCi</secondary>
     </indexterm>
 
-    <para>GHCiは、開始するとき、常に<filename>$HOME/.ghci</filename>、次に<filename>./.ghci</filename>を読み、そこに書かれているコマンドを実行する。</para>
+    <para>GHCiは、開始するとき、<literal>-ignore-dot-ghci</literal>フラグが与えられていない限り、<filename>$HOME/.ghci</filename>、次に<filename>./.ghci</filename>を読み、そこに書かれているコマンドを実行する。</para>
 
     <para>ホームディレクトリの<filename>.ghci</filename>は、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトがGHC拡張とCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
 
@@ -1029,6 +1646,16 @@ Prelude> :set -fno-glasgow-exts
       </varlistentry>
     </variablelist>
 
+  </sect1>
+
+  <sect1 id="ghci-obj">
+    <title>GHCi内でオブジェクトコードにコンパイルする</title>
+
+    <para>デフォルトでは、GHCiはHaskellソースコードをコンパイルして、ランタイムシステムが解釈できるバイトコードを出力する。GHCiはHaskellコードをオブジェクトコードにコンパイルすることもできる。この機能を有効にするには、コマンド行または<literal>:set</literal>で<option>-fobject-code</option>フラグを使えばよい。(<option>-fbyte-code</option>とすればまた元のバイトコードコンパイルに戻る)。オブジェクトコードへのコンパイルは時間が掛かるが、コードはバイトコードと比べて10〜20倍早く動作する。</para>
+
+    <para>GHCi内でオブジェクトコードにコンパイルする機能は、コンパイル型アプリケーションを開発しているときに特に便利である。<literal>:reload</literal>コマンドがGHCを<option>--make</option>オプション付きで再起動するのよりもずっと速いからで、これはインタフェースファイルがすべてメモリにキャッシュされているからである。</para>
+
+    <para>オブジェクトコードにコンパイルすることには欠点もある。例えば、オブジェクトコードのモジュールにはブレークポイントを設定することができない。解釈実行されているモジュールでは全ての最上位の束縛がGHCiから可視であるのに対して、オブジェクトコードのモジュールではエクスポートされたものしか可視でない。</para>
   </sect1>
 
   <sect1 id="ghci-faq">
@@ -1084,6 +1711,14 @@ Prelude> :set -fno-glasgow-exts
         </listitem>
       </varlistentry>
 
+      <varlistentry>
+	<term>デフォルトのバッファリングモードがGHCiとGHCで異なっている。</term>
+        <listitem>
+          <para>
+            GHCでは、デフォルトでstdoutハンドルは行バッファされている。しかし、GHCiでは、stdoutに関するバッファリングを無効にしてある。これが通常インタプリタに期待される振る舞いだからである。出力は生成されると同時に出現する。
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </sect1>
 
