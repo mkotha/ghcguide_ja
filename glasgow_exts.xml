@@ -675,10 +675,11 @@ Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-f
 </sect1>
 
 
-<sect2>
-<title>データ型と型シノニム</title>
+<!-- TYPE SYSTEM EXTENSIONS -->
+<sect1 id="data-type-extensions">
+<title>データ型と型シノニムへの拡張</title>
 
-<sect3 id="nullary-types">
+<sect2 id="nullary-types">
 <title>構築子のないデータ型</title>
 
 <para><option>-fglasgow-exts</option>フラグが指定されていると、構築子なしでデータ型を宣言できるようになる。例えば、以下のようにである。</para>
@@ -691,9 +692,9 @@ Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-f
 <para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような類について多相的でも良いが、類が<literal>*</literal>でないなら、明示的な類注釈を使う必要がある。(<xref linkend="kinding"/>を見よ)</para>
 
 <para>このようなデータ型はボトムというただ一つの値しか持たないが、「幽霊型(phantom type)」を定義するときには便利なことがある。</para>
-</sect3>
+</sect2>
 
-<sect3 id="infix-tycons">
+<sect2 id="infix-tycons">
 <title>中置型構築子、中置クラス、中置型変数</title>
 
 <para>
@@ -748,9 +749,9 @@ GHCでは、型構築子、クラス、型変数を演算子として定義し�
 
 </itemizedlist>
 </para>
-</sect3>
+</sect2>
 
-<sect3 id="type-synonyms">
+<sect2 id="type-synonyms">
 <title>型シノニムの制限緩和</title>
 
 <para>
@@ -834,10 +835,10 @@ GHCは現在、型シノニムを展開する前に類検査を行っている�
 </programlisting>
 これは、関数の矢印の左側に非ボックス化タプルが現れることをGHCが許していないからである。
 </para>
-</sect3>
+</sect2>
 
 
-<sect3 id="existential-quantification">
+<sect2 id="existential-quantification">
 <title>存在量化されたデータ構築子
 </title>
 
@@ -912,7 +913,7 @@ GHCは現在、型シノニムを展開する前に類検査を行っている�
 結局できたことは、不特定の型の値を、それを操作するいくつかの関数と一緒に梱包して、梱包物の集まりを統一的に扱うことである。この方法で、オブジェクト指向っぽいプログラミングのかなりの部分を行うことができる。
 </para>
 
-<sect4 id="existential">
+<sect3 id="existential">
 <title>どこが存在的か？
 </title>
 
@@ -932,9 +933,9 @@ GHCは現在、型シノニムを展開する前に類検査を行っている�
 しかし、Haskellプログラマは上に挙げた通常の<emphasis>全称</emphasis>量化された型を考えれば十分である。こうすれば、存在量化のための構文要素を新しく加える必要がない。
 </para>
 
-</sect4>
+</sect3>
 
-<sect4>
+<sect3>
 <title>型クラス</title>
 
 <para>
@@ -986,9 +987,9 @@ Baz2 :: forall b. Show b => b -> (b -> b) -> Baz
 先の全称量化と構文的にうまく調和していることに注意せよ。
 </para>
 
-</sect4>
+</sect3>
 
-<sect4 id="existential-records">
+<sect3 id="existential-records">
 <title>レコード構築子</title>
 
 <para>
@@ -1055,10 +1056,10 @@ setTag obj t = obj{ tag = t }
 
 </para>
 
-</sect4>
+</sect3>
 
 
-<sect4>
+<sect3>
 <title>制約</title>
 
 <para>
@@ -1167,13 +1168,16 @@ instance Eq T where
 
 </para>
 
-</sect4>
 </sect3>
 
 </sect2>
 
+</sect1> <!-- TEMPORARY! TODO: replace this line with section about gadt -->
 
-
+<!-- TYPE SYSTEM EXTENSIONS -->
+<sect1 id="type-class-extensions">
+<title>クラスおよびインスタンス宣言</title>
+ 
 <sect2 id="multi-param-type-classes">
 <title>クラス宣言</title>
 
@@ -1665,6 +1669,11 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 
 
 </sect2>
+
+</sect1>
+
+<sect1 id="other-type-extensions">
+<title>型システムへのその他の拡張</title>
 
 <sect2 id="type-restrictions">
 <title>型シグネチャ</title>
