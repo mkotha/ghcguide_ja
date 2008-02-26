@@ -23,9 +23,16 @@
     <indexterm><primary>extensions</primary><secondary>options controlling</secondary>
     </indexterm>
 
-    <para>これらのフラグは、言語のどんな変種が許されるか制御するものである。これらを一つも使わない場合は、標準のHaskell 98になる。</para>
+    <para>言語オプションのフラグは、言語のどの変種が許されるか制御するものである。これらを一つも使わない場合は、標準のHaskell 98になる。</para>
 
-    <para>注意: 専用の構文を有効にするオプションを使うと、Haskell 98で動作していたコードがコンパイルできなくなる<emphasis>可能性がある</emphasis>。これは大抵、変数名として使われていたものが予約語になることが原因である。このため、以下の各オプションには、そのオプションによって有効になる専用の構文の一覧が付されている。ここではHaskell 98の字句構文(Haskell 98レポートを見よ)の記法と非終端記号を使っている。専用の構文には次の二種類がある。</para>
+    <para>一般的に、全ての言語オプションは「<option>-X</option>」で始まる。例えば<option>-XTemplateHaskell</option>のように。</para>
+
+   <para>言語オプションは全て、「<option>No</option>」を前置することによって無効にすることができる。例えば「<option>-XNoTemplateHaskell</option>」のように。</para>
+
+   <para> Language options recognised by Cabal can also be enabled using the <literal>LANGUAGE</literal> pragma,
+   thus <literal>{-# LANGUAGE TemplateHaskell #-}</literal> (see <xref linkend="language-pragma"/>>). </para>
+
+    <para>専用の構文を有効にするオプションを使うと、Haskell 98で動作していたコードがコンパイルできなくなる<emphasis>可能性がある</emphasis>。これは大抵、変数名として使われていたものが予約語になることが原因である。このため、以下の各オプションには、そのオプションによって有効になる専用の構文の一覧が付されている。ここではHaskell 98の字句構文(Haskell 98レポートを見よ)の記法と非終端記号を使っている。専用の構文には次の二種類がある。</para>
 
     <itemizedlist>
       <listitem>
@@ -46,11 +53,13 @@
           <indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>これは、<xref linkend="ghc-language-features"/>で解説されているHaskell 98への拡張を、別途記載がない限り、全て同時に有効にする。</para>
+          <para>これは、<xref linkend="ghc-language-features"/>で解説されているHaskell 98への拡張を、別途記載がない限り、全て同時に有効にする。我々はこの多目的フラグをやめて、機能を個別に有効にする方向に移行しようとしている。</para>
 
           <para>新しい予約語は、<literal>forall</literal>(型中のみ)、<literal>mdo</literal>。</para>
 
           <para>その他の盗まれる構文は、<replaceable>varid</replaceable>{<literal>&num;</literal>}、<replaceable>char</replaceable><literal>&num;</literal>、<replaceable>string</replaceable><literal>&num;</literal>、<replaceable>integer</replaceable><literal>&num;</literal>、<replaceable>float</replaceable><literal>&num;</literal>、<replaceable>float</replaceable><literal>&num;&num;</literal>、<literal>(&num;</literal>、<literal>&num;)</literal>、<literal>|)</literal>、<literal>{|</literal>である。</para>
+
+	  <para>以下の個別言語フラグが有効になる。<option>-XForeignFunctionInterface</option>、<option>-XImplicitParams</option>、<option>-XScopedTypeVariables</option>、<option>-XGADTs</option>、<option>-XTypeFamilies</option>。</para>
 	</listitem>
       </varlistentry>
 
@@ -159,6 +168,13 @@
           <para>暗黙パラメータを有効にする。(<xref linkend="implicit-parameters"/>を見よ)。現在、<option>-fglasgow-exts</option>が使われていると自動的に有効になる。</para>
 
           <para>盗まれる構文は<literal>?<replaceable>varid</replaceable></literal>と<literal>%<replaceable>varid</replaceable></literal>である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-XOverloadedStrings</option></term>
+	<listitem>
+	  <para>文字列リテラルの多重定義を有効にする。(<xref linkend="overloaded-strings"/>を見よ)。</para>
 	</listitem>
       </varlistentry>
 
