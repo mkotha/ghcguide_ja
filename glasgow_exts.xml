@@ -198,8 +198,6 @@
   </sect1>
 
 <!-- UNBOXED TYPES AND PRIMITIVE OPERATIONS -->
-<!--    included from primitives.sgml  -->
-<!-- &primitives; -->
 <sect1 id="primitives">
   <title>非ボックス化型とプリミティブ演算</title>
 
@@ -238,6 +236,11 @@
 <listitem><para>もっとも基本的な制限は、プリミティブ値は、多相的な関数に渡したり多相的なデータ型中に保持したりできないということである。これによって<literal>[Int&num;]</literal>(つまり、プリミティブ整数のリスト)のようなものが禁止される。この制限があるのは、多相的な引数や多相的な構築子フィールドはポインタであると期待されているからである。これらに非ボックス化整数が入り込むと、GCの追跡対象となり、予測できないスペースリークを引き起こす。また、その多相的な要素に対して<function>seq</function>を行うと、ポインタとして参照外しを試みることになり、壊滅的な結果を招く。さらに悪いことに、非ボックス化型はポインタよりも大きいことがある。(<literal>Double&num;</literal>が一例)
 </para>
 </listitem>
+<listitem><para>newtypeを定義するとき、その表現の型(データ構築子の引数の型)が非ボックス化型であってはならない。よって、以下は許されない。
+<programlisting>
+  newtype A = MkA Int#
+</programlisting>
+</para></listitem>
 <listitem><para><emphasis>最上位の</emphasis>束縛で、非ボックス化型を持つ変数を束縛することはできない。
 </para></listitem>
 <listitem><para><emphasis>再帰的な</emphasis>束縛で、非ボックス化型を持つ変数を束縛することはできない。
