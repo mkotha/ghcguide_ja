@@ -1304,7 +1304,88 @@ data Counter a where
 </itemizedlist></para>
 
  </sect2>
-</sect1> <!-- ja-6.8.1:TEMPORARY! TODO: replace this line with section about gadt -->
+ 
+<sect2 id="gadt">
+<title>一般化代数データ型(GADT)</title>
+
+<para>一般化代数データ型は、通常の代数的データ型を拡張して、構築子がより多様な型を持てるようにしたものである。以下は例である。
+<programlisting>
+  data Term a where
+      Lit    :: Int -> Term Int
+      Succ   :: Term Int -> Term Int
+      IsZero :: Term Int -> Term Bool	
+      If     :: Term Bool -> Term a -> Term a -> Term a
+      Pair   :: Term a -> Term b -> Term (a,b)
+</programlisting>
+通常のデータ型の場合と違って、構築子の結果の型が<literal>Term a</literal>だとは限らないことに注意。この一般化のお陰で、<literal>Term</literal>について、正しく型の付いた<literal>eval</literal>関数を書くことができる。
+<programlisting>
+  eval :: Term a -> a
+  eval (Lit i) 	    = i
+  eval (Succ t)     = 1 + eval t
+  eval (IsZero t)   = eval t == 0
+  eval (If b e1 e2) = if eval b then eval e1 else eval e2
+  eval (Pair e1 e2) = (eval e1, eval e2)
+</programlisting>
+GADTの鍵となる点は、<emphasis>パターン照合によって型の精密化が起こる</emphasis>ことである。以下の例を考える。
+<programlisting>
+  eval :: Term a -> a
+  eval (Lit i) =  ...
+</programlisting>
+等式の右辺では、<literal>a</literal>が精密化されて<literal>Int</literal>になる。これこそが売りである。型付け規則の正確な規定は利用の手引きが目指すところではないが、設計は、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/gadt/index.htm">Simple unification-based type inference for GADTs</ulink>, (ICFP 2006)で述べられているものによく倣っている。
+一般的な原則はこうである。<emphasis>精密化は、ユーザ供給の型注釈を基にしてのみ起こる</emphasis>。従って、もし<literal>eval</literal>に型シグネチャが与えられなければ、型精密化は起こらず、大量の不明瞭なエラーが発生することだろう。一方、精密化はかなり一般的である。例えば、以下のものがあったとしよう。
+<programlisting>
+  eval :: Term a -> a -> a
+  eval (Lit i) j =  i+j
+</programlisting>
+このパターン照合で、型<literal>a</literal>が精密化されて(構築子<literal>Lit</literal>の型にしたがって)<literal>Int</literal>になる。この精密化は<literal>j</literal>の型とこの<literal>case</literal>式の結果の型にも及ぶ。だから<literal>i+j</literal>という加算は合法である。
+</para>
+<para>
+これらの例と、他の多くの例が、Hongwei XiとTim Sheardによる論文群で与えられている。<ulink url="http://haskell.org/haskellwiki/GADT">wikiには</ulink>もっと長い入門文書があるし、Ralf Hinzeの<ulink url="http://www.informatik.uni-bonn.de/~ralf/publications/With.pdf">Fun with phantom types</ulink>にもいくつか例がある。
+これらの論文ではGHCに実装されているのと異なる記法を使っていることがあるので注意。
+</para>
+<para>
+この節の残りの部分では、GADTをサポートするGHCの拡張について概観する。この拡張は<option>-XGADTs</option>で有効になる。
+<itemizedlist>
+<listitem><para>
+GADTは、GADT様式の構文(<xref linkend="gadt-style"/>)でなければ宣言できない。Haskell 98の古いデータ宣言の構文では、常に通常のデータ型が宣言される。各構築子の結果の型は定義しようとしている型構築子で始まっていなければならないが、GADTについては、その型への引数は任意のmonotypeで良い。例えば、上の<literal>Term</literal>型において、各構築子の型は<literal>Term ty</literal>で終わっていなければならないが、<literal>ty</literal>が型変数である必要はない。(例えば構築子<literal>Lit</literal>)。
+</para></listitem>
+
+<listitem><para>
+GADTについて<literal>deriving</literal>節を使うことはできない。通常のデータ型だけである。
+</para></listitem>
+
+<listitem><para>
+<xref linkend="gadt-style"/>で述べたように、レコード記法にも対応している。例えば以下のように。
+<programlisting>
+  data Term a where
+      Lit    { val  :: Int }      :: Term Int
+      Succ   { num  :: Term Int } :: Term Int
+      Pred   { num  :: Term Int } :: Term Int
+      IsZero { arg  :: Term Int } :: Term Bool	
+      Pair   { arg1 :: Term a
+             , arg2 :: Term b
+             }                    :: Term (a,b)
+      If     { cnd  :: Term Bool
+             , tru  :: Term a
+             , fls  :: Term a
+             }                    :: Term a
+</programlisting>
+ただし、GADTについては以下の制約が追加される。フィールド<literal>f</literal>を持つ全ての構築子は、(α変換を法として)同じ結果型を持たねばならない。だから、上の例なら、<literal>num</literal>フィールドと<literal>arg</literal>フィールドをまとめて一つの名前にすることはできない。フィールド型はどちらも<literal>Term Int</literal>だが、実は選択関数は異なる型を持っている。
+
+<programlisting>
+  num :: Term Int -> Term Int
+  arg :: Term Bool -> Term Int
+</programlisting>
+</para></listitem>
+
+</itemizedlist>
+</para>
+
+</sect2>
+</sect1>
+
+<!-- ====================== End of Generalised algebraic data types =======================  -->
+<!--ja:here comes sect1 about deriving -->
 
 <!-- TYPE SYSTEM EXTENSIONS -->
 <sect1 id="type-class-extensions">
@@ -2939,147 +3020,6 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 
 </sect1>
 <!-- ==================== End of type system extensions =================  -->
-  
-<!-- ====================== Generalised algebraic data types =======================  -->
-
-<sect1 id="gadt">
-<title>一般化代数データ型(GADT)</title>
-
-<para>一般化代数データ型は、通常の代数的データ型を拡張して、構築子に型シグネチャを明示的に指定できるようにしたものである。以下のように。
-<programlisting>
-  data Term a where
-      Lit    :: Int -> Term Int
-      Succ   :: Term Int -> Term Int
-      IsZero :: Term Int -> Term Bool	
-      If     :: Term Bool -> Term a -> Term a -> Term a
-      Pair   :: Term a -> Term b -> Term (a,b)
-</programlisting>
-通常のデータ型の場合と違って、構築子の結果の型が<literal>Term a</literal>だとは限らないことに注意。ここで、<literal>Term</literal>について、正しく型の付いた<literal>eval</literal>関数を書くことができる。
-<programlisting>
-  eval :: Term a -> a
-  eval (Lit i) 	    = i
-  eval (Succ t)     = 1 + eval t
-  eval (IsZero t)   = eval t == 0
-  eval (If b e1 e2) = if eval b then eval e1 else eval e2
-  eval (Pair e1 e2) = (eval e1, eval e2)
-</programlisting>
-これらのものや別の多くの例がHongwei XiとTim Sheardの論文で示されている。<ulink url="http://haskell.org/haskellwiki/GADT">wikiには</ulink>より長い入門文書もあり、Ralf Hinzeの<ulink url="http://www.informatik.uni-bonn.de/~ralf/publications/With.pdf">Fun with phantom types</ulink>にもいくつかの例が載っている。論文ではGHCに実装されているのと異なる記法が用いられている可能性があることに注意。
-</para>
-<para>
-以下では、GADTをサポートするGHC拡張を概観する。これは網羅的であるには程遠いが、ICFP 2006に現れた論文<ulink url="http://research.microsoft.com/%7Esimonpj/papers/gadt/index.htm">Simple unification-based type inference for GADTs</ulink>に記述されている設計に良く従っている。
-<itemizedlist>
-<listitem><para>
-上の例のように、データ型宣言でwhere形式を使うことができる。個々の構築子の型シグネチャは独立しており、通常通り暗黙に全称量化される。普通のHaskellのデータ型宣言と異なり、「<literal>data Term a where</literal>」のようなヘッダに現れる型変数はスコープを持たない。実際、代わりに次のように類シグネチャを書くのでも良い。
-<programlisting>
-  data Term :: * -> * where ...
-</programlisting>
-あるいは、この二つの混合でも良い。
-<programlisting>
-  data Foo a :: (* -> *) -> * where ...
-</programlisting>
-型変数(もしあれば)に明示的に類を添えることもできる。よって、次のように<literal>Foo</literal>のヘッダを書くこともできる。
-<programlisting>
-  data Foo a (b :: * -> *) where ...
-</programlisting>
-</para></listitem>
-
-<listitem><para>
-データ構築子の型について、唯一の制約は、結果の型が、今定義している型構築子で始まっていなければならない、ということである。例えば、上記の<literal>Term</literal>データ型では、各構築子の型は、<literal>... -> Term ...</literal>という形で終わっていなければならない。
-</para></listitem>
-
-<listitem><para>
-GADT様式のデータ型宣言においてレコード構文を使うこともできる。
-
-<programlisting>
-  data Term a where
-      Lit    { val  :: Int }      :: Term Int
-      Succ   { num  :: Term Int } :: Term Int
-      Pred   { num  :: Term Int } :: Term Int
-      IsZero { arg  :: Term Int } :: Term Bool	
-      Pair   { arg1 :: Term a
-             , arg2 :: Term b
-             }                    :: Term (a,b)
-      If     { cnd  :: Term Bool
-             , tru  :: Term a
-             , fls  :: Term a
-             }                    :: Term a
-</programlisting>
-<literal>f</literal>というフィールドを持つ全ての構築子に対して、(a)フィールド<literal>f</literal>の型は同じでなければならず、(b)構築子の結果の型が同じでなければならない。(どちらも、α変換を法として等しければ良い)。従って、上の例では、<literal>num</literal>と<literal>arg</literal>を同じ名前にすることはできない。フィールドの型はどちらも<literal>Term Int</literal>であるが、選択関数は異なる型を持つ。
-
-<programlisting>
-  num :: Term Int -> Term Int
-  arg :: Term Bool -> Term Int
-</programlisting>
-
-今のところ、レコード更新はGADTではまだ不可能である。このため、サポートされているのは、レコードの構築、選択、パターン照合だけである。
-
-<programlisting>
-  someTerm :: Term Bool
-  someTerm = IsZero { arg = Succ { num = Lit { val = 0 } } }
-
-  eval :: Term a -> a
-  eval Lit    { val = i } = i
-  eval Succ   { num = t } = eval t + 1
-  eval Pred   { num = t } = eval t - 1
-  eval IsZero { arg = t } = eval t == 0
-  eval Pair   { arg1 = t1, arg2 = t2 } = (eval t1, eval t2)
-  eval t@If{} = if eval (cnd t) then eval (tru t) else eval (fls t)
-</programlisting>
-
-</para></listitem>
-
-<listitem><para>
-正確性注釈は、構築子の型の中の当然の場所に付けることができる。
-<programlisting>
-  data Term a where
-      Lit    :: !Int -> Term Int
-      If     :: Term Bool -> !(Term a) -> !(Term a) -> Term a
-      Pair   :: Term a -> Term b -> Term (a,b)
-</programlisting>
-</para></listitem>
-
-<listitem><para>
-GADT様式のデータ型宣言で<literal>deriving</literal>節を使うことができるが、これはそのデータ型がHaskell 98の構文を用いても定義できる場合だけである。例えば、以下の二つの宣言は同等である。
-<programlisting>
-  data Maybe1 a where {
-      Nothing1 :: Maybe1 a ;
-      Just1    :: a -> Maybe1 a
-    } deriving( Eq, Ord )
-
-  data Maybe2 a = Nothing2 | Just2 a 
-       deriving( Eq, Ord )
-</programlisting>
-これは、素のHaskell 98のデータ型を<literal>where</literal>形式で宣言するときに、<literal>deriving</literal>を使えなくなることがないようにするだけのものである。
-</para></listitem>
-
-<listitem><para>
-パターン照合では型の精密化(refinement)が起こることがある。以下の例を考える。
-<programlisting>
-  eval :: Term a -> a
-  eval (Lit i) =  ...
-</programlisting>
-等式の右辺では、<literal>a</literal>が精密化されて<literal>Int</literal>になる。(これこそが売りである)。型付け規則の正確な規定は利用の手引きが目指すところではないが、考え方については、Simon PJのホームページに論文"Wobbly types: practical type inference for generalised algebraic data types"がある。</para>
-
-<para>一般的な原則はこうである。<emphasis>精密化は、ユーザ供給の型注釈を基にしてのみ起こる</emphasis>。従って、もし<literal>eval</literal>に型シグネチャが与えられなければ、型精密化は起こらず、大量の不明瞭なエラーが発生することだろう。一方、精密化はかなり一般的である。例えば、以下のものがあったとしよう。
-<programlisting>
-  eval :: Term a -> a -> a
-  eval (Lit i) j =  i+j
-</programlisting>
-このパターン照合で、型<literal>a</literal>が精密化されて(構築子<literal>Lit</literal>の型にしたがって)<literal>Int</literal>になる。この精密化は<literal>j</literal>の型とこの<literal>case</literal>式の結果の型にも及ぶ。だから<literal>i+j</literal>という加算は合法である。
-</para>
-</listitem>
-</itemizedlist>
-</para>
-
-<para>GADTは存在型を一般化したものであることに注意。例えば、以下の二つの宣言は同等である。
-<programlisting>
-  data T a = forall b. MkT b (b->a)
-  data T' a where { MKT :: b -> (b->a) -> T' a }
-</programlisting>
-</para>
-</sect1>
-
-<!-- ====================== End of Generalised algebraic data types =======================  -->
 
 <!-- ====================== TEMPLATE HASKELL =======================  -->
 
