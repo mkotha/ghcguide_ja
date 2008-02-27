@@ -1385,7 +1385,219 @@ GADTについて<literal>deriving</literal>節を使うことはできない。�
 </sect1>
 
 <!-- ====================== End of Generalised algebraic data types =======================  -->
-<!--ja:here comes sect1 about deriving -->
+
+<sect1 id="deriving">
+<title>「deriving」機構への拡張</title>
+
+<sect2 id="deriving-inferred">
+<title>deriving節について推論される文脈</title>
+
+<para>
+Haskell Reportは、正確にどんな場合に<literal>deriving</literal>節が有効かについてはっきりしない。例を示す。
+<programlisting>
+  data T0 f a = MkT0 a         deriving( Eq )
+  data T1 f a = MkT1 (f a)     deriving( Eq )
+  data T2 f a = MkT2 (f (f a)) deriving( Eq )
+</programlisting>
+自然生成された<literal>Eq</literal>のコードは以下のようなインスタンス宣言になるだろう。
+<programlisting>
+  instance Eq a         => Eq (T0 f a) where ...
+  instance Eq (f a)     => Eq (T1 f a) where ...
+  instance Eq (f (f a)) => Eq (T2 f a) where ...
+</programlisting>
+最初のものは明らかに問題ない。二番目も、それほど明らかではないが、問題ない。三番目はHaskell 98でなく、インスタンスの停止性を損なう危険がある。
+</para>
+<para>
+GHCは保守的な立場を採っている。最初の二つは受け付けるが、三番目は受け付けない。規則はこうである。推論された文脈中の各制約は、型変数のみから成っていなければならず、型変数に重複があってもならない。
+</para>
+<para>
+この規則はフラグに関係なく適用される。もっと風変りな文脈が必要なら、<link linkend="stand-alone-deriving">単独derivingの機構</link>を使って自分で書くことができる。
+</para>
+</sect2>
+
+<sect2 id="stand-alone-deriving">
+<title>単独deriving宣言</title>
+
+<para>
+GHCは単独の<literal>deriving</literal>宣言を受け付けるようになった。これは<literal>-XStandaloneDeriving</literal>で有効になる。
+<programlisting>
+  data Foo a = Bar a | Baz String
+
+  deriving instance Eq a => Eq (Foo a)
+</programlisting>
+構文は通常のインスタンス宣言と同じであるが、(a)<literal>deriving</literal>キーワードを使うことと、(b)<literal>where</literal>部がないことが異なる。通常のインスタンス宣言でするのと全く同じように、文脈(この例では文脈は<literal>(Eq a)</literal>)を指定しなければならない。(これは、データ型宣言に付属したderiving節において文脈が推論されるのと対照を為す)。このような<literal>deriving instance</literal>の規則は、形式と停止性に関して、通常のインスタンス宣言が従うのと同じ規則に従い、同じフラグで制御される。<link linkend="instance-decls"/>を見よ。</para>
+
+<para>この単独deriving構文は、通常の<literal>deriving</literal>がnewtypeに対して一般化された(<xref linkend="newtype-deriving"/>)のと全く同じように一般化される。例えば次のように。
+<programlisting>
+  newtype Foo a = MkFoo (State Int a)
+
+  deriving instance MonadState Int Foo
+</programlisting>
+GHCは常に、インスタンスの<literal>最後</literal>のパラメタ(この例では<literal>Foo</literal>)を導出対象の型として扱う。
+</para>
+
+</sect2>
+
+<sect2 id="deriving-typeable">
+<title><literal>Typeable</literal>クラスおよび<literal>Data</literal>クラスについてのderiving節</title>
+
+<para>
+Haskell 98では、プログラマがデータ型宣言に「<literal>deriving( Eq, Ord )</literal>」と付け加えれば、これらのクラスの標準的なインスタンス宣言が生成される。Haskell 98では、<literal>deriving</literal>節に現れることのできるクラスは標準の<literal>Eq</literal>、<literal>Ord</literal>、<literal>Enum</literal>、<literal>Ix</literal>、<literal>Bounded</literal>、<literal>Read</literal>、<literal>Show</literal>だけである。
+</para>
+<para>
+GHCはこれを拡張し、新たに二つのクラスが自動的に導出できるようにする。(ただし、<option>-XDeriveDataTypeable</option>フラグが必要)。<literal>Typeable</literal>と<literal>Data</literal>である。これらのクラスはそれぞれライブラリモジュール<literal>Data.Typeable</literal>と<literal>Data.Generics</literal>で定義されており、<literal>deriving</literal>節で使うためには、あらかじめ適切なクラスをスコープに導入しておく必要がある。
+</para>
+<para><literal>Typeable</literal>のインスタンスは、データ型の型パラメタの数が七個以下で、その全てが類<literal>*</literal>を持っているときのみ導出できる。これは、<literal>Typeable</literal>クラスが<ulink url="http://research.microsoft.com/%7Esimonpj/papers/hmap/gmap2.ps">Scrap More Boilerplate: Reflection, Zips, and Generalised Casts</ulink>で述べられている形を使って導出されているからである。(この論文の7.4節では、使われる複数の<literal>Typeable</literal>について述べられているが、ライブラリが提供するのは<literal>Typeable1</literal>から<literal>Typeable7</literal>までだけである)。この条件を満たさない場合、プログラマは、そのデータ構築子に合った類を持つ<literal>TypeableX</literal>を書き、そのデータ型についてのインスタンスを手で書くことができる。</para>
+</sect2>
+
+<sect2 id="newtype-deriving">
+<title>newtypeについての導出インスタンスの一般化</title>
+
+<para>
+<literal>newtype</literal>を使って抽象型を定義するとき、元の型からインスタンスをいくつか継承させたいと思うことがあるかもしれない。Haskell 98では、<literal>Eq</literal>、<literal>Ord</literal>、<literal>Enum</literal>、<literal>Bounded</literal>に関しては導出を使うことでインスタンスを継承させられるが、それ以外の型については明示的なインスタンス宣言を書かなければならない。例えば、次のように定義したとする。
+
+<programlisting> 
+  newtype Dollars = Dollars Int 
+</programlisting> 
+
+そして、<literal>Dollars</literal>に対して数値演算を使いたいなら、次のようにして明示的に<literal>Num</literal>のインスタンスを書かなければならない。
+
+<programlisting> 
+  instance Num Dollars where
+    Dollars a + Dollars b = Dollars (a+b)
+    ...
+</programlisting>
+このインスタンスは、<literal>newtype</literal>の構築子を適用したり排除したりしているだけである。特にくやしいのは、この構築子は実行時には存在しないので、このインスタンス宣言が定義する辞書は<literal>Int</literal>の辞書と<emphasis>全体を通して同じ</emphasis>で、違いはこちらの方がより遅いことだけだ、という点である。
+</para>
+
+
+<sect3> <title>deriving節の一般化</title>
+<para>
+このようなことをしなくても、GHCでは、<option>-XGeneralizedNewtypeDeriving</option>を使ってこの種のインスタンスは導出できるようになった。従って、次のように書くことができる。
+<programlisting> 
+  newtype Dollars = Dollars Int deriving (Eq,Show,Num)
+</programlisting> 
+
+そして、実装では、<literal>Dollars</literal>について<literal>Int</literal>のものと<emphasis>同じ</emphasis><literal>Num</literal>用辞書が使われる。概念上は、コンパイラは次のような形のインスタンス宣言を導出している。
+
+<programlisting> 
+  instance Num Int => Num Dollars
+</programlisting> 
+
+このインスタンスは、型にしたがって<literal>newtype</literal>構築子を付けたり外したりすることだけを行う。
+</para>
+<para>
+
+構築子クラスのインスタンスも同様に導出することができる。例えば、次のように、状態と失敗を扱うモナド変換子を実装したとしよう。
+
+<programlisting> 
+  instance Monad m => Monad (State s m) 
+  instance Monad m => Monad (Failure m)
+</programlisting> 
+Haskell 98では、次のようにしてパーサモナドを定義することができる。
+<programlisting> 
+  type Parser tok m a = State [tok] (Failure m) a
+</programlisting> 
+
+これは、上記のインスタンス宣言によって自動的にモナドになっている。拡張を使うと、<literal>Monad</literal>クラスのインスタンスを書くことなくパーサの型を抽象型にすることができる。次のようになる。
+
+<programlisting> 
+  newtype Parser tok m a = Parser (State [tok] (Failure m) a)
+                         deriving Monad
+</programlisting>
+この場合、導出されたインスタンス宣言は次の形になる。
+<programlisting> 
+  instance Monad (State [tok] (Failure m)) => Monad (Parser tok m) 
+</programlisting> 
+
+<literal>Monad</literal>は構築子クラスなので、このインスタンスはこのnewtypeの<emphasis>部分適用</emphasis>であり、左辺全体ではない。インスタンス宣言の文脈を生成するためにこの型宣言が「η変換」されたと考えることができる。
+</para>
+<para>
+
+多引数型クラスについても、そのnewtypeがクラスの最後の引数であることを条件に、インスタンスを導出できる。この場合、<literal>deriving</literal>節に現れるのはクラスの「部分適用」形である。例として、次のようなクラスがあったとする。
+
+<programlisting> 
+  class StateMonad s m | m -> s where ... 
+  instance Monad m => StateMonad s (State s m) where ... 
+</programlisting> 
+このとき、次のようにして、<literal>Parser</literal>についての<literal>StateMonad</literal>のインスタンスを導出できる。
+<programlisting> 
+  newtype Parser tok m a = Parser (State [tok] (Failure m) a)
+                         deriving (Monad, StateMonad [tok])
+</programlisting>
+
+導出インスタンスは、部分適用されたクラスを最後にnewtypeに適用し、完全に適用された形にすることで得られる。次のようにである。
+
+<programlisting> 
+  instance StateMonad [tok] (State [tok] (Failure m)) =>
+           StateMonad [tok] (Parser tok m)
+</programlisting>
+</para>
+<para>
+
+この拡張の結果、newtype宣言での導出インスタンスは、<literal>Show</literal>と<literal>Read</literal>(これらは元の型とは異なる振る舞いをする)を除いた全てのクラスについて一様に扱われ(、元となった型の辞書を再利用することで実装され)る。
+</para>
+</sect3>
+
+<sect3> <title>より精密な規定</title>
+<para>
+導出されたインスタンス宣言が構築されるときの規則は以下である。次の宣言(型シノニムを展開した後のもの)を考える。
+
+<programlisting> 
+  newtype T v1...vn = T' (t vk+1...vn) deriving (c1...cm) 
+</programlisting> 
+
+ここで、
+ <itemizedlist>
+<listitem><para>
+<literal>ci</literal>はクラスの部分適用であり、<literal>C t1'...tj'</literal>という形をとる。ただし<literal>C</literal>の引数の数は<literal>j+1</literal>である。すなわち、<literal>C</literal>はただ一つの引数を欠いている。
+</para></listitem>
+<listitem><para>
+  <literal>k</literal>は、<literal>ci (T v1...vk)</literal>の類が正しくなるように選ばれる。
+</para></listitem>
+<listitem><para>
+  型<literal>t</literal>は任意の型である。
+</para></listitem>
+<listitem><para>
+  型変数<literal>vk+1...vn</literal>は、<literal>t</literal>にも、<literal>ci</literal>にも出現しない。
+</para></listitem>
+<listitem><para>
+  <literal>ci</literal>はどれも、<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>のいずれでもない。これらのクラスは型やその構築子を「素通りする」べきものではない。これらのクラスをnewtypeに導出することもできるが、それは通常の方法で行われ、この新しい機構は利用されない。
+</para></listitem>
+</itemizedlist>
+このとき、それぞれの<literal>ci</literal>に対して、導出されるインスタンス宣言は以下のようになる。
+<programlisting> 
+  instance ci t => ci (T v1...vk)
+</programlisting>
+<emphasis>うまくいかない</emphasis>例として、以下のものを考えてみよう。
+<programlisting> 
+  newtype NonMonad m s = NonMonad (State s m s) deriving Monad 
+</programlisting> 
+ここで、次のインスタンスを導出することはできない。
+<programlisting> 
+  instance Monad (State s m) => Monad (NonMonad m) 
+</programlisting> 
+
+なぜなら、型変数<literal>s</literal>が<literal>State s m</literal>に現れており、「η変換」によって消し去ることができないからである。この<literal>deriving</literal>節が拒絶されるのは良いことである。<literal>NonMonad m</literal>は実際、同じ理由で、モナドではないからである。正しい型を持つ<literal>>>=</literal>を定義しようとしてみよ。できないはずである。
+</para>
+<para>
+
+また、クラス引数の<emphasis>順序</emphasis>が重要になることに注意。これは、最後の引数についてしかインスタンスの導出ができないからである。もし上記の<literal>StateMonad</literal>が次のように定義されていたなら、上のように<literal>Parser</literal>型についてインスタンスを導出することは不可能だった。
+
+<programlisting> 
+  class StateMonad m s | m -> s where ... 
+</programlisting>
+
+我々は、多引数型クラスには通常ひとつの「主要な」引数があり、それについてのインスタンス導出が最も重視される、という仮説を立てている。
+</para>
+<para>最後に、これら全ては<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>の各クラスには適用されない。これらには、組込みの導出規則(Haskellレポートの4.3.3節)が適用される。(<literal>Eq</literal>、<literal>Ord</literal>、<literal>Ix</literal>、<literal>Bounded</literal>の各標準クラスについては、どちらの方法を使うかは重要でない)
+</para>
+</sect3>
+
+</sect2>
+
+</sect1>
+
 
 <!-- TYPE SYSTEM EXTENSIONS -->
 <sect1 id="type-class-extensions">
@@ -2825,161 +3037,6 @@ consider how one would parse this:
             in
             head ys
 </programlisting>
-</para>
-</sect3>
-
-</sect2>
-
-<sect2 id="deriving-typeable">
-<title><literal>Typeable</literal>クラスおよび<literal>Data</literal>クラスについてのderiving節</title>
-
-<para>
-Haskell 98では、プログラマがデータ型宣言に「<literal>deriving( Eq、Ord )</literal>」と付け加えれば、これらのクラスの標準的なインスタンス宣言が生成される。Haskell 98では、<literal>deriving</literal>節に現れることのできるクラスは標準の<literal>Eq</literal>、<literal>Ord</literal>、<literal>Enum</literal>、<literal>Ix</literal>、<literal>Bounded</literal>、<literal>Read</literal>、<literal>Show</literal>だけである。
-</para>
-<para>
-GHCはこれを拡張し、新たに二つのクラスが自動的に導出できるようにする。(ただし、<option>-fglasgow-exts</option>フラグが必要)。<literal>Typeable</literal>と<literal>Data</literal>である。これらのクラスはそれぞれライブラリモジュール<literal>Data.Typeable</literal>と<literal>Data.Generics</literal>で定義されており、<literal>deriving</literal>節で使うためには、あらかじめ適切なクラスをスコープに導入しておく必要がある。
-</para>
-<para><literal>Typeable</literal>のインスタンスは、データ型の型パラメタの数が七個以下で、その全てが類<literal>*</literal>を持っているときのみ導出できる。これは、<literal>Typeable</literal>クラスが<ulink url="http://research.microsoft.com/%7Esimonpj/papers/hmap/gmap2.ps">Scrap More Boilerplate: Reflection, Zips, and Generalised Casts</ulink>で述べられている形を使って導出されているからである。(この論文の7.4節では、使われる複数の<literal>Typeable</literal>について述べられているが、ライブラリが提供するのは<literal>Typeable1</literal>から<literal>Typeable7</literal>までだけである)。この条件を満たさない場合、プログラマは、そのデータ構築子に合った類を持つ<literal>TypeableX</literal>を書き、そのデータ型についてのインスタンスを手で書くことができる。</para>
-</sect2>
-
-<sect2 id="newtype-deriving">
-<title>newtypeについての導出インスタンスの一般化</title>
-
-<para>
-<literal>newtype</literal>を使って抽象型を定義するとき、元の型からインスタンスをいくつか継承させたいと思うことがあるかもしれない。Haskell 98では、<literal>Eq</literal>、<literal>Ord</literal>、<literal>Enum</literal>、<literal>Bounded</literal>に関しては導出を使うことでインスタンスを継承させられるが、それ以外の型については明示的なインスタンス宣言を書かなければならない。例えば、次のように定義したとする。
-
-<programlisting> 
-  newtype Dollars = Dollars Int 
-</programlisting> 
-
-そして、<literal>Dollars</literal>に対して数値演算を使いたいなら、次のようにして明示的に<literal>Num</literal>のインスタンスを書かなければならない。
-
-<programlisting> 
-  instance Num Dollars where
-    Dollars a + Dollars b = Dollars (a+b)
-    ...
-</programlisting>
-このインスタンスは、<literal>newtype</literal>の構築子を適用したり排除したりしているだけである。特にくやしいのは、この構築子は実行時には存在しないので、このインスタンス宣言が定義する辞書は<literal>Int</literal>の辞書と<emphasis>全体を通して同じ</emphasis>で、違いはこちらの方がより遅いことだけだ、という点である。
-</para>
-
-
-<sect3> <title>deriving節の一般化</title>
-<para>
-このようなことをしなくても、GHCではこの種のインスタンスは導出できるようになった。従って、次のように書くことができる。
-<programlisting> 
-  newtype Dollars = Dollars Int deriving (Eq,Show,Num)
-</programlisting> 
-
-そして、実装では、<literal>Dollars</literal>について<literal>Int</literal>のものと<emphasis>同じ</emphasis><literal>Num</literal>用辞書が使われる。概念上は、コンパイラは次のような形のインスタンス宣言を導出している。
-
-<programlisting> 
-  instance Num Int => Num Dollars
-</programlisting> 
-
-このインスタンスは、型にしたがって<literal>newtype</literal>構築子を付けたり外したりすることだけを行う。
-</para>
-<para>
-
-構築子クラスのインスタンスも同様に導出することができる。例えば、次のように、状態と失敗を扱うモナド変換子を実装したとしよう。
-
-<programlisting> 
-  instance Monad m => Monad (State s m) 
-  instance Monad m => Monad (Failure m)
-</programlisting> 
-Haskell 98では、次のようにしてパーサモナドを定義することができる。
-<programlisting> 
-  type Parser tok m a = State [tok] (Failure m) a
-</programlisting> 
-
-これは、上記のインスタンス宣言によって自動的にモナドになっている。拡張を使うと、<literal>Monad</literal>クラスのインスタンスを書くことなくパーサの型を抽象型にすることができる。次のようになる。
-
-<programlisting> 
-  newtype Parser tok m a = Parser (State [tok] (Failure m) a)
-                         deriving Monad
-</programlisting>
-この場合、導出されたインスタンス宣言は次の形になる。
-<programlisting> 
-  instance Monad (State [tok] (Failure m)) => Monad (Parser tok m) 
-</programlisting> 
-
-<literal>Monad</literal>は構築子クラスなので、このインスタンスはこのnewtypeの<emphasis>部分適用</emphasis>であり、左辺全体ではない。インスタンス宣言の文脈を生成するためにこの型宣言が「η変換」されたと考えることができる。
-</para>
-<para>
-
-多引数型クラスについても、そのnewtypeがクラスの最後の引数であることを条件に、インスタンスを導出できる。この場合、<literal>deriving</literal>節に現れるのはクラスの「部分適用」形である。例として、次のようなクラスがあったとする。
-
-<programlisting> 
-  class StateMonad s m | m -> s where ... 
-  instance Monad m => StateMonad s (State s m) where ... 
-</programlisting> 
-このとき、次のようにして、<literal>Parser</literal>についての<literal>StateMonad</literal>のインスタンスを導出できる。
-<programlisting> 
-  newtype Parser tok m a = Parser (State [tok] (Failure m) a)
-                         deriving (Monad, StateMonad [tok])
-</programlisting>
-
-導出インスタンスは、部分適用されたクラスを最後にnewtypeに適用し、完全に適用された形にすることで得られる。次のようにである。
-
-<programlisting> 
-  instance StateMonad [tok] (State [tok] (Failure m)) =>
-           StateMonad [tok] (Parser tok m)
-</programlisting>
-</para>
-<para>
-
-この拡張の結果、newtype宣言での導出インスタンスは、<literal>Show</literal>と<literal>Read</literal>(これらは元の型とは異なる振る舞いをする)を除いた全てのクラスについて一様に扱われ(、元となった型の辞書を再利用することで実装され)る。
-</para>
-</sect3>
-
-<sect3> <title>より精密な規定</title>
-<para>
-導出されたインスタンス宣言が構築されるときの規則は以下である。次の宣言(型シノニムを展開した後のもの)を考える。
-
-<programlisting> 
-  newtype T v1...vn = T' (t vk+1...vn) deriving (c1...cm) 
-</programlisting> 
-
-ここで、
- <itemizedlist>
-<listitem><para>
-  型<literal>t</literal>は任意の型である。
-</para></listitem>
-<listitem><para>
-  <literal>vk+1...vn</literal>は、<literal>t</literal>に出現しない型変数である.
-</para></listitem>
-<listitem><para>
-<literal>ci</literal>はクラスの部分適用であり、<literal>C t1'...tj'</literal>という形をとる。ただし<literal>C</literal>の引数の数は<literal>j+1</literal>である。すなわち、<literal>C</literal>はただ一つの引数を欠いている。
-</para></listitem>
-<listitem><para>
-  <literal>ci</literal>はどれも、<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>のいずれでもない。これらのクラスは型やその構築子を「素通りする」べきものではない。これらのクラスをnewtypeに導出することもできるが、それは通常の方法で行われ、この新しい機構は利用されない。
-</para></listitem>
-</itemizedlist>
-このとき、それぞれの<literal>ci</literal>に対して、導出されるインスタンス宣言は以下のようになる。
-<programlisting> 
-  instance ci (t vk+1...v) => ci (T v1...vp)
-</programlisting>
-ここで、<literal>p</literal>は、<literal>T v1...vp</literal>の<emphasis>類</emphasis>がクラス<literal>Ci</literal>の最後の引数として正しくなるように決められる。<emphasis>うまくいかない</emphasis>例として、以下のものを考えてみよう。
-<programlisting> 
-  newtype NonMonad m s = NonMonad (State s m s) deriving Monad 
-</programlisting> 
-ここで、次のインスタンスを導出することはできない。
-<programlisting> 
-  instance Monad (State s m) => Monad (NonMonad m) 
-</programlisting> 
-
-なぜなら、型変数<literal>s</literal>が<literal>State s m</literal>に現れており、「η変換」によって消し去ることができないからである。この<literal>deriving</literal>節が拒絶されるのは良いことである。<literal>NonMonad m</literal>は実際、同じ理由で、モナドではないからである。正しい型を持つ<literal>>>=</literal>を定義しようとしてみよ。できないはずである。
-</para>
-<para>
-
-また、クラス引数の<emphasis>順序</emphasis>が重要になることに注意。これは、最後の引数についてしかインスタンスの導出ができないからである。もし上記の<literal>StateMonad</literal>が次のように定義されていたなら、上のように<literal>Parser</literal>型についてインスタンスを導出することは不可能だった。
-
-<programlisting> 
-  class StateMonad m s | m -> s where ... 
-</programlisting>
-
-我々は、多引数型クラスには通常ひとつの「主要な」引数があり、それについてのインスタンス導出が最も重視される、という仮説を立てている。
-</para>
-<para>最後に、これら全ては<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>の各クラスには適用されない。これらには、組込みの導出規則(Haskellレポートの4.3.3節)が適用される。(<literal>Eq</literal>、<literal>Ord</literal>、<literal>Ix</literal>、<literal>Bounded</literal>の各標準クラスについては、どちらの方法を使うかは重要でない)
 </para>
 </sect3>
 
