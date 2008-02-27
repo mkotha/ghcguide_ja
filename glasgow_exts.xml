@@ -1135,7 +1135,7 @@ f1 (MkFoo a f) = a
 <para>
 <literal>deriving</literal>を使って、存在量化されたデータ構築子のあるデータ型のインスタンスを定義することはできない。
 
-理由: 大部分の場合、これは意味をなさない。例。
+理由: 大抵の場合、これは意味をなさない。例。
 
 <programlisting>
 data T = forall a. MkT [a] deriving( Eq )
