@@ -1034,18 +1034,6 @@ main = do
     display (inc (inc counterB))   -- prints "##"
 </programlisting>
 
-GADT宣言(<xref linkend="gadt"/>を見よ)では、<literal>forall</literal>は省いてよい。例えば、同じ<literal>Counter a</literal>をGADTを使って次のように表現することができる。
-
-<programlisting>
-data Counter a where
-    NewCounter { _this    :: self
-               , _inc     :: self -> self
-               , _display :: self -> IO ()
-               , tag      :: a
-               }
-        :: Counter a
-</programlisting>
-
 現在のところ、レコード更新構文はHaskell 98データ型に対してのみサポートされている。従って、下記の関数は動作しない。
 
 <programlisting>
@@ -1172,7 +1160,151 @@ instance Eq T where
 
 </sect2>
 
-</sect1> <!-- TEMPORARY! TODO: replace this line with section about gadt -->
+<!-- ====================== Generalised algebraic data types =======================  -->
+
+<sect2 id="gadt-style">
+<title>構築子のシグネチャを明示してデータ型を宣言する</title>
+
+<para>GHCは、構築子の型シグネチャを明示的に与えることで代数的データ型を宣言することを許している。例えば、次のように。
+<programlisting>
+  data Maybe a where
+      Nothing :: Maybe a
+      Just    :: a -> Maybe a
+</programlisting>
+この形式は「GADT様式の宣言」と呼ばれる。これは、一般化代数データ型(<xref linkend="gadt"/>に記述がある)が、この形式でしか宣言できないからである。</para>
+<para>GADT様式の構文は存在型(<xref linkend="existential-quantification"/>)の一般化になっていることに注意。例えば、以下の二つの宣言は同等である。
+<programlisting>
+  data Foo = forall a. MkFoo a (a -> Bool)
+  data Foo' where { MKFoo :: a -> (a->Bool) -> Foo' }
+</programlisting>
+</para>
+<para>標準のHaskell-98の構文で宣言できるデータ型は全てGADT様式でも宣言できる。どちらを選ぶかは大部分スタイルの問題だが、GADT様式の宣言が通常と異なる重要な点が一つある。データ構築子に関するクラス制約の扱いが異なるのである。具体的に言うと、構築子に型クラス文脈が与えられたとき、パターン照合によってその文脈が使えるようになる。例を示す。
+<programlisting>
+  data Set a where
+    MkSet :: Eq a => [a] -> Set a
+
+  makeSet :: Eq a => [a] -> Set a
+  makeSet xs = MkSet (nub xs)
+
+  insert :: a -> Set a -> Set a
+  insert a (MkSet as) | a `elem` as = MkSet as
+                      | otherwise   = MkSet (a:as)
+</programlisting>
+<literal>mkSet</literal>を構築子として使う(例えば<literal>makeSet</literal>の定義)と、期待通り<literal>(Eq a)</literal>の制約が生じる。新機能は、<literal>MkSet</literal>についてのパターン照合(<literal>insert</literal>の定義にあるようなもの)の際、文脈<literal>(Eq a)</literal>が<emphasis>使えるようになる</emphasis>ということである。実装の言葉で言うと、<literal>MkSet</literal>には、渡された<literal>(Eq a)</literal>の辞書を持っておくための隠れたフィールドがある。それで、パターン照合の際には、照合の右辺からその辞書を使うことができる。この例では、こうして得られたEqの辞書を、<literal>elem</literal>の呼び出しによって生成されたEq制約を満足させるのに使うので、<literal>insert</literal>の型自体には<literal>Eq</literal>制約が現れない。</para>
+<para>この振る舞いは、Haskell 98の、データ型宣言における文脈の奇妙な扱い(Haskell 98レポートの4.2.1節)と対照を為す。Haskell 98では、次の定義によって、上の<literal>MkSet</literal>と同じ型の<literal>MkSet'</literal>が得られる。
+<programlisting>
+  data Eq a => Set' a = MkSet' [a]
+</programlisting>
+しかし、<literal>MkSet'</literal>についてのパターン照合では、<literal>(Eq a)</literal>の制約が<emphasis>使えるようになる</emphasis>のでなく、<literal>(Eq a)</literal>の制約を<emphasis>要求する</emphasis>のだ。変な振る舞いだが、GHCはこれを忠実に実装している。しかし、GADT様式の宣言なら、GHCの振る舞いはずっと有用で、同時にずっと直感的である。</para>
+<para>
+例えば、GHCの振る舞いの応用の一つとして、辞書をオブジェクト化するというのが考えられる。
+<programlisting>
+   data NumInst a where
+     MkNumInst :: Num a => NumInst a
+
+   intInst :: NumInst Int
+   intInst = MkNumInst
+
+   plus :: NumInst a -> a -> a -> a
+   plus MkNumInst p q = p + q
+</programlisting>
+ここで、<literal>NumInst a</literal>型の値は、<literal>(Num a)</literal>の辞書を明示的にしたものと同等である。
+</para>
+
+<para>
+この節の残りの部分では、GADT様式のデータ型宣言について、さらなる詳細を与える。
+
+<itemizedlist>
+<listitem><para>
+各データ構築子の結果の型は、定義しようとしている型構築子で始まっていなければならない。構築子の結果の型が全て<literal>T a1 ... an</literal>という形(ただし<literal>a1 .. an</literal>は相異なる型変数)なら、それは<emphasis>通常の</emphasis>データ型であり、そうでなければ<emphasis>一般化された</emphasis>データ型(<xref linkend="gadt"/>)である。
+</para></listitem>
+
+<listitem><para>
+それぞれの構築子の型シグネチャは独立していて、通常通り暗黙に全称量化される。別々の構築子には異なる全称量化の型変数があっても良いし、異なる型制約があっても良い。例えば、これは問題ない。
+<programlisting>
+  data T a where
+    T1 :: Eq b => b -> T b
+    T2 :: (Show c, Ix c) => c -> [c] -> T c
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+Haskell 98様式のデータ型宣言と異なり、「<literal>data Set a where</literal>」というヘッダに出てくる型変数にはスコープがない。実際、代わりに類シグネチャを書くこともできる。
+<programlisting>
+  data Set :: * -> * where ...
+</programlisting>
+あるいは、この二つを混ぜるのでも良い。
+<programlisting>
+  data Foo a :: (* -> *) -> * where ...
+</programlisting>
+型変数(与えられるなら)は明示的に類付けされていても良いので、<literal>Foo</literal>のヘッダを以下のように書くこともできる。
+<programlisting>
+  data Foo a (b :: * -> *) where ...
+</programlisting>
+</para></listitem>
+
+
+<listitem><para>
+正確性注釈は、構築子の型の中の当然の場所に付けることができる。
+<programlisting>
+  data Term a where
+      Lit    :: !Int -> Term Int
+      If     :: Term Bool -> !(Term a) -> !(Term a) -> Term a
+      Pair   :: Term a -> Term b -> Term (a,b)
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+GADT様式のデータ型宣言で<literal>deriving</literal>節を使うことができる。例えば、以下の二つの宣言は同等である。
+<programlisting>
+  data Maybe1 a where {
+      Nothing1 :: Maybe1 a ;
+      Just1    :: a -> Maybe1 a
+    } deriving( Eq, Ord )
+
+  data Maybe2 a = Nothing2 | Just2 a 
+       deriving( Eq, Ord )
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+GADT様式のデータ型宣言においてレコード構文を使うこともできる。
+
+<programlisting>
+  data Person where
+      Adult { name :: String, children :: [Person] } :: Person
+      Child { name :: String } :: Person
+</programlisting>
+通常と同じように、<literal>f</literal>というフィールドを持つ全ての構築子に関して、フィールド<literal>f</literal>の型が(α変換を法として)等しくなければならない。
+</para>
+<para>
+今のところ、レコード更新はGADTではまだ不可能である。このため、サポートされているのは、レコードの構築、選択、パターン照合だけである。例を示す。
+<programlisting>
+  aPerson = Adult { name = "Fred", children = [] }
+
+  shortName :: Person -> Bool
+  hasChildren (Adult { children = kids }) = not (null kids)
+  hasChildren (Child {})                  = False
+</programlisting>
+</para></listitem>
+
+<listitem><para> 
+Haskell 98風のレコード構文で存在型を宣言する場合(<xref linkend="existential-records"/>)と同様に、レコード選択関数は、選択関数にうまく型が付くフィールドについてのみ生成される。以下は、存在的レコードの節の例をGADT様式にしたものである。
+<programlisting>
+data Counter a where
+    NewCounter { _this    :: self
+               , _inc     :: self -> self
+               , _display :: self -> IO ()
+               , tag      :: a
+               }
+        :: Counter a
+</programlisting>
+前と同じように、ここで生成される選択関数は唯一つ、<literal>tag</literal>についてものである。ただし、パターン照合とレコード構築では、相変わらず全てのフィールド名を使うことができる。
+</para></listitem>
+</itemizedlist></para>
+
+ </sect2>
+</sect1> <!-- ja-6.8.1:TEMPORARY! TODO: replace this line with section about gadt -->
 
 <!-- TYPE SYSTEM EXTENSIONS -->
 <sect1 id="type-class-extensions">
