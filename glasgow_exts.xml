@@ -1891,20 +1891,19 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 <option>-fglasgow-exts</option>フラグが使われていると、この規則は大幅に緩められる。まず、複数引数の型クラスが許される。次に、インスタンス宣言の文脈および頭部は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
 <orderedlist>
 <listitem><para>
-文脈中の各表明に対して、次が求められる。
+Paterson条件: 文脈中の各表明に対して、次が求められる。
 <orderedlist>
 <listitem><para>その表明に、頭部よりも多く出現する型変数があってはならない</para></listitem>
 <listitem><para>その表明中の構築子と変数の数の合計(同じ物でも複数回数える)が、頭部中のそれよりも少なくなければならない。</para></listitem>
 </orderedlist>
 </para></listitem>
 
-<listitem><para>対応範囲条件(coverage condition)。クラス中のそれぞれの関数従属<replaceable>tvs</replaceable><subscript>left</subscript> <literal>-&gt;</literal> <replaceable>tvs</replaceable><subscript>right</subscript>に対して、S(<replaceable>tvs</replaceable><subscript>right</subscript>)中の型変数は全てS(<replaceable>tvs</replaceable><subscript>left</subscript>)にも現れなければならない。ただし、Sは、クラス宣言中の型変数を対応するインスタンス宣言中の型に対応させる置換写像である。
+<listitem><para>対応範囲条件(Coverage Condition)。クラス中のそれぞれの関数従属<replaceable>tvs</replaceable><subscript>left</subscript> <literal>-&gt;</literal> <replaceable>tvs</replaceable><subscript>right</subscript>に対して、S(<replaceable>tvs</replaceable><subscript>right</subscript>)中の型変数は全てS(<replaceable>tvs</replaceable><subscript>left</subscript>)にも現れなければならない。ただし、Sは、クラス宣言中の型変数を対応するインスタンス宣言中の型に対応させる置換写像である。
 </para></listitem>
 </orderedlist>
-これらの制約により、文脈の簡約に終わりがあることが保証される。一回簡約するごとに最悪でも構築子一つ分問題が小さくなるからである。例えば、以下のようなものが禁止されていなければ、型検査器がループするだろう。
-<programlisting>
-  instance C a => C a where ...
-</programlisting>
+これらの制約により、文脈の簡約に終わりがあることが保証される。一回簡約するごとに最悪でも構築子一つ分問題が小さくなるからである。<option>-fallow-undecidable-instances</option>フラグ(<xref linkend="undecidable-instances"/>)を与えれば、Paterson条件と対応範囲条件の両方が撤廃される。これらの制限がある理由についての沢山の背景資料が、論文<ulink  url="http://research.microsoft.com/%7Esimonpj/papers/fd%2Dchr/">Understanding functional dependencies via Constraint Handling Rules</ulink>に見つかる。</para>
+
+<para>
 例を挙げると、以下のものは問題ない。
 <programlisting>
   instance C Int [a]          -- 複数引数
@@ -1950,8 +1949,6 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
   instance C a where
     op = ... -- デフォルト
 </programlisting>
-</para>
-<para>これらの制約が存在する理由についての大量の背景資料は、論文<ulink url="http://research.microsoft.com/%7Esimonpj/papers/fd%2Dchr/">Understanding functional dependencies via Constraint Handling Rules</ulink>で見付かる。
 </para>
 </sect3>
 
@@ -2005,7 +2002,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 </programlisting>
 </para>
 <para>
-これにもかかわらず、GHCは、より自由な規則の下で実験することを許している。<option>-XUndecidableInstances</option> <indexterm><primary>-XUndecidableInstances option</primary></indexterm>という実験的なフラグを使えば、インスタンス宣言の文脈と頭部の両方において任意の型を使うことができる。停止性は、深さ固定の再帰スタックを使うことで保証される。スタックの深さを超過した場合、バックトレースのようなものが表示される。この時、<option>-fcontext-stack=</option><emphasis>N</emphasis>で、スタックをより深くすることもできる。
+これにもかかわらず、GHCは、より自由な規則の下で実験することを許している。<option>-XUndecidableInstances</option> <indexterm><primary>-XUndecidableInstances option</primary></indexterm>という実験的なフラグを使えば、Paterson条件と対応範囲条件(<xref linkend="instance-rules"/>に記述がある)の両方が撤廃される。停止性は、深さ固定の再帰スタックを使うことで保証される。スタックの深さを超過した場合、バックトレースのようなものが表示される。この時、<option>-fcontext-stack=</option><emphasis>N</emphasis>で、スタックをより深くすることもできる。
 </para>
 
 </sect3>
@@ -2035,7 +2032,14 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
   f :: [b] -> [b]
   f x = ...
 </programlisting>
-<literal>f</literal>の右辺から、<literal>C Int [b]</literal>という制約を得たとしよう。しかし、GHCはインスタンス(C)を使うことはない。なぜなら、<literal>f</literal>の呼び出しによっては、<literal>b</literal>が<literal>Int</literal>に実体化するかも知れず、その場合は(D)が最も特殊性の高いインスタンスになるからである。よって、GHCはこのプログラムを拒絶する。<option>-XIncoherentInstances</option>フラグを追加すると、GHCは、後々のインスタンス化についての問題を指摘することなく、(C)を選ぶようになる。
+<literal>f</literal>の右辺から、<literal>C Int [b]</literal>という制約を得たとしよう。しかし、GHCはインスタンス(C)を使うことはない。なぜなら、<literal>f</literal>の呼び出しによっては、<literal>b</literal>が<literal>Int</literal>に実体化するかも知れず、その場合は(D)が最も特殊性の高いインスタンスになるからである。よって、GHCはこのプログラムを拒絶する。(<option>-XIncoherentInstances</option>フラグを追加すると、GHCは、後々のインスタンス化についての問題を指摘することなく、(C)を選ぶようになる)。
+</para>
+<para>
+<literal>f</literal>に型シグネチャを与えたので、<literal>f</literal>が指定した型を持っていることをGHCが<emphasis>検査</emphasis>せねばならなかったことに注意。そうでなく、型シグネチャを与えず、GHCに<emphasis>推論</emphasis>してもらったとしよう。この場合、GHCは<literal>C Int [Int]</literal>という制約を単純化することは避ける(前と同じ理由)が、プログラムを拒絶することはなく、以下の型を推論する。
+<programlisting>
+  f :: C Int b => [b] -> [b]
+</programlisting>
+これは、どのインスタンスを選ぶかの問題を<literal>f</literal>の呼び出し側まで遅延する。その時には、型<literal>b</literal>についてより多くが知られているだろう。
 </para>
 <para>
 重複インスタンスや非整合(incoherent)インスタンスになるかどうかは、<emphasis>インスタンス宣言</emphasis>の性質であり、そのモジュールがコンパイルされるときに<option>-XOverlappingInstances</option>と<option>-XIncoherentInstances</option>が有効になっていたかどうかで決まる。インスタンス宣言をインポートし、利用するモジュールでは、フラグはどちらも必要ない。特に、インスタンス発見の過程では、以下が成り立つ。
