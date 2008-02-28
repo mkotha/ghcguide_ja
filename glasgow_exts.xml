@@ -4696,61 +4696,7 @@ r) ->
 
 <sect1 id="special-ids">
 <title>特殊な組込み関数</title>
-<para>GHCには特殊な振る舞いをする組込み関数が少々ある。この節ではこれを解説する。これらは全て<literal>GHC.Exts</literal>からエクスポートされている。</para>
-
-<sect2> <title>関数<literal>seq</literal></title>
-<para>
-関数<literal>seq</literal>はHaskell 98レポートにある通りである。
-<programlisting>
-  seq :: a -> b -> b
-</programlisting>
-この関数は、第一引数を頭部正規形まで簡約し、第二引数を結果として返す。この関数の説明がここにあるのはなぜかというと、<literal>seq</literal>は、型が多相的であるにもかかわらず、第二引数が非ボックス化型であったり非ボックス化タプルであったりしても良いからである。つまり<literal>(seq x 4#)</literal>や<literal>(seq x (# p,q #))</literal>のようにである。この場合、<literal>b</literal>が非ボックス化型として実体化することになるが、これは通常許されない。
-</para>
-</sect2>
-
-<sect2> <title>関数<literal>inline</literal></title>
-<para>
-<literal>inline</literal>関数は少々実験的なものである。
-<programlisting>
-  inline :: a -> a
-</programlisting>
-<literal>(inline f)</literal>という呼び出しは、<literal>f</literal>を、大きさにかかわらずインライン化されるようにする。より正確には、<literal>(inline f)</literal>という呼び出しは<literal>f</literal>の定義の右辺に書き換えられる。これによって、プログラマは、関数をインライン化するかを、関数の<emphasis>定義地点</emphasis>ではなく特定の<emphasis>呼び出し元</emphasis>で制御することができる。(<literal>INLINE</literal>プラグマと比較せよ。<xref linkend="inline-noinline-pragma"/>)
-</para>
-<para>
-このインライン化は、呼び出しの引数や<literal>f</literal>の定義の大きさに関係なく起こる。これは無条件である。重大な問題は、<literal>f</literal>の定義がコンパイラから可視でなければならないことである。つまり、<literal>f</literal>が、その時点のスコープにおいてlet束縛されていなければならない。インライン化が発生しなかった場合、<literal>inline</literal>は段階0において恒等関数に展開される。このため、これを使うことがオーバーヘッドにつながることはない。</para>
-
-<para>関数が別のモジュールで定義されている場合、GHCは、それが自動的にインライン化される<emphasis>かもしれない</emphasis>という程度に小さいときのみ、そのインライン化候補をインタフェースファイルに露出する。任意の大きさの関数をインタフェースファイルに露出するように指示する方法は今のところない。(この欠点は修正できるものである。なんらかのプラグマを使えば良い)</para>
-</sect2>
-
-<sect2> <title>関数<literal>lazy</literal></title>
-<para>
-<literal>lazy</literal>関数は正確性解析を少し抑制する。
-<programlisting>
-  lazy :: a -> a
-</programlisting>
-<literal>(lazy e)</literal>という呼び出しは<literal>e</literal>と同じだが、正格性解析に関しては、<literal>lazy</literal>には魔法的な特性がある。<literal>lazy</literal>は、意味上は第一引数について正格であるが、遅延するとみなされるのである。正確性解析が走った後、<literal>lazy</literal>の呼び出しはインライン化されて恒等関数になる。
-</para>
-<para>
-この振る舞いは、評価順を制御するときに便利なことがある。特に、<literal>lazy</literal>はライブラリ中の<literal>Control.Parallel.par</literal>の定義に使われている。
-<programlisting>
-  par :: a -> b -> b
-  par x y = case (par# x) of { _ -> lazy y }
-</programlisting>
-もし<literal>lazy</literal>が遅延しなければ、<literal>par</literal>は<literal>y</literal>について正格なように見え、<literal>par</literal>のそもそもの目的が達成できない。
-</para>
-<para><literal>seq</literal>と同様、<literal>lazy</literal>の引数も非ボックス化型であり得る。</para>
-</sect2>
-
-<sect2> <title>関数<literal>unsafeCoerce#</literal></title>
-<para>
-<literal>unsafeCoerce#</literal>関数を使うと、型検査器を完全に素通りすることができる。型は次の通りである。
-<programlisting>
-  unsafeCoerce# :: a -> b
-</programlisting>
-つまり、これを使うと、あらゆる型をあらゆる型に型強制できる。この関数を使うなら、この関数についてしっかり理解しておかなければならない。さもなくばセグメンテーション違反が待っている。これは、一般に、あなたの書いたプログラムがwell-typedだということをあなたは知っているが、それを証明するにはHaskellの型システムの表現力が弱すぎる、というときに使う。
-</para>
-<para><literal>unsafeCoerce#</literal>の引数は非ボックス化型であっても良い。ただし、ボックス化型を非ボックス化型に型強制しようとすると極めて悪いことが起こるだろう。</para>
-</sect2>
+<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="../libraries/base/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
 </sect1>
 
 
