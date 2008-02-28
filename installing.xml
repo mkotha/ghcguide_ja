@@ -1,62 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="sec-installing-bin-distrib">
+<chapter id="installing-bin-distrib">
   <title>GHCのインストール</title>
 <indexterm><primary>binary installations</primary></indexterm>
 <indexterm><primary>installation, of binaries</primary></indexterm>
 
-<para>インストールはバイナリ配布物から行うのが最も簡単で、しかも推奨される方法だ。(なぜバイナリか？ GHCはHaskellで書かれたHaskellコンパイラなので、なんらかの方法でブートストラップしないといけないからだ。この目的のために、我々はHaskellコードから機械的に生成されたCコードを提供しているが、これを使うのは実際かなりの苦痛だ。もしGHCをソースからビルドしなければならないなら、そのためにバイナリ配布のGHCを使うのが妥当な方法だ。<literal>fptools</literal>プログラムの多くはHaskellで書かれているので、バイナリ配布物を使うことで、これらをHaskellコンパイラなしでインストールすることができる。)</para>
+<para>インストールはバイナリ配布物から行うのが最も簡単で、しかも推奨される方法だ。(なぜバイナリか？ GHCはHaskellで書かれたHaskellコンパイラなので、なんらかの方法でブートストラップしないといけないからだ。この目的のために、我々はHaskellコードから機械的に生成されたCコードを提供しているが、これを使うのは実際かなりの苦痛だ。もしGHCをソースからビルドしなければならないなら、そのためにバイナリ配布のGHCを使うのが妥当な方法だ。)</para>
 
 <para>この手引きは複数の部分から成っている。</para>
 
   <itemizedlist>
     <listitem>
       <para>Unix的なものへのインストール(<xref
-      linkend="sec-unix-a-likes"/>)。</para>
+      linkend="unix-a-likes"/>)。</para>
     </listitem>
     <listitem>
       <para>Windowsへのインストール(<xref
-      linkend="sec-install-windows"/>)。</para>
+      linkend="install-windows"/>)。</para>
     </listitem>
     <listitem>
       <para>インストールされるファイルの配置(<xref
-      linkend="sec-install-files"/>)。GHCをインストールするのにこれを知っている必要はないが、実装を変えようというときには役に立つ。</para>
+      linkend="install-files"/>)。GHCをインストールするのにこれを知っている必要はないが、実装を変えようというときには役に立つ。</para>
     </listitem>
   </itemizedlist>
   
-  <sect1 id="sec-unix-a-likes"><title>Unix的なものへのインストール</title>
+  <sect1 id="unix-a-likes"><title>Unix的なものへのインストール</title>
 
     <sect2>
       <title>プラットフォーム固有のパッケージが利用可能なとき</title>
       
-      <para>プラットフォームによっては、そのプラットフォーム固有の方法でパッケージ化されたバイナリが提供されている。もしこれが利用できるなら、それを使うのがおそらくGHCをインストールする最良の方法だろう。なぜなら、依存関係が自動的に処理される上に、ふつう、パッケージシステムを使って後日パッケージをアンインストールすることができるからである。
+      <para>有名なOSの多くは、そのプラットフォーム固有の方法でパッケージ化されたGHCバイナリを提供している。もしこれが利用できるなら、それを使うのがおそらくGHCをインストールする最良の方法だろう。なぜなら、依存関係が自動的に処理される上に、ふつう、パッケージシステムを使って後日パッケージをアンインストールすることができるからである。
       </para>
-
-      <para>我々が普段提供しているパッケージは以下の通り。</para>
-
-      <variablelist>
-	<varlistentry>
-	  <term>RedHat or SuSE Linux/x86</term>
-	  <listitem>
-            <para>RedHatとSuSE Linux(x86のみ)のためのRPMソース、RPMバイナリのパッケージはほとんどのメジャーリリースで利用可能である。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>Debian Linux/x86</term>
-	  <listitem>
-            <para>Linux(x86のみ)のためのDebianパッケージも、ほとんどのメジャーリリースで利用可能である。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>FreeBSD/x86</term>
-	  <listitem>
-            <para>FreeBSD/x86でGHCをインストールするには、portsツリーを使う(<literal>cd /usr/ports/lang/ghc &amp;&amp; make install</literal>)か、地域のFreeBSDミラーから入手できるコンパイル済みパッケージを利用することができる。</para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
-      
-      <para>他にもプラットフォーム固有のパッケージが利用可能かもしれない。詳細はGHCのダウンロードページを確認せよ。</para>
+      <para><ulink url="http://www.haskell.org/ghc/distribution_packages.html">distribution packages</ulink>のページを見て、あなたのプラットフォームで利用できるパッケージがあるかどうか確かめてほしい。</para>
     </sect2>
 
 <sect2>
@@ -67,141 +41,28 @@
 </para>
 
 <para>
-バイナリ配布物は、「束(bundle)」の単位で提供される。<literal><replaceable>bundle</replaceable>-<replaceable>platform</replaceable>.tar.gz</literal>(<replaceable>platform</replaceable>の定義については<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">building guide</ulink>を見よ)というファイル一つが一つの束に対応する。次のようにバイナリ配布物の束を展開したとしよう。
+バイナリ配布物は、「束(bundle)」の単位で提供され、<literal>ghc-<replaceable>version</replaceable>-<replaceable>platform</replaceable>.tar.bz2</literal>と呼ばれる。(<replaceable>platform</replaceable>の定義については<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">building guide</ulink>を見よ)。次のようにバイナリ配布物の束を展開したとしよう。</para>
 
+<para>
 <screen>
 % cd /your/scratch/space
-% gunzip &#60; ghc-x.xx-sun-sparc-solaris2.tar.gz | tar xvf -</screen>
-
+% bunzip2 &#60; ghc-<replaceable>version</replaceable>-<replaceable>platform</replaceable>.tar.bz2 | tar xvf -</screen>
 </para>
 
-<para>すると、<literal>ghc-<replaceable>version</replaceable></literal>という単一のディレクトリができ、その構造は次のようなものであるはずである。</para>
+<para>すると、<literal>ghc-<replaceable>version</replaceable></literal>という単一のディレクトリの中に束の内容があるはずである。</para>
 
-<indexterm><primary>binary distribution, layout</primary></indexterm>
-<indexterm><primary>directory layout (binary distributions)</primary></indexterm>
-<variablelist>
-
-<varlistentry>
-<term><literal>Makefile.in</literal></term>
-<listitem>
-<para>
-<literal>Mekafile</literal>を作るための原型(<xref linkend="sec-install"/>)。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>configure</literal></term>
-<listitem>
-<para>
-設定スクリプト(<xref linkend="sec-install"/>)。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>README</literal></term>
-<listitem>
-<para>
-このファイル要約。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>INSTALL</literal></term>
-<listitem>
-<para>
-この束をインストールする方法の説明。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>ANNOUNCE</literal></term>
-<listitem>
-<para>
-この束の告知メッセージ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>NEWS</literal></term>
-<listitem>
-<para>
-この束のリリースノート。<literal>ANNOUNCE</literal>の、より長い版である。GHCでは、リリースノートは利用手引きに含まれ、このファイルは存在しない。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-	    <term><literal>bin/<replaceable>platform</replaceable></literal></term>
-<listitem>
-<para>
-そのプラットフォーム専用の実行ファイルのうち、利用者が直接実行するものが置かれる。これらのファイルは最終的にパスの通った場所に置かれねばならない。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>lib/<replaceable>platform</replaceable>/</literal></term>
-<listitem>
-<para>
-そのプラットフォーム専用のインストール補助ファイルが置かれる。典型的には、個々の<literal>fptools</literal>プロジェクトそれぞれについて、「バージョン番号付きのプロジェクト名」という名前のサブディレクトリがある。例えば、GHCなら<literal>ghc-x.xx</literal>/というサブディレクトリがあることになる。ただし、<literal>x.xx</literal>はその束にあるGHCのバージョン番号である。</para>
-
-<para>
-これらのサブディレクトリは一般に次のような構造を持つ。</para>
-
-<para>
-<variablelist>
-
-<varlistentry>
-<term><literal>libHSstd.a</literal>など:</term>
-<listitem>
-<para>
-補助のライブラリアーカイブ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>ghc-iface.prl</literal>など:</term>
-<listitem>
-<para>
-補助スクリプト。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>import/</literal></term>
-<listitem>
-<para>
-<indexterm><primary>Interface files</primary></indexterm> プレリュードの(<literal>.hi</literal>)。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>include/</literal></term>
-<listitem>
-<para>
-いくつかのC<literal>&num;include</literal>ファイル。
-</para>
-</listitem></varlistentry>
-</variablelist>
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>share/</literal></term>
-<listitem>
-<para>
-プラットフォーム非依存のインストール補助ファイルが置かれる。ここにもまた、個々の<literal>fptools</literal>ごとにサブディレクトリがある。</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>html/</literal></term>
-<listitem>
-<para>
-HTML文書ファイル(プロジェクトごとに一つのサブディレクトリ)が置かれる。
-</para>
-</listitem></varlistentry>
-</variablelist>
-
-<sect3 id="sec-install">
+<sect3 id="install">
 <title>インストール</title>
 
 <para>
-よろしい、では選んだ束を展開したとしよう。次はなんだ？さて、少なくとも<literal>configure</literal><indexterm><primary>configure</primary></indexterm>スクリプトを実行する必要がある。これには、束のトップレベルディレクトリに移動し、<literal>./configure</literal>と打てば良い。これで<literal>Makefile.in</literal>が<literal>Makefile</literal>に変換される。
+よろしい、では選んだ束を展開したとしよう。次はなんだ？よろしい、まず束を<literal>設定</literal><indexterm><primary>configure</primary></indexterm>(configure)する必要がある。これには、束のトップレベルディレクトリに移動し、<literal>./configure</literal>と打てば良い。これで<literal>Makefile-vars.in</literal>が<literal>Makefile-vars</literal>に変換される。
 </para>
 
 <para>
-<indexterm><primary>installing in-place</primary></indexterm>
-<indexterm><primary>in-place installation</primary></indexterm>
-この時点で、インストールの過程を経ることなく、ツールをその場で使うこともできるようになった。<literal>make in-place</literal>と打てば、ツール群がその場での使用できるように準備される。さらに、今<literal>make</literal>が表示したパスを<literal>PATH</literal>環境変数に加える必要がある。この方法は、単にパッケージを試してみたいときや、ツールを正しくインストールするのに必要な権限を持っていない(あるいはインストールしたくない)ときに有用である。もし後でパッケージを「正しく」インストールすると決めた場合は、下記のインストール手順に従う必要があることに注意。</para>
+<literal>configure</literal>スクリプトはいくつかのフラグを取る。最も広く使われるのは<literal>--prefix=<replaceable>/path/to/install/in</replaceable></literal>フラグで、デフォルトの場所(/usr/local)でなく<replaceable>/path/to/install/in</replaceable>にインストールされるように指示するものである。configureが受け付ける全てのフラグを見るには、<literal>configure --help</literal>を実行せよ。</para>
 
 <para>
-パッケージをインストールするには、次のことを行う必要がある。
+その後、次のことを行う必要がある。
 </para>
 
 <para>
@@ -210,87 +71,25 @@ HTML文書ファイル(プロジェクトごとに一つのサブディレクト
 <listitem>
 
 <para>
-<literal>Makefile</literal>を編集して下記の変数の設定を確認する。
-
-<indexterm><primary>directories, installation</primary></indexterm>
-<indexterm><primary>installation directories</primary></indexterm>
-
-<variablelist>
-
-<varlistentry>
-<term><literal>platform</literal></term>
-<listitem>
-<para>
-インストールしようとしているプラットフォーム。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>bindir</literal></term>
-<listitem>
-<para>
-ユーザから実行可能なバイナリをインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>libdir</literal></term>
-<listitem>
-<para>
-プラットフォーム依存の補助ファイルをインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>datadir</literal></term>
-<listitem>
-<para>
-プラットフォーム非依存の補助ファイルをインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>infodir</literal></term>
-<listitem>
-<para>
-Emacs infoファイルをインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>htmldir</literal></term>
-<listitem>
-<para>
-HTML文書をインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>dvidir</literal></term>
-<listitem>
-<para>
-DVI文書をインストールするディレクトリ。
-</para>
-</listitem></varlistentry>
-</variablelist>
-
-これらの変数の値は、配布物に付属する<command>configure</command><indexterm><primary>configure</primary></indexterm>スクリプトを実行するときに設定することもできるが、値が期待どおりになっているかを見て確かめるのは常に良い考えである。</para>
-
-<para>
-<emphasis><command>configure</command>を走らせる代わりに、<filename>Makefile.in</filename>を<filename>Makefile</filename>にコピーして上記の変数を直接設定しても、全く問題ない。ただし、間違えないように！</emphasis>
-</para>
-
-</listitem>
-<listitem>
-
-<para>
 <literal>make install</literal>を実行する。これは通常のUnixの<literal>make</literal>で動作する<emphasis>はず</emphasis>である。GNU <literal>make</literal>のような豪華なものは必要としない。
 </para>
 </listitem>
-<listitem>
 
+<listitem>
+<para>
+必要なら、指示される通りに、binディレクトリをPATHに加える。
+</para>
+</listitem>
+
+<listitem>
 <para>
 t?cshまたはzshの利用者は、シェルが新しくbinディレクトリに入ったものを見ることができるように、<literal>rehash</literal>を実行する。
 </para>
 </listitem>
-<listitem>
 
+<listitem>
 <para>
-終わったら、インストールの結果を、<xref linkend="sec-GHC-test"/>にある方法でテストする。<literal>-v</literal>オプションを使って、どのパスが使われているか確認すること。もし期待どおりに動いていないなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">building guide</ulink>にある既知の落し穴の一覧を調べると良い。
+終わったら、インストールの結果を、<xref linkend="GHC-test"/>にある方法でテストする。<literal>-v</literal>オプションを使って、どのパスが使われているか確認すること。もし期待どおりに動いていないなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">building guide</ulink>にある既知の落し穴の一覧を調べると良い。
 </para>
 </listitem>
 
@@ -304,67 +103,7 @@ t?cshまたはzshの利用者は、シェルが新しくbinディレクトリに
 
 </sect3>
 
-
-<sect3>
-<title>どんな束があるか</title>
-
-<para>
-<indexterm><primary>bundles, binary</primary></indexterm>
-基本の束以外にもたくさんのGHCの束が存在する。それらのファイル名は、<literal>ghc-x.xx-<replaceable>bundle</replaceable>-<replaceable>platform</replaceable>.tar.gz</literal>である。ただし、<replaceable>platform</replaceable>は上記と同じで、<replaceable>bundle</replaceable>は以下のいずれかである。
-</para>
-
-<para>
-<variablelist>
-
-<varlistentry>
-<term><literal>prof</literal>:</term>
-<listitem>
-<para>
-コスト集約点によるプロファイリング。おそらくあなたはこれを必要とするだろう。
-<indexterm><primary>profiling bundles</primary></indexterm>
-<indexterm><primary>bundles, profiling</primary></indexterm>
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>par</literal>:</term>
-<listitem>
-<para>
-Parallel Haskellの諸機能(PVM上で動作する)。この手の事に興味があるなら必要だろう。
-<indexterm><primary>parallel bundles</primary></indexterm>
-<indexterm><primary>bundles, parallel</primary></indexterm>
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>gran</literal>:</term>
-<listitem>
-<para>
-&ldquo;GranSim&rdquo; parallel-Haskellシミュレータ(うーん&hellip; 主に実装者向けかな)。
-<indexterm><primary>bundles, gransim</primary></indexterm>
-<indexterm><primary>gransim bundles</primary></indexterm>
-</para>
-</listitem></varlistentry>
-<varlistentry>
-<term><literal>ticky</literal>:</term>
-<listitem>
-<para>
-「ticky-ticky」プロファイリング。これは、「プログラムを実行したときに何が起こったか」についての極めて詳細な情報を与える。真に実装者向け。
-<indexterm><primary>bundles, ticky-ticky</primary></indexterm>
-<indexterm><primary>ticky-ticky bundles</primary></indexterm>
-</para>
-</listitem></varlistentry>
-</variablelist>
-</para>
-
-<para>
-基本とprofilingの<emphasis>二つ</emphasis>の束を使う、というのがよくある方法である。普段我々はその二つ以外を作らない。ただし、ソース配布物から自分でビルドすることはできる。
-</para>
-
-<para>
-これらのいろいろなGHCの束は同一のディレクトリに展開するように設計されている。展開した後、上記の方法でインストールすれば、一回の手順で全体がインストールされる。注意：少なくとも基本のGHC配布物の束がなければならない。追加の束だけでは基本部分がインストールされない。</para>
-
-</sect3>
-
-<sect3 id="sec-GHC-test">
+<sect3 id="GHC-test">
 <title>GHCが正しく動いていそうか調べる
 </title>
 
@@ -401,9 +140,6 @@ Hello, world!</screen>
 
 </para>
 
-<para>
-単純だけれど有益なテストとして、悪名高い<literal>nfib</literal><indexterm><primary>nfib</primary></indexterm>プログラムを、色々な数値型を使ってコンパイル・実行するというものがある。まず<literal>nfib :: Int -&gt; Int</literal>から始めて、次に<literal>Integer</literal>、<literal>Float</literal>、<literal>Double</literal>、<literal>Rational</literal>、さらに、あるいは多重定義版も試す。このためのコードはソース配布物の<literal>ghc/misc/examples/nfib/</literal>にある。</para>
-
 <para>どうやってGHCを「運転する」かについてのさらなる情報のためには、読み進めよ。</para>
 
 </sect3>
@@ -413,10 +149,10 @@ Hello, world!</screen>
 </sect1>
 
 
-<sect1 id="sec-install-windows"><title>Windowsへのインストール</title>
+<sect1 id="install-windows"><title>Windowsへのインストール</title>
 
 <para>
-グラスゴーHaskellコンパイラ(5.02より後)をWindowsプラットフォーム上で動かすのは容易い。Installshieldが必要なことを全て行ってくれる。
+グラスゴーHaskellコンパイラ(5.02より後)をWindowsプラットフォーム上で動かすのは容易い。インストーラが必要なことを全て行ってくれる。
 </para>
 
 <sect2><title>GHCをWindowsにインストールする</title>
@@ -426,21 +162,15 @@ GHCをインストールするには、次の手順を踏めば良い。
 </para>
 <itemizedlist>
 <listitem><para>
-GHCのダウンロードページ(<ulink url="http://www.haskell.org/ghc">haskell.org</ulink>)から、Installshieldの<filename>setup.exe</filename>をダウンロードする。
+<ulink url="http://www.haskell.org/ghc/download.html">GHCのダウンロードページ</ulink>から、インストーラをダウンロードする。
 </para></listitem>
 
-<listitem><para><filename>setup.exe</filename>を実行する。Windowsでは、GHCの全てのファイルは単一のディレクトリにインストールされる。インストールオプションの一覧から「Custom」を選ぶと、どのディレクトリにするか選ぶことができる。そうしなかった場合、<filename>c:/ghc/<replaceable>ghc-version</replaceable></filename>にインストールされる。GHCの実行バイナリは、選んだディレクトリ下の<filename>bin/</filename>サブディレクトリにインストールされる。</para>
-
-<para>(もし既に同じバージョンのGHCがインストールされているなら、Installshieldを実行すると、GHCを「modify」するか「remove」するかが選べる。「remove」を選び、もう一度<filename>setup.exe</filename>を実行すれば、インストールができるようになる。)</para>
-
+<listitem><para>インストーラを実行する。Windowsでは、GHCの全てのファイルは単一のディレクトリにインストールされる。変更できるが、デフォルトではそのディレクトリは<filename>c:/ghc/ghc-<replaceable>version</replaceable></filename>である。GHCの実行バイナリは、インストールディレクトリ下の<filename>bin/</filename>サブディレクトリにインストールされる。GHCをコマンド行から起動したいなら、これを<literal>$PATH</literal>環境変数に加えること。</para>
 
 <para>
-インストールが完了したら、GHCi、及びGHCのドキュメントが、スタートメニューの「Start/Programs/Glasgow Haskell Compiler」から利用可能になるはずである。
+インストールが完了したら、GHCi、及びGHCのドキュメントが、スタートメニューの「Start/All Programs/GHC/ghc-<replaceable>version</replaceable>」から利用可能になるはずである。
 </para>
 </listitem>
-
-<listitem><para>インストール手順の最後のダイアログボックスで、どこにGHCバイナリがインストールされたか(ふつうは<filename>c:/ghc/<replaceable>ghc-version</replaceable>/bin/</filename>)を確認することができる。GHCをコマンドラインから起動したいなら、これをPATH環境変数に加えること。
-</para></listitem>
 
 <listitem><para>
 GHCは、一時ファイルを作るディレクトリを必要とする。適切なディレクトリを見付けるために、標準のWindows手続き<literal>GetTempPath()</literal>を使う。この手続きは次のものを返す。
@@ -467,7 +197,7 @@ bash$ ghc -o main main.hs
 ..
 bash$ ./main
 Hello, world!
-bash$ </screen>
+bash$</screen>
 </listitem>
 </itemizedlist>
 
@@ -475,13 +205,13 @@ bash$ </screen>
 GHCをインストールするのに、Cygwinツールチェインやその他のものは必要ない。
 </para>
 <para>
-GHCをインストールするのには約140Mのディスク空き容量が必要である。GHCを快適に使うには、マシンには最低でも64Mのメモリがあるべきだ。
+GHCをインストールするのには約365Mのディスク空き容量が必要である。GHCを快適に使うには、マシンには最低でも64Mのメモリがあるべきだ。
 </para>
 </sect2>
 
 <sect2><title>GHCを移動する</title>
 <para>
-現在のところ、GHCのインストール場所は固定されている。(<filename>c:/ghc/ghc-x.yy</filename>)(訳注：すぐ上にあるように、現在ではインストール場所を変えることができる)しかし、一旦インストールした後は、<filename>ghc-x.yy</filename>ディレクトリをコピーすることで自由にGHCツリー全体を移動させることができる。(もしこれをしたなら、「Start/Programs/Glasgow Haskell Compiler」以下のリンクを修正する必要があるかもしれない)
+一旦インストールした後は、<filename>c:/ghc/ghc-<replaceable>version</replaceable></filename>ディレクトリをコピーすることで自由にGHCツリー全体を移動させることができる。(もしこれをしたなら、「Start/All Programs/GHC/ghc-<replaceable>version</replaceable>」以下のリンクを修正する必要があるだろう)
 </para>
 <para>
 GHCツリーを空白を含むパスに置いても問題ない。しかし、CygwinツールとともにGHCを使いたいなら、Cygwinが混乱するおそれがあるので、これはしないほうが良い。この問題はまだ完全には解明されていないが、少なくともGHC自体の問題でないことは分かっている。それでも、面倒を避けるために、我々はふつうパスが空白を含まないところにGHCを置く。
@@ -495,7 +225,7 @@ GHCツリーを空白を含むパスに置いても問題ない。しかし、Cy
 	<varlistentry>
           <term>シンボリックリンクがうまく働かない。</term>
 	  <listitem>
-            <para>シンボリックリンクはCygwin(<xref linkend="sec-install" />)の下でしか働かない。そのため、Cygwin DLLにリンクされていないプログラム(特に、Mingwin用にビルドされたもの)はシンボリックリンクを扱えない。</para>
+            <para>シンボリックリンクはCygwin(<xref linkend="install" />)の下でしか働かない。そのため、Cygwin DLLにリンクされていないプログラム(特に、Mingwin用にビルドされたもの)はシンボリックリンクを扱えない。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -508,22 +238,12 @@ GHCツリーを空白を含むパスに置いても問題ない。しかし、Cy
 	</varlistentry>
       </variablelist>
 
-<!-- doesn't add much value any longer; leave out [sof 7/2002].
-<para>
-Further information on using GHC under Windows can be found in <ulink
-url="http://www.dcs.gla.ac.uk/~sof/ghc-win32.html">Sigbj&oslash;rn Finne's
-pages</ulink>. Note: ignore the installation instructions, which are rather
-out of date; the <emphasis>Miscellaneous</emphasis> section at the bottom of
-the page is of most interest, covering topics beyond the scope of this
-manual.
-</para>
--->
 </sect2>
 
 </sect1>
 
 
-<sect1 id="sec-install-files"><title>インストールされたファイルの配置</title>
+<sect1 id="install-files"><title>インストールされたファイルの配置</title>
 
 <para>
 この節では、どのファイルがどこにインストールされるかを説明する。GHCをインストールするだけなら
@@ -577,10 +297,11 @@ GHCは、実行されるとき、ライブラリディレクトリの場所を�
   $(libdir)/
     package.conf           GHCのパッケージ設定
     ghc-usage.txt          ghc &ndash;&ndash;helpで表示されるメッセージ
+    ghci-usage.txt         ghci &ndash;&ndash;helpで表示されるメッセージ
     
     bin/                   [Win32のみ] ユーザから見えるバイナリ
-         ghc.exe
-         ghci.exe
+        ghc.exe
+        ghci.exe
 
     unlit                  文芸形式のマークアップを削除する
     
@@ -601,32 +322,31 @@ GHCは、実行されるとき、ライブラリディレクトリの場所を�
         ld.exe
 
         crt0.o              標準
-	   ..etc..	    バイナリ
+	    ..etc..	    バイナリ
         
         libmingw32.a        標準
-	   ..etc..	    ライブラリ
+	    ..etc..	    ライブラリ
 
         *.h                 includeファイル
 
-    imports/                GHCのインタフェースファイル
-        std/*.hi              「std」ライブラリ
-	lang/*.hi             「lang」ライブラリ
-        ..etc..
+    hslibs-imports/         GHCのインタフェースファイル
+        ghc/*.hi              「ghc」ライブラリのインタフェースファイル
 
     include/                 Cのヘッダファイル
         StgMacros.h           GHC固有の
-        ..etc...              ヘッダファイル
+        ..etc..               ヘッダファイル
 
         mingw/*.h            [Win32のみ] Mingwinのヘッダファイル
 
-    libHSrts.a              GHCのライブラリアーカイブ
-    libHSstd.a
-    libHSlang.a
-      ..etc..
+    lib/                    GHC'のライブラリ
+        base-2.1
+        ..etc..
 
-    HSstd1.o                GHCのライブラリ リンク可能ファイル
-    HSstd2.o                  (ghciによって使われる。
-    HSlang.o                  ghciはまだ.aファイルを理解できないので)
+    libHSrts*.a             GHC RTSのアーカイブ
+    libHSghc.a              GHCパッケージのアーカイブ
+
+    HSrts.o                 GHC RTSのリンク可能ファイル、ghciが使う
+    HSghc.o                 GHCパッケージのリンク可能ファイル、ghciが使う
 </programlisting>
 
 <para>次のことに注意。
@@ -646,7 +366,7 @@ GHCは、実行されるとき、ライブラリディレクトリの場所を�
 </listitem>
 
 	<listitem>
-          <para><filename>ghc-split</filename>および<filename>ghc-asm</filename>という補助プログラムはPerlスクリプトであり、一行目は<literal>#!/bin/perl</literal>である。Unixでは、このスクリプトはシェルスクリプトとして実行され、それがPerlを起動する。Windowsでは、GHCが直接<filename>$(libdir)/perl.exe</filename>を起動し、<literal>#!/bin/perl</literal>はコメントとみなされる。このようになっているのは、Windowsでは、Perlがインストールされていることを前提にするのではなく、GHC付属のPerlを起動したいからである。</para>
+          <para><filename>ghc-split</filename>および<filename>ghc-asm</filename>という補助プログラムはPerlスクリプトであり、一行目は<literal>#!/usr/bin/perl</literal>である。Unixでは、このスクリプトはシェルスクリプトとして実行され、それがPerlを起動する。Windowsでは、GHCが直接<filename>$(libdir)/perl.exe</filename>を起動し、<literal>#!/usr/bin/perl</literal>はコメントとみなされる。このようになっているのは、Windowsでは、Perlがインストールされていることを前提にするのではなく、GHC付属のPerlを起動したいからである。</para>
 	</listitem>
 </itemizedlist>
 </para>
