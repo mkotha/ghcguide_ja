@@ -3150,7 +3150,7 @@ Template Haskellに関するwikiページが<ulink url="http://haskell.org/haske
 		  <itemizedlist>
 		    <listitem><para> <literal>[| ... |]</literal>、ただし「...」は式。このクォートの型は<literal>Expr</literal>である。</para></listitem>
 		    <listitem><para> <literal>[d| ... |]</literal>、ただし「...」は最上位の宣言の列。このクォートの型は<literal>Q [Dec]</literal>である。</para></listitem>
-		    <listitem><para>[計画があるが、未実装] <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Type</literal>である。</para></listitem>
+		    <listitem><para> <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Type</literal>である。</para></listitem>
 		  </itemizedlist></para></listitem>
 
 	      <listitem><para>
