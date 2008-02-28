@@ -3800,6 +3800,57 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
     <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。この後には、その種類のプラグマに特有の情報が続いても良い。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。<replaceable>word</replaceable>が認識できなかったプラグマは(無言で)無視される。</para>
 
+    <para>ある種のプラグマは<emphasis>ファイルヘッダプラグマ</emphasis>である。ファイルヘッダプラグマは、ファイル中で<literal>module</literal>キーワードよりも前になければならない。ファイルヘッダプラグマはいくつあっても良いし、コメントの前にあっても後にあっても良い。</para>
+
+    <sect2 id="language-pragma">
+      <title>LANGUAGEプラグマ</title>
+
+      <indexterm><primary>LANGUAGE</primary><secondary>pragma</secondary></indexterm>
+      <indexterm><primary>pragma</primary><secondary>LANGUAGE</secondary></indexterm>
+
+      <para>このプラグマは、言語拡張を、可搬性のある方法で有効にできるようにするものである。意図としては、全てのコンパイラが同じ構文の<literal>LANGUAGE</literal>に対応する、というものである。もちろん、全ての拡張が全てのコンパイラで使える訳ではないが。可能なら、<literal>OPTIONS_GHC</literal>プラグマの代わりに<literal>LANGUAGE</literal>を使うべきである。</para>
+
+      <para>例えば、FFIと、CPPを使った前処理を有効にするには、次のようにする。</para>
+
+<programlisting>{-# LANGUAGE ForeignFunctionInterface, CPP #-}</programlisting>
+
+      <para><literal>LANGUAGE</literal>はファイルヘッダプラグマ(<xref linkend="pragmas"/>を見よ)である。</para>
+
+      <para>全ての言語拡張は、前に「<literal>-X</literal>」を付けることでコマンド行フラグになる。例えば<option>-XForeignFunctionInterface</option>のように。(同様に、全ての「<literal>-X</literal>」フラグは<literal>LANGUAGE</literal>プラグマとして書ける)
+      </para>
+      <para>対応している言語拡張の一覧は、<literal>ghc --supported-languages</literal>を実行することで得られる。(<xref linkend="modes"/>を見よ)</para>
+
+      <para><ulink url="../libraries/Cabal/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Language-Haskell-Extension.html">web上の最新版</ulink>)で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
+    </sect2>
+
+    <sect2 id="options-pragma">
+      <title>OPTIONS_GHCプラグマ</title>
+      <indexterm><primary>OPTIONS_GHC</primary>
+      </indexterm>
+      <indexterm><primary>pragma</primary><secondary>OPTIONS_GHC</secondary>
+      </indexterm>
+
+      <para><literal>OPTIONS_GHC</literal>プラグマは、そのソースファイルをコンパイルするときにコンパイラに与える追加のオプションを指定するのに使う。詳細は<xref linkend="source-file-options"/>を見よ。</para>
+
+      <para>GHCの古い版では<literal>OPTIONS_GHC</literal>ではなく<literal>OPITONS</literal>を受け付けていたが、これはもはや非推奨である。</para>
+    </sect2>
+
+      <para><literal>OPTIONS_GHC</literal>はファイルヘッダプラグマ(<xref linkend="pragmas"/>を見よ)である。</para>
+
+    <sect2 id="include-pragma">
+      <title>INCLUDEプラグマ</title>
+
+      <para><literal>INCLUDE</literal>プラグマは、(Cを介してコンパイルしているときに)モジュールをコンパイルしてできるCソースファイルが<literal>#include</literal>すべきCのヘッダを指定するためのものである。例を示す。</para>
+
+<programlisting>
+{-# INCLUDE "foo.h" #-}
+{-# INCLUDE &lt;stdio.h&gt; #-}</programlisting>
+
+      <para><literal>INCLUDE</literal>はファイルヘッダプラグマ(<xref linkend="pragmas"/>を見よ)である。</para>
+
+      <para><literal>INCLUDE</literal>プラグマは、<option>-#include</option>オプション(<xref linkend="options-C-compiler" />)の、より良い代替手段である。<literal>INCLUDE</literal>プラグマは他のコンパイラでも解釈されるからである。<literal>foreign import</literal>宣言それぞれにインクルードファイルを書く方法もあるが、この方法はGHCでは推奨されない。</para>
+    </sect2>
+
     <sect2 id="deprecated-pragma">
       <title>DEPRECATEDプラグマ</title>
       <indexterm><primary>DEPRECATED</primary>
@@ -3828,20 +3879,6 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
       </itemizedlist>
       非推奨とされた要素、あるいは非推奨モジュールに由来するものを使うと、適切なメッセージでそれと知らされる。しかし、(a)定義モジュール中で非推奨関数を使った場合、および(b)エクスポートリスト中で非推奨関数を使った場合、は報告されない。後者のおかげで、一つのモジュールが複数のモジュールがエクスポートしているものを集めて再エクスポートするという構造のライブラリで、余計な文句を言うことがない。</para>
       <para>フラグ<option>-fno-warn-deprecations</option>を使ってこの警告を抑制することができる。</para>
-    </sect2>
-
-    <sect2 id="include-pragma">
-      <title>INCLUDEプラグマ</title>
-
-      <para><literal>INCLUDE</literal>プラグマは、(Cを介してコンパイルしているときに)モジュールをコンパイルしてできるCソースファイルが<literal>#include</literal>すべきCのヘッダを指定するためのものである。例を示す。</para>
-
-<programlisting>
-{-# INCLUDE "foo.h" #-}
-{-# INCLUDE &lt;stdio.h&gt; #-}</programlisting>
-
-      <para><literal>INCLUDE</literal>プラグマは、必要なら<literal>OPTIONS_GHC</literal>とともに、ソースファイルの先頭になければならない。</para>
-
-      <para><literal>INCLUDE</literal>プラグマは、<option>-#include</option>オプション(<xref linkend="options-C-compiler" />)の、より良い代替手段である。<literal>INCLUDE</literal>プラグマは他のコンパイラでも解釈されるからである。<literal>foreign import</literal>宣言それぞれにインクルードファイルを書く方法もあるが、この方法はGHCでは推奨されない。</para>
     </sect2>
 
     <sect2 id="inline-noinline-pragma">
@@ -3934,22 +3971,6 @@ key_function :: Int -> String -> (Bool, Double)
       </sect3>
     </sect2>
 
-    <sect2 id="language-pragma">
-      <title>LANGUAGEプラグマ</title>
-
-      <indexterm><primary>LANGUAGE</primary><secondary>pragma</secondary></indexterm>
-      <indexterm><primary>pragma</primary><secondary>LANGUAGE</secondary></indexterm>
-
-      <para>このプラグマは、言語拡張を、可搬性のある方法で有効にできるようにするものである。意図としては、全てのコンパイラが同じ構文の<literal>LANGUAGE</literal>に対応する、というものである。もちろん、全ての拡張が全てのコンパイラで使える訳ではないが。可能なら、<literal>OPTIONS_GHC</literal>プラグマの代わりに<literal>LANGUAGE</literal>を使うべきである。</para>
-
-      <para>例えば、FFIと、CPPを使った前処理を有効にするには、次のようにする。</para>
-
-<programlisting>{-# LANGUAGE ForeignFunctionInterface, CPP #-}</programlisting>
-
-      <para><ulink url="../libraries/Cabal/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Language-Haskell-Extension.html">web上の最新版</ulink>)で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
-    </sect2>
-
-
     <sect2 id="line-pragma">
       <title>LINEプラグマ</title>
 
@@ -3960,18 +3981,6 @@ key_function :: Int -> String -> (Bool, Double)
 <programlisting>{-# LINE 42 "Foo.vhs" #-}</programlisting>
 
       <para>エラーメッセージが報告されるとき、<literal>LINE</literal>プラグマで指定された行・ファイルを参照するようになる。</para>
-    </sect2>
-
-    <sect2 id="options-pragma">
-      <title>OPTIONS_GHCプラグマ</title>
-      <indexterm><primary>OPTIONS_GHC</primary>
-      </indexterm>
-      <indexterm><primary>pragma</primary><secondary>OPTIONS_GHC</secondary>
-      </indexterm>
-
-      <para><literal>OPTIONS_GHC</literal>プラグマは、そのソースファイルをコンパイルするときにコンパイラに与える追加のオプションを指定するのに使う。詳細は<xref linkend="source-file-options"/>を見よ。</para>
-
-      <para>GHCの古い版では<literal>OPTIONS_GHC</literal>ではなく<literal>OPITONS</literal>を受け付けていたが、これはもはや非推奨である。</para>
     </sect2>
 
     <sect2 id="rules">
