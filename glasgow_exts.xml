@@ -2236,49 +2236,6 @@ GHCは、型シグネチャに関して以下の制限を課す。次の型を�
 </para>
 </sect3>
 
-<sect3 id="hoist">
-<title>forallの引き上げ</title>
-<para>
-次のように、一般化型シノニム(<xref linkend="type-synonyms"/>参照)を矢印の右辺で使うのが便利なことが良くある。
-<programlisting>
-  type Discard a = forall b. a -> b -> a
-
-  g :: Int -> Discard Int
-  g x y z = x+y
-</programlisting>
-これを単純に展開すると以下のようになる。
-<programlisting>
-  g :: Int -> (forall b. Int -> b -> Int)
-</programlisting>
-しかし、GHCはこの<literal>forall</literal>を「引き上げ」、以下の同型な型を得る。
-<programlisting>
-  g :: forall b. Int -> Int -> b -> Int
-</programlisting>
-一般に、規則はこうである。<emphasis>明示的な型指定(型シグネチャなど)の型を決定するときは、型シノニムを展開した後、以下の変換を繰り返し適用する。</emphasis>
-<programlisting>
-  <emphasis>type1</emphasis> -> forall a1..an. <emphasis>context2</emphasis> => <emphasis>type2</emphasis>
-==>
-  forall a1..an. <emphasis>context2</emphasis> => <emphasis>type1</emphasis> -> <emphasis>type2</emphasis>
-</programlisting>
-(実際には、GHCは型シノニムの情報をできるだけ保持しようと努めるが、これはエラーメッセージで使うためであり、使い易さの問題に過ぎない)。この規則は、もちろん、<literal>forall</literal>がシノニム由来であるかどうかにかかわらず適用される。例えば、<literal>g</literal>の型シグネチャを次のように書いても同じである。
-<programlisting>
-  g :: Int -> Int -> forall b. b -> Int
-</programlisting>
-</para>
-<para>
-この引き上げ操作に際し、GHCは重複した制約を排除する。例として次のものを考える。
-<programlisting>
-  type Foo a = (?x::Int) => Bool -> a
-  g :: Foo (Foo Int)
-</programlisting>
-これは、次のものと同じである。
-<programlisting>
-  g :: (?x::Int) => Bool -> Bool -> Int
-</programlisting>
-</para>
-</sect3>
-
-
 </sect2>
 
 <sect2 id="implicit-parameters">
