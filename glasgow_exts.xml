@@ -3064,7 +3064,7 @@ consider how one would parse this:
 Haskellレポートでは、束縛のグループ(最上位、または<literal>let</literal>や<literal>where</literal>中のもの)は、まず強連結な成分に分割され、次に依存性の順に型検査されると規定されている(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.1">Haskellレポートの4.5.1節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.1">和訳</ulink>))。個々のグループが型検査されるとき、グループの中の明示的な型シグネチャのある束縛は、指定された多相型を持つものとして型環境に入れられ、そうでないものは全て、グループが一般化されるまで単相的でありつづける。(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.2">Haskellレポートの4.5.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.2">和訳</ulink>))
 </para>
 
-<para>Mark Jonesの論文<ulink url="http://www.cse.ogi.edu/~mpj/thih/">Typing Haskell in Haskell</ulink>での提案に従って、GHCはより一般的な様式を実装している。<option>-fglasgow-exts</option>が指定されているとき、<emphasis>依存性解析において、明示的な型シグネチャのある変数への参照は無視される</emphasis>。依存性解析がこのように変更される結果、依存性グループは小さくなり、より多くの束縛が型検査を通るようになる。例として以下を考える。
+<para>Mark Jonesの論文<ulink url="http://www.cse.ogi.edu/~mpj/thih/">Typing Haskell in Haskell</ulink>での提案に従って、GHCはより一般的な様式を実装している。<option>-XRelaxedPolyRec</option>が指定されているとき、<emphasis>依存性解析において、明示的な型シグネチャのある変数への参照は無視される</emphasis>。依存性解析がこのように変更される結果、依存性グループは小さくなり、より多くの束縛が型検査を通るようになる。例として以下を考える。
 <programlisting>
   f :: Eq a =&gt; a -> Bool
   f x = (x == x) || g True || g "Yes"
@@ -3079,7 +3079,7 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 </para>
 
 <para>
-また、この改良された依存性解析によって、相互再帰的な関数のシグネチャが互いに異なる文脈を持つことができるようになった。これはHaskell 98では不正である(4.5.2節の最後の文)。<option>-fglasgow-exts</option>が使われているとき、GHCは<emphasis>改良された</emphasis>グループについてのみ、シグネチャが同じ文脈を持っていることを要求する。これは実際的には、同じ文脈を持たなければならないのは、一つのパターン束縛で束縛された複数の変数だけだということである。例えば、以下のものは問題ない。
+また、この改良された依存性解析によって、相互再帰的な関数のシグネチャが互いに異なる文脈を持つことができるようになった。これはHaskell 98では不正である(4.5.2節の最後の文)。<option>-XRelaxedPolyRec</option>が使われているとき、GHCは<emphasis>改良された</emphasis>グループについてのみ、シグネチャが同じ文脈を持っていることを要求する。これは実際的には、同じ文脈を持たなければならないのは、一つのパターン束縛で束縛された複数の変数だけだということである。例えば、以下のものは問題ない。
 <programlisting>
   f :: Eq a =&gt; a -> Bool
   f x = (x == x) || g True
