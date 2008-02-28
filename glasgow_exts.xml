@@ -3723,7 +3723,7 @@ case v of { !pat -> e; _ -> e' }
 
 <!-- ==================== ASSERTIONS =================  -->
 
-<sect1 id="sec-assertions">
+<sect1 id="assertions">
 <title>アサーション
 <indexterm><primary>Assertions</primary></indexterm>
 </title>
