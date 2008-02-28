@@ -5,7 +5,7 @@
  </title>
   <indexterm><primary>packages</primary></indexterm>
   
-  <para>パッケージとは、Haskellモジュールから成るライブラリで、コンパイラが把握している。GHCにはいくつかのパッケージが付属している。同梱の<ulink url="../libraries/index.html">ライブラリ説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">web上の最新版</ulink>)を見よ。また、<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>から別のライブラリを入手してインストールすることもできる。</para>
+  <para>パッケージとは、Haskellモジュールから成るライブラリで、コンパイラが把握している。GHCにはいくつかのパッケージが付属している。同梱の<ulink url="../libraries/index.html">ライブラリ説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">web上の最新版</ulink>)を見よ。また、<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>から別のライブラリを入手してインストールすることができる。</para>
 
   <para>パッケージを使うのはこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
@@ -17,7 +17,7 @@
     <indexterm><primary>packages</primary>
       <secondary>using</secondary></indexterm>
     
-    <para>どんなパッケージがインストールされているか見るためには、<literal>ghc-pkg</literal>コマンドを使えば良い。</para>
+    <para>GHCは、<emphasis>インストール済み</emphasis>のパッケージしか関知しない。どんなパッケージがインストールされているか見るためには、<literal>ghc-pkg</literal>コマンドを使えば良い。</para>
 
 <screen>
 $ ghc-pkg list
@@ -30,11 +30,9 @@ $ ghc-pkg list
     (hssource-1.0), rts-1.0
       </screen>
 
-    <para>パッケージは露出されているか隠されているかのいずれかである。あなたのHaskellコードからインポートできるのは露出されているパッケージのモジュールだけである。隠しパッケージのモジュールをインポートしようとすると、GHCはエラーメッセージを出力する。</para>
+    <para>インストールされているパッケージは、デフォルトで露出されているか隠されているかのいずれかである。デフォルトで隠されているパッケージは、上記の出力に括弧付きで(<literal>(lang-1.0)</literal>のように)現れる。下記のコマンド行フラグを使えば、隠しパッケージを露出したり露出パッケージを隠したりできる。あなたのHaskellコードからインポートできるのは露出されているパッケージのモジュールだけである。隠しパッケージのモジュールをインポートしようとすると、GHCはエラーメッセージを出力する。</para>
 
-    <para>パッケージはそれぞれ露出フラグを持っていて、これがパッケージがデフォルトで露出されるかそうでないかを決める。デフォルトで隠されるパッケージは<literal>ghc-pkg list</literal>の出力で括弧付きで(<literal>(lang-1.0)</literal>のように)現れる。デフォルトで隠されているパッケージを露出させるには、<option>-package</option>を使う。(下記参照)</para>
-    
-    <para>あるパッケージがどんなモジュールを公開しているかを見るには、以下のようにすれば良い。</para>
+    <para>あるパッケージがどんなモジュールを公開しているかを見るには、<literal>ghc-pkg</literal>コマンドを使う。(<xref linkend="package-management"/>を見よ)</para>
     
 <screen>
 $ ghc-pkg field network exposed-modules
@@ -45,8 +43,6 @@ exposed-modules: Network.BSD,
                  Network
 </screen>
 
-      <para>一般に、階層化モジュールを含むパッケージは通常デフォルトで露出されている。しかし、二つのパッケージが同じモジュールを含むというととがあり得る。この場合、それらのうちただ一だけが露出されていなければならない。あるモジュールが二つ以上のパッケージに所属するとき、それをインポートするのはエラーである。</para>
-
     <para>パッケージ制御のためのコマンド行引数は以下の通りである。</para>
 
     <variablelist>
@@ -56,7 +52,7 @@ exposed-modules: Network.BSD,
 	  <indexterm><primary><option>-package</option></primary></indexterm>
 	</term>
 	<listitem>
-          <para>このオプションを与えると、<replaceable>P</replaceable>は露出される。パッケージ<replaceable>P</replaceable>はバージョン番号付きで完全な形で指定しても良いし(たとえば、<literal>network-1.0</literal>)、単一のバージョンしかインストールされていないならバージョン番号は省略しても良い。</para>
+          <para>このオプションを与えると、インストール済みパッケージ<replaceable>P</replaceable>が露出される。パッケージ<replaceable>P</replaceable>はバージョン番号付きで完全な形で指定しても良いし(たとえば、<literal>network-1.0</literal>)、単一のバージョンしかインストールされていないならバージョン番号は省略しても良い。</para>
 
           <para><replaceable>P</replaceable>の複数のバージョンがインストールされているなら、指定されたもの以外の全てのバージョンは隠される。</para>
 
@@ -108,7 +104,31 @@ exposed-modules: Network.BSD,
           <para><literal>-igonore-package P</literal>と言うのは、<literal>P</literal>、及び<literal>P</literal>に依存する全てのパッケージについて<literal>-hide-package</literal>フラグを与えるのと同じである。<literal>P</literal>に依存するインストール済みパッケージがどれなのか前もって分からないことがあるが、そういうときに<literal>-ignore-package</literal>フラグが便利である。</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term><option>-package-name <replaceable>foo</replaceable></option></term>
+        <indexterm><primary><literal>-package-name</literal></primary>
+          <secondary>option</secondary></indexterm>
+        <listitem>
+          <para>コンパイルしようとしているモジュールが、パッケージ<literal>foo</literal>の一員であることを、GHCに伝える。このフラグが省略される(とてもよくある場合である)と、デフォルトのパッケージである<literal>main</literal>と推定される。</para>
+
+          <para>注意: <option>-package-name</option>の引数はそのパッケージの完全なパッケージ識別子であるべきである。つまりバージョン番号を含んでいなければならない。例えば、<literal>-package mypkg-1.2</literal>のように。</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
+  </sect2>
+
+  <sect2 id="package-main">
+    <title>mainパッケージ</title>
+
+  <para>完全なHaskellプログラムは全て、<literal>main</literal>パッケージの<literal>Main</literal>モジュールの<literal>main</literal>を定義せねばならない。(<option>-package-name</option>フラグを省略すると<literal>main</literal>パッケージ用のコードがコンパイルされる)。これを怠ると、やや不明瞭なリンク時のエラーメッセージが出る。
+<programlisting>
+/usr/bin/ld: Undefined symbols:
+_ZCMain_main_closure
+___stginit_ZCMain
+</programlisting>
+</para>
+
   </sect2>
 
   <sect2 id="package-overlaps">
@@ -212,22 +232,7 @@ $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
       </listitem>
     </itemizedlist>
     
-      <para>新しいパッケージの一部となるべきモジュールをコンパイルするときは、<literal>-package-name</literal>オプションを使うこと。</para>
-
-      <variablelist>
-	<varlistentry>
-	  <term><option>-package-name <replaceable>foo</replaceable></option></term>
-	  <indexterm><primary><literal>-package-name</literal></primary>
-	    <secondary>option</secondary></indexterm>
-	  <listitem>
-            <para>パッケージ<literal>foo</literal>の一員となる予定のモジュールをコンパイルするとき、このオプションを加える。このフラグが省略されると、デフォルトのパッケージである<literal>main</literal>と推定される。</para>
-
-            <para>注意: <option>-package-name</option>の引数はそのパッケージの完全なパッケージ識別子であるべきである。つまりバージョン番号を含んでいなければならない。例えば、<literal>-package mypkg-1.2</literal>のように。</para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
-
-      <para>パッケージのコンパイル時に<literal>-package-name</literal>オプションを付け忘れるとおそらく惨事になるが、それが分かるのは後でそのパッケージからモジュールをインポートしようとしたときだろう。この時点でGHCは、そのモジュールがあると期待されるパッケージと、<literal>.hi</literal>ファイルに記録されたパッケージ名が異なることに文句をいう。</para>
+      <para>新しいパッケージの一部となるべきモジュールをコンパイルするときは、<literal>-package-name</literal>オプション(<xref linkend="using-packages"/>)を使うこと。パッケージのコンパイル時に<literal>-package-name</literal>オプションを付け忘れるとおそらく惨事になるが、それが分かるのは後でそのパッケージからモジュールをインポートしようとしたときだろう。この時点でGHCは、そのモジュールがあると期待されるパッケージと、<literal>.hi</literal>ファイルに記録されたパッケージ名が異なることに文句をいう。</para>
 
     <para>注意に値することとして、Windowsでは、それぞれのパッケージがDLLとしてビルドされているとき、DLLへの参照は余分な間接参照を必要とするので、パッケージ内での参照の方がパッケージ間参照よりもコストがかからない。もちろん、このことは<filename>main</filename>パッケージにも当てはまる。</para>
     </sect2>
