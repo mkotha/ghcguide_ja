@@ -2572,7 +2572,9 @@ Haskellでは全ての型変数の類は推論される。(機械で検査でき
 構築子<literal>Unused</literal>は、型変数<literal>cxt</literal>が正しい類を与えられるようにするためだけに存在する。
 </para>
 <para>
-GHCでは、このようなことをしなくても、型変数が明示的に束縛されるときはいつでも、その型変数の類を直接指定できるようになった。
+GHCでは、このようなことをしなくても、<option>-XKindSignatures</option>を使えば、型変数が明示的に束縛されるときはいつでも、その型変数の類を直接指定できるようになった。</para>
+<para>
+このフラグによって、以下の場所で類シグネチャを使えるようになる。
 <itemizedlist>
 <listitem><para><literal>data</literal>宣言。
 <screen>
