@@ -2096,9 +2096,66 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
 </para>
 </sect3>
 
-
 </sect2>
 
+<sect2 id="overloaded-strings">
+<title>文字列リテラルの多重定義</title>
+
+<para>
+GHCは<emphasis>文字列リテラルの多重定義</emphasis>に対応している。通常、文字列リテラルは型<literal>String</literal>を持つが、文字列リテラルの多重定義を有効にする(<literal>-XOverloadedStrings</literal>で)と、文字列リテラルが<literal>(IsString a) => a</literal>という型を持つようになる。
+</para>
+<para>
+これは、通常の文字列構文を使って、パックされた文字列やその他の文字列的な型を書くことができるということである。文字列リテラルは整数リテラルとほとんど同じように振る舞う。つまり、式とパターンの両方で使うことができる。リテラルがパターンで使われた場合、整数リテラルと同じ方法で、等値性のテストに置き換えられる。
+</para>
+<para>
+クラス<literal>IsString</literal>は次のように定義されている。
+<programlisting>
+class IsString a where
+    fromString :: String -> a
+</programlisting>
+定義済みのインスタンスは一つだけで、文字列が通常通りに使えるようにする、自明なものである。
+<programlisting>
+instance IsString [Char] where
+    fromString cs = cs
+</programlisting>
+<literal>IsString</literal>クラスはデフォルトでスコープに無い。明示的に言及したい(例えば、インスタンス宣言のために)なら、<literal>GHC.Exts</literal>モジュールからインポートすることができる。
+</para>
+<para>
+<option>-XOverloadedStrings</option>が指定されたときは、Haskellのデフォルト化機構が拡張されて、文字列リテラルにも対応するようになる。具体的には以下の通り。
+<itemizedlist>
+<listitem><para>
+デフォルト宣言におけるそれぞれの型は、<literal>Num</literal><emphasis>または</emphasis><literal>IsString</literal>のインスタンスでなければならない。
+</para></listitem>
+
+<listitem><para>
+標準のデフォルト化規則(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.3.4">Haskell Report, Section 4.3.4</ulink>)は次のように拡張される。デフォルト化は、全ての未解決の制約が標準のクラス<emphasis>または</emphasis><literal>IsString</literal>についてであって、少くとも一つが数値クラス<emphasis>または</emphasis><literal>IsString</literal>である場合に適用される。
+</para></listitem>
+</itemizedlist>
+</para>
+<para>
+小さい例を示す。
+<programlisting>
+module Main where
+
+import GHC.Exts( IsString(..) )
+
+newtype MyString = MyString String deriving (Eq, Show)
+instance IsString MyString where
+    fromString = MyString
+
+greet :: MyString -> MyString
+greet "hello" = "world"
+greet other = other
+
+main = do
+    print $ greet "hello"
+    print $ greet "fool"
+</programlisting>
+</para>
+<para>
+パターン照合は等値比較に翻訳されるので、パターン照合のためには<literal>Eq</literal>を導出することが必要だということに注意。
+</para>
+</sect2>
 </sect1>
 
 <sect1 id="other-type-extensions">
