@@ -94,7 +94,7 @@
 
 	  <para>インタフェースが変わったときに知らせてくれる便利なオプションとして<option>-hi-diffs</option><indexterm><primary>-hi-diffs option</primary></indexterm>がある。これは、変更のあったインタフェースファイルに<command>diff</command>を施すものである。</para>
 
-	  <para><command>make</command>を使っているなら、依存性情報を自動的に生成して、全てのモジュールが、インポート先インタフェースに対して、古くならないようにすることができる。<xref linkend="sec-makefile-dependencies"/>を参照してほしい。</para>
+	  <para><command>make</command>を使っているなら、依存性情報を自動的に生成して、全てのモジュールが、インポート先インタフェースに対して、古くならないようにすることができる。<xref linkend="makefile-dependencies"/>を参照してほしい。</para>
 
           <para>「バグ報告の前の最後のコンパイル」をすることになったら、コンパイルオプションに<option>-dcore-lint</option>を追加する(より詳しい検査ができる)ことを推奨する。</para>
 

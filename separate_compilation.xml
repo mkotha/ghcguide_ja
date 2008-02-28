@@ -554,11 +554,11 @@ Main.o Main.hc Main.s : Foo.hi Baz.hi   # MainはFooとBazをインポートし�
 Foo.o Foo.hc Foo.s    : Baz.hi          # Foo imports Baz
 </programlisting>
 
-      これが言っているのは、もし<literal>Foo.o</literal>か<literal>Foo.hc</literal>か<literal>Foo.s</literal>のどれかついて、最終更新日時が<literal>Baz.hi</literal>よりも前ならば、そのファイルは古くなっているので更新されなければならない、ということである。更新するということになると、<literal>make</literal>はそのためのルールを探す。そして、あらかじめ定義しておいたサフィックスルールのいずれかがうまく働く。これらの依存関係は<command>ghc</command>を使って自動的に生成することもできる。<xref linkend="sec-makefile-dependencies"/>を見よ。</para>
+      これが言っているのは、もし<literal>Foo.o</literal>か<literal>Foo.hc</literal>か<literal>Foo.s</literal>のどれかついて、最終更新日時が<literal>Baz.hi</literal>よりも前ならば、そのファイルは古くなっているので更新されなければならない、ということである。更新するということになると、<literal>make</literal>はそのためのルールを探す。そして、あらかじめ定義しておいたサフィックスルールのいずれかがうまく働く。これらの依存関係は<command>ghc</command>を使って自動的に生成することもできる。<xref linkend="makefile-dependencies"/>を見よ。</para>
 
  </sect2>
 
-      <sect2 id="sec-makefile-dependencies">
+      <sect2 id="makefile-dependencies">
 	<title>依存関係を生成する</title>
 	<indexterm><primary>dependencies in Makefiles</primary></indexterm>
 	<indexterm><primary>Makefile dependencies</primary></indexterm>

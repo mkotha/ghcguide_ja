@@ -234,7 +234,7 @@ module X where
           <indexterm><primary>dependency-generation mode</primary></indexterm>
         </term>
 	<listitem>
-          <para>依存性生成モード。このモードでは、GHCは<literal>Makefile</literal>で使うのに適した依存性情報を生成する。<xref linkend="sec-makefile-dependencies"/>を見よ。</para>
+          <para>依存性生成モード。このモードでは、GHCは<literal>Makefile</literal>で使うのに適した依存性情報を生成する。<xref linkend="makefile-dependencies"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
