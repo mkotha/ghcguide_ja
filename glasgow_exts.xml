@@ -3090,6 +3090,22 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 </para>
 </sect2>
 
+<sect2 id="type-families">
+<title>型の族
+</title>
+
+<para>
+GHCは、型を添字とする型の族(type family)を定義することに対応している。これは、Haskell 98における、クラスによる値の多重定義を、型にまで拡張したものと見ることができる。型の族がクラス中で宣言された場合、それを関連型(associated type)とも呼ぶ。
+</para>
+<para>
+型の族には二種類ある。データの族と型シノニムの族である。現在、完全に実装されているのは前者だけで、後者についてはまだ作業中である。結果として、この言語拡張の仕様はまだある程度流動的である。よって、この言語拡張とその使い方の詳しい説明は現在<ulink url="http://haskell.org/haskellwiki/GHC/Indexed_types">Haskell wikiの型の族についてのページ</ulink>にある。安定したら、この資料はこの利用の手引きに移されるだろう。
+</para>
+<para>
+型の族は<option>-XTypeFamilies</option>によって有効になる。
+</para>
+
+</sect2>
+ 
 </sect1>
 <!-- ==================== End of type system extensions =================  -->
 
