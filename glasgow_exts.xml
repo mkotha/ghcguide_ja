@@ -2642,6 +2642,8 @@ Haskellの型シグネチャは暗黙に量化される。新しいキーワー�
     g2 :: (forall a. Eq a => [a] -> a -> Bool) -> Int -> Int
 
     f3 :: ((forall a. a->a) -> Int) -> Bool -> Bool
+
+    f4 :: Int -> (forall a. a -> a)
 </programlisting>
 ここで、<literal>f1</literal>と<literal>g1</literal>はランク1の型で、標準のHaskellで書くことができる。(例えば、<literal>f1 :: a->b->a</literal>)。これらの<literal>forall</literal>は、Haskellが暗黙に加える全称量化を明示的なものにしている。
 </para>
@@ -2654,18 +2656,11 @@ Haskellの型シグネチャは暗黙に量化される。新しいキーワー�
 <para>
 GHCは任意のランクの型を認めている。つまり、関数矢印に必要なだけ深く<literal>forall</literal>を入れ子にすることができる。(GHCは過去にはランクを2に制限していたが、この制限は撤廃された)。特に、forallの付いた型(「型スキーム」とも呼ばれる)は、<!-- 訳注: including operational type class context -->型クラス文脈も含めて、以下の場所で使える。
 <itemizedlist>
-<listitem> <para>関数矢印の左側</para> </listitem>
-<listitem> <para>関数矢印の右側(<xref linkend="hoist"/>を見よ) </para> </listitem>
+<listitem> <para>関数矢印の左側または右側(例えば<literal>f4</literal>を見よ)</para> </listitem>
 <listitem> <para>データ型宣言で、構築子の引数として、またはフィールドの型として。例えば、上記の<literal>f1,f2,f3,g1,g2</literal>はどれも、フィールドの型シグネチャとして合法である。</para> </listitem>
 <listitem> <para>暗黙パラメタの型として</para> </listitem>
 <listitem> <para>パターン型シグネチャ(<xref linkend="scoped-type-variables"/>を見よ)の中 </para> </listitem>
 </itemizedlist>
-<literal>forall</literal>を書けない場所が一つある。型変数をforall付きの型で具体化することはできないのである。<!-- 訳注: 古い？(impredicative p -->従って、forallの付いた型を型構築子の引数にすることはできない。よって以下の型は非合法である。
-<programlisting>
-    x1 :: [forall a. a->a]
-    x2 :: (forall a. a->a, Int)
-    x3 :: Maybe (forall a. a->a)
-</programlisting>
 もちろん、<literal>forall</literal>はキーワードになる。型変数として<literal>forall</literal>を使うことはもはやできない。
 </para>
 
