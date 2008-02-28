@@ -99,7 +99,15 @@
         </listitem>
       </varlistentry>
 
-
+      <varlistentry>
+        <term>
+          <option>-pgmwindres</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmwindres</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Windowsにおいて、マニフェストを埋め込むためのプログラムとして<replaceable>cmd</replaceable>を使う。通常、これは、GHCのインストールで供給される<literal>windres</literal>プログラムである。<xref linkend="options-linker"/>の<option>-fno-embed-manifest</option>参照。</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </sect2>
 
@@ -189,6 +197,15 @@
         </term>
         <listitem>
           <para><replaceable>option</replaceable>を依存関係生成器に渡す。</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-optwindres</option>  <replaceable>option</replaceable>
+          <indexterm><primary><option>-optwindres</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Windowsにおいて、マニフェストを埋め込む際、<replaceable>option</replaceable>を<literal>windres</literal>に渡す。<xref linkend="options-linker"/>の<option>-fno-embed-manifest</option>を見よ。</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -423,7 +440,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fasm</option></primary></indexterm>
         </term>
         <listitem>
-          <para>Cを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>は最適化が無効のときはデフォルトである。(<xref linkend="options-optimise"/>を見よ)</para>
+          <para>Cを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>はデフォルトである。</para>
         </listitem>
       </varlistentry>
 
@@ -433,7 +450,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fvia-C</option></primary></indexterm>
         </term>
         <listitem>
-          <para>ネイティブコード生成器を使わず、Cを介してコンパイルする。最適化コンパイルのとき、及びGHCにネイティブコード生成器のないアーキテクチャでは、これがデフォルトである。</para>
+          <para>ネイティブコード生成器を使わず、Cを介してコンパイルする。GHCにネイティブコード生成器のないアーキテクチャでは、これがデフォルトである。</para>
         </listitem>
       </varlistentry>
 
@@ -444,6 +461,26 @@ $ cat foo.hspp</screen>
         </term>
         <listitem>
           <para>コード生成(と、それ以降の段階全て)を完全に省略する。コンパイルの中間段階の出力を見たいだけのときには使い道があるかもしれない。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fobject-code</option>
+          <indexterm><primary><option>-fobject-code</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>オブジェクトコードを生成する。GHCi以外ではこれがデフォルトであり、GHCiでは、バイトコードよりもオブジェクトコードを優先して生成するようにすることができる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fbyte-code</option>
+          <indexterm><primary><option>-fbyte-code</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>オブジェクトコードの代わりにバイトコードを生成する。GHCiではこれがデフォルトである。現在、バイトコードは対話的インタプリタでのみ使え、ディスクに保存することができない。このオブションが役に立つのは、<option>-fobject-code</option>の効果を反転させるときだけである。</para>
         </listitem>
       </varlistentry>
 
@@ -643,6 +680,38 @@ $ cat foo.hspp</screen>
           <para><option>-threaded</option>が与えられていると、他言語関数の呼び出しは、呼び出し元のHaskellスレッドを作ったのと同じOSスレッド(そのスレッドがforeign exportされたHaskellの関数によって作られた場合)または適当なOSスレッド(そのスレッドが<literal>forkIO</literal>で作られた場合)で実行される。</para>
 
           <para>スレッド化ランタイムがどのように「束縛スレッド」を使うかについてのさらなる詳細は、<ulink url="../libraries/base/Control.Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールにある。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-fno-gen-manifest</option>
+          <indexterm><primary><option>-fno-gen-manifest</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+          <para>Windowsでは、バイナリをリンクする際、GHCは通常<firstterm>マニフェスト</firstterm><indexterm><primary>manifest</primary></indexterm>ファイルを生成する。マニフェストは<literal><replaceable>prog</replaceable>.exe.manifest</literal>というファイルに置かれる。ここで、<replaceable>prog.exe</replaceable>が実行ファイルの名前である。現在、このマニフェストファイルの役割は唯一つである。Windows Vistaにおける「インストーラの検知」<indexterm><primary>installer detection</primary></indexterm>を無効にするのだ。(これは、ある種の名前(例えば、「install」「setup」「patch」を含む名前)の実行ファイルの権限を昇格させようとするものだ)。マニフェストファイルを使ってインストーラ検知を無効にしないと、Windowsがインストーラだと見なした実行ファイルを実行しようと試みた場合、起動者にパーミッションエラーのコードが返されることになる。この結果、起動者によって、ユーザに昇格の許可を求めるダイアログボックスを表示したり、単に権限不足のエラーになるかもしれない。</para>
+
+          <para>インストーラ検知は、セキュリティコントロールパネルを使って大域的に無効にすることもできるが、GHCはデフォルトで、ユーザがインストーラ検知を無効にしてあることに依存しないバイナリを生成する。</para>
+          
+          <para><option>-fno-gen-manifest</option>はこのマニフェストファイルの生成を無効にする。こうすることの一つの理由としては、例えば自分でマニフェストファイルを用意した場合というのがあるだろう。</para>
+
+          <para>将来的には、GHCはマニフェストファイルをもっと多くのことに使うようになるかもしれない。依存しているDLLの位置を指定するなど。</para>
+
+          <para><option>-fno-gen-manifest</option>は<option>-fno-embed-manifest</option>も有効にする。下記参照。</para>
+        </listitem>
+      </varlistentry>
+          
+      <varlistentry>
+        <term>
+          <option>-fno-embed-manifest</option>
+          <indexterm><primary><option>-fno-embed-manifest</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+          <para>WindowsにおいてGHCがバイナリのリンク時に生成するマニフェストファイルは、デフォルトで、実行ファイル自体に埋め込まれる。これによって、バイナリを、マニフェストファイルを同時に供給する必要なしで配布することができる。この埋め込みは、<literal>windres</literal><indexterm><primary><literal>windres</literal></primary></indexterm>を走らせることによって為される。マニフェストを埋め込むためにGHCが何をしているが正確に知るには、<option>-v</option>フラグを使うとよい。このために、GHCのインストールには<literal>windres</literal>のコピーが付属している。</para>
+          
+          <para><option>-pgmwindres</option>(<xref linkend="replacing-phases" />)と<option>-optwindres</option>(<xref linkend="forcing-options-through"/>)も参照。</para>
         </listitem>
       </varlistentry>
     </variablelist>
