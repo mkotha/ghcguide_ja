@@ -2,7 +2,7 @@
 <chapter id="win32">
 <title>Win32システムでGHCを運用する</title>
 
-<sect1>
+<sect1 id="ghc-windows">
 <title>WindowsプラットフォームでGHCを起動する</title>
 
 <para>
@@ -41,11 +41,10 @@ Notice how the "%1" argument is quoted (or not).
 
   <para>例外がひとつある。<literal>CYGWIN</literal>環境変数に<literal>tty</literal>が含まれない場合、Cygwinのシェルを使うことができる。このモードでは、CygwinのシェルはWindowsのコンソールシェルとして振る舞い、コンソールイベントは子プロセスに伝播される。<literal>CYGWIN</literal>環境変数はCygwinのシェルを起動する<emphasis>前</emphasis>に設定されねばならぬことに注意。後で変更してもシェルには何の影響も与えられない。</para>
 
-  <para>この問題が影響するのはGHCiだけでなく、コンソールイベントを補足したいあらゆるGHCでコンパイルされたプログラムにも影響する。 <ulink url="../libraries/base/GHC-ConsoleHandler.html">GHC.ConsoleHandler</ulink>モジュールを見よ。</para>
+  <para>この問題が影響するのはGHCiだけでなく、GHCでコンパイルされたプログラムで、コンソールイベントを補足したいあらゆるプログラムに影響する。 <ulink url="../libraries/base/GHC-ConsoleHandler.html">GHC.ConsoleHandler</ulink>モジュールを見よ。</para>
 </sect1>
 
-
-<sect1>
+<sect1 id="terminal-interaction">
 <title>端末を使った対話</title>
 
 <para>デフォルトでは、GHCでビルドされたアプリケーションは開始時にコンソールウィンドウを開く。コンソールウィンドウなしのGUIのみのアプリケーションをビルドしたいなら、リンクの段階で<literal>--optl-mwindows</literal>を使えば良い。
@@ -62,7 +61,7 @@ Notice how the "%1" argument is quoted (or not).
 
 </sect1>
 
-<sect1>
+<sect1 id="library-differences">
 <title>ライブラリの振る舞いにおける差異</title>
 
 <para>
@@ -77,7 +76,7 @@ Windowsでは、文字<literal>^Z</literal>はファイル終端文字と解釈�
 </para>
 </sect1>
 
-<sect1>
+<sect1 id="ghci-cygwin">
 <title>
 GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使う</title>
 
@@ -117,7 +116,7 @@ GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使
 </title>
 
 <para>
-<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。しかし、そのための機構は残されている。興味があるなら、GHCチームに問い合わせてほしい。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
+<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。我々は将来この機能を復活できるように望んでいる。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
 
 <!--
 <para>
@@ -198,18 +197,18 @@ option on all the Haskell modules that make up your application.
 
 <para>
 <indexterm><primary>Creating a Win32 DLL</primary></indexterm>
-<indexterm><primary>&ndash;&ndash;mk-dll</primary></indexterm>
+<indexterm><primary>&ndash;&ndash;shared</primary></indexterm>
 HaskellライブラリをDLLに封じ込めるのは簡単な作業である。ライブラリを構成するオブジェクトファイルをコンパイルして作り、次のようなコマンドを発行することでDLLをビルドする。
 </para>
 
 <para>
 <screen>
-ghc &ndash;&ndash;mk-dll -o foo.dll bar.o baz.o wibble.a -lfooble
+ghc &ndash;&ndash;shared -o foo.dll bar.o baz.o wibble.a -lfooble
 </screen>
 </para>
 
 <para>
-GHCのコンパイラ駆動器に<option>&ndash;&ndash;mk-dll</option>を渡すと、実行ファイルを作る代わりにDLLをビルドする。そのDLLは、コマンド行で渡された全てのオブジェクトファイルとアーカイブから成る。
+GHCのコンパイラ駆動器に<option>&ndash;&ndash;shared</option>を渡すと、実行ファイルを作る代わりにDLLをビルドする。そのDLLは、コマンド行で渡された全てのオブジェクトファイルとアーカイブから成る。
 </para>
 
 <!--
@@ -245,10 +244,10 @@ you compile into a DLL must have a common root.
 
 <listitem>
 <para>
-<option>&ndash;&ndash;mk-dll</option>を使う際、デフォルトでは、全てのオブジェクトファイルのエントリポイントがDLLからエクスポートされる。これを制限したいなら、次のようにして、コマンド行中で<emphasis>モジュール定義ファイル</emphasis>を指定することができる。
+<option>&ndash;&ndash;shared</option>を使う際、デフォルトでは、全てのオブジェクトファイルのエントリポイントがDLLからエクスポートされる。これを制限したいなら、次のようにして、コマンド行中で<emphasis>モジュール定義ファイル</emphasis>を指定することができる。
 
 <screen>
-ghc &ndash;&ndash;mk-dll -o .... -optdll&ndash;&ndash;def -optdllMyDef.def
+ghc &ndash;&ndash;shared -o .... MyDef.def
 </screen>
 
 詳細はMicrosoftの文書を参照してほしいが、モジュール定義ファイルは、エクスポートしたいエントリポイントの単なる羅列である。HaskellのCOMサーバDLLをビルドするのに使うものを挙げる。
@@ -265,13 +264,13 @@ EXPORTS
 
 <listitem>
 <para>
-<option>&ndash;&ndash;mk-dll</option>オプションは、DLLを作成するのに加え、インポートライブラリも作る。インポートライブラリの名前は、次のようにしてDLLの名前から作られる。
+<option>&ndash;&ndash;shared</option>オプションは、DLLを作成するのに加え、インポートライブラリも作る。インポートライブラリの名前は、次のようにしてDLLの名前から作られる。
 
 <programlisting>
-DLL: HScool.dll  ==&#62; import lib: libHScool_imp.a
+DLL: HScool.dll  ==&#62; import lib: libHScool.dll.a
 </programlisting>
 
-このような名前の付け方は少々奇妙に見えるかもしれないが、これはインポートライブラリと通常の静的ライブラリが共存できるようにするためである。(例えば<filename>libHSfoo.a</filename>と<filename>libHSfoo&lowbar;imp.a</filename>)。さらに、コンパイラ駆動器が非静的モードの時、コマンド行中の<option>-lHSfoo</option>を<option>-lHSfoo&lowbar;imp</option>に書き換えるので、非静的リンクから静的リンクに切り替えるのは、単に<option>-static</option>をコマンド行に追加するだけで済む。
+このような名前の付け方は少々奇妙に見えるかもしれないが、これはインポートライブラリと通常の静的ライブラリが共存できるようにするためである。(例えば<filename>libHSfoo.a</filename>と<filename>libHSfoo.dll.a</filename>)。さらに、コンパイラ駆動器が非静的モードの時、コマンド行中の<option>-lHSfoo</option>を<option>-lHSfoo&lowbar;imp</option>に書き換えるので、非静的リンクから静的リンクに切り替えるのは、単に<option>-static</option>をコマンド行に追加するだけで済む。
 
 </para>
 </listitem>
@@ -285,9 +284,7 @@ DLL: HScool.dll  ==&#62; import lib: libHScool_imp.a
 <title>他の言語から呼ぶためのDLLを作る</title>
 
 <para>
-Haskellコードをまとめて、他の言語、例えばVisual BasicやC++から呼べるようにしたいなら、いくつか知っておくと良いことがある。この汚い部分は<emphasis>他言語関数インタフェース</emphasis>定義にあるが、これをDLLのビルドとどうやって組み合わせるかは簡単でないことがあるので、例を挙げる。
-
-</para>
+Haskellコードをまとめて、他の言語、例えばVisual BasicやC++から呼べるようにしたいなら、いくつか知っておくと良いことがある。これは<xref linkend="ffi-library" />の特別な場合である。以下ではDLL特有の問題について扱う。例を挙げる。</para>
 
 <itemizedlist>
 
@@ -326,7 +323,7 @@ HaskellのRTSを起動する<function>DllMain()</function>をコンパイルす�
 #include &lt;windows.h&gt;
 #include &lt;Rts.h&gt;
 
-extern void__stginit_Adder(void);
+extern void __stginit_Adder(void);
 
 static char* args[] = { "ghcDll", NULL };
                        /* 注意: argvはNULLで終わっていなければならない */
@@ -360,7 +357,7 @@ ghc -c dllMain.c
 DLLを構築する。
 
 <screen>
-ghc &ndash;&ndash;mk-dll -o adder.dll adder.o adder_stub.o dllMain.o
+ghc &ndash;&ndash;shared -o adder.dll adder.o adder_stub.o dllMain.o
 </screen>
 
 </para>
@@ -386,6 +383,85 @@ Private Declare Function adder Lib "adder.dll" Alias "adder@8"
 
 </itemizedlist>
 
+</sect2>
+
+<sect2>
+<title>DllMain()に注意！</title>
+
+<para>関数<literal>DllMain()</literal>の本体は極めて危険な場所である。これは、プロセスの終了時、DLLがアンロードされる順番が規定されていないからである。つまり、あなたのDLLが脱初期化するときに呼ぶ関数の含まれているDLLがアンロードされた後に、あなたのDLLの<literal>DllMain()</literal>が呼ばれるかもしれないのである。言い換えると、終了処理のコードを<literal>DllMain()</literal>に置くことはできない。但し、終了処理のコードが、利用できることが保証されているある種の関数(詳しくはPlatform SDKを見よ)しか呼ばないなら別である。</para>
+
+
+<para>解決策は、常にDLLから関数<literal>Begin()</literal>と<literal>End()</literal>をエクスポートし、このDLLを使うアプリケーションからそれらを呼んで、End()関数にある終了処理コードが必要とする全てのDLLが、呼ばれた時点で利用可能状態であることを保証することである。</para>
+
+<para>以下の例は、テストしていないが、この考え方を例証するものである。(この例に何か問題を見付けたり、もっと良い例があるなら、知らせてほしい)。<literal>Bar</literal>と<literal>Zap</literal>という二つのHaskellモジュールを使うLewisというDLLがあるとしよう。ただし、<literal>Bar</literal>は<literal>Zap</literal>をインポートしており、従って<xref linkend="using-own-main"/>の意味でルートモジュールであるとする。すると、このDLLの主要なC++単位はこのような感じになる。</para>
+
+<programlisting>
+ // Lewis.cpp -- GCCでコンパイルする
+ #include &lt;Windows.h&gt;
+ #include "HsFFI.h"
+
+ #define __LEWIS_DLL_EXPORT
+ #include "Lewis.h"
+
+ #include "Bar_stub.h"  // GHCが生成したもの
+ #include "Zap_stub.h"
+
+ BOOL APIENTRY DllMain( HANDLE hModule, 
+                        DWORD  ul_reason_for_call, 
+                        LPVOID lpReserved
+                       ){
+   return TRUE;
+ }
+
+ extern "C"{
+
+ LEWIS_API HsBool lewis_Begin(){
+   int argc = ...
+   char *argv[] = ...
+
+   // Haskellランタイムを初期化する
+   hs_init(&amp;argc, &amp;argv);
+
+   // Haskellに、全てのルートモジュールについて通知する
+   hs_add_root(__stginit_Bar);
+
+   // ここで残り全部の初期化を行い
+   // 問題があれば偽を返す
+   return HS_BOOL_TRUE;
+ }
+
+ LEWIS_API void lewis_End(){
+   hs_exit();
+ }
+
+ LEWIS_API HsInt lewis_Test(HsInt x){
+   // BarやZapからエクスポートされた
+   // Haskell関数を使う
+
+   return ...
+ }
+
+ } // extern "C"
+
+そして、このDLLの関数を使ったアプリケーションのmain()は以下のようになるだろう。
+
+ // MyApp.cpp
+ #include "stdafx.h"
+ #include "Lewis.h"
+
+ int main(int argc, char *argv[]){
+   if (lewis_Begin()){
+      // 以降、Lewis DLLからエクスポートされた
+      // 他の関数を安全に呼べる
+
+   }
+   lewis_End();
+   return 0;
+ }
+</programlisting>
+
+<para><literal>Lewis.h</literal>は、DLLの外部ユーザ(GHCをインストールしているとは限らないし、従って<literal>HsFFI.h</literal>などを持っているとは限らない)に対してもHaskell FFIの型が定義されているように、必要な<literal>#ifndef</literal>を持つことになるだろう。
+</para>
 </sect2>
 
 </sect1>
