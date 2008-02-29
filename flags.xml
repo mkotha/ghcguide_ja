@@ -710,7 +710,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XScopedTypeVariables</option></entry>
-	      <entry><link linkend="scoped-type-variables">レキシカルスコープの型変数</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる。</entry>
+	      <entry><link linkend="scoped-type-variables">字句的スコープを持つ型変数</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoScopedTypeVariables</option></entry>
 	    </row>
@@ -848,8 +848,8 @@
 	    </row>
 	    <row>
 	      <entry><option>-XUnboxedTuples</option></entry>
-	      <entry><link linkend="unboxed-tuples">非ボックスかタプル</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry><link linkend="unboxed-tuples">非ボックス化タプル</link>を有効にする。</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoUnboxedTuples</option></entry>
 	    </row>
 	    <row>
