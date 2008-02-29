@@ -4,7 +4,7 @@
 <chapter id="ffi">
  <title>他言語関数インタフェース(FFI)</title>
 
-  <para>GHCは、Haskell 98の追補である他言語関数インタフェース1.0に(大部分)準拠している。これの定義は<ulink url="http://haskell.org/"><literal>http://haskell.org/</literal></ulink>から得られる。</para>
+  <para>GHCは、Haskell 98の追補である他言語関数インタフェース1.0に(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>から得られる。</para>
 
   <para>GHCでFFI対応を有効にするには、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>フラグか、これを含意する<option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグを与えれば良い。</para>
 

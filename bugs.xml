@@ -226,7 +226,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
   x = russel (MkU russel)
 </programlisting>
 
-        <para>この不自然な例以外に、GHCを発散させるプログラムの形は見付かっていず、この問題を修正しようとするとあらゆるコンパイルにオーバーヘッドが掛かることになるので、このバグは修正されないままになっている。さらなる背景情報は<ulink url="http://research.microsoft.com/~simonpj/Papers/inlining">Secrets of the GHC inliner</ulink>にある。</para>
+        <para>この不自然な例以外に、GHCを発散させるプログラムの形は見付かっていず、この問題を修正しようとするとあらゆるコンパイルにオーバーヘッドが掛かることになるので、このバグは修正されないままになっている。さらなる背景情報は<ulink url="http://research.microsoft.com/~simonpj/Papers/inlining/">Secrets of the GHC inliner</ulink>にある。</para>
       </listitem>
 
       <listitem>
