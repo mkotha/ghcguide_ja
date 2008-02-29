@@ -1266,7 +1266,7 @@
 	    <row>
 	      <entry><option>-fspec-threshold</option>=<replaceable>n</replaceable></entry>
 	      <entry>liberate-caseとSpecConstrの両変換について、関数特殊化に関するサイズの閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
-	      <entry>static</entry>
+	      <entry>静</entry>
 	      <entry><option>-</option></entry>
  	    </row>
  
