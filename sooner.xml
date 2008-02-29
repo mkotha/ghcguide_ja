@@ -25,11 +25,7 @@
 	<listitem>
           <para>ヒープ空間のためにメモリを多く使う(合理的な範囲内で)と、GHCのGC回数を減らし、結果としてコンパイル時間を減らすことができる。<option>-Rghc-timing</option>オプションを使うと、GCの動作報告が得られる。(<option>+RTS -Sstderr -RTS</option>オプションを使ってGC統計情報を直接標準出力に送ることもできる。)</para>
 
-          <para>全体のうち20%以上の時間ををGCで使っているなら、メモリを増やすのが効果的だろう。</para>
-
-          <para>ヒープサイズが最大値(デフォルトでは64M)に近づいていて、メモリがたくさんあるなら、最大サイズを<option>-M&lt;size&gt;</option><indexterm><primary>-M&lt;size&gt; option</primary></indexterm>オプションで増やすと良いかもしれない。例えば、<command>ghc -c -O -M1024m Foo.hs</command>のようにする。</para>
-
-          <para>コンパイラのデフォルトの確保領域の大きさを増やすのも効果的かもしれない。これには、<option>-A&lt;size&gt;</option><indexterm><primary>-A&lt;size&gt; option</primary></indexterm>オプションを使う。</para>
+          <para>全体のうち20%以上の時間ををGCで使っているなら、メモリを増やすのが効果的かもしれない。これには<option>-H&lt;size&gt;</option><indexterm><primary><option>-H</option></primary></indexterm>オプションを使う。コンパイラのデフォルトの確保領域の大きさを増やすのも効果的かもしれない。これには、<option>+RTS -A&lt;size&gt; -RTS</option><indexterm><primary>-A&lt;size&gt; option</primary></indexterm>オプションを使う。</para>
 
           <para>GHCのメモリの使いかたに改善が見られない場合は、バグとして報告してほしい。</para>
 	</listitem>
@@ -63,24 +59,9 @@
       <varlistentry>
 	<term>GHCはある種の構造をコンパイルするときに遅くなる</term>
 	<listitem>
-          <para>深く入れ子にされたリスト内包表記がその一例であるようだ。過去には、大きな定数テーブルも良くなかった。</para>
-
           <para>この種の振る舞いはバグとして報告するのが良いと考える。そうすれば修正を試みることができるからである。</para>
 
-          <para>コンパイラの中で長時間ふらふらしやすいのが正確性解析器である。<option>-fno-strictness</option><indexterm><primary>-fno-strictness anti-option</primary></indexterm>を使えば、これを単独で無効にできる。</para>
-	  
           <para>コンパイラのどの部分が悪戯しているかを知るには、<option>-v2</option><indexterm><primary><option>-v</option></primary></indexterm>が便利だろう。</para>
-
-          <para>モジュールに大量の定数データがあると、巨大なbasic blockが生成され、このせいでネイティブコード生成器のレジスタ割り付け器がぶっ壊れることがある。こういうときは<option>-fvia-C</option><indexterm><primary>-fvia-C option</primary></indexterm>を持ち出せば良い。(これについてGCCが特に速いというわけでもないが)</para>
-	</listitem>
-      </varlistentry>
-      
-      <varlistentry>
-        <term>明示的な<literal>import</literal>宣言</term>
-	<listitem>
-          <para><literal>import Foo</literal>と言う代わりに、<literal>import Foo (...欲しいもの...)</literal>と言おう。GHCを使って最小限必要なimportを調べることもできる。これには<option>-ddump-minimal-imports</option>を使う。(<xref linkend="hi-options"/>を見よ)</para>
-
-          <para>本当のことをいうと、これで削減できるコンパイル時間はとても少ない。しかし、思慮深く<literal>import</literal>を使うことでプログラムが理解しやすくなることがあるので、いずれにせよこれは良い考えである。</para>
 	</listitem>
       </varlistentry>
     </variablelist>
@@ -113,8 +94,6 @@
         <term>Cを介してコンパイルし、GCCに頑張ってもらう</term>
 	<listitem>
           <para>ネイティブコード生成器は素早く動作するように設計されていて、ものすごく賢く動作するように設計されている訳ではない。GCCの方がレジスタ割り付けなどをずっと真剣に行うので、GCCにやらせた方が良い。</para>
-
-          <para>現在のところ、<option>-O</option>を有効にするとGCCが代わりに使われるようになる。これは将来変わるかもしれない。</para>
 
           <para>よって、とても速いコードが必要な時は、<option>-O -fvia-C</option>を使っている。</para>
 	</listitem>
