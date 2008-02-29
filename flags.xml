@@ -1375,6 +1375,39 @@
     </sect2>
 
     <sect2>
+      <title>プログラム網羅オプション</title>
+      
+      <para><xref linkend="hpc"/></para>
+
+      <informaltable>
+	<tgroup cols="4" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>フラグ</entry>
+	      <entry>解説</entry>
+	      <entry>動静</entry>
+	      <entry>逆</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><option>-fhpc</option></entry>
+	      <entry>Haskellプログラム網羅率の計器付与を有効にする</entry>
+	      <entry>静</entry>
+	      <entry><option>-</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-hpcdir dir</option></entry>
+	      <entry>コンパイル中に.mixファイルを保管するディレクトリ(デフォルトは.hpc)</entry>
+	      <entry>動</entry>
+	      <entry><option>-</option></entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </informaltable>
+    </sect2>
+
+    <sect2>
       <title>Haskell前処理器オプション</title>
 
       <para><xref linkend="pre-processor"/></para>
@@ -1503,7 +1536,19 @@
 	    <row>
 	      <entry><option>-fno-code</option></entry>
 	      <entry>コード生成を省略する</entry>
-	      <entry>モード</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fbyte-code</option></entry>
+	      <entry>バイトコードを生成する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fobject-code</option></entry>
+	      <entry>オブジェクトコードを生成する</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -1611,6 +1656,18 @@
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
+	    <row>
+	      <entry><option>-fno-gen-manifest</option></entry>
+	      <entry>マニフェストファイルを生成しない(Windowsのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-embed-manifest</option></entry>
+	      <entry>マニフェストファイルを実行ファイルに埋め込まない(Windowsのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1683,6 +1740,12 @@
 	    <row>
 	      <entry><option>-pgmF</option> <replaceable>cmd</replaceable></entry>
 	      <entry><replaceable>cmd</replaceable>を前処理器として使う(<option>-F</option>が指定されているときのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmwindres</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>を、Windowsでマニフェストを埋め込むためのプログラムとして使う。</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1766,6 +1829,12 @@
 	    <row>
 	      <entry><option>-optdep</option> <replaceable>option</replaceable></entry>
 	      <entry><replaceable>option</replaceable>を依存関係生成器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optwindres</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>を<literal>windres</literal>に渡す</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1903,6 +1972,12 @@
 	    <row>
 	      <entry><option>-ddump-foreign</option></entry>
 	      <entry><literal>foreign export</literal>のスタブを表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ddump-hpc</option></entry>
+	      <entry>プログラム網羅率のために計器付与された段階で表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -2156,12 +2231,6 @@
 	    <row>
 	      <entry><option>-fno-asm-mangling</option></entry>
 	      <entry>アセンブリのmanglingを無効にする(代わりに<option>-unreg</option>を使うこと)</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-fno-print-bind-result</option></entry>
-	      <entry><link linkend="ghci-stmts"><!-- 訳注: リンク貼り間違い linkendとすべき -->GHCiで束縛の結果を表示するのを無効にする</link></entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
