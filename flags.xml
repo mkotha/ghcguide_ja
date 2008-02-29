@@ -489,19 +489,19 @@
 	    <row>
 	      <entry><option>-fbreak-on-exception</option></entry>
 	      <entry><link linkend="ghci-debugger-exceptions">例外が投げられる度にブレークする</link></entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-fno-break-on-exception</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-fbreak-on-error</option></entry>
 	      <entry><link linkend="ghci-debugger-exceptions">例外やエラーがキャッチされなかった場合にブレークする</link></entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-fno-break-on-error</option></entry>
 	    </row>
             <row>
               <entry><option>-fprint-evld-with-show</option></entry>
               <entry><link linkend="breakpoints"><literal>:print</literal>でShowのインスタンスを使うのを有効にする</link></entry>
-              <entry>dynamic</entry>
+              <entry>動</entry>
               <entry><option>-fno-print-evld-with-show</option></entry>
             </row>
 	    <row>
@@ -633,7 +633,7 @@
  	    <row>
 	      <entry><option>-fdisambiguate-record-fields</option></entry>
 	      <entry><link linkend="disambiguate-fields">レコードフィールドの曖昧性除去</link>を有効にする</entry>
- 	      <entry>dynamic</entry>
+ 	      <entry>動</entry>
 	      <entry><option>-fno-disambiguate-record-fields</option></entry>
  	    </row>
 	    <row>
@@ -681,7 +681,7 @@
             <row>
               <entry><option>-XRelaxedPolyRec</option></entry>
               <entry><link linkend="typing-binds">相互再帰的な多相関数</link>の検査を緩める</entry>
-              <entry>dynamic</entry>
+              <entry>動</entry>
               <entry><option>-XNoRelaxedPolyRec</option></entry>
             </row>
 	    <row>
@@ -693,19 +693,19 @@
 	    <row>
 	      <entry><option>-XOverloadedStrings</option></entry>
 	      <entry><link linkend="overloaded-strings">文字列リテラルの多重定義</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoOverloadedStrings</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XGADTs</option></entry>
 	      <entry><link linkend="gadt">一般化代数データ型</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoGADTs</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XTypeFamilies</option></entry>
-	      <entry><link linkend="type-families">型ファミリ</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry><link linkend="type-families">型の族</link>を有効にする。</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoTypeFamilies</option></entry>
 	    </row>
 	    <row>
@@ -729,121 +729,121 @@
 	    <row>
 	      <entry><option>-XCPP</option></entry>
 	      <entry><link linkend="c-pre-processor">Cプリプロセッサ</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoCPP</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPatternGuards</option></entry>
 	      <entry><link linkend="pattern-guards">パターンガード</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoPatternGuards</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XUnicodeSyntax</option></entry>
 	      <entry>Unicode構文を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoUnicodeSyntax</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XMagicHash</option></entry>
 	      <entry>「magic hash」を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoMagicHash</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPolymorphicComponents</option></entry>
 	      <entry>polymorphic componentsを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoPolymorphicComponents</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XExistentialQuantification</option></entry>
 	      <entry><link linkend="existential-quantification">存在量化</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoExistentialQuantification</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XKindSignatures</option></entry>
 	      <entry><link linkend="kinding">類シグネチャ</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoKindSignatures</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPatternSignatures</option></entry>
 	      <entry><link linkend="pattern-type-sigs">パターン型シグネチャ</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoPatternSignatures</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XEmptyDataDecls</option></entry>
 	      <entry>空のデータ型宣言を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoEmptyDataDecls</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XParallelListComp</option></entry>
 	      <entry><link linkend="parallel-list-comprehensions">並行リスト内包表記</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoParallelListComp</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XUnliftedFFITypes</option></entry>
 	      <entry>unlifted FFI typesを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoUnliftedFFITypes</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XLiberalTypeSynonyms</option></entry>
 	      <entry><link linkend="type-synonyms">自由化型シノニム</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoLiberalTypeSynonyms</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRank2Types</option></entry>
 	      <entry>ランク2の型を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoRank2Types</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRankNTypes</option></entry>
 	      <entry>ランクNの型を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoRankNTypes</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XTypeOperators</option></entry>
 	      <entry>型演算子を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoTypeOperators</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecursiveDo</option></entry>
 	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPArr</option></entry>
 	      <entry>parallel arrayを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoPArr</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecordWildCards</option></entry>
 	      <entry>record wildcardを有効にする</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoRecordWildCards</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecordPuns</option></entry>
 	      <entry>record punを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoRecordPuns</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XDisambiguateRecordFields</option></entry>
 	      <entry><link linkend="disambiguate-fields">フィールドの曖昧性除去</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoDisambiguateRecordFields</option></entry>
 	    </row>
 	    <row>
@@ -855,55 +855,55 @@
 	    <row>
 	      <entry><option>-XStandaloneDeriving</option></entry>
 	      <entry><link linkend="stand-alone-deriving">独立deriving</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoStandaloneDeriving</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XDeriveDataTypeable</option></entry>
 	      <entry><link linkend="deriving-typeable">DataとTypeableの両クラスについてのderiving</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoDeriveDataTypeable</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XGeneralizedNewtypeDeriving</option></entry>
 	      <entry><link linkend="newtype-deriving">newtype deriving</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoGeneralizedNewtypeDeriving</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XTypeSynonymInstances</option></entry>
 	      <entry><link linkend="type-synonyms">型シノニム</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoTypeSynonymInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XFlexibleContexts</option></entry>
 	      <entry>flexible contextを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoFlexibleContexts</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XFlexibleInstances</option></entry>
 	      <entry>flexible instanceを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoFlexibleInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XConstrainedClassMethods</option></entry>
 	      <entry>constrained class methodを有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoConstrainedClassMethods</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XMultiParamTypeClasses</option></entry>
 	      <entry><link linkend="multi-param-type-classes">多引数の型クラス</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoMultiParamTypeClasses</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XFunctionalDependencies</option></entry>
 	      <entry><link linkend="functional-dependencies">関数従属</link>を有効にする。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-XNoFunctionalDependencies</option></entry>
  	    </row>
 	  </tbody>
@@ -981,7 +981,7 @@
           <row>
             <entry><option>-fwarn-implicit-prelude</option></entry>
             <entry>Preludeが暗黙にimportされるときに警告する</entry>
-            <entry>dynamic</entry>
+            <entry>動</entry>
             <entry><option>-fno-warn-implicit-prelude</option></entry>
           </row>
 
@@ -1051,7 +1051,7 @@
 	  <row>
 	    <entry><option>-fwarn-tabs</option></entry>
 	    <entry>ソースファイル中にタブがあったときに警告する</entry>
-	    <entry>dynamic</entry>
+	    <entry>動</entry>
 	    <entry><option>-fno-warn-tabs</option></entry>
 	  </row>
 
@@ -1065,7 +1065,7 @@
 	  <row>
 	    <entry><option>-fwarn-monomorphism-restriction</option></entry>
 	    <entry>単相性限定が適用された時に警告する</entry>
-	    <entry>dynamic</entry>
+	    <entry>動</entry>
 	    <entry><option>-fno-warn-monomorphism-restriction</option></entry>
 	  </row>
 
@@ -1238,7 +1238,7 @@
             <row>
 	      <entry><option>-frewrite-rules</option></entry>
 	      <entry>全ての書き換え規則(多重定義関数の自動特殊化で生成されたものも含む)を有効にする。<option>-O</option>によっても有効になる。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry><option>-fno-rewrite-rules</option></entry>
  	    </row>
 
@@ -1252,14 +1252,14 @@
 	    <row>
 	      <entry><option>-fspec-constr</option></entry>
 	      <entry>SpecConstr変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry>-fno-spec-constr</entry>
 	    </row>
 
 	    <row>
 	      <entry><option>-fliberate-case</option></entry>
 	      <entry>liberate-case変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
-	      <entry>dynamic</entry>
+	      <entry>動</entry>
 	      <entry>-fno-liberate-case</entry>
 	    </row>
 
