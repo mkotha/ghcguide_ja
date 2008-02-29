@@ -2164,7 +2164,7 @@ main = do
 <sect2 id="type-restrictions">
 <title>型シグネチャ</title>
 
-<sect3><title>型シグネチャの文脈</title>
+<sect3 id="flexible-contexts"><title>型シグネチャの文脈</title>
 <para>
 Haskell 98と異なり、型シグネチャは<emphasis>(クラス 型変数)</emphasis>または<emphasis>(クラス (型変数 型変数 ...))</emphasis>という形をとる必要はない。よって、以下のような型シグネチャは完全に正しい。
 <programlisting>

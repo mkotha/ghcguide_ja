@@ -87,12 +87,6 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>&ndash;&ndash;print-docdir</option></entry>
-	      <entry>GHCの文書ディレクトリを表示</entry>
-	      <entry>モード</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
 	      <entry><option>-ferror-spans</option></entry>
 	      <entry>エラーメッセージで範囲を完全な形で表示する</entry>
 	      <entry>静</entry>
@@ -458,7 +452,7 @@
       </informaltable>
     </sect2>
 
-    <sect2>
+    <sect2 id="interactive-mode-options">
       <title>対話モードのオプション</title>
       
       <para><xref linkend="ghci-dot-files"/></para>
@@ -510,6 +504,13 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
+	    <row>
+	      <entry><option>-fno-print-bind-contents</option></entry>
+	      <entry><link linkend="breakpoints">GHCiで束縛の中身を表示するのを無効にする</link></entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -637,7 +638,7 @@
 	      <entry><option>-fno-disambiguate-record-fields</option></entry>
  	    </row>
 	    <row>
-	      <entry><option>-XForeignFunctionInterface</option>または<option>-XForeignFunctionInterface</option></entry>
+	      <entry><option>-XForeignFunctionInterface</option><entry>
 	      <entry><link linkend="ffi">他言語関数インタフェース</link> (<option>-fglasgow-exts</option>によっても有効になる)</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoForeignFunctionInterface</option></entry>
@@ -752,9 +753,21 @@
 	    </row>
 	    <row>
 	      <entry><option>-XPolymorphicComponents</option></entry>
-	      <entry>polymorphic componentsを有効にする。</entry>
+	      <entry><link linkend="universal-quantification">データ構築子が多相的な構成要素を持てるようにする。</link></entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoPolymorphicComponents</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XRank2Types</option></entry>
+	      <entry>ランク2の型を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoRank2Types</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XRankNTypes</option></entry>
+	      <entry>ランクNの型を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoRankNTypes</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XExistentialQuantification</option></entry>
@@ -799,18 +812,6 @@
 	      <entry><option>-XNoLiberalTypeSynonyms</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XRank2Types</option></entry>
-	      <entry>ランク2の型を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoRank2Types</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XRankNTypes</option></entry>
-	      <entry>ランクNの型を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoRankNTypes</option></entry>
-	    </row>
-	    <row>
 	      <entry><option>-XTypeOperators</option></entry>
 	      <entry>型演算子を有効にする。</entry>
 	      <entry>動</entry>
@@ -830,13 +831,13 @@
 	    </row>
 	    <row>
 	      <entry><option>-XRecordWildCards</option></entry>
-	      <entry>record wildcardを有効にする</entry>
+	      <entry><link linkend="record-wildcards">record wildcard</link>を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecordWildCards</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecordPuns</option></entry>
-	      <entry>record punを有効にする。</entry>
+	      <entry><link linkend="record-puns">record pun</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecordPuns</option></entry>
 	    </row>
@@ -878,19 +879,19 @@
 	    </row>
 	    <row>
 	      <entry><option>-XFlexibleContexts</option></entry>
-	      <entry>flexible contextを有効にする。</entry>
+	      <entry><link linkend="flexible-contexts">柔軟な文脈</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoFlexibleContexts</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XFlexibleInstances</option></entry>
-	      <entry>flexible instanceを有効にする。</entry>
+	      <entry><link linkend="instance-rules">柔軟なインスタンス</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoFlexibleInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XConstrainedClassMethods</option></entry>
-	      <entry>constrained class methodを有効にする。</entry>
+	      <entry><link linkend="class-method-types">制約付きクラスメソッド</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoConstrainedClassMethods</option></entry>
 	    </row>
