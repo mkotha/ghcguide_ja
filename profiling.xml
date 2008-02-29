@@ -176,7 +176,7 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
       </varlistentry>
     </variablelist>
 
-    <para>再帰的関数や相互に再帰的な一群の関数についてはどうだろうか。コストはどこに割り当てられるのか。答えはこうである。GHCは一群の関数が互いに再帰的に呼び合ったという情報は保持するが、時刻と確保の基本プロファイルにおいてはこの情報は表示されず、呼び出しグラフは平坦化されて木として表示される。XMLプロファイルツール(<xref linkend="prof-xml-tool"/>で説明する)は呼び出しグラフ中の輪を表示できるだろう。</para>
+    <para>再帰的関数や相互に再帰的な一群の関数についてはどうだろうか。コストはどこに割り当てられるのか。答えはこうである。GHCは一群の関数が互いに再帰的に呼び合ったという情報は保持するが、時刻と確保の基本プロファイルにおいてはこの情報は表示されず、呼び出しグラフは平坦化されて木として表示される。</para>
 
     <sect2><title>コスト集約点を手動で挿入する</title>
 
@@ -188,7 +188,7 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
      {-# SCC "name" #-} &lt;expression&gt;
 </programlisting>
 
-      <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。</para>
+      <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。(SCCは「Set Cost Centre」(コスト集約点を設定せよ)の意である)</para>
 
     </sect2>
 
@@ -315,16 +315,6 @@ x = nfib 25
           <para><option>-p</option>オプションは標準的な<emphasis>時間プロファイル</emphasis>の報告を生成する。結果は<filename><replaceable>program</replaceable>.prof</filename>というファイルに出力される。</para>
 
           <para><option>-P</option>はより詳細なプロファイル(実際の時間と確保量のデータを含む)を生成する。(あまり使われない)</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-px</option>:
-          <indexterm><primary><option>-px</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para><option>-px</option>オプションは、プロファイル情報をXML形式で生成する。この形式は我々の新しいプロファイルツールで使用できる。<xref linkend="prof-xml-tool"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -513,7 +503,7 @@ x = nfib 25
 
       <para>「分類」オプション(上記の例では<option>-hr</option>)は一つしか与えられないが、適用できる制約の数に上限はない。全てのオプションは基本的に組み合わせ可能であるが、例外として、GHCは今のところ<option>-hr</option>と<option>-hb</option>オプションを併用するのをサポートしていない。</para>
 
-      <para>ヒーププロファイルに関するオプションがあとふたつある。</para>
+      <para>ヒーププロファイルに関するオプションがあと三つある。</para>
 
       <variablelist>
 	<varlistentry>
@@ -537,6 +527,16 @@ x = nfib 25
             <para>これには主スレッドも含まれるので、<option>-xt</option>はプログラムが使っているスタック空間の大きさを知るのに良い。</para>
 
             <para>スレッドが占めるメモリとスタックは、クロージャの説明や型での分類に際しては「TSO」と表示される。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-L<replaceable>num</replaceable></option>
+            <indexterm><primary><option>-L</option></primary><secondary>RTS option</secondary></indexterm>
+          </term>
+	  <listitem>
+	    <para>ヒーププロファイルにおける、コスト集約点スタックの名前の長さの最大値を設定する。デフォルトは25。</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -644,25 +644,6 @@ x = nfib 25
 	</listitem>
       </itemizedlist>
     </sect2>
-
-  </sect1>
-
-  <sect1 id="prof-xml-tool">
-    <title>グラフィカルな時間/確保量プロファイル</title>
-
-    <para>プログラムの時間と確保量についてのプロファイルグラフをグラフィカルに見ることができる。これには<command>ghcprof</command>を使う。これはGHC 4.08に付属する新しいツールであり、いずれはGHCのプロファイルを閲覧する道具としてデファクトスタンダードになるだろう。<footnote><para>実はこれはもはや正しくない。我々は今Gtk+HSを使ってヒーププロファイルを表示する新しいツールに取り組んでいるので、<command>ghcprof</command>は将来のある時点で消え去るかも知れない。</para></footnote></para>
-
-    <para><command>ghcprof</command>を実行するには、<productname>uDraw(Graph)</productname>をインストールしておかなければならない。これは<ulink url="http://www.informatik.uni-bremen.de/uDrawGraph/en/uDrawGraph/uDrawGraph.html"><citetitle>uDraw(Graph)</citetitle></ulink>から入手できる。バイナリ配布物のどれかをインストールし、環境変数<envar>UDG_HOME</envar>がインストールディレクトリを指すようにすること。</para>
-
-    <para><command>ghcprof</command>はXMLを使ったプロファイルログ形式を使うので、プログラムを実行するときには専用のオプション<option>-px</option>を渡さなければならない。この場合も生成ファイルの名前は<filename>&lt;prog&gt;.prof</filename>である。プロファイルを見るには、次のように<command>ghcprof</command>を実行する。</para>
-
-    <indexterm><primary><option>-px</option></primary></indexterm>
-
-<screen>
-$ ghcprof &lt;prog&gt;.prof
-</screen>
-
-    <para>これでウィンドウが現れ、プログラムの驚嘆すべき細部に渡る呼び出しグラフが表示されるはずである。<command>ghcprof</command>を使うことに関するさらなる情報は<ulink url="http://www.dcs.warwick.ac.uk/people/academic/Stephen.Jarvis/profiler/index.html"><citetitle>The Cost-Centre Stack Profiling Tool for GHC</citetitle></ulink>で得られる。</para>
 
   </sect1>
 
@@ -864,6 +845,263 @@ END_SAMPLE 11695.47
 
   </sect1>
 
+  <sect1 id="hpc">
+    <title>コード網羅率を観察する</title>
+    <indexterm><primary>code coverage</primary></indexterm>
+    <indexterm><primary>Haskell Program Coverage</primary></indexterm>
+    <indexterm><primary>hpc</primary></indexterm>
+
+    <para>
+      コード網羅ツールは、コードのどの部分が実際に実行され、どの部分が一回も呼ばれなかったかを、プログラマが判断できるようにする。GHCには計器付きコードを生成するオプションがあり、生成されたコードは<ulink url="http://www.haskell.org/hpc">Haskell Program Coverage</ulink>(HPC)ツールキット(GHCに付属している)の一員としてコード網羅率を記録する。このコード網羅率情報は、HPCツールを使って人間が理解できる形式に変換することができる。</para>
+
+    <para>正しい計器付きコードは二種類の網羅率情報を供給する。ソース網羅率と真偽値制御網羅率である。ソース網羅率は、プログラムがどれくらい隅々まで使われたかの度合いで、三つの水準、すなわち宣言(最上位のものと局所的なものの両方)、分岐(複数の等式やcaseの枝からの選択)、式(あらゆる深さのもの)で測られる。真偽値網羅率は、構文的に真偽値が要求される全ての場所(ガード、条件、qualifier(訳者: qualifierって何？))について、どれくらいTrueとFalseの両方が得られたかである。</para>
+
+    <para>HPCは、この両方の種類の情報を、二つの主要な方法で表示する。一つは、統計要約の付いたテキスト形式の報告書(hpc報告)であり、もう一つはソースの色付きマークアップ(hpcマークアップ)である。真偽値網羅については、それぞれのガード、条件、qualifierについて、四つの結果があり得る。TrueとFalseの両方が起こった、Trueだけ、Falseだけ、一回も評価されなかった、である。hpcマークアップの出力において、黄色の背景による強調はプログラムのその部分が一回も評価されなかったことを示し、緑の背景は常にTrueだったことを、赤い背景は常にFalseだったことを示す。</para>
+
+   <sect2><title>小さな例: 逆数をとる</title>
+
+    <para>
+      例として、Recip.hsという、逆数の正確な十進表現を計算するプログラムを使おう。小数の循環部分は括弧に入れて示すことにする。
+    </para>
+<programlisting>
+reciprocal :: Int -> (String, Int)
+reciprocal n | n > 1 = ('0' : '.' : digits, recur)
+             | otherwise = error
+	          "attempting to compute reciprocal of number &lt;= 1"
+  where
+  (digits, recur) = divide n 1 []
+divide :: Int -> Int -> [Int] -> (String, Int)
+divide n c cs | c `elem` cs = ([], position c cs)
+              | r == 0      = (show q, 0)
+              | r /= 0      = (show q ++ digits, recur)
+  where
+  (q, r) = (c*10) `quotRem` n
+  (digits, recur) = divide n r (c:cs)
+
+position :: Int -> [Int] -> Int
+position n (x:xs) | n==x      = 1
+                  | otherwise = 1 + position n xs
+
+showRecip :: Int -> String
+showRecip n =
+  "1/" ++ show n ++ " = " ++
+  if r==0 then d else take p d ++ "(" ++ drop p d ++ ")"
+  where
+  p = length d - r
+  (d, r) = reciprocal n
+
+main = do
+  number &lt;- readLn
+  putStrLn (showRecip number)
+  main
+</programlisting>
+
+    <para>HPCの計器付与は-fhpcフラグで有効になる。</para>
+
+<screen>
+$ ghc -fhpc Recip.hs --make 
+</screen>
+    <para>HPC index(.mix)ファイルはサブディレクトリ.hpcに置かれる。これはHPCにとっての.hiファイルのようなものだと考えられる。
+   </para>
+<screen>
+$ ./Recip
+1/3
+= 0.(3)
+</screen>
+    <para>以下のようにして、網羅率のテキスト要約を生成できる。</para>
+<screen>
+$ hpc report Recip
+ 80% expressions used (81/101)
+ 12% boolean coverage (1/8)
+      14% guards (1/7), 3 always True, 
+                        1 always False, 
+                        2 unevaluated
+       0% 'if' conditions (0/1), 1 always False
+     100% qualifiers (0/0)
+ 55% alternatives used (5/9)
+100% local declarations used (9/9)
+100% top-level declarations used (5/5)
+</screen>
+    <para>マークアップされたソースを生成することもできる。</para>
+<screen>
+$ hpc markup Recip
+writing Recip.hs.html
+</screen>
+    <para>
+      これによって、Haskellモジュール一つにつき一つのファイルと、四つのインデックスファイル(hpc_index.html、hpc_index_alt.html、hpc_index_exp.html、hpc_index_fun.html)が生成される。
+	</para>
+     </sect2> 
+
+     <sect2><title>網羅率の測定器を付与するオプション</title>
+	<para>
+          網羅率を有効にするのは簡単で、-fhpcフラグを使えばよい。計器付きのものと計器付きでないものは自由に混ぜて構わない。Mainモジュールをコンパイルするとき、hpcコンパイルされたモジュールがあれば、GHCが自動的にそれを検出して、正しい初期化コードを追加する。
+	</para>
+
+     </sect2>
+
+     <sect2><title>hpcツールキット</title>
+
+      <para>hpcツールキットはcvs/svn/darcs的なインタフェースを持っている。つまり、一つのバイナリに沢山の機能単位が含まれている。</para>
+<screen>
+$ hpc 
+Usage: hpc COMMAND ...
+
+Commands:
+  help        Display help for hpc or a single command
+Reporting Coverage:
+  report      Output textual report about program coverage
+  markup      Markup Haskell source with program coverage
+Processing Coverage files:
+  sum         Sum multiple .tix files in a single .tix file
+  combine     Combine two .tix files in a single .tix file
+  map         Map a function over a single .tix file
+Coverage Overlays:
+  overlay     Generate a .tix file from an overlay file
+  draft       Generate draft overlay that provides 100% coverage
+Others:
+  show        Show .tix file in readable, verbose format
+  version     Display version for hpc
+</screen>
+
+     <para>一般的に言って、これらのオプションは、計器付きバイナリが生成した後の.tixファイルに対して動作する。hpcは、生の.tixファイルと、生成される詳細な報告書の間の仲介として働く。</para>
+	  
+	<para>
+          hpcツールは、アプリケーションをビルドした場所の最上位ディレクトリに居て、その同じ最上位ディレクトリに.tixファイルがあることを前提とする。別のディレクトリに対してhpcを使うには--srcdirフラグを使うことができる。また、複数の場所でコンパイルされたプログラム(パッケージでは普通のことである)を分析する場合は、--srcdirを複数回使えばよい。
+	</para>
+	  
+	<para>
+        ここからは、hpcのメジャーモードについて詳しく説明する。
+     </para>
+
+       <sect3><title>hpc report</title>
+		<para>hpc reportは、網羅率のテキスト形式の報告書を与える。デフォルトで、includeやexcludeが使われない限り、報告書を生成する上ですべてのモジュールとパッケージが考慮に入る。--per-moduleフラグが使われない限り、報告書は要約である。--xml-outputオプションは、hpcを使って網羅率を収集するツールのためにある。
+		</para>	
+<screen>
+$ hpc help report
+Usage: hpc report [OPTION] .. &lt;TIX_FILE&gt; [&lt;MODULE&gt; [&lt;MODULE&gt; ..]]
+
+Options:
+
+    --per-module                  show module level detail
+    --decl-list                   show unused decls
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --srcdir=DIR                  path to source directory of .hs files
+                                  multi-use of srcdir possible
+    --hpcdir=DIR                  sub-directory that contains .mix files
+                                  default .hpc [rarely used]
+    --xml-output                  show output in XML
+</screen>
+       </sect3>
+       <sect3><title>hpc markup</title>
+		<para>hpc markupはソースファイルをマークアップして色付きhtmlにする。
+		</para>
+<screen>
+$ hpc help markup
+Usage: hpc markup [OPTION] .. &lt;TIX_FILE&gt; [&lt;MODULE&gt; [&lt;MODULE&gt; ..]]
+
+Options:
+
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --srcdir=DIR                  path to source directory of .hs files
+                                  multi-use of srcdir possible
+    --hpcdir=DIR                  sub-directory that contains .mix files
+                                  default .hpc [rarely used]
+    --fun-entry-count             show top-level function entry counts
+    --highlight-covered           highlight covered code, rather that code gaps
+    --destdir=DIR                 path to write output to
+</screen>
+
+       </sect3>
+       <sect3><title>hpc sum</title>
+		<para>hpc sumは任意の個数の.tixファイルを足し合わせて、単一の.tixファイルにする。hpc sumは元の.tixファイルを変更せず、新しい.tixファイルを作る。</para>
+<screen>
+$ hpc help sum
+Usage: hpc sum [OPTION] .. &lt;TIX_FILE&gt; [&lt;TIX_FILE&gt; [&lt;TIX_FILE&gt; ..]]
+Sum multiple .tix files in a single .tix file
+
+Options:
+
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --output=FILE                 output FILE
+    --union                       use the union of the module namespace (default is intersection)
+</screen>
+       </sect3>
+       <sect3><title>hpc combine</title>
+		<para>hpc combineはhpcのスイスアーミーナイフである。.tixファイルの差(difference)をとること、ある.tixファイルから別の.tixファイルを引く(subtract)こと、二つの.tixファイルを足す(add)ことができる。hpc combineは元の.tixファイルを変更せず、新しい.tixファイルを生成する。
+		</para>
+<screen>
+$ hpc help combine
+Usage: hpc combine [OPTION] .. &lt;TIX_FILE&gt; &lt;TIX_FILE&gt;
+Combine two .tix files in a single .tix file
+
+Options:
+
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --output=FILE                 output FILE
+    --function=FUNCTION           combine .tix files with join function, default = ADD
+                                  FUNCTION = ADD | DIFF | SUB
+    --union                       use the union of the module namespace (default is intersection)
+</screen>
+       </sect3>
+       <sect3><title>hpc map</title>
+		<para>hpc mapは.tixファイルを反転(invert)したり零化(zero)したりする。hpc mapは元の.tixファイルを変更せず、新しい.tixファイルを生成する。
+		</para>
+<screen>
+$ hpc help map
+Usage: hpc map [OPTION] .. &lt;TIX_FILE&gt; 
+Map a function over a single .tix file
+
+Options:
+
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --output=FILE                 output FILE
+    --function=FUNCTION           apply function to .tix files, default = ID
+                                  FUNCTION = ID | INV | ZERO
+    --union                       use the union of the module namespace (default is intersection)
+</screen>
+       </sect3>
+       <sect3><title>hpc overlayとhpc draft</title>
+		<para>
+                        overlayはHPCの実験的機能で、網羅率のテキスト記述である。hpc draftは.tixファイルからdraft overlayを作るのに使われ、hpc overlayはoverlayから.tixファイルを生成する。
+		</para>
+<screen>
+% hpc help overlay
+Usage: hpc overlay [OPTION] .. &lt;OVERLAY_FILE&gt; [&lt;OVERLAY_FILE&gt; [...]]
+
+Options:
+
+    --srcdir=DIR   path to source directory of .hs files
+                   multi-use of srcdir possible
+    --hpcdir=DIR   sub-directory that contains .mix files
+                   default .hpc [rarely used]
+    --output=FILE  output FILE
+% hpc help draft  
+Usage: hpc draft [OPTION] .. &lt;TIX_FILE&gt;
+
+Options:
+
+    --exclude=[PACKAGE:][MODULE]  exclude MODULE and/or PACKAGE
+    --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
+    --srcdir=DIR                  path to source directory of .hs files
+                                  multi-use of srcdir possible
+    --hpcdir=DIR                  sub-directory that contains .mix files
+                                  default .hpc [rarely used]
+    --output=FILE                 output FILE
+</screen>
+      </sect3>
+     </sect2>
+     <sect2><title>Haskell Program Coverageの注意点と短所</title>
+	  <para>
+                HPCは.tixファイルをロックしようとしないので、同じディレクトリでバイナリを並行に実行すると競合条件が現れるだろう。バイナリの名前を変更する以外に、生成される.tixファイルの名前を変えるすべはない。HPCはGHCiでは動作しない。
+  	  </para>
+    </sect2>
+  </sect1>
+
   <sect1 id="ticky-ticky">
     <title>「ticky-ticky」プロファイルを使う</title>
     <indexterm><primary>ticky-ticky profiling</primary></indexterm>
@@ -874,7 +1112,7 @@ END_SAMPLE 11695.47
 
     <para>ticky-tickyプロファイルは主に実装者向けである。通常のプロファイルシステムである「コスト集約点」式(これは全ての利用者があらゆる場合に使うように意図されている)とは大きく異なる。</para>
 
-    <para>ticky-tickyプロファイルを使えるようにするには、システムを作るときに適切なライブラリやいろんなものをビルドしておかなければならない。インストールの手引きの中の「Customising what libraries to build」を見よ。</para>
+    <para>ticky-tickyプロファイルを使えるようにするには、ticky RTSをビルドしておかなければならない。(これはビルドの手引きに記述されているべきだが、RTSを"t"というwayを有効にしてビルドすることに相当する。</para>
 
     <para>プログラムにticky-tickyの数値を出力させるには、<option>-r</option>というRTSオプション<indexterm><primary>-r RTS option</primary></indexterm>を使う。<xref linkend="runtime-control"/>を見よ。</para>
 
