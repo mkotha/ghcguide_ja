@@ -55,13 +55,15 @@
 
     <variablelist>
      <varlistentry>
-       <term><option>-V<replaceable>secs</replaceable></option></term>
+       <term><option>-V<replaceable>secs</replaceable></option>
        <indexterm><primary><option>-V</option></primary><secondary>RTS
-       option</secondary></indexterm>
+       option</secondary></indexterm></term>
        <listitem>
-         <para>RTSの時計が進行する時間間隔を設定する。ランタイムは単一のタイマシグナルを使って時計を進行させる。コンテクストスイッチのタイマ(<xref linkend="sec-using-concurrent"/>)およびヒーププロファイル時のタイマ(<xref linkend="rts-options-heap-prof"/>)を制御するのにはこれが使われる。また、時間プロファイルをとるときは、プロファイルの標本を記録するのにRTSのタイマシグナルを直接使うことになる。</para>
+         <para>RTSの時計が進行する時間間隔を設定する。ランタイムは単一のタイマシグナルを使って時計を進行させる。コンテクストスイッチのタイマ(<xref linkend="using-concurrent"/>)およびヒーププロファイル時のタイマ(<xref linkend="rts-options-heap-prof"/>)を制御するのにはこれが使われる。また、時間プロファイルをとるときは、プロファイルの標本を記録するのにRTSのタイマシグナルを直接使うことになる。</para>
 
          <para>通常、<option>-V</option>オプションを直接指定する必要はない。<option>-C</option>や<option>-i</option>オプションで短い間隔が指定されたときは、自動的にRTSタイマの分解能も調整されるからである。しかし、時間プロファイルの分解能を増したいときには、<option>-V</option>を設定することが必要になる。</para>
+
+         <para>値0を使うと、RTSの時計は完全に無効にされ、それに依存したタイマも無効になる。コンテクストスイッチのタイマとプロファイルタイマである。それでもコンテクストスイッチは発生するが、決定的に、かつ通常よりずっと高い頻度で発生するようになる。インターバルタイマを無効にすると、実行時の非決定性の源が一つ除かれるわけであり、デバッグに便利である。</para>
        </listitem>
      </varlistentry>
 
@@ -70,7 +72,7 @@
        <indexterm><primary><option>--install-signal-handlers</option></primary><secondary>RTS
        option</secondary></indexterm></term>
        <listitem>
-         <para>yes(デフォルト)なら、RTSはctrl-Cの類を補足するためのシグナルハンドラを設置する。このオプションは、HaskellコードをDLLとして使っていて、自分でシグナルハンドラを設定したいときに特に有用である。</para>
+         <para>yes(デフォルト)なら、RTSはctrl-Cの類を捕捉するためのシグナルハンドラを設置する。このオプションは、HaskellコードをDLLとして使っていて、自分でシグナルハンドラを設定したいときに特に有用である。</para>
        </listitem>
      </varlistentry>
     </variablelist>
@@ -267,7 +269,7 @@
   <sect2>
     <title>プロファイルと並列性に関するRTSオプション</title>
 
-    <para>プロファイルに関するRTSオプションは<xref linkend="rts-options-heap-prof"/>で、並行実行に関わる物は<xref linkend="sec-using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
+    <para>プロファイルに関するRTSオプションは<xref linkend="rts-options-heap-prof"/>で、並行実行に関わる物は<xref linkend="using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
   </sect2>
 
   <sect2 id="rts-options-debugging">
@@ -405,6 +407,27 @@ char *ghc_rts_opts = "-H128m -K1m";
     </variablelist>
 
     <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
+  </sect2>
+
+  <sect2>
+    <title>RTSに関する情報を取得する</title>
+
+    <indexterm><primary>RTS</primary></indexterm>
+
+    <para>RTSに、自分自身の情報をいくらか表示させることが可能である。これをするには<option>--info</option>フラグを使う。例えば次のように。</para>
+<screen>
+$ ./a.out +RTS --info
+ [("GHC RTS", "Yes")
+ ,("GHC version", "6.7")
+ ,("RTS way", "rts_p")
+ ,("Host platform", "x86_64-unknown-linux")
+ ,("Build platform", "x86_64-unknown-linux")
+ ,("Target platform", "x86_64-unknown-linux")
+ ,("Compiler unregisterised", "NO")
+ ,("Tables next to code", "YES")
+ ]
+</screen>
+    <para>この情報は、<literal>[(String, String)]</literal>型の値として読めるように整形されている。</para>
   </sect2>
 </sect1>
 
