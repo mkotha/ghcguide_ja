@@ -51,7 +51,7 @@
           <para><option>-odir</option>オプションが指定されていないとき(デフォルト)は、オブジェクトファイルの名前は、ソースファイルの名前(モジュール名は無視される)をもとに、接尾辞を<replaceable>osuf</replaceable>に付け替えることで得られる。</para>
 	</listitem>
 	<listitem>
-          <para><option>-odir</option>&nbsp;<replaceable>dir</replaceable>が指定されているときは、オブジェクトファイルの名前は<replaceable>dir</replaceable>/<replaceable>mod</replaceable>.<replaceable>osuf</replaceable>になる。ここで<replaceable>mod</replaceable>はモジュールの名前のドットをスラッシュで置き換えたものである。</para>
+          <para><option>-odir</option>&nbsp;<replaceable>dir</replaceable>が指定されているときは、オブジェクトファイルの名前は<replaceable>dir</replaceable>/<replaceable>mod</replaceable>.<replaceable>osuf</replaceable>になる。ここで<replaceable>mod</replaceable>はモジュールの名前のドットをスラッシュで置き換えたものである。必要なディレクトリ構造が<replaceable>dir</replaceable>の下にないなら、GHCは黙ってそれを作る。</para>
 	</listitem>
       </itemizedlist>
 
@@ -238,7 +238,9 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
       <variablelist>
 	<varlistentry>
 	  <term>
+            <option>-keep-hc-file</option>
             <option>-keep-hc-files</option>
+            <indexterm><primary><option>-keep-hc-file</option></primary></indexterm>
             <indexterm><primary><option>-keep-hc-files</option></primary></indexterm>
           </term>
 	  <listitem>
@@ -248,7 +250,9 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
 
 	<varlistentry>
 	  <term>
+            <option>-keep-s-file</option>
             <option>-keep-s-files</option>
+            <indexterm><primary><option>-keep-s-file</option></primary></indexterm>
             <indexterm><primary><option>-keep-s-files</option></primary></indexterm>
           </term>
 	  <listitem>
@@ -258,7 +262,9 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
 
 	<varlistentry>
 	  <term>
+            <option>-keep-raw-s-file</option>
             <option>-keep-raw-s-files</option>
+            <indexterm><primary><option>-keep-raw-s-file</option></primary></indexterm>
             <indexterm><primary><option>-keep-raw-s-files</option></primary></indexterm>
           </term>
 	  <listitem>
@@ -345,7 +351,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
             <indexterm><primary><option>--show-iface</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para>インタフェースファイルの中身を人間可読(っぽいよう)な形式で表示する。ただし<replaceable>file</replaceable>はそのファイルの名前である。</para>
+            <para>インタフェースファイルの中身を人間可読(っぽいよう)な形式で表示する。ただし<replaceable>file</replaceable>はそのファイルの名前である。<xref linkend="modes"/>を見よ。</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -610,9 +616,16 @@ ghc -M -optdep-f -optdep.depend ...
 
 	<variablelist>
 	  <varlistentry>
+	    <term><option>-ddump-mod-cycles</option></term>
+	    <listitem>
+	      <para>モジュールグラフにおけるサイクルの一覧を表示する。こういうサイクルを排除しようとしているときに便利である。このフラグには、<literal>-optdep</literal>を前置する必要がない。</para>
+	    </listitem>
+	  </varlistentry>
+
+	  <varlistentry>
 	    <term><option>-w</option></term>
 	    <listitem>
-              <para>インタフェースファイルの隠蔽(訳注: 現在のディレクトリにあるインタフェースファイルが探索パスにある同名のインタフェースファイルを隠すことだと思われる)に関する警告を無効にする。</para>
+              <para>インタフェースファイルの隠蔽(訳注: 現在のディレクトリにあるインタフェースファイルが探索パスにある同名のインタフェースファイルを隠すことだと思う)に関する警告を無効にする。</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -664,6 +677,7 @@ ghc -M -optdep-f -optdep.depend ...
 	    </listitem>
 	  </varlistentry>
 
+<!-- Not currently implemented:
 	  <varlistentry>
 	    <term><option>&ndash;&ndash;exclude-directory=&lt;dirs&gt;</option></term>
 	    <listitem>
@@ -677,6 +691,7 @@ ghc -M -optdep-f -optdep.depend ...
               <para><filename>&lt;file&gt;</filename>が「安定して」いないとみなす。つまり、このファイルへの依存性が(もしあれば)生成される。このオプションはふつう<option>&ndash;&ndash;exclude-directory</option>と同時に使われる。</para>
 	    </listitem>
 	  </varlistentry>
++-->
 
 	  <varlistentry>
 	    <term><option>&ndash;&ndash;include-pkg-deps</option></term>
@@ -707,11 +722,36 @@ ghc -M -optdep-f -optdep.depend ...
     instance C a =&gt; D (T a) where ...
     class C a where ...
 </programlisting>
-ここでは、DもTもOrphanモジュールで宣言されていない。このようなモジュールは孤立モジュールと呼ばれる。これは次のように定義される。</para>
+ここでは、DもTもOrphanモジュールで宣言されていない。このようなモジュールは「孤立モジュール」と呼ばれる。GHCは孤立モジュールを認識し、モジュールをコンパイルするときにはそのモジュール以下の全ての孤立モジュールのインタフェースファイルを訪れる。この作業は大抵無駄になるが、回避する方法はない。したがって、孤立モジュールの数をなるべく減らすように努力するべきである。</para>
+
+<para>
+関数従属によって話がややこしくなる。次のものがあったとしよう。
+<programlisting>
+  module B where
+    instance E T Int where ...
+    data T = ...
+</programlisting>
+これは孤立モジュールだろうか。<literal>T</literal>が同じモジュールで定義されているので、そうでないように見える。しかし、<literal>E</literal>に関数従属性があったとしよう。
+<programlisting>
+  module Lib where
+    class E x y | y -> x where ...
+</programlisting>
+すると、あるモジュールMがこれをインポートしたとして、<literal>(E a Int)</literal>という制約は<literal>a = T</literal>とすることで「改善」されねばならない。<emphasis>Mで<literal>T</literal>が明示的に言及されていないにも関わらず</emphasis>、である。</para>
+
+このような考察から、孤立モジュールについての以下の定義が生まれた。
 <itemizedlist>
   <listitem><para><emphasis>孤立モジュール</emphasis><indexterm><primary>orphan module</primary></indexterm>は、一つ以上の<emphasis>孤立インスタンス</emphasis>または一つ以上の<emphasis>孤立規則</emphasis>を含む。</para></listitem>
 
-  <listitem><para>モジュールMにあるインスタンス宣言が<emphasis>孤立インスタンス</emphasis>なのは、<indexterm><primary>orphan instance</primary></indexterm>インスタンスの頭部(「<literal>=&gt;</literal>」より後の部分)で言及されている型構築子やクラスがどれもMで定義されていないときである。</para>
+  <listitem><para>モジュールMにあるインスタンス宣言が<emphasis>孤立インスタンス</emphasis>なのは、<indexterm><primary>orphan instance</primary></indexterm>
+<itemizedlist> 
+<listitem><para>
+  そのインスタンス宣言のクラスがMで宣言されたものでなく、かつ
+</para></listitem>
+<listitem>
+<para>そのクラスに関数従属がなくそのインスタンスの頭部にある型構築子がどれもMで宣言されていない、<emphasis>または</emphasis>、ある関数従属があって、それについて、インスタンス頭部のうち<emphasis>決定されない</emphasis>部分で言及される型構築子が、どれもMで定義されていない場合である。
+	</para></listitem>
+  </itemizedlist>
+  </para>
 
   <para>考慮されるのはインスタンスの頭部だけである。上記の例では、Cの宣言がモジュールAにあるが、これでは十分でない。DかTの宣言でなければならない。</para>
   </listitem>
@@ -719,9 +759,7 @@ ghc -M -optdep-f -optdep.depend ...
   <listitem><para>モジュールMにある書き換え規則が<emphasis>孤立規則</emphasis>なのは、<indexterm><primary>orphan rule</primary></indexterm>規則の左辺に自由変項として現れる変数、型構築子、クラスがどれもMで宣言されていないときである。</para></listitem>
  </itemizedlist>
 
-<para>GHCは孤立モジュールを認識し、モジュールをコンパイルするときにはそのモジュール以下の全ての孤立モジュールのインタフェースファイルを訪れる。これは通常無駄な作業だが、回避する方法はない。したがって、孤立モジュールの数をなるべく減らすように努力するべきである。</para>
-
-<para>孤立モジュールをそれと知るには、<option>--show-iface</option>を使ってそのインタフェースファイル<filename>M.hi</filename>を見れば良い。最初の行に「!」があれば、GHCはそれを孤立モジュールだと判断している。</para>
+<para>「-fwarn-orphan-module」を追加すれば、あなたが孤立モジュールを作ったときにGHCがそれを警告する。孤立モジュールをそれと知るには、<link linkend="modes"><option>--show-iface</option>モード</link>を使ってそのインタフェースファイル<filename>M.hi</filename>を見れば良い。最初の行に<literal>[orphan module]</literal>があれば、GHCはそれを孤立モジュールだと判断している。</para>
 </sect2>
 
   </sect1>
