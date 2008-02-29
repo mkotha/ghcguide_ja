@@ -1,8 +1,9 @@
 <!ENTITY ghci           SYSTEM "ghci.xml">
+<!ENTITY runghc         SYSTEM "runghc.xml">
 <!ENTITY flags          SYSTEM "flags.xml">
 <!ENTITY license        SYSTEM "license.xml">
 <!ENTITY intro          SYSTEM "intro.xml" >
-<!ENTITY relnotes       SYSTEM "6.6.1-notes.xml" >
+<!ENTITY relnotes       SYSTEM "6.8.1-notes.xml" >
 <!ENTITY installing     SYSTEM "installing.xml" >
 <!ENTITY using          SYSTEM "using.xml" >
 <!ENTITY runtime        SYSTEM "runtime_control.xml" >
@@ -14,7 +15,6 @@
 <!ENTITY packages       SYSTEM "packages.xml" >
 <!ENTITY parallel       SYSTEM "parallel.xml" >
 <!ENTITY phases         SYSTEM "phases.xml" >
-<!ENTITY primitives     SYSTEM "primitives.xml" >
 <!ENTITY separate       SYSTEM "separate_compilation.xml" >
 <!ENTITY bugs           SYSTEM "bugs.xml" >
 <!ENTITY wrong          SYSTEM "gone_wrong.xml" >
