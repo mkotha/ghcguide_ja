@@ -1411,12 +1411,12 @@ Haskell Reportは、正確にどんな場合に<literal>deriving</literal>節が
 GHCは保守的な立場を採っている。最初の二つは受け付けるが、三番目は受け付けない。規則はこうである。推論された文脈中の各制約は、型変数のみから成っていなければならず、型変数に重複があってもならない。
 </para>
 <para>
-この規則はフラグに関係なく適用される。もっと風変りな文脈が必要なら、<link linkend="stand-alone-deriving">単独derivingの機構</link>を使って自分で書くことができる。
+この規則はフラグに関係なく適用される。もっと風変りな文脈が必要なら、<link linkend="stand-alone-deriving">独立derivingの機構</link>を使って自分で書くことができる。
 </para>
 </sect2>
 
 <sect2 id="stand-alone-deriving">
-<title>単独deriving宣言</title>
+<title>独立deriving宣言</title>
 
 <para>
 GHCは単独の<literal>deriving</literal>宣言を受け付けるようになった。これは<literal>-XStandaloneDeriving</literal>で有効になる。
@@ -1427,7 +1427,7 @@ GHCは単独の<literal>deriving</literal>宣言を受け付けるようにな�
 </programlisting>
 構文は通常のインスタンス宣言と同じであるが、(a)<literal>deriving</literal>キーワードを使うことと、(b)<literal>where</literal>部がないことが異なる。通常のインスタンス宣言でするのと全く同じように、文脈(この例では文脈は<literal>(Eq a)</literal>)を指定しなければならない。(これは、データ型宣言に付属したderiving節において文脈が推論されるのと対照を為す)。このような<literal>deriving instance</literal>の規則は、形式と停止性に関して、通常のインスタンス宣言が従うのと同じ規則に従い、同じフラグで制御される。<link linkend="instance-decls"/>を見よ。</para>
 
-<para>この単独deriving構文は、通常の<literal>deriving</literal>がnewtypeに対して一般化された(<xref linkend="newtype-deriving"/>)のと全く同じように一般化される。例えば次のように。
+<para>この独立deriving構文は、通常の<literal>deriving</literal>がnewtypeに対して一般化された(<xref linkend="newtype-deriving"/>)のと全く同じように一般化される。例えば次のように。
 <programlisting>
   newtype Foo a = MkFoo (State Int a)
 
