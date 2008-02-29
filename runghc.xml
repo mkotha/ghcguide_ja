@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="runghc">
+  <title>runghcを使う</title>
+  <indexterm><primary>runghc</primary></indexterm>
+
+  <para>runghcは、Haskellプログラムをコンパイルせずに実行できるようにする。</para>
+
+  <sect1 id="runghc-introduction">
+    <title>フラグ</title>
+
+    <para>runghcのコマンド行はこのようになる</para>
+<screen>
+runghc [runghc flags] [GHC flags] module [program flags]
+</screen>
+    <para>現在、唯一のrunghcフラグは<literal>-f /path/to/ghc</literal>で、プログラムを走らせるのにどのGHCを使うかをrunghcに伝える。これが与えられなかった場合、runghcはシステムの探索パスにあるディレクトリからGHCを探す。</para>
+
+    <para>runghcは<literal>[runghc flags]</literal>と<literal>[GHC flags]</literal>と<literal>[GHC flags]</literal>の境界がどこかを推測しようとするが、間違った場合には<literal>--</literal>フラグを使うことができる。例えば、<literal>runghc -- -fglasgow-exts Foo</literal>とすれば、runghcは、<literal>glasgow-exts</literal>をGHCのパスとして使おうとするのでなく、このフラグをGHCに渡す。</para>
+
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; mode: xml ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
+     ;;; End: ***
+ -->
