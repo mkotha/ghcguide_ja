@@ -45,9 +45,9 @@ module X where
 
       <para>ソースファイル中のオプションはコマンドシェルには渡されず、コンパイラが内部的に管理するコマンド行引数の配列に加えられるだけだということに注意せよ。そのため、<literal>OPTIONS_GHC</literal>の中でワイルドカードなどを使おうとすると猛烈にがっかりすることになるだろう。</para>
 
-      <para>注意: OPTIONS_GHCの内容はコマンド行オプションの前に連結されるので、OPTIONS_GHCでの設定をコマンド行から変更することができる。</para>
+      <para>注意: OPTIONS_GHCの内容はコマンド行オプションの後に連結されるので、ソースファイルで与えられたオプションはコマンド行から与えられたものよりも優先される。</para>
 
-      <para>Makefileの内容を全てソースファイルに移すのは推奨されないが、場合によっては<literal>OPTIONS_GHC</literal>プラグマを使うのが「正しい方法」である。(<option>-keep-hc-file-too</option>を使っていて、モジュールにOPTIONフラグがあるなら、生成された.hcファイルにOPTIONS_GHCが置かれる)</para>
+      <para>Makefileの内容を全てソースファイルに移すのは推奨されないが、場合によっては<literal>OPTIONS_GHC</literal>プラグマを使うのが「正しい方法」である。(<option>-keep-hc-file</option>を使っていて、モジュールにOPTIONフラグがあるなら、生成された.hcファイルにOPTIONS_GHCが置かれる)</para>
     </sect2>
 
     <sect2>
@@ -90,7 +90,7 @@ module X where
     </variablelist>
     
     <para>フラグの早見表(<xref linkend="flag-reference"/>)にはそれぞれのフラグがどれに分類されるか記されている。</para>
-    <para>静的であるが、GHCiの<literal>:set</literal>コマンドで設定できるフラグも少しながらある。これは表中では&ldquo;static/<literal>:set</literal>&rdquo;と表記される。</para>
+    <para>静的であるが、GHCiの<literal>:set</literal>コマンドで設定できるフラグも少しながらある。これは表中では&ldquo;静/<literal>:set</literal>&rdquo;と表記される。</para>
   </sect1>
 
   <sect1 id="file-suffixes">
@@ -169,7 +169,7 @@ module X where
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
-	    <arg choice='plain'>&ndash;&ndash;interactive</arg>
+	    <arg choice='plain'>--interactive</arg>
 	  </cmdsynopsis>
           <indexterm><primary>interactive mode</primary></indexterm>
           <indexterm><primary>ghci</primary></indexterm>
@@ -182,7 +182,7 @@ module X where
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
-	    <arg choice='plain'>&ndash;&ndash;make</arg>
+	    <arg choice='plain'>--make</arg>
 	  </cmdsynopsis>
           <indexterm><primary>make mode</primary></indexterm>
           <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
@@ -195,7 +195,7 @@ module X where
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
-	    <arg choice='plain'>&ndash;e</arg> <arg choice='plain'><replaceable>expr</replaceable></arg>
+	    <arg choice='plain'>-e</arg> <arg choice='plain'><replaceable>expr</replaceable></arg>
           </cmdsynopsis>
           <indexterm><primary>eval mode</primary></indexterm>
 	</term>
@@ -207,13 +207,10 @@ module X where
       <varlistentry>
 	<term>
           <cmdsynopsis>
-	    <command>ghc</command>
-	    <group>
-	      <arg>-E</arg>
-	      <arg>-C</arg>
-	      <arg>-S</arg>
-	      <arg>-c</arg>
-	    </group>
+	    <command>ghc -E</command>
+	    <command>ghc -C</command>
+	    <command>ghc -S</command>
+	    <command>ghc -c</command>
 	  </cmdsynopsis>
 	  <indexterm><primary><option>-E</option></primary></indexterm>
 	  <indexterm><primary><option>-C</option></primary></indexterm>
@@ -228,8 +225,7 @@ module X where
       <varlistentry>
 	<term>
           <cmdsynopsis>
-            <command>ghc</command>
-	    <arg choice='plain'>&ndash;M</arg>
+            <command>ghc -M</command>
           </cmdsynopsis>
           <indexterm><primary>dependency-generation mode</primary></indexterm>
         </term>
@@ -241,15 +237,113 @@ module X where
       <varlistentry>
 	<term>
           <cmdsynopsis>
-            <command>ghc</command>
-	    <arg choice='plain'>&ndash;&ndash;mk-dll</arg>
+            <command>ghc --mk-dll</command>
           </cmdsynopsis>
-	  <indexterm><primary>dependency-generation mode</primary></indexterm>
+	  <indexterm><primary>DLL-creation mode</primary></indexterm>
         </term>
 	<listitem>
           <para>DLL作成モード。(Windowsのみ)<xref linkend="win32-dlls-create"/>を見よ。</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --help</command> <command>ghc -?</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;help</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>使いかたに関する長いメッセージを標準出力に吐いて、終了する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --show-iface <replaceable>file</replaceable></command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;--show-iface</option></primary></indexterm>
+        </term>
+	<listitem>
+              <para><replaceable>file</replaceable>中のインタフェースを読んで、それをテキストとして<literal>stdout</literal>にダンプする。例えば、<literal>ghc --show-iface M.hi</literal>のようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --supported-languages</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;supported-languages</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>対応している言語拡張を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --info</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;info</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>コンパイラに関する情報を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --version</command>
+            <command>ghc -V</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>-V</option></primary></indexterm>
+          <indexterm><primary><option>&ndash;&ndash;version</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>GHCのバージョン番号を含む一行の文字列を印字する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <cmdsynopsis>
+            <command>ghc --numeric-version</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;numeric-version</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>GHCの数値的なバージョン番号のみを印字する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+            <command>ghc --print-libdir</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;print-libdir</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>GHCのライブラリディレクトリのパスを表示する。これはGHCのライブラリファイル、インタフェースファイル、およびインクルードファイルが置かれているディレクトリツリーの最上位である。(Unixではふつう<literal>/usr/local/lib/ghc-5.04</literal>のようなところである)これはパッケージ設定ファイルにおける<literal>libdir</literal><indexterm><primary><literal>libdir</literal></primary></indexterm>の値である。(<xref linkend="packages"/>を見よ)</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <cmdsynopsis>
+            <command>ghc --print-docdir</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>&ndash;&ndash;print-docdir</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>GHCの文書ディレクトリを表示する。配布によっては文書が存在せず、その場合このディレクトリは空だったり存在しなかったりするかもしれないのに注意。</para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
     <sect2 id="make-mode">
@@ -257,7 +351,7 @@ module X where
       <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
       <indexterm><primary>separate compilation</primary></indexterm>
       
-      <para><option>&ndash;&ndash;make</option>オプションが指定されると、GHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる単一のモジュール(ふつうは<literal>Main</literal>)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
+      <para><option>&ndash;&ndash;make</option>オプションが指定されると、GHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる一つ以上のモジュール(ふつうは<literal>Main</literal>だけ)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
 
 <screen>
 ghc &ndash;&ndash;make Main.hs
@@ -399,7 +493,7 @@ ghc -c Foo.hs</screen>
 
       <para>注意: Cプリプロセスは省略可能であり、<option>-cpp</option><indexterm><primary><option>-cpp</option></primary></indexterm>フラグによって有効になる。詳しくは<xref linkend="c-pre-processor"/>を見よ。</para>
       
-      <para>注意: <option>-E</option><indexterm><primary>-E option</primary></indexterm>オプションはコンパイラをプリプロセス段階まで走らせ、結果をファイルに出力する。これは以前の振る舞い(ファイルを標準出力に表示)とは異なることに注意。</para>
+      <para>注意: <option>-E</option><indexterm><primary>-E option</primary></indexterm>オプションはコンパイラをプリプロセス段階まで走らせ、結果をファイルに出力する。</para>
 
       <sect3 id="overriding-suffixes">
         <title>ファイルに対するデフォルトの振る舞いを上書きする</title>
@@ -427,21 +521,8 @@ ghc -c Foo.hs</screen>
     <indexterm><primary>help options</primary></indexterm>
     <indexterm><primary>verbosity options</primary></indexterm>
 
+    <para><xref linkend="modes"/>にある、<option>--help</option>、<option>--version</option>、<option>--numeric-version</option>、<option>--print-libdir</option>の各モードも参照。</para>
     <variablelist>
-      <varlistentry>
-	<term>
-          <option>&ndash;&ndash;help</option>
-          <indexterm><primary><option>&ndash;&ndash;help</option></primary></indexterm>
-        </term>
-	<term>
-          <option>-?</option>
-          <indexterm><primary><option>-?</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>使いかたに関する長いメッセージを標準出力に吐いて、終了する。</para>
-	</listitem>
-      </varlistentry>
-
       <varlistentry>
 	<term>
           <option>-n</option>
@@ -512,40 +593,6 @@ ghc -c Foo.hs</screen>
       </varlistentry>
       
       <varlistentry>
-	<term>
-          <option>-V</option>
-          <indexterm><primary><option>-V</option></primary></indexterm>
-        </term>
-	<term>
-          <option>&ndash;&ndash;version</option>
-          <indexterm><primary><option>&ndash;&ndash;version</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>GHCのバージョン番号を含む一行の文字列を印字する。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>&ndash;&ndash;numeric-version</option>
-          <indexterm><primary><option>&ndash;&ndash;numeric-version</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>GHCの数値的なバージョン番号のみを印字する。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>&ndash;&ndash;print-libdir</option>
-          <indexterm><primary><option>&ndash;&ndash;print-libdir</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>GHCのライブラリディレクトリのパスを表示する。これはGHCのライブラリファイル、インタフェースファイル、およびインクルードファイルが置かれているディレクトリツリーの最上位である。(Unixではふつう<literal>/usr/local/lib/ghc-5.04</literal>のようなところである)これはパッケージ設定ファイルにおける<literal>libdir</literal><indexterm><primary><literal>libdir</literal></primary></indexterm>の値である。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
 	<term><option>-ferror-spans</option>
           <indexterm><primary><option>-ferror-spans</option></primary>
 	  </indexterm>
@@ -609,15 +656,7 @@ ghc -c Foo.hs</screen>
 	<term><option>-W</option>:</term>
 	<listitem>
 	  <indexterm><primary>-W option</primary></indexterm>
-          <para>標準的な警告に加えて、 <option>-fwarn-incomplete-patterns</option>、<option>-fwarn-unused-matches</option>、<option>-fwarn-unused-imports</option>、<option>-fwarn-unused-binds</option>を提供する。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-w</option>:</term>
-	<listitem>
-	  <indexterm><primary><option>-w</option></primary></indexterm>
-          <para>全ての警告を、標準的なものも含めて、無効にする。</para>
+          <para>標準的な警告に加えて、 <option>-fwarn-incomplete-patterns</option>、<option>-fwarn-dodgy-imports</option>、<option>-fwarn-unused-matches</option>、<option>-fwarn-unused-imports</option>、<option>-fwarn-unused-binds</option>を提供する。</para>
 	</listitem>
       </varlistentry>
 
@@ -625,7 +664,15 @@ ghc -c Foo.hs</screen>
 	<term><option>-Wall</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-Wall</option></primary></indexterm>
-          <para>全ての警告オプションを有効にする。</para>
+          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-simple-patterns</option>、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-implicit-prelude</option>である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-w</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-w</option></primary></indexterm>
+          <para>全ての警告を、標準的なものおよび<literal>-Wall</literal>が有効にしないものも含めて、無効にする。</para>
 	</listitem>
       </varlistentry>
 
@@ -634,6 +681,14 @@ ghc -c Foo.hs</screen>
 	<listitem>
 	  <indexterm><primary><option>-Werror</option></primary></indexterm>
           <para>全ての警告を致命的なエラーにする。一括コンパイルのときに警告を見逃さないようにするのに便利である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-Wwarn</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-Wwarn</option></primary></indexterm>
+	  <para>警告を警告として扱い、エラーにしない。これはデフォルトだが、<option>-Werror</option>フラグを否定するのに便利である。</para>
 	</listitem>
       </varlistentry>
 
@@ -650,6 +705,17 @@ ghc -c Foo.hs</screen>
 	  </indexterm>
 	  <indexterm><primary>deprecations</primary></indexterm>
           <para>非推奨の関数や型が使われたときに警告する。何かを非推奨と宣言するにはプラグマを使う。<xref linkend="deprecated-pragma"/>を見よ。</para>
+
+          <para>このオプションはデフォルトで有効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-dodgy-imports</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-dodgy-imports</option></primary>
+	  </indexterm>
+	  <para>データ型<literal>T</literal>が全ての構築子を伴ってインポート(つまり<literal>T(..)</literal>)されているものの、抽象的にエクスポート(つまり<literal>T</literal>)されている場合に警告を出力する。</para>
 	</listitem>
       </varlistentry>
 
@@ -675,6 +741,19 @@ ghc -c Foo.hs</screen>
 
           <para>現在のディレクトリにあるモジュールやインタフェースファイルが、ライブラリディレクトリなどにある同名のものを隠しているときに警告する。</para>
 	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-fwarn-implicit-prelude</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-implicit-prelude</option></primary></indexterm>
+          <indexterm><primary>implicit prelude, warning</primary></indexterm>
+          <para>Preludeが暗黙にインポートされたときにコンパイラが警告するようにする。これは、Preludeモジュールを<literal>import ... Prelude ...</literal>で明示的にイポートしたり、暗黙のインポートが無効にされたりしていない限り発生する。(暗黙のインポートを無効にするには、<option>-fno-implicit-prelude</option>か<literal>LANGUAGE NoImplicitPrelude</literal>プラグマを使う)</para>
+
+          <para>暗黙にPreludeを参照する構文については警告が生成されない。<option>-fno-implicit-prelude</option>によって、その構文がPreludeを参照するかどうかが変わったとしても同じである。例えば、<literal>368</literal>が<literal>Prelude.fromInteger (368::Prelude.Integer)</literal>(ここで<literal>Prelude</literal>は、コンパイル中のモジュールが何をインポートしているかに関わらず、実際のPreludeモジュールを指す)を意味したとしても警告はされない。</para>
+
+          <para>この警告はデフォルトで無効である。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -754,7 +833,7 @@ f foo = foo { x = 6 }
 	  <indexterm><primary><option>-fwarn-missing-signatures</option></primary></indexterm>
 	  <indexterm><primary>type signatures, missing</primary></indexterm>
 
-          <para>全てのトップレベルの関数・値に型シグネチャがあることをGHCに確認させたいなら、<option>-fwarn-missing-signatures</option>オプションを使うと良い。これはデフォルトで無効である。</para>
+          <para>全てのトップレベルの関数・値に型シグネチャがあることをGHCに確認させたいなら、<option>-fwarn-missing-signatures</option>オプションを使うと良い。警告の一部としてGHCは推論された型も報告する。これはデフォルトで無効である。</para>
 	</listitem>
       </varlistentry>
 
@@ -764,9 +843,7 @@ f foo = foo { x = 6 }
 	  <indexterm><primary><option>-fwarn-name-shadowing</option></primary></indexterm>
 	  <indexterm><primary>shadowing, warning</primary></indexterm>
 	  
-          <para>このオプションが有効だと、内側のスコープの値と同名の外側のスコープの値があるとき、つまり内側の値が外側のものを隠すときに警告する。これはミスタイプが原因の発見しがたいバグを捕らえることがある。例えば、<literal>let x = ... x ... in</literal>という意図的でない環状の定義が考えられる。</para>
-
-          <para>結果として、このオプションは環状の再帰的定義に対しても文句をいう。</para>
+          <para>このオプションが有効だと、内側のスコープの値と同名の外側のスコープの値があるとき、つまり内側の値が外側のものを隠すときに警告する。これはミスタイプが原因の発見しがたいバグを捕らえることがある。例えば、<literal>f = ... let f = id in ... f ...</literal>において、再帰呼び出しであるはずのものが意図せず捕捉されるというものがある。</para>
 	</listitem>
       </varlistentry>
 
@@ -790,7 +867,7 @@ f foo = foo { x = 6 }
           <indexterm><primary>patterns, overlapping</primary></indexterm>
         </term>
 	<listitem>
-          <para>デフォルトで、コンパイラはパターンが重複しているときに警告する。つまり、以下のような場合である。</para>
+          <para>デフォルトで、コンパイラはパターンが重複しているときに警告する。例えば以下のような場合である。</para>
 
 <programlisting>
 f :: String -&#62; Int
@@ -815,8 +892,17 @@ f "2"    = 2
 	      f xs = [y | Just y &lt;- xs]
 	      </programlisting>
             <option>-fwarn-simple-patterns</option>を有効にすると、このような、おそらく無実の場合についても警告を出す。これがこのフラグがデフォルトで無効にされている理由である。</para>
-          <para><literal>deriving( Read )</literal>機構はパターン照合を使ったモナディックなコードを生成するので、コンパイラ生成のコードに関する誤解を招く警告を目にするかも知れない。(これはまず間違いなく悪いことであるが、修正は厄介である)</para>
+	</listitem>
+      </varlistentry>
 
+      <varlistentry>
+	<term><option>-fwarn-tabs</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-tabs</option></primary></indexterm>
+	  <indexterm><primary>tabs, warning</primary></indexterm>
+	  <para>ソースファイルにタブがあるときにコンパイラが警告するようにする。</para>
+
+	  <para>この警告はデフォルトで無効である。</para>
 	</listitem>
       </varlistentry>
 
@@ -826,6 +912,17 @@ f "2"    = 2
 	  <indexterm><primary><option>-fwarn-type-defaults</option></primary></indexterm>
 	  <indexterm><primary>defaulting mechanism, warning</primary></indexterm>
           <para>数値型に対するデフォルト化機構が発動したときに警告・通知する。これは、あるデフォルトを前提としたコードを別のデフォルトの下のコードに変換するときに便利である。例えば、<constant>1</constant>という値に特に制約がないとき、Haskell 1.4の「デフォルトのデフォルト」は型<literal>Int</literal>を与えるが、Haskell 98ではこれは<literal>Integer</literal>である。これは実行時性能と挙動に影響を与える可能性があるので、通知されると便利である。</para>
+
+	  <para>この警告はデフォルトで無効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-monomorphism-restriction</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-monomorphism-restriction</option></primary></indexterm>
+	  <indexterm><primary>monomorphism restriction, warning</primary></indexterm>
+	  <para>Haskellの単相性制限が適用されるソースを書いたときにコンパイラがそれを警告/通知するようにする。単相性制限が黙って適用されると予期せぬ振る舞いの原因になることがあるので、これが適用されたという明示的な警告があると便利なことがある。</para>
 
 	  <para>この警告はデフォルトで無効である。</para>
 	</listitem>
@@ -924,8 +1021,6 @@ f "2"    = 2
           </term>
 	  <listitem>
             <para>「高品質のコードをそれほど時間を掛けずに生成せよ」という意味である。例えば、<command>ghc -c -O Main.lhs</command>のように使われる。</para>
-
-            <para>現在、<option>-O</option>を指定すると<option>-fvia-C</option>も有効になる。これは将来変わるかもしれない。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -988,7 +1083,7 @@ f "2"    = 2
 	  <term><option>-fignore-asserts</option>:</term>
 	  <listitem>
 	    <indexterm><primary><option>-fignore-asserts</option></primary></indexterm>
-            <para>ソースコード中で<literal>Exception.assert</literal>関数が使われていても無視する。(言い替えると、<literal>Exception.assert p e</literal>を<literal>e</literal>に書き換える。<xref linkend="sec-assertions"/>を見よ)。このフラグは<option>-O</option>が指定されていると有効になる。</para>
+            <para>ソースコード中で<literal>Exception.assert</literal>関数が使われていても無視する。(言い替えると、<literal>Exception.assert p e</literal>を<literal>e</literal>に書き換える。<xref linkend="assertions"/>を見よ)。このフラグは<option>-O</option>が指定されていると有効になる。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1030,7 +1125,28 @@ f "2"    = 2
             <indexterm><primary><option>-fno-state-hack</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><literal>State#</literal>トークンを引数として持っているラムダは全て単一進入(訳注: single entry。クロージャが一回しかenterされない(呼ばれない)こと)であるとみなし、したがってその内容をインライン化しても良いとみなされる、という「stateハック」を無効にする。このハックはIOとSTモナドを使うコードの性能を向上させることがあるが、共有が阻害される危険も伴っている。</para>
+            <para><literal>State#</literal>トークンを引数として持っているラムダは全て単一進入(訳注: single entry。クロージャが一回しかenterされない(呼ばれない)こと)であるとみなし、したがってその内部にいろんな物をインライン化しても良いとみなされる、という「stateハック」を無効にする。このハックはIOとSTモナドを使うコードの性能を向上させることがあるが、共有が阻害される危険も伴っている。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fomit-interface-pragmas</option>
+	    <indexterm><primary><option>-fomit-interface-pragmas</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>コンパイル中のモジュール(Mとしよう)のインタフェースファイルにおいて、本質的でない情報を全て省略するようにGHCに指示する。これによって、Mをインポートするモジュールからは、Mがエクスポートする関数の<emphasis>型</emphasis>しか見えず、展開候補や正格性情報などが見えなくなる。よって、例えば、Mからエクスポートされた関数が、それをインポートするモジュールでインライン化されるということがなくなる。これによる利点は、Mをインポートするモジュールを再コンパイルしなければならない頻度が減るということである。(Mのエクスポート物の型が変わった場合だけ再コンパイルすればよく、実装が変わっただけならしなくてよい)
+	      </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fignore-interface-pragmas</option>
+	    <indexterm><primary><option>-fignore-interface-pragmas</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>インタフェースファイルを読むときに本質的でない情報を全て無視するようにGHCに指示する。つまり、仮に<filename>M.hi</filename>に関数の展開候補や正格性情報があったとしても、GHCはその情報を無視する。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1050,7 +1166,7 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-funfolding-update-in-place&lt;n&gt;</option>
+            <option>-funfolding-update-in-place=<replaceable>n</replaceable></option>
             <indexterm><primary><option>-funfolding-update-in-place</option></primary></indexterm>
           </term>
 	  <listitem>
@@ -1064,7 +1180,7 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-funfolding-creation-threshold&lt;n&gt;</option>:
+            <option>-funfolding-creation-threshold=<replaceable>n</replaceable></option>:
 	    <indexterm><primary><option>-funfolding-creation-threshold</option></primary></indexterm>
 	    <indexterm><primary>inlining, controlling</primary></indexterm>
 	    <indexterm><primary>unfolding, controlling</primary></indexterm>
@@ -1079,7 +1195,7 @@ f "2"    = 2
 	</varlistentry>
 
 	<varlistentry>
-	  <term><option>-funfolding-use-threshold&lt;n&gt;</option>:</term>
+	  <term><option>-funfolding-use-threshold=<replaceable>n</replaceable></option>:</term>
 	  <listitem>
 	    <indexterm><primary><option>-funfolding-use-threshold</option></primary></indexterm>
 	    <indexterm><primary>inlining, controlling</primary></indexterm>
@@ -1096,7 +1212,7 @@ f "2"    = 2
   
   &phases;  
   
-  <sect1 id="sec-using-concurrent">
+  <sect1 id="using-concurrent">
     <title>Concurrent Haskellを使う</title>
     <indexterm><primary>Concurrent Haskell</primary><secondary>using</secondary></indexterm>
 
