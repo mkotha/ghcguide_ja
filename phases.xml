@@ -679,7 +679,7 @@ $ cat foo.hspp</screen>
 
           <para><option>-threaded</option>が与えられていると、他言語関数の呼び出しは、呼び出し元のHaskellスレッドを作ったのと同じOSスレッド(そのスレッドがforeign exportされたHaskellの関数によって作られた場合)または適当なOSスレッド(そのスレッドが<literal>forkIO</literal>で作られた場合)で実行される。</para>
 
-          <para>スレッド化ランタイムがどのように「束縛スレッド」を使うかについてのさらなる詳細は、<ulink url="../libraries/base/Control.Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールにある。</para>
+          <para>スレッド化ランタイムがどのように「束縛スレッド」を使うかについてのさらなる詳細は、<ulink url="../libraries/base/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールにある。</para>
         </listitem>
       </varlistentry>
 
