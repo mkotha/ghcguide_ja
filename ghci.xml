@@ -268,6 +268,32 @@ Prelude>
 
       <para>モナド束縛と違って、<literal>let</literal>束縛では束縛された値が自動的に印字されることがないことに注意。</para>
 
+      <para>ヒント: <literal>let</literal>文を使って、プロンプトで関数を定義することもできる。</para>
+<screen>
+Prelude> let add a b = a + b
+Prelude> add 1 2
+3
+Prelude>
+</screen>
+        <para>しかし、複数の節からなる関数を定義したり、相互再帰的な関数を定義したりすると、このやりかたはすぐ面倒になる。配置規則が使えず、定義全体を、明示的な中括弧とセミコロンを使って一行で与えないといけないからだ。</para>
+<screen>
+Prelude> let { f op n [] = n ; f op n (h:t) = h `op` f op n t }
+Prelude> f (+) 0 [1..3]
+6
+Prelude>
+</screen>
+      <para>この問題を軽減するために、GHCiのコマンドを<literal>:{</literal>と<literal>:}</literal>で囲む(それぞれ一行使って)と、複数行に渡らせることができるようになっている。</para>
+<screen>
+Prelude> :{
+Prelude| let { g op n [] = n
+Prelude|     ; g op n (h:t) = h `op` g op n t
+Prelude|     }
+Prelude| :}
+Prelude> g (*) 1 [1..3]
+6
+</screen>
+      <para>このような複数行コマンドは全てのGHCiコマンドについて用いることができ、<literal>:{</literal>と<literal>:}</literal>の間の行は単純に一行に繋げられて解釈される。よって、この行の集りは繋げられたときに単一の正しいコマンドになっていなければならず、配置規則を使うことはできない。複数行コマンドの主な目的は、モジュールのロードの代替にすることではなく、.ghciファイル(<xref linkend="ghci-dot-files"/>を見よ)での定義を見やすく、保守しやすくすることである。</para>
+
       <para>文を評価または実行している間に発生した例外は、GHCiのコマンド行インタフェースによって捕捉され、印字される(例外について詳しくは、ライブラリ説明書の<literal>Control.Exception</literal>を見よ)。</para>
 
       <para>束縛は、同じ名前の既存の束縛を覆い隠す。現在のモジュールの文脈でスコープにある実体も同様に覆い隠される。</para>
@@ -857,7 +883,7 @@ as = 'b' : 'c' : (_t1::[Char])
 <programlisting>
 import Prelude hiding (map)
 
-map :: (a->b) -> a -> b
+map :: (a->b) -> [a] -> [b]
 map f [] = []
 map f (x:xs) = f x : map f xs
 </programlisting>
@@ -1058,12 +1084,32 @@ $ ghci -lm
 
       <varlistentry>
 	<term>
-          <literal>:browse</literal> <optional><optional><literal>*</literal></optional><replaceable>module</replaceable></optional> ...
+          <literal>:browse</literal><optional><literal>!</literal></optional> <optional><optional><literal>*</literal></optional><replaceable>module</replaceable></optional> ...
           <indexterm><primary><literal>:browse</literal></primary></indexterm>
         </term>
 	<listitem>
           <para><replaceable>module</replaceable>で定義されている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<replaceable>module</replaceable>が省略された場合、直近にロードされたモジュールが使われる。</para>
-          <para><literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>でスコープにある<emphasis>全ての</emphasis>識別子が表示される。そうでない場合、一覧は<replaceable>module</replaceable>がエクスポートしたものに限定される。<literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。</para>
+          <para><literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>でスコープにある<emphasis>全ての</emphasis>識別子が表示される。そうでない場合、一覧は<replaceable>module</replaceable>がエクスポートしたものに限定される。<literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。このコマンドの後ろに<literal>!</literal>記号が置かれた場合、データ構築子とクラスメソッドは個々に表示される。そうでなければ、データ型宣言やクラス宣言の一部としてのみ表示される。<literal>!</literal>の形式では、さらに、項目をグループに分けて、それぞれについて可能なインポートについてのコメントを付加する。</para>
+<screen>
+Prelude> :browse! Data.Maybe
+-- not currently imported
+Data.Maybe.catMaybes :: [Maybe a] -> [a]
+Data.Maybe.fromJust :: Maybe a -> a
+Data.Maybe.fromMaybe :: a -> Maybe a -> a
+Data.Maybe.isJust :: Maybe a -> Bool
+Data.Maybe.isNothing :: Maybe a -> Bool
+Data.Maybe.listToMaybe :: [a] -> Maybe a
+Data.Maybe.mapMaybe :: (a -> Maybe b) -> [a] -> [b]
+Data.Maybe.maybeToList :: Maybe a -> [a]
+-- imported via Prelude
+Just :: a -> Maybe a
+data Maybe a = Nothing | Just a
+Nothing :: Maybe a
+maybe :: b -> (a -> b) -> Maybe a -> b
+</screen>
+  <para>
+    この出力が示すのは、現在のセッションの文脈(<literal>Prelude</literal>のスコープ)で、<literal>Data.Maybe</literal>の項目の最初の一団がインポートされておらず(ただしGHCiセッションでは完全修飾された形で利用できる。<xref linkend="ghci-scope"/>を見よ)、二番目の一団が<literal>Prelude</literal>を介してインポートされていて、修飾なし、あるいは<literal>Prelude.</literal>という修飾子付きの形式で利用できる、ということである。
+  </para>
 	</listitem>
       </varlistentry>
 
@@ -1115,11 +1161,11 @@ $ ghci -lm
 
       <varlistentry>
 	<term>
-          <literal>:def</literal> <replaceable>name</replaceable> <replaceable>expr</replaceable>
+          <literal>:def<optional>!</optional> <optional><replaceable>name</replaceable> <replaceable>expr</replaceable></optional></literal>
           <indexterm><primary><literal>:def</literal></primary></indexterm>
         </term>
 	<listitem>
-	  <para>コマンド<literal>:def</literal> <replaceable>name</replaceable> <replaceable>expr</replaceable>は、新しいGHCiコマンド<literal>:<replaceable>name</replaceable></literal>を、Haskellの式<replaceable>expr</replaceable>で実装されたものとして定義する。式の型は<literal>String -&gt; IO String</literal>でなければならない。<literal>:<replaceable>name</replaceable> <replaceable>args</replaceable></literal>がプロンプトに入力されると、GHCiは式<literal>(<replaceable>name</replaceable> <replaceable>args</replaceable>)</literal>を走らせ、結果の<literal>String</literal>を受け取り、それをコマンドの列として再びGHCiに入力する。結果においては、隣り合うコマンドは「<literal>\n</literal>」で区切られていなければならない。</para>
+	  <para><literal>:def</literal>は、GHCiにおいて新しいコマンド(マクロと言ってもいい)を定義するのに使われる。コマンド<literal>:def</literal> <replaceable>name</replaceable> <replaceable>expr</replaceable>は、新しいGHCiコマンド<literal>:<replaceable>name</replaceable></literal>を、Haskellの式<replaceable>expr</replaceable>で実装されたものとして定義する。式の型は<literal>String -&gt; IO String</literal>でなければならない。<literal>:<replaceable>name</replaceable> <replaceable>args</replaceable></literal>がプロンプトに入力されると、GHCiは式<literal>(<replaceable>name</replaceable> <replaceable>args</replaceable>)</literal>を走らせ、結果の<literal>String</literal>を受け取り、それをコマンドの列として再びGHCiに入力する。結果においては、隣り合うコマンドは「<literal>\n</literal>」で区切られていなければならない。</para>
 
           <para>これは少々ややこしいので、いくつか例を挙げる。まず、次に示す新しいGHCiコマンドは、引数を取らず、結果を生成せず、単に現在の日時を出力するだけのものである。</para>
 
@@ -1152,6 +1198,8 @@ Prelude> :. cmds.ghci
 </screen>
 
           <para>このコマンドの名前は<literal>:.</literal>であるが、これは「<literal>.</literal>」(同じことをするUnixシェルのコマンド)のアナロジーである。</para>
+
+          <para><literal>:def</literal>と単独で入力すると、現在定義されているマクロの一覧を表示する。既に存在するコマンド名を再定義しようとすると失敗する。ただし<literal>:def!</literal>の形式が使われた場合は別で、この場合その名前の古いコマンドは黙って失われる。</para>
 	</listitem>
       </varlistentry>
 
@@ -1215,6 +1263,16 @@ Prelude> :. cmds.ghci
         </term>
 	<listitem>
           <para>利用可能なコマンドの一覧を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:</literal>
+          <indexterm><primary><literal>:</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>前のコマンドを繰り返す。</para>
 	</listitem>
       </varlistentry>
 
@@ -1347,7 +1405,7 @@ Prelude> :main foo bar
           <indexterm><primary><literal>:set</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para>色々なオプションを設定する。利用可能なオプションの一覧は、<xref linkend="ghci-set"/>を見よ。<literal>:set</literal>コマンド自体は、どのオプションが現在有効になっているか表示する。</para>
+          <para>色々なオプションを設定する。利用可能なオプションの一覧は<xref linkend="ghci-set"/>を、GHCi特有のフラグは<xref linkend="interactive-mode-options"/>を見よ。<literal>:set</literal>コマンド単独では、どのオプションが現在有効になっているか表示する。また、現在の動的フラグの設定状況の一覧も表示する。GHCi特有のフラグは分けて表示される。</para>
 	</listitem>
       </varlistentry>
 
@@ -1445,6 +1503,27 @@ Prelude> :main foo bar
           <para>現在ロードされているモジュールの一覧を表示する。</para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:show packages</literal>
+          <indexterm><primary><literal>:show packages</literal></primary></indexterm>
+        </term>
+	<listitem>
+    <para>現在有効なパッケージフラグと、現在ロードされているパッケージの一覧を表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>:show languages</literal>
+          <indexterm><primary><literal>:show languages</literal></primary></indexterm>
+        </term>
+	<listitem>
+    <para>現在有効な言語フラグを表示する。</para>
+	</listitem>
+      </varlistentry>
+
 
       <varlistentry>
 	<term>
