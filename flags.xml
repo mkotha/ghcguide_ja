@@ -638,7 +638,7 @@
 	      <entry><option>-fno-disambiguate-record-fields</option></entry>
  	    </row>
 	    <row>
-	      <entry><option>-XForeignFunctionInterface</option><entry>
+	      <entry><option>-XForeignFunctionInterface</option></entry>
 	      <entry><link linkend="ffi">他言語関数インタフェース</link> (<option>-fglasgow-exts</option>によっても有効になる)</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoForeignFunctionInterface</option></entry>
