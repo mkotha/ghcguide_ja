@@ -332,18 +332,6 @@ module X where
 	</listitem>
       </varlistentry>
 
-      <varlistentry>
-	<term>
-	  <cmdsynopsis>
-            <command>ghc --print-docdir</command>
-          </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;print-docdir</option></primary></indexterm>
-        </term>
-	<listitem>
-	  <para>GHCの文書ディレクトリを表示する。配布によっては文書が存在せず、その場合このディレクトリは空だったり存在しなかったりするかもしれないのに注意。</para>
-	</listitem>
-      </varlistentry>
-
     </variablelist>
 
     <sect2 id="make-mode">
