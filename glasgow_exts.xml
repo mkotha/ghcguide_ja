@@ -207,7 +207,7 @@
 
 <para>どんなプリミティブ型があるか、それらにどんな演算が働くか、についての真正な事実は<filename>fptools/ghc/compiler/prelude/primops.txt.pp</filename>というファイルに記されている。このファイルは直接GHCのプリミティブ演算の定義を生成するのに使われるので、内容は常に正しい。また、テキスト化処理ができるようになっている。</para>
 
-<para>じっさい、処理の結果が<ulink url="http://haskell.cs.yale.edu/ghc/docs/papers/core.ps.gz">External Core language</ulink>の説明に含まれているので、活字に組まれたものを探しているならこれを使うと良い。<filename>primops.txt</filename>を処理するプログラムへのSGMLバックエンドを作ってくれる人がいれば、とてもありがたい。結果をこの利用者手引きに載せられるからである。</para>
+<para>じっさい、処理の結果が<ulink url="http://www.haskell.org/ghc/docs/papers/core.ps.gz">External Core language</ulink>の説明に含まれているので、活字に組まれたものを探しているならこれを使うと良い。<filename>primops.txt</filename>を処理するプログラムへのSGMLバックエンドを作ってくれる人がいれば、とてもありがたい。結果をこの利用者手引きに載せられるからである。</para>
 
 <para>以下はいくつかの主要な点についての短いまとめである。</para>
   
@@ -527,7 +527,7 @@ mdoがどのように型検査され脱糖されるかの完全な詳細につ�
 </para>
 
 <para>
-ウェブページ<ulink url="http://www.cse.ogi.edu/PacSoft/projects/rmb">http://www.cse.ogi.edu/PacSoft/projects/rmb</ulink>には、再帰的モナド束縛に関する最新の情報がある。
+ウェブページ<ulink url="http://www.cse.ogi.edu/PacSoft/projects/rmb/">http://www.cse.ogi.edu/PacSoft/projects/rmb/</ulink>には、再帰的モナド束縛に関する最新の情報がある。
 </para>
 
 <para>
@@ -629,15 +629,15 @@ fromInteger :: Integer -> Bool -> Bool
 GHCは演算子の左セクションの構文に小さな拡張を認めていて、これを使って後置演算子を定義することができる。拡張とはこうである。以下のような左セクションがあったとしよう。
 <programlisting>
   (e !)
-</programlisting> 
+</programlisting>
 これは、(型検査と実行の両面において)以下の式と等しい。
 <programlisting>
   ((!) e)
-</programlisting> 
+</programlisting>
 (これは式<literal>e</literal>が何であっても、また演算子<literal>(!)</literal>が何であっても成り立つ)。Haskell 98の厳密な解釈では、このセクションは以下と同等だとされる。
 <programlisting>
   (\y -> (!) e y)
-</programlisting> 
+</programlisting>
 つまり、演算子は二引数の関数でなければならない。GHCでは一引数の関数であっても良く、結果として、関数を後置記法で書くことができるようになる。
 </para>
 <para>この拡張はHaskell 98を逸脱しているので、本来ならフラグで有効にされるべきものである。しかし、実際には常に有効になっている。(もちろん、この拡張によってHaskell 98プログラムが振る舞いを変えることはない)
@@ -935,8 +935,8 @@ GHCは現在、型シノニムを展開する前に類検査を行っている�
 
 </sect3>
 
-<sect3>
-<title>型クラス</title>
+<sect3 id="existential-with-context">
+<title>存在型と型クラス</title>
 
 <para>
 簡単な拡張として、構築子の前に任意の文脈を置くことを可能にするというのがある。
@@ -981,10 +981,6 @@ Baz2 :: forall b. Show b => b -> (b -> b) -> Baz
 
 <para>
 操作的には、辞書渡し式の実装では、構築子<function>Baz1</function>と<function>Baz2</function>は<literal>Eq</literal>と<literal>Show</literal>の辞書をそれぞれ記憶しておかなければならず、パターン照合の時にはそれを展開する。
-</para>
-
-<para>
-先の全称量化と構文的にうまく調和していることに注意せよ。
 </para>
 
 </sect3>
@@ -1191,13 +1187,8 @@ instance Eq T where
                       | otherwise   = MkSet (a:as)
 </programlisting>
 <literal>mkSet</literal>を構築子として使う(例えば<literal>makeSet</literal>の定義)と、期待通り<literal>(Eq a)</literal>の制約が生じる。新機能は、<literal>MkSet</literal>についてのパターン照合(<literal>insert</literal>の定義にあるようなもの)の際、文脈<literal>(Eq a)</literal>が<emphasis>使えるようになる</emphasis>ということである。実装の言葉で言うと、<literal>MkSet</literal>には、渡された<literal>(Eq a)</literal>の辞書を持っておくための隠れたフィールドがある。それで、パターン照合の際には、照合の右辺からその辞書を使うことができる。この例では、こうして得られたEqの辞書を、<literal>elem</literal>の呼び出しによって生成されたEq制約を満足させるのに使うので、<literal>insert</literal>の型自体には<literal>Eq</literal>制約が現れない。</para>
-<para>この振る舞いは、Haskell 98の、データ型宣言における文脈の奇妙な扱い(Haskell 98レポートの4.2.1節)と対照を為す。Haskell 98では、次の定義によって、上の<literal>MkSet</literal>と同じ型の<literal>MkSet'</literal>が得られる。
-<programlisting>
-  data Eq a => Set' a = MkSet' [a]
-</programlisting>
-しかし、<literal>MkSet'</literal>についてのパターン照合では、<literal>(Eq a)</literal>の制約が<emphasis>使えるようになる</emphasis>のでなく、<literal>(Eq a)</literal>の制約を<emphasis>要求する</emphasis>のだ。変な振る舞いだが、GHCはこれを忠実に実装している。しかし、GADT様式の宣言なら、GHCの振る舞いはずっと有用で、同時にずっと直感的である。</para>
 <para>
-例えば、GHCの振る舞いの応用の一つとして、辞書をオブジェクト化するというのが考えられる。
+例えば、応用の一つとして、辞書をオブジェクト化するというのがある。
 <programlisting>
    data NumInst a where
      MkNumInst :: Num a => NumInst a
@@ -1210,7 +1201,24 @@ instance Eq T where
 </programlisting>
 ここで、<literal>NumInst a</literal>型の値は、<literal>(Num a)</literal>の辞書を明示的にしたものと同等である。
 </para>
-
+<para>これは全て、<xref linkend="existential-with-context"/>の構文を使って宣言された構築子についても当てはまる。例えば、上のデータ型<literal>NumInst</literal>は次のように定義しても同等である。
+<programlisting>
+   data NumInst a 
+      = Num a => MkNumInst (NumInst a)
+</programlisting>
+存在型を定義する場合と違って<literal>forall</literal>がないことに注意。これは、<literal>Num</literal>が、データ型の全称修飾された型変数<literal>a</literal>を制約するからである。ひとつの構築子に、全称と存在の両方の型変数があってもよい。例えば、以下の二つの宣言は同等である。
+<programlisting>
+   data T1 a 
+	= forall b. (Num a, Eq b) => MkT1 a b
+   data T2 a where
+	MkT2 :: (Num a, Eq b) => a -> b -> T2 a
+</programlisting>
+</para>
+<para>これらの振る舞いは全て、Haskell 98の、データ型宣言における文脈の奇妙な扱い(Haskell 98レポートの4.2.1節)と対照を為す。Haskell 98では、次の定義によって、上の<literal>MkSet</literal>と同じ型の<literal>MkSet'</literal>が得られる。
+<programlisting>
+  data Eq a => Set' a = MkSet' [a]
+</programlisting>
+しかし、<literal>MkSet'</literal>についてのパターン照合では、<literal>(Eq a)</literal>の制約が<emphasis>使えるようになる</emphasis>のでなく、<literal>(Eq a)</literal>の制約を<emphasis>要求する</emphasis>のだ。変な振る舞いだが、GHCはこれを忠実に実装している。しかし、GADT様式の宣言なら、GHCの振る舞いはずっと有用で、同時にずっと直感的である。</para>
 <para>
 この節の残りの部分では、GADT様式のデータ型宣言について、さらなる詳細を与える。
 
@@ -1331,7 +1339,7 @@ GADTの鍵となる点は、<emphasis>パターン照合によって型の精密
   eval :: Term a -> a
   eval (Lit i) =  ...
 </programlisting>
-等式の右辺では、<literal>a</literal>が精密化されて<literal>Int</literal>になる。これこそが売りである。型付け規則の正確な規定は利用の手引きが目指すところではないが、設計は、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/gadt/index.htm">Simple unification-based type inference for GADTs</ulink>, (ICFP 2006)で述べられているものによく倣っている。
+等式の右辺では、<literal>a</literal>が精密化されて<literal>Int</literal>になる。これこそが売りである。型付け規則の正確な規定は利用の手引きが目指すところではないが、設計は、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/gadt/">Simple unification-based type inference for GADTs</ulink>, (ICFP 2006)で述べられているものによく倣っている。
 一般的な原則はこうである。<emphasis>精密化は、ユーザ供給の型注釈を基にしてのみ起こる</emphasis>。従って、もし<literal>eval</literal>に型シグネチャが与えられなければ、型精密化は起こらず、大量の不明瞭なエラーが発生することだろう。一方、精密化はかなり一般的である。例えば、以下のものがあったとしよう。
 <programlisting>
   eval :: Term a -> a -> a
@@ -1340,7 +1348,7 @@ GADTの鍵となる点は、<emphasis>パターン照合によって型の精密
 このパターン照合で、型<literal>a</literal>が精密化されて(構築子<literal>Lit</literal>の型にしたがって)<literal>Int</literal>になる。この精密化は<literal>j</literal>の型とこの<literal>case</literal>式の結果の型にも及ぶ。だから<literal>i+j</literal>という加算は合法である。
 </para>
 <para>
-これらの例と、他の多くの例が、Hongwei XiとTim Sheardによる論文群で与えられている。<ulink url="http://haskell.org/haskellwiki/GADT">wikiには</ulink>もっと長い入門文書があるし、Ralf Hinzeの<ulink url="http://www.informatik.uni-bonn.de/~ralf/publications/With.pdf">Fun with phantom types</ulink>にもいくつか例がある。
+これらの例と、他の多くの例が、Hongwei XiとTim Sheardによる論文群で与えられている。<ulink url="http://www.haskell.org/haskellwiki/GADT">wikiには</ulink>もっと長い入門文書があるし、Ralf Hinzeの<ulink url="http://www.informatik.uni-bonn.de/~ralf/publications/With.pdf">Fun with phantom types</ulink>にもいくつか例がある。
 これらの論文ではGHCに実装されているのと異なる記法を使っていることがあるので注意。
 </para>
 <para>
@@ -1456,13 +1464,13 @@ GHCはこれを拡張し、新たに二つのクラスが自動的に導出で�
 <para>
 <literal>newtype</literal>を使って抽象型を定義するとき、元の型からインスタンスをいくつか継承させたいと思うことがあるかもしれない。Haskell 98では、<literal>Eq</literal>、<literal>Ord</literal>、<literal>Enum</literal>、<literal>Bounded</literal>に関しては導出を使うことでインスタンスを継承させられるが、それ以外の型については明示的なインスタンス宣言を書かなければならない。例えば、次のように定義したとする。
 
-<programlisting> 
+<programlisting>
   newtype Dollars = Dollars Int 
-</programlisting> 
+</programlisting>
 
 そして、<literal>Dollars</literal>に対して数値演算を使いたいなら、次のようにして明示的に<literal>Num</literal>のインスタンスを書かなければならない。
 
-<programlisting> 
+<programlisting>
   instance Num Dollars where
     Dollars a + Dollars b = Dollars (a+b)
     ...
@@ -1474,15 +1482,15 @@ GHCはこれを拡張し、新たに二つのクラスが自動的に導出で�
 <sect3> <title>deriving節の一般化</title>
 <para>
 このようなことをしなくても、GHCでは、<option>-XGeneralizedNewtypeDeriving</option>を使ってこの種のインスタンスは導出できるようになった。従って、次のように書くことができる。
-<programlisting> 
+<programlisting>
   newtype Dollars = Dollars Int deriving (Eq,Show,Num)
-</programlisting> 
+</programlisting>
 
 そして、実装では、<literal>Dollars</literal>について<literal>Int</literal>のものと<emphasis>同じ</emphasis><literal>Num</literal>用辞書が使われる。概念上は、コンパイラは次のような形のインスタンス宣言を導出している。
 
-<programlisting> 
+<programlisting>
   instance Num Int => Num Dollars
-</programlisting> 
+</programlisting>
 
 このインスタンスは、型にしたがって<literal>newtype</literal>構築子を付けたり外したりすることだけを行う。
 </para>
@@ -1490,25 +1498,25 @@ GHCはこれを拡張し、新たに二つのクラスが自動的に導出で�
 
 構築子クラスのインスタンスも同様に導出することができる。例えば、次のように、状態と失敗を扱うモナド変換子を実装したとしよう。
 
-<programlisting> 
+<programlisting>
   instance Monad m => Monad (State s m) 
   instance Monad m => Monad (Failure m)
-</programlisting> 
+</programlisting>
 Haskell 98では、次のようにしてパーサモナドを定義することができる。
-<programlisting> 
+<programlisting>
   type Parser tok m a = State [tok] (Failure m) a
-</programlisting> 
+</programlisting>
 
 これは、上記のインスタンス宣言によって自動的にモナドになっている。拡張を使うと、<literal>Monad</literal>クラスのインスタンスを書くことなくパーサの型を抽象型にすることができる。次のようになる。
 
-<programlisting> 
+<programlisting>
   newtype Parser tok m a = Parser (State [tok] (Failure m) a)
                          deriving Monad
 </programlisting>
 この場合、導出されたインスタンス宣言は次の形になる。
-<programlisting> 
+<programlisting>
   instance Monad (State [tok] (Failure m)) => Monad (Parser tok m) 
-</programlisting> 
+</programlisting>
 
 <literal>Monad</literal>は構築子クラスなので、このインスタンスはこのnewtypeの<emphasis>部分適用</emphasis>であり、左辺全体ではない。インスタンス宣言の文脈を生成するためにこの型宣言が「η変換」されたと考えることができる。
 </para>
@@ -1516,19 +1524,19 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 
 多引数型クラスについても、そのnewtypeがクラスの最後の引数であることを条件に、インスタンスを導出できる。この場合、<literal>deriving</literal>節に現れるのはクラスの「部分適用」形である。例として、次のようなクラスがあったとする。
 
-<programlisting> 
+<programlisting>
   class StateMonad s m | m -> s where ... 
   instance Monad m => StateMonad s (State s m) where ... 
-</programlisting> 
+</programlisting>
 このとき、次のようにして、<literal>Parser</literal>についての<literal>StateMonad</literal>のインスタンスを導出できる。
-<programlisting> 
+<programlisting>
   newtype Parser tok m a = Parser (State [tok] (Failure m) a)
                          deriving (Monad, StateMonad [tok])
 </programlisting>
 
 導出インスタンスは、部分適用されたクラスを最後にnewtypeに適用し、完全に適用された形にすることで得られる。次のようにである。
 
-<programlisting> 
+<programlisting>
   instance StateMonad [tok] (State [tok] (Failure m)) =>
            StateMonad [tok] (Parser tok m)
 </programlisting>
@@ -1543,9 +1551,9 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 <para>
 導出されたインスタンス宣言が構築されるときの規則は以下である。次の宣言(型シノニムを展開した後のもの)を考える。
 
-<programlisting> 
+<programlisting>
   newtype T v1...vn = T' (t vk+1...vn) deriving (c1...cm) 
-</programlisting> 
+</programlisting>
 
 ここで、
  <itemizedlist>
@@ -1566,17 +1574,17 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 </para></listitem>
 </itemizedlist>
 このとき、それぞれの<literal>ci</literal>に対して、導出されるインスタンス宣言は以下のようになる。
-<programlisting> 
+<programlisting>
   instance ci t => ci (T v1...vk)
 </programlisting>
 <emphasis>うまくいかない</emphasis>例として、以下のものを考えてみよう。
-<programlisting> 
+<programlisting>
   newtype NonMonad m s = NonMonad (State s m s) deriving Monad 
-</programlisting> 
+</programlisting>
 ここで、次のインスタンスを導出することはできない。
-<programlisting> 
+<programlisting>
   instance Monad (State s m) => Monad (NonMonad m) 
-</programlisting> 
+</programlisting>
 
 なぜなら、型変数<literal>s</literal>が<literal>State s m</literal>に現れており、「η変換」によって消し去ることができないからである。この<literal>deriving</literal>節が拒絶されるのは良いことである。<literal>NonMonad m</literal>は実際、同じ理由で、モナドではないからである。正しい型を持つ<literal>>>=</literal>を定義しようとしてみよ。できないはずである。
 </para>
@@ -1584,7 +1592,7 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 
 また、クラス引数の<emphasis>順序</emphasis>が重要になることに注意。これは、最後の引数についてしかインスタンスの導出ができないからである。もし上記の<literal>StateMonad</literal>が次のように定義されていたなら、上のように<literal>Parser</literal>型についてインスタンスを導出することは不可能だった。
 
-<programlisting> 
+<programlisting>
   class StateMonad m s | m -> s where ... 
 </programlisting>
 
@@ -1607,7 +1615,7 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 <title>クラス宣言</title>
 
 <para>
-この節及び次の節では、型クラスに関するGHCの拡張を説明する。論文<ulink url="http://research.microsoft.com/~simonpj/Papers/type-class-design-space" >Type classes: exploring the design space</ulink> (Simon Peyton Jones, Mark Jones, Erik Meijer)には、多くの背景事項が書かれている。
+この節及び次の節では、型クラスに関するGHCの拡張を説明する。論文<ulink url="http://research.microsoft.com/~simonpj/Papers/type-class-design-space/" >Type classes: exploring the design space</ulink> (Simon Peyton Jones, Mark Jones, Erik Meijer)には、多くの背景事項が書かれている。
 </para>
 <para>
 これらの拡張は全て<option>-fglasgow-exts</option>フラグで有効になる。
@@ -1675,7 +1683,7 @@ Haskell 98では、クラスメソッドの型中に、クラス型変数につ�
     fromList :: [a] -> s a
     elem     :: Eq a => a -> s a -> Bool
 </programlisting>
-Haskell 98では<literal>elem</literal>の型は不正である。制約<literal>Eq a</literal>がクラス型変数(この場合<literal>a</literal>)のみを拘束しているからである。GHCではこの制限はない。
+Haskell 98では<literal>elem</literal>の型は不正である。制約<literal>Eq a</literal>がクラス型変数(この場合<literal>a</literal>)のみを拘束しているからである。GHCはこの制限を撤廃する(<option>-XConstrainedClassMethods</option>フラグ)。
 </para>
 
 
@@ -1686,7 +1694,7 @@ Haskell 98では<literal>elem</literal>の型は不正である。制約<literal
 <title>関数従属
 </title>
 
-<para>関数従属は、&ldquo;<ulink url="http://www.cse.ogi.edu/~mpj/pubs/fundeps.html">Type Classes with Functional Dependencies</ulink>&rdquo;, Mark P. Jones, In Proceedings of the 9th European Symposium on Programming, ESOP 2000, Berlin, Germany, March 2000, Springer-Verlag LNCS 1782,で述べられている通りに実装されている。
+<para>関数従属は、&ldquo;<ulink url="http://citeseer.ist.psu.edu/jones00type.html">Type Classes with Functional Dependencies</ulink>&rdquo;, Mark P. Jones, In Proceedings of the 9th European Symposium on Programming, ESOP 2000, Berlin, Germany, March 2000, Springer-Verlag LNCS 1782,で述べられている通りに実装されている。
 </para>
 <para>
 関数従属は、クラス宣言の構文中で次のように垂直線を使うことで導入される。
@@ -1888,7 +1896,7 @@ fではxとyの値を一つの集まりに対して順番にinsertしようと�
 Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)</literal>という形でなければならない。ここで、<literal>C</literal>はクラス、<literal>T</literal>は型構築子、<literal>a1 ... an</literal>は相異なる型変数である。さらに、インスタンス宣言中の文脈における表明は<literal>C a</literal>という形でなければならない。ここで<literal>a</literal>は頭部に出現する型変数である。
 </para>
 <para>
-<option>-fglasgow-exts</option>フラグが使われていると、この規則は大幅に緩められる。まず、複数引数の型クラスが許される。次に、インスタンス宣言の文脈および頭部は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
+<option>-XFlexibleInstances</option>フラグが使われていると、この規則は大幅に緩められる。まず、複数引数の型クラスが許される。次に、インスタンス宣言の文脈および頭部は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
 <orderedlist>
 <listitem><para>
 Paterson条件: 文脈中の各表明に対して、次が求められる。
@@ -1986,7 +1994,7 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
   class F a b | a->b
   instance F [a] [[a]]
   instance (D c, F a c) => D [a]   -- 「c」は頭部で言及されていない
-</programlisting>  
+</programlisting>
 同様に、対応範囲条件を撤廃したいと思うかもしれない。
 <programlisting>
   class Mul a b c | a b -> c where
@@ -2128,7 +2136,7 @@ instance IsString [Char] where
 </para></listitem>
 
 <listitem><para>
-標準のデフォルト化規則(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.3.4">Haskell Report, Section 4.3.4</ulink>)は次のように拡張される。デフォルト化は、全ての未解決の制約が標準のクラス<emphasis>または</emphasis><literal>IsString</literal>についてであって、少くとも一つが数値クラス<emphasis>または</emphasis><literal>IsString</literal>である場合に適用される。
+標準のデフォルト化規則(<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.3.4">Haskell Report, Section 4.3.4</ulink>)は次のように拡張される。デフォルト化は、全ての未解決の制約が標準のクラス<emphasis>または</emphasis><literal>IsString</literal>についてであって、少くとも一つが数値クラス<emphasis>または</emphasis><literal>IsString</literal>である場合に適用される。
 </para></listitem>
 </itemizedlist>
 </para>
@@ -2654,12 +2662,23 @@ Haskellの型シグネチャは暗黙に量化される。新しいキーワー�
 関数<literal>f3</literal>はランク3の型を持っている。関数矢印の左にランク2の型があるからである。
 </para>
 <para>
-GHCは任意のランクの型を認めている。つまり、関数矢印に必要なだけ深く<literal>forall</literal>を入れ子にすることができる。(GHCは過去にはランクを2に制限していたが、この制限は撤廃された)。特に、forallの付いた型(「型スキーム」とも呼ばれる)は、<!-- 訳注: including operational type class context -->型クラス文脈も含めて、以下の場所で使える。
+GHC has three flags to control higher-rank types:
+<itemizedlist>
+<listitem><para>
+ <option>-XPolymorphicComponents</option>: データ構築子(だけ)が、多相的な引数の型を持てる。
+</para></listitem>
+<listitem><para>
+ <option>-XRank2Types</option>: あらゆる関数(データ構築子を含む)が、ランク2の型を持てる。
+</para></listitem>
+<listitem><para>
+ <option>-XRankNTypes</option>: あらゆる関数(データ構築子を含む)が、任意のランクの型を持てる。つまり、関数矢印に必要なだけ深く<literal>forall</literal>を入れ子にすることができる。特に、forallの付いた型(「型スキーム」とも呼ばれる)は、<!-- 訳注: including operational type class context -->型クラス文脈も含めて、以下の場所で使える。
 <itemizedlist>
 <listitem> <para>関数矢印の左側または右側(例えば<literal>f4</literal>を見よ)</para> </listitem>
 <listitem> <para>データ型宣言で、構築子の引数として、またはフィールドの型として。例えば、上記の<literal>f1,f2,f3,g1,g2</literal>はどれも、フィールドの型シグネチャとして合法である。</para> </listitem>
 <listitem> <para>暗黙パラメタの型として</para> </listitem>
 <listitem> <para>パターン型シグネチャ(<xref linkend="scoped-type-variables"/>を見よ)の中 </para> </listitem>
+</itemizedlist>
+</para></listitem>
 </itemizedlist>
 もちろん、<literal>forall</literal>はキーワードになる。型変数として<literal>forall</literal>を使うことはもはやできない。
 </para>
@@ -2869,7 +2888,7 @@ GHCは、可能な最も内側の量化点を探したり<emphasis>しない</em
   f Nothing  = Nothing
 </programlisting>
 <literal>Maybe</literal>に<emphasis>多相的</emphasis>な型である<literal>(forall a. [a] -> [a])</literal>が与えられていることに注意。</para>
-<para>この拡張についての技術的な詳細は、論文<ulink url="http://research.microsoft.com/%7Esimonpj/papers/boxy">Boxy types: type inference for higher-rank types and impredicativity</ulink>にある。これはICFP 2006に現れた。
+<para>この拡張についての技術的な詳細は、論文<ulink url="http://research.microsoft.com/%7Esimonpj/papers/boxy/">Boxy types: type inference for higher-rank types and impredicativity</ulink>にある。これはICFP 2006に現れた。
 </para>
 </sect2>
 
@@ -2910,7 +2929,7 @@ f xs = ys ++ ys
 </itemizedlist>
 </para>
 <para>
-Haskellでは、プログラマの書いた型シグネチャは、その自由変数について暗黙に量化される(Haskellレポートの<ulink url="http://haskell.org/onlinereport/decls.html#sect4.1.2">4.1.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.1.2">和訳</ulink>))。字句的スコープを持つ型変数がこの暗黙量化規則に与える影響として、スコープにある型変数は全称量化されない。例えば、型変数<literal>a</literal>がスコープにあるとすると、
+Haskellでは、プログラマの書いた型シグネチャは、その自由変数について暗黙に量化される(Haskellレポートの<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.1.2">4.1.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.1.2">和訳</ulink>))。字句的スコープを持つ型変数がこの暗黙量化規則に与える影響として、スコープにある型変数は全称量化されない。例えば、型変数<literal>a</literal>がスコープにあるとすると、
 <programlisting>
   (e :: a -> a)     は     (e :: a -> a)          を意味する
   (e :: b -> b)     は     (e :: forall b. b->b)  を意味する
@@ -2963,7 +2982,20 @@ Haskellでは、プログラマの書いた型シグネチャは、その自由�
 パターン型シグネチャに現れる型変数がすべて既にスコープにある場合(つまり、外側の文脈で束縛されている場合)、事態は簡単である。そのシグネチャは、パターンの型を当たり前の方法で制限するだけのものである。
 </para>
 <para>
-スコープにない型変数をパターン型シグネチャに登場させても良い場合が一つだけある。存在的なデータ構築子に関するパターン照合の場合である。例を挙げる。
+式型シグネチャや宣言型シグネチャと違って、パターン型シグネチャは暗黙に一般化されることがない。<emphasis>パターン束縛</emphasis>中のパターンは、既にスコープにある型変数にしか言及してはならない。例を示す。
+<programlisting>
+  f :: forall a. [a] -> (Int, [a])
+  f xs = (n, zs)
+    where
+      (ys::[a], n) = (reverse xs, length xs) -- OK
+      zs::[a] = xs ++ ys                     -- OK
+
+      Just (v::b) = ...  -- 駄目。bがスコープにないので。
+</programlisting>
+ここで、<literal>ys</literal>と<literal>zs</literal>のパターンシグネチャは問題ないが、<literal>v</literal>のパターンシグネチャは、<literal>b</literal>がスコープにないので、不正である。
+</para>
+<para>
+一方、パターン束縛<emphasis>以外</emphasis>の全てのパターンでは、パターン型シグネチャがスコープにない型変数に言及しても良い。この場合、<emphasis>このシグネチャがこの型変数をスコープに導入する</emphasis>。これは、存在的データ構築子の場合に特に重要である。例えば以下のような場合。
 <programlisting>
   data T = forall a. MkT [a]
 
@@ -2972,10 +3004,13 @@ Haskellでは、プログラマの書いた型シグネチャは、その自由�
                  where
                    t3::[a] = [t,t,t]
 </programlisting>
-ここで、パターン型シグネチャ<literal>(t::a)</literal>は、スコープにない字句的型変数に言及している。実際、これはスコープにあってはならない。このパターン照合で束縛されるからである。このような状況では(そしてこのような状況でのみ)、パターン型シグネチャがまだスコープにない型変数に言及できる、というのがGHCの規則である。作用として、その型変数はスコープに導入され、存在的に束縛された型変数を表すことになる。
+ここで、パターン型シグネチャ<literal>(t::a)</literal>は、スコープにない字句的型変数に言及している。実際、これはスコープにあっては<emphasis>ならない</emphasis>。このパターン照合で束縛されるからである。このような状況では(そしてこのような状況でのみ)、パターン型シグネチャがまだスコープにない型変数に言及できる、というのがGHCの規則である。作用として、その型変数はスコープに導入され、存在的に束縛された型変数を表すことになる。
 </para>
 <para>
-これは少し奇妙に思えるかもしれない。我々もそう思う。しかし、このような型変数をスコープに導入する<emphasis>なんらかの</emphasis>方法は必要であり、さもなくば、後続の型シグネチャから存在束縛された型変数を名前で呼ぶことができなくなってしまう。
+パターン型シグネチャがこの方法で型変数を束縛する場合、GHCはその型変数が<emphasis>固い</emphasis>(完全に既知の)型変数に束縛されたと見なす。これによって、ユーザの書いた型シグネチャが全て完全に既知の型を表すことになる。
+</para>
+<para>
+このあたりのことは少し奇妙に思えるかもしれない。我々もそう思う。しかし、このような型変数をスコープに導入する<emphasis>なんらかの</emphasis>方法は必要であり、さもなくば、後続の型シグネチャから存在束縛された型変数を名前で呼ぶことができなくなってしまう。
 </para>
 <para>
 これはパターン型シグネチャがスコープにない字句的型変数に言及できる<emphasis>唯一の</emphasis>状況(になった)である。例えば、<literal>a</literal>がまだスコープにないなら、<literal>f</literal>と<literal>g</literal>は両方とも不正である。
@@ -3061,10 +3096,10 @@ consider how one would parse this:
 <title>相互再帰的な束縛に対する型付けの一般化</title>
 
 <para>
-Haskellレポートでは、束縛のグループ(最上位、または<literal>let</literal>や<literal>where</literal>中のもの)は、まず強連結な成分に分割され、次に依存性の順に型検査されると規定されている(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.1">Haskellレポートの4.5.1節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.1">和訳</ulink>))。個々のグループが型検査されるとき、グループの中の明示的な型シグネチャのある束縛は、指定された多相型を持つものとして型環境に入れられ、そうでないものは全て、グループが一般化されるまで単相的でありつづける。(<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.2">Haskellレポートの4.5.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.2">和訳</ulink>))
+Haskellレポートでは、束縛のグループ(最上位、または<literal>let</literal>や<literal>where</literal>中のもの)は、まず強連結な成分に分割され、次に依存性の順に型検査されると規定されている(<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.1">Haskellレポートの4.5.1節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.1">和訳</ulink>))。個々のグループが型検査されるとき、グループの中の明示的な型シグネチャのある束縛は、指定された多相型を持つものとして型環境に入れられ、そうでないものは全て、グループが一般化されるまで単相的でありつづける。(<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.2">Haskellレポートの4.5.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.2">和訳</ulink>))
 </para>
 
-<para>Mark Jonesの論文<ulink url="http://www.cse.ogi.edu/~mpj/thih/">Typing Haskell in Haskell</ulink>での提案に従って、GHCはより一般的な様式を実装している。<option>-XRelaxedPolyRec</option>が指定されているとき、<emphasis>依存性解析において、明示的な型シグネチャのある変数への参照は無視される</emphasis>。依存性解析がこのように変更される結果、依存性グループは小さくなり、より多くの束縛が型検査を通るようになる。例として以下を考える。
+<para>Mark Jonesの論文<ulink url="http://citeseer.ist.psu.edu/424440.html">Typing Haskell in Haskell</ulink>での提案に従って、GHCはより一般的な様式を実装している。<option>-XRelaxedPolyRec</option>が指定されているとき、<emphasis>依存性解析において、明示的な型シグネチャのある変数への参照は無視される</emphasis>。依存性解析がこのように変更される結果、依存性グループは小さくなり、より多くの束縛が型検査を通るようになる。例として以下を考える。
 <programlisting>
   f :: Eq a =&gt; a -> Bool
   f x = (x == x) || g True || g "Yes"
@@ -3098,7 +3133,7 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 GHCは、型を添字とする型の族(type family)を定義することに対応している。これは、Haskell 98における、クラスによる値の多重定義を、型にまで拡張したものと見ることができる。型の族がクラス中で宣言された場合、それを関連型(associated type)とも呼ぶ。
 </para>
 <para>
-型の族には二種類ある。データの族と型シノニムの族である。現在、完全に実装されているのは前者だけで、後者についてはまだ作業中である。結果として、この言語拡張の仕様はまだある程度流動的である。よって、この言語拡張とその使い方の詳しい説明は現在<ulink url="http://haskell.org/haskellwiki/GHC/Indexed_types">Haskell wikiの型の族についてのページ</ulink>にある。安定したら、この資料はこの利用の手引きに移されるだろう。
+型の族には二種類ある。データの族と型シノニムの族である。現在、完全に実装されているのは前者だけで、後者についてはまだ作業中である。結果として、この言語拡張の仕様はまだある程度流動的である。よって、この言語拡張とその使い方の詳しい説明は現在<ulink url="http://www.haskell.org/haskellwiki/GHC/Indexed_types">Haskell wikiの型の族についてのページ</ulink>にある。安定したら、この資料はこの利用の手引きに移されるだろう。
 </para>
 <para>
 型の族は<option>-XTypeFamilies</option>によって有効になる。
@@ -3114,10 +3149,10 @@ GHCは、型を添字とする型の族(type family)を定義することに対�
 <sect1 id="template-haskell">
 <title>Template Haskell</title>
 
-<para>Template HaskellはHaskellでコンパイル時メタプログラミングをすることを可能にする。主要な技術的革新の背景は"<ulink url="http://research.microsoft.com/~simonpj/papers/meta-haskell">Template Meta-programming for Haskell</ulink>" (Proc Haskell Workshop 2002)で議論されている。
+<para>Template HaskellはHaskellでコンパイル時メタプログラミングをすることを可能にする。主要な技術的革新の背景は"<ulink url="http://research.microsoft.com/~simonpj/papers/meta-haskell/">Template Meta-programming for Haskell</ulink>" (Proc Haskell Workshop 2002)で議論されている。
 </para>
 <para>
-Template Haskellに関するwikiページが<ulink url="http://haskell.org/haskellwiki/Template_Haskell">http://www.haskell.org/th/</ulink>にある。また、<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">オンラインHaskellライブラリリファレンス</ulink>を参照することもできる(ExpQという型で検索すると良い)。[一時的: 元の設計からの多くの変更点が<ulink url="http://research.microsoft.com/~simonpj/tmp/notes2.ps">"http://research.microsoft.com/~simonpj/tmp/notes2.ps"</ulink>に記されている。これらの変更点が全てGHC 6.6にある訳ではない。]
+Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/haskellwiki/Template_Haskell">http://www.haskell.org/th/</ulink>にある。また、<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">オンラインHaskellライブラリリファレンス</ulink>を参照することもできる(ExpQという型で検索すると良い)。[一時的: 元の設計からの多くの変更点が<ulink url="http://research.microsoft.com/~simonpj/tmp/notes2.ps">"http://research.microsoft.com/~simonpj/tmp/notes2.ps"</ulink>に記されている。これらの変更点が全てGHC 6.6にある訳ではない。]
 </para>
 
 <para>以下では、入門用の例として、論文の最初の例を使っている。
@@ -3691,19 +3726,19 @@ f !x = 3
 <programlisting>
 (!) f x = 3
 </programlisting>
-Haskellのパターン照合の意味論はHaskellレポートの<ulink url="http://haskell.org/onlinereport/exps.html#sect3.17.2">3.17.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.2">和訳</ulink>)に書かれている。この記述に、第十項目として以下のものを付け加える。
+Haskellのパターン照合の意味論はHaskellレポートの<ulink url="http://www.haskell.org/onlinereport/exps.html#sect3.17.2">3.17.2節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.2">和訳</ulink>)に書かれている。この記述に、第十項目として以下のものを付け加える。
 <itemizedlist><listitem><para>パターン<literal>!pat</literal>の値<literal>v</literal>への照合は、次のように振る舞う:
 <itemizedlist><listitem><para>もし、<literal>v</literal>がボトムなら、照合は発散する。</para></listitem>
 		<listitem><para>そうでなければ、<literal>pat</literal>は<literal>v</literal>と照合する。</para></listitem>
 </itemizedlist>
 </para></listitem></itemizedlist>
-同様に、<ulink url="http://haskell.org/onlinereport/exps.html#sect3.17.3">3.17.3節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.3">和訳</ulink>)の図4に、新しい場合(t)を追加する。
+同様に、<ulink url="http://www.haskell.org/onlinereport/exps.html#sect3.17.3">3.17.3節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.3">和訳</ulink>)の図4に、新しい場合(t)を追加する。
 <programlisting>
 case v of { !pat -> e; _ -> e' }
    = v `seq` case v of { pat -> e; _ -> e' }
 </programlisting>
 </para><para>
-残りはlet式である。これの変換はHaskellレポートの<ulink url="http://haskell.org/onlinereport/exps.html#sect3.12">3.12節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.12">和訳</ulink>)で与えられている。そこにある変換の箱において、まず以下の変換を施す。<literal>!qi = ei</literal>という形をした全てのパターン<literal>pi</literal>について、これを<literal>(xi,!qi) = ((),ei)</literal>に変換し、<literal>e0</literal>を<literal>(xi `seq` e0)</literal>で置き換える。次に、左辺のパターンがどれも先頭にびっくりマークを持たないようになったら、今ある箱の中にある規則を適用する。
+残りはlet式である。これの変換はHaskellレポートの<ulink url="http://www.haskell.org/onlinereport/exps.html#sect3.12">3.12節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.12">和訳</ulink>)で与えられている。そこにある変換の箱において、まず以下の変換を施す。<literal>!qi = ei</literal>という形をした全てのパターン<literal>pi</literal>について、これを<literal>(xi,!qi) = ((),ei)</literal>に変換し、<literal>e0</literal>を<literal>(xi `seq` e0)</literal>で置き換える。次に、左辺のパターンがどれも先頭にびっくりマークを持たないようになったら、今ある箱の中にある規則を適用する。
 </para>
 <para>このlet規則の効果は、本体の評価が始まる前に、パターン<literal>qi</literal>の照合を完全に終わらせることである。以下のように、<literal>qi</literal>が変数である場合に備えて、びっくりマークは変換後の形においても保持される。
 <programlisting>
@@ -4031,7 +4066,7 @@ key_function :: Int -> String -> (Bool, Double)
 
   h :: Eq a => a -> a -> a
   {-# SPECIALISE h :: (Eq a) => [a] -> [a] -> [a] #-}
-</programlisting>  
+</programlisting>
 最後の例では、生成されたRULSの左辺がかなり複雑なものになる(試してみよ)ので、あまりうまく発動しないかもしれない。この手の特殊化を使うことがあったら、どの程度うまくいったか知らせてほしい。
 </para>
 
@@ -4921,7 +4956,7 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
 <title>恐怖の単相性限定を無効にする</title>
           <indexterm><primary><option>-XNoMonomorphismRestriction</option></primary></indexterm>
 
-<para>Haskellの単相性限定(Haskellレポートの<ulink url="http://haskell.org/onlinereport/decls.html#sect4.5.5">4.5.5節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.5">和訳</ulink>)を見よ)は、<option>-XNoMonomorphismRestriction</option>で完全に無効にできる。
+<para>Haskellの単相性限定(Haskellレポートの<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.5">4.5.5節</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/decls.html#sect4.5.5">和訳</ulink>)を見よ)は、<option>-XNoMonomorphismRestriction</option>で完全に無効にできる。
 </para>
 </sect2>
 
