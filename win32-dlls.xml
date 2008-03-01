@@ -197,18 +197,18 @@ option on all the Haskell modules that make up your application.
 
 <para>
 <indexterm><primary>Creating a Win32 DLL</primary></indexterm>
-<indexterm><primary>&ndash;&ndash;shared</primary></indexterm>
+<indexterm><primary>&ndash;shared</primary></indexterm>
 HaskellライブラリをDLLに封じ込めるのは簡単な作業である。ライブラリを構成するオブジェクトファイルをコンパイルして作り、次のようなコマンドを発行することでDLLをビルドする。
 </para>
 
 <para>
 <screen>
-ghc &ndash;&ndash;shared -o foo.dll bar.o baz.o wibble.a -lfooble
+ghc &ndash;shared -o foo.dll bar.o baz.o wibble.a -lfooble
 </screen>
 </para>
 
 <para>
-GHCのコンパイラ駆動器に<option>&ndash;&ndash;shared</option>を渡すと、実行ファイルを作る代わりにDLLをビルドする。そのDLLは、コマンド行で渡された全てのオブジェクトファイルとアーカイブから成る。
+GHCのコンパイラ駆動器に<option>&ndash;shared</option>を渡すと、実行ファイルを作る代わりにDLLをビルドする。そのDLLは、コマンド行で渡された全てのオブジェクトファイルとアーカイブから成る。
 </para>
 
 <!--
@@ -244,10 +244,10 @@ you compile into a DLL must have a common root.
 
 <listitem>
 <para>
-<option>&ndash;&ndash;shared</option>を使う際、デフォルトでは、全てのオブジェクトファイルのエントリポイントがDLLからエクスポートされる。これを制限したいなら、次のようにして、コマンド行中で<emphasis>モジュール定義ファイル</emphasis>を指定することができる。
+<option>&ndash;shared</option>を使う際、デフォルトでは、全てのオブジェクトファイルのエントリポイントがDLLからエクスポートされる。これを制限したいなら、次のようにして、コマンド行中で<emphasis>モジュール定義ファイル</emphasis>を指定することができる。
 
 <screen>
-ghc &ndash;&ndash;shared -o .... MyDef.def
+ghc &ndash;shared -o .... MyDef.def
 </screen>
 
 詳細はMicrosoftの文書を参照してほしいが、モジュール定義ファイルは、エクスポートしたいエントリポイントの単なる羅列である。HaskellのCOMサーバDLLをビルドするのに使うものを挙げる。
@@ -264,7 +264,7 @@ EXPORTS
 
 <listitem>
 <para>
-<option>&ndash;&ndash;shared</option>オプションは、DLLを作成するのに加え、インポートライブラリも作る。インポートライブラリの名前は、次のようにしてDLLの名前から作られる。
+<option>&ndash;shared</option>オプションは、DLLを作成するのに加え、インポートライブラリも作る。インポートライブラリの名前は、次のようにしてDLLの名前から作られる。
 
 <programlisting>
 DLL: HScool.dll  ==&#62; import lib: libHScool.dll.a
@@ -357,7 +357,7 @@ ghc -c dllMain.c
 DLLを構築する。
 
 <screen>
-ghc &ndash;&ndash;shared -o adder.dll adder.o adder_stub.o dllMain.o
+ghc &ndash;shared -o adder.dll adder.o adder_stub.o dllMain.o
 </screen>
 
 </para>
