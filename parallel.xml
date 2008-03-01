@@ -15,7 +15,7 @@
   <sect2 id="concurrent-haskell">
     <title>Concurrent Haskell</title>
 
-  <para>Concurrent HaskellとはGHCの並行性拡張に付けられた名前である。これはデフォルトで有効になっており、特別なフラグは必要ない。<ulink url="http://research.microsoft.com/copyright/accept.asp?path=/users/simonpj/papers/concurrent-haskell.ps.gz">Concurrent Haskellの論文</ulink>は今でも素晴らしいリソースであるし、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/marktoberdorf">Tackling the awkward squad</ulink>もそうである。
+  <para>Concurrent HaskellとはGHCの並行性拡張に付けられた名前である。これはデフォルトで有効になっており、特別なフラグは必要ない。<ulink url="http://research.microsoft.com/copyright/accept.asp?path=/users/simonpj/papers/concurrent-haskell.ps.gz">Concurrent Haskellの論文</ulink>は今でも素晴らしいリソースであるし、<ulink url="http://research.microsoft.com/%7Esimonpj/papers/marktoberdorf/">Tackling the awkward squad</ulink>もそうである。
   </para><para>
   プログラマに対しては、Concurrent Haskellでは新しい言語要素は導入されず、単なるライブラリ(<ulink url="../libraries/base/Control-Concurrent.html">Control.Concurrent</ulink>)の形を取る。このライブラリからは例えば次のような関数がエクスポートされている。
   <itemizedlist>
@@ -51,7 +51,7 @@
   <sect2>
     <title>純粋なコードに並列計算用の注釈を加える</title>
 
-  <para>通常の単一スレッドのHaskellプログラムは、SMP並列性を有効にしただけではその恩恵を被ることができない。並列性をコンパイラから見えるようにしてやる必要があるのだ。これには、Concurrent Haskell(<xref linkend="concurrent-haskell"/>)を使ってスレッドをforkするという方法もあるが、純粋なコードから並列性を取り出す場合、最も単純な方法は<literal>par</literal>コンビネータを使うことである。これは、<literal>seq</literal>と強く関連している(また、良く一緒に使われる)。これらはどちらも<ulink url="../libraries/base/Control-Parallel.html"><literal>Control.Parallel</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Parallel.html">web上の最新版</ulink>)にある。</para>
+  <para>通常の単一スレッドのHaskellプログラムは、SMP並列性を有効にしただけではその恩恵を被ることができない。並列性をコンパイラから見えるようにしてやる必要があるのだ。これには、Concurrent Haskell(<xref linkend="concurrent-haskell"/>)を使ってスレッドをforkするという方法もあるが、純粋なコードから並列性を取り出す場合、最も単純な方法は<literal>par</literal>コンビネータを使うことである。これは、<literal>seq</literal>と強く関連している(また、良く一緒に使われる)。これらはどちらも<ulink url="../libraries/parallel/Control-Parallel.html"><literal>Control.Parallel</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/parallel/Control-Parallel.html">web上の最新版</ulink>)にある。</para>
 
 <programlisting>
 infixr 0 `par`
@@ -77,7 +77,7 @@ nfib n | n &#60;= 1 = 1
 
     <para><literal>par</literal>を使うとき、一般的な経験則としては、発火させる計算は後で必要とされるものであるべきだが、一方、あまりすぐ必要とされるものであるべきではない。また、あまり小さい計算を発火させるべきではない。得られる並列性に比べてそれをforkするコストが比較的高いからである。実際には、これらの比率を正しく把握するのは難しい。</para>
 
-    <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="../libraries/base/Control-Parallel-Strategies.html"><literal>Control.Parallel.Strategies</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Parallel-Strategies.html">web上の最新版</ulink>)モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
+    <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="../libraries/parallel/Control-Parallel-Strategies.html"><literal>Control.Parallel.Strategies</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/parallel/Control-Parallel-Strategies.html">web上の最新版</ulink>)モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
   </sect2>
 
 </sect1>
