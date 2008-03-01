@@ -1405,7 +1405,7 @@ Prelude> :main foo bar
           <indexterm><primary><literal>:set</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para>色々なオプションを設定する。利用可能なオプションの一覧は<xref linkend="ghci-set"/>を、GHCi特有のフラグは<xref linkend="interactive-mode-options"/>を見よ。<literal>:set</literal>コマンド単独では、どのオプションが現在有効になっているか表示する。また、現在の動的フラグの設定状況の一覧も表示する。GHCi特有のフラグは分けて表示される。</para>
+          <para>色々なオプションを設定する。利用可能なオプションの一覧は<xref linkend="ghci-set"/>を、GHCi固有のフラグは<xref linkend="interactive-mode-options"/>を見よ。<literal>:set</literal>コマンド単独では、どのオプションが現在有効になっているか表示する。また、現在の動的フラグの設定状況の一覧も表示する。GHCi固有のフラグは分けて表示される。</para>
 	</listitem>
       </varlistentry>
 
