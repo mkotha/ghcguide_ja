@@ -49,7 +49,7 @@
       <varlistentry>
 	<term>glasgow-haskell-users:</term>
 	<listitem>
-	  <para>これはGHCの利用者が互いにおしゃべりをする場である。なにかGHCに関する質問があるなら、先に<ulink url="http://haskell.org/haskellwiki/GHC/FAQ">FAQ</ulink>を探してみてほしい。</para>
+	  <para>これはGHCの利用者が互いにおしゃべりをする場である。なにかGHCに関する質問があるなら、先に<ulink url="http://www.haskell.org/haskellwiki/GHC/FAQ">FAQ</ulink>を探してみてほしい。</para>
 
 	  <variablelist>
 	    <varlistentry>
@@ -193,7 +193,8 @@
   </sect1>
 
 
-&relnotes;
+&relnotes2;
+&relnotes1;
 
 </chapter>
 
