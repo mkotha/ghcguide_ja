@@ -4710,12 +4710,10 @@ g x = show x
            {GHCziShow.ZCDShow
             (tpl1::GHCziBase.Int ->
                    a ->
-                   GHCziBase.ZMZN GHCziBase.Char -> GHCziBase.ZMZN GHCziBase.Cha
-r)
+                   GHCziBase.ZMZN GHCziBase.Char -> GHCziBase.ZMZN GHCziBase.Char)
             (tpl2::a -> GHCziBase.ZMZN GHCziBase.Char)
             (tpl3::GHCziBase.ZMZN a ->
-                   GHCziBase.ZMZN GHCziBase.Char -> GHCziBase.ZMZN GHCziBase.Cha
-r) ->
+                   GHCziBase.ZMZN GHCziBase.Char -> GHCziBase.ZMZN GHCziBase.Char) ->
               tpl2})
         (%note "bar"
          eta);
