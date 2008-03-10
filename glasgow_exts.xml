@@ -4720,7 +4720,7 @@ g x = show x
 </programlisting>
 
 <para>
-ここで、関数<function>show</function>(これは展開されてShow辞書についてのcase式になっている)に<literal>%note</literal>が付属ていることが分かる。<varname>eta</varname>(<varname>x</varname>という名前だったもの)も同様である。
+ここで、関数<function>show</function>(これは展開されてShow辞書についてのcase式になっている)に<literal>%note</literal>が付属していることが分かる。<varname>eta</varname>(<varname>x</varname>という名前だったもの)も同様である。
 </para>
 
 </sect2>
