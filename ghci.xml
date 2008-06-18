@@ -591,7 +591,7 @@ right :: [a]
 left = (_t1::[a])
 </screen>
 
-      <para>これでは大したことは分からない。何が起きたかというと、<literal>left</literal>が未評価の計算(中断された計算、<firstterm>サンク</firstterm>ともいう)に束縛されていて、<literal>:print</literal>は決して評価を強制しないのだ。これは、ブレークポイントで<literal>:print</literal>を使って値を調べるとき、望ましくない副作用を起こさずに済むようにするためだ。評価を強制しないので、プログラムが通常と異なる結果を与えることもないし、例外が発生することもないし、無限ループや別のブレークポイント(<xref linkend="nested-breakpoints"/>)に遭遇することもない。<literal>:print</literal>は、サンクをforceする代わりに、各サンクをアンダースコアから始まる新しい変数(ここでは<literal>_t1</literal>)に束縛する。</para>
+      <para>これでは大したことは分からない。何が起きたかというと、<literal>left</literal>が未評価の計算(中断された計算、<firstterm>サンク</firstterm>ともいう)に束縛されており、しかも<literal>:print</literal>は決して評価を強制しないのだ。これは、ブレークポイントで<literal>:print</literal>を使って値を調べるとき、望ましくない副作用を起こさずに済むようにするためだ。評価を強制しないので、プログラムが通常と異なる結果を与えることもないし、例外が発生することもないし、無限ループや別のブレークポイント(<xref linkend="nested-breakpoints"/>)に遭遇することもない。<literal>:print</literal>は、サンクをforceする代わりに、各サンクをアンダースコアから始まる新しい変数(ここでは<literal>_t1</literal>)に束縛する。</para>
 
         <para><literal>-fprint-evld-with-show</literal>というフラグは、<literal>:print</literal>が可能な限り既存の<literal>Show</literal>インスタンスを再利用するようにするものである。これが起こるのは、対象の変数の中身が完全に評価済みの時だけである。</para>
 
@@ -656,7 +656,7 @@ right :: [a]
    :break <replaceable>identifier</replaceable>
 </screen>
 
-      <para><replaceable>identifier</replaceable>は最上位の関数の名前(修飾名も使える)である。ただし、この関数の定義されているモジュールが、現在GHCiにロードされており、さらに解釈実行されていなければならない。ブレークポイントは関数の本体、関数が完全に適用され、パターン照合が行われる前の点に設定される。</para>
+      <para><replaceable>identifier</replaceable>は最上位の関数の名前(修飾名も使える)である。ただし、この関数の定義されているモジュールが、現在GHCiにロードされており、さらに解釈実行されていなければならない。ブレークポイントは関数の本体、関数が完全に適用されたがパターン照合が行われる前の点に設定される。</para>
 
       <para>行番号(と列番号)でブレークポイントを設定することもできる。</para>
 
@@ -842,7 +842,7 @@ a :: a
       <title>例外をデバッグする</title>
       <para>もう一つデバッグ中によく発生する疑問として、「この例外はどこから来たんだ？」というものがある。<literal>error</literal>や<literal>head []</literal>によって発生する例外には文脈情報が付属していない。プログラム中のどの<literal>head</literal>の呼び出しがエラーの原因になったかを調べるのは骨の折れる作業であり、通常<literal>Debug.Trace.trace</literal>を使ったり、プロファイル付きでコンパイルして<literal>+RTS -xc</literal>(<xref linkend="prof-time-options"/>を見よ)を使ったりすることになる。</para>
 
-      <para>GHCiデバッガの提供する方法を使うと、このようなエラーを素早く、かつコードを再コンパイルすることなしに突き止めることが、うまくすればできるかもしれない。一つの方法は、ソースコード中で例外を投げた場所にブレークポイントを設定し、<literal>:trace</literal>と<literal>:history</literal>を使って文脈を把握することだろう。しかし、<literal>head</literal>はライブラリ中にあり、そこに直接ブレークポイントを設定する訳にはいかない。このために、GHCiには<literal>-fbreak-on-exceptin</literal>フラグが用意されていて、これを使うと、例外が投げられた時に評価器が停止するようにできる。<literal>-fbreak-on-error</literal>も同様だが、これは例外が捕捉されなかった場合のみ停止する。例外によって停止したときは、GHCiはちょうどブレークポイントに当ったのと同じように振る舞うが、違いとして、ソースコード中の位置が表示されない。したがって、<literal>:trace</literal>と組み合わせて、例外が発生する直前のステップを記録するようにしないと、これらのコマンドはあまり有用でない。例えば次のように。</para>
+      <para>GHCiデバッガの提供する方法を使うと、このようなエラーを素早く、かつコードを再コンパイルすることなしに突き止めることが、うまくすればできるかもしれない。一つの方法は、ソースコード中で例外を投げた場所にブレークポイントを設定し、<literal>:trace</literal>と<literal>:history</literal>を使って文脈を把握することだろう。しかし、<literal>head</literal>はライブラリ中にあり、そこに直接ブレークポイントを設定する訳にはいかない。このために、GHCiには<literal>-fbreak-on-exception</literal>フラグが用意されていて、これを使うと、例外が投げられた時に評価器が停止するようにできる。<literal>-fbreak-on-error</literal>も同様だが、これは例外が捕捉されなかった場合のみ停止する。例外によって停止したときは、GHCiはちょうどブレークポイントに当ったのと同じように振る舞うが、違いとして、ソースコード中の位置が表示されない。したがって、<literal>:trace</literal>と組み合わせて、例外が発生する直前のステップを記録するようにしないと、これらのコマンドはあまり有用でない。例えば次のように。</para>
 
 <screen>
 *Main> :set -fbreak-on-exception
