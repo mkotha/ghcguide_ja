@@ -1154,20 +1154,6 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-funfolding-update-in-place=<replaceable>n</replaceable></option>
-            <indexterm><primary><option>-funfolding-update-in-place</option></primary></indexterm>
-          </term>
-	  <listitem>
-            <para>ある実験的な「最適化」を有効にする。これを有効にすると、サンクの文脈では、構築子を返す関数を少しだけ積極的にインライン化するようになる。
-<programlisting>
-   x = plusInt a b
-</programlisting>
-            plusIntをインライン化すれば、サンク「x」について、その場更新(update-in-place)を使う機会が得られるかもしれない。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
             <option>-funfolding-creation-threshold=<replaceable>n</replaceable></option>:
 	    <indexterm><primary><option>-funfolding-creation-threshold</option></primary></indexterm>
 	    <indexterm><primary>inlining, controlling</primary></indexterm>

@@ -1300,13 +1300,6 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-funfolding-update-in-place</option></entry>
-              <entry>展開の設定を調整する</entry>
-	      <entry>静</entry>
-	      <entry><option>-fno-unfolding-update-in-place</option></entry>
-	    </row>
-
-	    <row>
 	      <entry><option>-funfolding-use-threshold</option></entry>
               <entry>展開の設定を調整する</entry>
 	      <entry>静</entry>
