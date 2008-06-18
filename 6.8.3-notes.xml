@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-6-8-3">
+  <title>Release notes for version 6.8.3</title>
+
+  <para>
+    6.8.3 is a bugfix release over 6.8.2. Many bugs in the compiler,
+    libraries and build system have been fixed. However, most library
+    APIs have not changed, so code that worked with 6.8.2 should
+    continue to work with 6.8.3. The notable exceptions, as well as the
+    user interface changes, are listed below.
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+        The arguments to <literal>ghc-pkg</literal> now understand
+        lists and wildcards, and there is a new command
+        <literal>ghc-pkg find-module</literal>; see
+        <xref linkend="package-management" /> for more details.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The filename completion in ghci is now more intelligent.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Options to be given to haddock now use a
+        <literal>OPTIONS_HADDOCK</literal> pragma, rather than a
+        <literal>DOC_OPTIONS</literal> pragma.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        We now look for GHCi config files in these locations:
+        <itemizedlist>
+          <listitem>
+            <para><literal>./.ghci</literal></para>
+          </listitem>
+          <listitem>
+            <para><literal>c:/Documents and Settings/<replaceable>user</replaceable>/Application Data/ghc/ghci.conf</literal> (on Windows)</para>
+          </listitem>
+          <listitem>
+            <para><literal><replaceable>$HOME</replaceable>/.ghc/ghci.conf</literal> (on *NIX)</para>
+          </listitem>
+          <listitem>
+            <para><literal><replaceable>$HOME</replaceable>/.ghci</literal></para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        You can now give multiple <literal>-e</literal> options to GHC.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        You can now use the <literal>-prof</literal> and
+        <literal>-threaded</literal> flags together, although
+        you cannot also use <literal>+RTS -N2</literal>.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        SCC names are no longer allowed to contain spaces, as some of
+        the profiling tools break if they do.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        On MacOS X we now include <literal>~/Library/Frameworks</literal>
+        in the framework searchpath.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Various changes have been made to GHC's internals, so there are
+        some differences in the API exposed by the ghc package. Most
+        notably, <literal>checkAndLoadModule</literal> has now been
+        implemented.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of base has been increased from 3.0.1.0 to 3.0.2.0.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of bytestring has been increased from 0.9.0.1 to 0.9.0.2.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <literal>GHC.TopHandler</literal> now exports
+        <literal>topHandler</literal> and
+        <literal>topHandlerFastExit</literal>.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of Cabal has been increased from 1.2.3.0 to 1.2.4.0.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        In Cabal, there is a new <literal>--hyperlink-source</literal>
+        flag for haddock 2.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of containers has been increased from 0.1.0.1 to 0.1.0.2.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of directory has been increased from 1.0.0.0 to 1.0.0.1.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of hpc has been increased from 0.5.0.0 to 0.5.0.1.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of process has been increased from 1.0.0.0 to 1.0.0.1.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of unix has been increased from 2.3.0.0 to 2.3.0.1.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        The version of Win32 has been increased from 2.1.1.0 to 2.1.1.1.
+      </para>
+    </listitem>
+  </itemizedlist>
+</sect1>
+
