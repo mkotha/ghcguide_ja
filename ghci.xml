@@ -372,7 +372,7 @@ Prelude IO>
       </sect3>
 
       <sect3>
-        <title><literal>:main</literal>コマンド</title>
+        <title><literal>:main</literal>コマンドと<literal>:run</literal>コマンド</title>
 
         <para>
           プログラムがコンパイルされ実行されるとき、コマンド行引数にアクセスするために<literal>getArgs</literal>関数を使うことができる。しかし、ghciでテストをしているときは、コマンド行引数を単純に<literal>main</literal>関数の引数として渡すことはできない。<literal>main</literal>関数は直接には引数をとらないからである。
@@ -386,6 +386,29 @@ Prelude IO>
 Prelude> let main = System.Environment.getArgs >>= print
 Prelude> :main foo bar
 ["foo","bar"]
+</screen>
+
+        <para>スペースなどの文字を含む引数は、引用符に入れることができ、Haskellの文字列と同じように扱われる。また、Haskellのリスト構文をそのまま使うこともできる。</para>
+
+<screen>
+Prelude> :main foo "bar baz"
+["foo","bar baz"]
+Prelude> :main ["foo", "bar baz"]
+["foo","bar baz"]
+</screen>
+
+        <para>最後に、<literal>-main-is</literal>フラグや<literal>:run</literal>コマンドを使えば、その他の関数を呼ぶことができる。</para>
+
+<screen>
+Prelude> let foo = putStrLn "foo" >> System.Environment.getArgs >>= print
+Prelude> let bar = putStrLn "bar" >> System.Environment.getArgs >>= print
+Prelude> :set -main-is foo
+Prelude> :main foo "bar baz"
+foo
+["foo","bar baz"]
+Prelude> :run bar ["foo", "bar baz"]
+bar
+["foo","bar baz"]
 </screen>
 
       </sect3>
@@ -493,7 +516,7 @@ def = toEnum 0
     <indexterm><primary>debugger</primary><secondary>in GHCi</secondary>
     </indexterm>
 
-    <para>GHCiは単純な命令的スタイルのデバッガを搭載していて、実行中の計算を停めて変数の値を確かめることができる。このデバッガはGHCiに統合されており、デフォルトで有効になっている。デバッグ機能を使うのにフラグは必要ない。一つ、重要な制限があって、ブレークポイントとステップ実行は<emphasis>解釈実行</emphasis>されているモジュールでしか使えない。コンパイル済みコードはデバッガからは見えない。</para>
+    <para>GHCiは単純な命令的スタイルのデバッガを搭載していて、実行中の計算を停めて変数の値を確かめることができる。このデバッガはGHCiに統合されており、デフォルトで有効になっている。デバッグ機能を使うのにフラグは必要ない。一つ、重要な制限があって、ブレークポイントとステップ実行は解釈実行されているモジュールでしか使えない。コンパイル済みコードはデバッガからは見えない<footnote><para>パッケージにはコンパイル済みコードしか入っていないので、パッケージをデバッグするにはそのソースを見つけてきて直接ロードするしかないことに注意。</para></footnote>。</para>
 
     <para>このデバッガは以下のものを提供する。
     <itemizedlist>
@@ -512,7 +535,7 @@ def = toEnum 0
       </itemizedlist>
     </para>
       
-    <para>現在のところ、&ldquo;スタックトレース&rdquo;を得る手段は提供されていないが、追跡と履歴の機能が有用な次善策になっていて、これらで十分エラー発生時の状況を知ることができることがしばしばある。</para>
+    <para>現在のところ、&ldquo;スタックトレース&rdquo;を得る手段は提供されていないが、追跡と履歴の機能が有用な次善策になっていて、これらで十分エラー発生時の状況を知ることができることがしばしばある。例えば、例外が投げられたときに自動的にブレークするようにすることが可能で、これは例外がコンパイル済みコードで投げられた場合にも有効である。(<xref linkend="ghci-debugger-exceptions"/>を見よ)</para>
       
     <sect2 id="breakpoints">
       <title>ブレークポイントと変数内容の表示</title>
@@ -1353,6 +1376,28 @@ Prelude> :main foo bar
 ["foo","bar"]
 </screen>
 
+        <para>スペースなどの文字を含む引数は、引用符に入れることができ、Haskellの文字列と同じように扱われる。また、Haskellのリスト構文をそのまま使うこともできる。</para>
+
+<screen>
+Prelude> :main foo "bar baz"
+["foo","bar baz"]
+Prelude> :main ["foo", "bar baz"]
+["foo","bar baz"]
+</screen>
+
+        <para>最後に、<literal>-main-is</literal>フラグや<literal>:run</literal>コマンドを使えば、その他の関数を呼ぶことができる。</para>
+
+<screen>
+Prelude> let foo = putStrLn "foo" >> System.Environment.getArgs >>= print
+Prelude> let bar = putStrLn "bar" >> System.Environment.getArgs >>= print
+Prelude> :set -main-is foo
+Prelude> :main foo "bar baz"
+foo
+["foo","bar baz"]
+Prelude> :run bar ["foo", "bar baz"]
+bar
+["foo","bar baz"]
+</screen>
         </listitem>
       </varlistentry>
 
@@ -1691,9 +1736,24 @@ Prelude> :set -fno-glasgow-exts
     <indexterm><primary>startup</primary><secondary>files, GHCi</secondary>
     </indexterm>
 
-    <para>GHCiは、開始するとき、<literal>-ignore-dot-ghci</literal>フラグが与えられていない限り、<filename>$HOME/.ghci</filename>、次に<filename>./.ghci</filename>を読み、そこに書かれているコマンドを実行する。</para>
+    <para>GHCiは、開始するとき、<literal>-ignore-dot-ghci</literal>フラグが与えられていない限り、以下の各ファイルが存在していれば、この順で読み、書かれているコマンドを実行する。</para>
 
-    <para>ホームディレクトリの<filename>.ghci</filename>は、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトがGHC拡張とCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
+    <enumeratedlist>
+    <listitem>
+      <para><filename>./.ghci</filename></para>
+    </listitem>
+    <listitem>
+      <para><literal><replaceable>appdata</replaceable>/ghc/ghci.conf</literal>、ただし<replaceable>appdata</replaceable>はシステムに依存。通常は<literal>C:/Documents and Settings/<replaceable>user</replaceable>/Application Data</literal>のようなところ。</para>
+    </listitem>
+    <listitem>
+      <para>Unixでは、<literal>$HOME/.ghc/ghci.conf</literal></para>
+    </listitem>
+    <listitem>
+      <para><literal>$HOME/.ghci</literal></para>
+    </listitem>
+   </enumeratedlist>
+
+    <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトがGHC拡張とCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
 
 <screen>
 :set -fglasgow-exts -cpp
@@ -1702,7 +1762,15 @@ Prelude> :set -fno-glasgow-exts
 
     <para>(厳密には<option>-i</option>フラグは静的オプションであるが、このように<literal>:set</literal>しても動くことに注意。ただし、この変更は、次に<literal>:load</literal>が実行されるまで効果を発揮しない。)</para>
 
-    <para><filename>.ghci</filename>ファイルが読まれるかどうかを制御する二つのコマンド行オプションがある。</para>
+    <para>GHCiマクロを沢山持つようになると、それらを別のファイルから調達したいと思うかもしれない。また、<filename>.ghci</filename>ファイルをデバッグしているときに、それを実行中のGHCiにロードしたいと思うことがあるかもしれない。</para>
+
+<screen>
+:def source readFile
+</screen>
+
+    <para>あなたの<filename>.ghci</filename>にこのマクロを置いておけば、<literal>:source file</literal>とすることで<literal>file</literal>からGHCiコマンドを読み込むことができる。Haskell wikiのページ<ulink url="http://haskell.org/haskellwiki/GHC/GHCi">GHC/GHCi</ulink>では、<filename>.ghci</filename>についてのその他の助言を読むことが(そしてもちろん、追加することも)できる。</para>
+
+    <para>開始時ファイルが読まれるかどうかを制御する二つのコマンド行オプションがある。</para>
 
     <variablelist>
       <varlistentry>
@@ -1711,7 +1779,7 @@ Prelude> :set -fno-glasgow-exts
           <indexterm><primary><option>-ignore-dot-ghci</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>開始時に、<filename>./.ghci</filename>も<filename>$HOME/.ghci</filename>も読まない。</para>
+          <para>開始するとき、<filename>./.ghci</filename>その他の開始時ファイルを読まない。</para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -1720,7 +1788,7 @@ Prelude> :set -fno-glasgow-exts
           <indexterm><primary><option>-read-dot-ghci</option></primary></indexterm>
         </term>
 	<listitem>
-          <para><filename>.ghci</filename>と<filename>$HOME/.ghci</filename>を読む。通常これがデフォルトであるが、<option>-read-dot-ghci</option>は前に指定された<option>-ignore-dot-ghci</option>を上書きするのに使うことができる。</para>
+          <para><filename>.ghci</filename>その他の開始時ファイル(上記)を読む。通常これがデフォルトであるが、<option>-read-dot-ghci</option>は前に指定された<option>-ignore-dot-ghci</option>を上書きするのに使うことができる。</para>
 	</listitem>
       </varlistentry>
     </variablelist>
