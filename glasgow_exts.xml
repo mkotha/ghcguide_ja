@@ -207,7 +207,7 @@
 
 <para>どんなプリミティブ型があるか、それらにどんな演算が働くか、についての真正な事実は<filename>fptools/ghc/compiler/prelude/primops.txt.pp</filename>というファイルに記されている。このファイルは直接GHCのプリミティブ演算の定義を生成するのに使われるので、内容は常に正しい。また、テキスト化処理ができるようになっている。</para>
 
-<para>じっさい、処理の結果が<ulink url="http://www.haskell.org/ghc/docs/papers/core.ps.gz">External Core language</ulink>の説明に含まれているので、活字に組まれたものを探しているならこれを使うと良い。<filename>primops.txt</filename>を処理するプログラムへのSGMLバックエンドを作ってくれる人がいれば、とてもありがたい。結果をこの利用者手引きに載せられるからである。</para>
+<para>じっさい、処理の結果が<ulink url="http://www.haskell.org/ghc/docs/papers/core.ps.gz">External Core language</ulink>の説明に含まれているので、活字に組まれたものを探しているならこれを使うと良い。<filename>primops.txt</filename>を処理するプログラムへのXMLバックエンドを作ってくれる人がいれば、とてもありがたい。結果をこの利用者手引きに載せられるからである。</para>
 
 <para>以下はいくつかの主要な点についての短いまとめである。</para>
   
@@ -1352,7 +1352,7 @@ GADTの鍵となる点は、<emphasis>パターン照合によって型の精密
 これらの論文ではGHCに実装されているのと異なる記法を使っていることがあるので注意。
 </para>
 <para>
-この節の残りの部分では、GADTをサポートするGHCの拡張について概観する。この拡張は<option>-XGADTs</option>で有効になる。
+この節の残りの部分では、GADTをサポートするGHCの拡張について概観する。この拡張は<option>-XGADTs</option>で有効になる。<option>-XGADTs</option>フラグを使うと、<option>-XRelaxedPolyRec</option>も同時に設定される。
 <itemizedlist>
 <listitem><para>
 GADTは、GADT様式の構文(<xref linkend="gadt-style"/>)でなければ宣言できない。Haskell 98の古いデータ宣言の構文では、常に通常のデータ型が宣言される。各構築子の結果の型は定義しようとしている型構築子で始まっていなければならないが、GADTについては、その型への引数は任意のmonotypeで良い。例えば、上の<literal>Term</literal>型において、各構築子の型は<literal>Term ty</literal>で終わっていなければならないが、<literal>ty</literal>が型変数である必要はない。(例えば構築子<literal>Lit</literal>)。
@@ -2907,7 +2907,7 @@ f xs = ys ++ ys
 </programlisting>
 <literal>f</literal>の型シグネチャが型変数<literal>a</literal>をスコープに導入している。この型変数のスコープは<literal>f</literal>の定義全体である。特に、<varname>ys</varname>の型シグネチャの位置ではこれがスコープに入っている。Haskell 98では、<varname>ys</varname>の型を宣言するのは不可能であった。これが可能になったことは、型変数が字句的スコープを持つことの重要な利点の一つである。
 </para>
-<para>字句的スコープを持つ型変数は<option>-fglasgow-exts</option>で有効になる。</para>
+<para>字句的スコープを持つ型変数は<option>-XScopedTypeVariables</option>で有効になる。このフラグを指定すると、<option>-XRelaxedPolyRec</option>も有効になる。</para>
 <para>注意: GHC 6.6では、字句的スコープを持つ型変数の挙動について大幅な変更が加えられた。この節を注意深く読んでほしい。</para>
 
 <sect3>
@@ -2943,19 +2943,36 @@ Haskellでは、プログラマの書いた型シグネチャは、その自由�
 
 <sect3 id="decl-type-sigs">
 <title>宣言型シグネチャ</title>
-<para><emphasis>明示的な</emphasis>量化(<literal>forall</literal>を使ったもの)を伴う型シグネチャがあると、その明示的に量化された型変数は、その関数(複数でも良い)の定義内で、スコープに導入される。例を挙げる。
+<para><emphasis>明示的な</emphasis>量化(<literal>forall</literal>を使ったもの)を伴う型シグネチャがあると、その明示的に量化された型変数は、その関数の定義内において、スコープに導入される。例を挙げる。
 <programlisting>
   f :: forall a. [a] -> [a]
   f (x:xs) = xs ++ [ x :: a ]
 </programlisting>
 <literal>forall a</literal>によって、<literal>a</literal>が<literal>f</literal>の定義内でスコープに導入されている。
 </para>
-<para>これは、<literal>f</literal>の型シグネチャにおける量化が明示的な場合にのみ発生する。
+<para>これは、以下の場合にのみ発生する。
+<itemizedlist>
+<listitem><para><literal>f</literal>の型シグネチャにおける量化が明示的である。例えば、
 <programlisting>
   g :: [a] -> [a]
   g (x:xs) = xs ++ [ x :: a ]
 </programlisting>
 このプログラムは拒絶される。<literal>a</literal>は<literal>f</literal>の定義においてスコープにないので、<literal>x::a</literal>は、通常のHaskellの暗黙量化規則に従って、<literal>x::forall a. a</literal>と解釈される。
+</para></listitem>
+<listitem><para>シグネチャの対象とする束縛が関数束縛または裸の変数束縛であって、パターン束縛でない。例えば、
+<programlisting>
+  f1 :: forall a. [a] -> [a]
+  f1 (x:xs) = xs ++ [ x :: a ]   -- 良い
+
+  f2 :: forall a. [a] -> [a]
+  f2 = \(x:xs) -> xs ++ [ x :: a ]   -- 良い
+
+  f3 :: forall a. [a] -> [a] 
+  Just f3 = Just (\(x:xs) -> xs ++ [ x :: a ])   -- これは駄目！
+</programlisting>
+<literal>f3</literal>の束縛はパターン束縛なので、この型シグネチャは<literal>a</literal>をスコープに導入しない。一方、<literal>f1</literal>は関数束縛で、<literal>f2</literal>は裸の変数を束縛している。したがって、これらでは両方ともシグネチャが<literal>a</literal>をスコープに導入している。
+</para></listitem>
+</itemizedlist>
 </para>
 </sect3>
 
@@ -3212,7 +3229,8 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
     <listitem><para>ある関数をコンパイル時に走らせることができるのは、その関数が別のモジュールからインポートされているときだけである。言い替えると、あるモジュールで関数を定義し、同じモジュールの接合でその関数を呼ぶということはできない。(そうすることに意味がない訳ではない。ただ実装が難しい)
    </para></listitem>
 
-    <listitem><para>さらに、ある関数をコンパイル時に走らせることができるのは、その関数のインポート元モジュールが、<emphasis>コンパイル中のモジュールと同じ相互再帰グループに属していない</emphasis>場合だけである。例として、Aというモジュールをコンパイルしているとき、BからインポートされたTemplate Haskellの関数を走らせることができるのは、BがAを(直接または間接に)インポートしていない場合だけである。理由は明白なはずである。Bを走らせるにはAをコンパイルして走らせねばならないが、我々は今まさにAを型検査しているのだから。</para></listitem>
+    <listitem><para>ある関数をコンパイル時に走らせることができるのは、その関数のインポート元モジュールが、<emphasis>コンパイル中のモジュールと同じ相互再帰グループに属していない</emphasis>場合だけである。さらに、その相互再帰グループの全てのモジュールが、接合が実行されるモジュールから非SOURCEなインポートを介して到達可能でなければならない。</para>
+    <para>例として、Aというモジュールをコンパイルしているとき、BからインポートされたTemplate Haskellの関数を走らせることができるのは、BがAを(直接または間接に)インポートしていない場合だけである。理由は明白なはずである。Bを走らせるにはAをコンパイルして走らせねばならないが、我々は今まさにAを型検査しているのだから。</para></listitem>
 
     <listitem><para>
             <literal>-ddump-splices</literal>フラグを使うと、最上位の接合が展開されるたびにそれが表示される。
@@ -3833,7 +3851,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
     <para>GHCはいくつかのプラグマ(ソースコード中に置かれるコンパイラへの指示)に対応している。プラグマは通常プログラムの意味には影響を与えないが、生成されるコードの効率性には影響し得る。</para>
 
-    <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。この後には、その種類のプラグマに特有の情報が続いても良い。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。<replaceable>word</replaceable>が認識できなかったプラグマは(無言で)無視される。</para>
+    <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。必要なら、この後に続けて、その種類のプラグマに特有の情報を書く。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。認識できない<replaceable>word</replaceable>を持ったプラグマは(無言で)無視される。プラグマ中ではレイアウト規則が適用されるので、閉じ括弧<literal>#-}</literal>は開き括弧<literal>{-#</literal>よりも右のカラムで始まっていなければならない。</para>
 
     <para>ある種のプラグマは<emphasis>ファイルヘッダプラグマ</emphasis>である。ファイルヘッダプラグマは、ファイル中で<literal>module</literal>キーワードよりも前になければならない。ファイルヘッダプラグマはいくつあっても良いし、コメントの前にあっても後にあっても良い。</para>
 
@@ -3981,7 +3999,7 @@ key_function :: Int -> String -> (Bool, Double)
 	    <para>"<literal>NOINLINE[k] f</literal>" : 段階<literal>k</literal>までは<literal>f</literal>をインライン化しないが、段階<literal>k</literal>以降は(プラグマがないかのように)インライン化しようとする。
             </para></listitem>
 	    <listitem>
-	    <para>"<literal>INLINE[~k] f</literal>" : 段階<literal>k</literal>までは<literal>f</literal>をインライン化しようとするが、段階<literal>k</literal>以降はインライン化しない。
+	    <para>"<literal>NOINLINE[~k] f</literal>" : 段階<literal>k</literal>までは<literal>f</literal>をインライン化しようとするが、段階<literal>k</literal>以降はインライン化しない。
             </para></listitem>
 	</itemizedlist>
 以下に、上の情報をまとめる。
@@ -4148,19 +4166,27 @@ f (T f1 f2) = f1 + f2
 data T = T {-# UNPACK #-} !(Int,Int)
 </programlisting>
 
-      <para>この場合、構築子<function>T</function>は、対を平坦化して、二つの<literal>Int</literal>を直接保持することになる。複数水準のアンパックもサポートされている。</para>
+      <para>この場合、構築子<function>T</function>は、対を平坦化して、二つの<literal>Int</literal>を直接保持することになる。複数水準のアンパックもサポートされている。
 
 <programlisting>
 data T = T {-# UNPACK #-} !S
 data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 </programlisting>
 
-      <para>この場合、二つの非ボックス化<literal>Int#</literal>が構築子<function>T</function>に直接置かれる。アンパックはnewtypeを透過して起こる。</para>
+      この場合、二つの非ボックス化<literal>Int#</literal>が構築子<function>T</function>に直接置かれる。アンパックはnewtypeを透過して起こる。</para>
 
       <para>フィールドがアンパックできないとき、警告は出力されないので、生成されたコードを<option>-ddump-simpl</option>で検査するのが良いかもしれない。</para>
 
       <para><option>-funbox-strict-fields</option>フラグも見よ。これは、簡単に言うと、あらゆる正格な構築子フィールドに<literal>{-#&nbsp;UNPACK&nbsp;#-}</literal>を加えるのと同じ効果がある。</para>
     </sect2>
+
+    <sect2 id="source-pragma">
+      <title>SOURCEプラグマ</title>
+
+      <indexterm><primary>SOURCE</primary></indexterm>
+     <para><literal>{-# SOURCE #-}</literal>は専ら<literal>import</literal>宣言の中で使われ、モジュールのループを断ち切る役割を果たす。詳しい説明は<xref linkend="mutual-recursion"/>にある。
+     </para>
+</sect2>
 
 </sect1>
 
@@ -4174,17 +4200,16 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 <indexterm><primary>rewrite rules</primary></indexterm></title>
 
 <para>
-プログラマは、ソースプログラムの一部として(プラグマで)書き換え規則を指定することができる。これらは可能なら必ず適用される。ただし、<option>-O</option>フラグ(<xref linkend="options-optimise"/>)が有効であり、かつ<option>-frules-off</option>フラグが指定されておらず、かつ<option>-fglasgow-exts</option>(<xref linkend="options-language"/>)が指定されていることが条件である。</para>
+プログラマは、ソースプログラムの一部として(プラグマで)書き換え規則を指定することができる。これらは可能なら必ず適用される。ただし、<option>-O</option>フラグ(<xref linkend="options-optimise"/>)が有効であり、かつ<option>-fno-rewrite-rules</option>フラグが指定されておらず、かつ<option>-fglasgow-exts</option>(<xref linkend="options-language"/>)が指定されていることが条件である。</para>
 
 <para>
 以下に例を示す。
 
 <programlisting>
   {-# RULES
-        "map/map"       forall f g xs. map f (map g xs) = map (f.g) xs
-  #-}
+  "map/map"    forall f g xs.  map f (map g xs) = map (f.g) xs
+    #-}
 </programlisting>
-
 </para>
 
 <sect2>
@@ -4194,15 +4219,27 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 構文の観点からは、以下がいえる。
 
 <itemizedlist>
-<listitem>
 
+<listitem>
 <para>
-一つの<literal>RULES</literal>プラグマには零個以上の規則を書ける。
+一つの<literal>RULES</literal>プラグマには零個以上の規則を書ける。規則の間はセミコロンで区切る。(このセミコロンはレイアウト規則によって生成されたものでもよい)
 </para>
 </listitem>
 
 <listitem>
-
+<para>
+プラグマ内ではレイアウト規則が適用される。現在、新しいインデントの水準が設定されることはない。そのため、一つのRULESプラグマに複数の規則を書いて、レイアウトを使ってそれを区切りたい場合、外側の定義と同じ位置で開始するように配置しなければならない。
+<programlisting>
+  {-# RULES
+  "map/map"    forall f g xs.  map f (map g xs) = map (f.g) xs
+  "map/append" forall f xs ys. map f (xs ++ ys) = map f xs ++ map f ys
+    #-}
+</programlisting>
+さらに、閉じ括弧<literal>#-}</literal>は開き括弧<literal>{-#</literal>よりも右で始まっているようにするべきである。
+</para>
+</listitem>
+ 
+<listitem>
 <para>
 全ての規則には名前があり、二重引用符で囲って示される。名前自体には全く意味はない。規則が何回発動したかを報告する際に用いられるだけである。
 </para>
@@ -4214,22 +4251,13 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 <programlisting>
   {-# RULES
         "map/map" [2]  forall f g xs. map f (map g xs) = map (f.g) xs
-  #-}
+    #-}
 </programlisting>
 ここでの「[2]」は、この規則が段階2以降(段階2を含む)で有効になることを意味している。逆の記法である「[~2]」を使うこともでき、規則が段階2まで有効(段階2自体は含まない)という意味である。
 </para>
 </listitem>
 
-
 <listitem>
-
-<para>
-<literal>RULES</literal>プラグマにはレイアウト規則が適用される。Currently no new indentation level is set, so you must lay out your rules starting in the same column as the enclosing definitions.
-</para>
-</listitem>
-
-<listitem>
-
 <para>
 規則中で言及される変数は、スコープにある(<function>map</function>のように)か、<literal>forall</literal>で束縛される(<function>f</function>、<function>g</function>、<function>xs</function>のように)かのどちらかでなければならない。<literal>forall</literal>で束縛された変数は<emphasis>パターン</emphasis>変数と呼ばれる。パターン変数は、型の<literal>forall</literal>の場合と同じく、空白で区切る。
 </para>
@@ -4320,7 +4348,7 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 GHCは規則が合流性や停止性を持つことを確かめようとはしない。例。
 
 <programlisting>
-  "loop"        forall x,y.  f x y = f y x
+  "loop"        forall x y.  f x y = f y x
 </programlisting>
 
 この規則はコンパイラを無限ループさせる。
@@ -4698,7 +4726,7 @@ g x = show x
 </para>
 
 <para>
-しかし、(<option>-fext-core</option>で)外部形式が生成されるとき、式<function>show</function>と<varname>x</varname>にNoteが付加される。<function>f</function>のcoreでの宣言は以下である。
+しかし、(<option>-fext-core</option>で)外部coreが生成されるとき、式<function>show</function>と<varname>x</varname>にNoteが付加される。<function>f</function>のcoreでの宣言は以下である。
 </para>
 
 <programlisting>
