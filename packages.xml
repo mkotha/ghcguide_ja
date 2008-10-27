@@ -304,6 +304,24 @@ $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
       </varlistentry>
 
       <varlistentry>
+	<term><literal>ghc-pkg find-module <replaceable>M</replaceable> [<option>--simple-output</option>]</literal></term>
+	<listitem>
+    <para>このオプションは、<replaceable>M</replaceable>というモジュールをエクスポートしている登録済みパッケージを列挙する。例を挙げる。</para>
+<screen>
+$ ghc-pkg find-module Var
+c:/fptools/validate/ghc/driver/package.conf.inplace:
+    (ghc-6.9.20080428)
+
+$ ghc-pkg find-module Data.Sequence
+c:/fptools/validate/ghc/driver/package.conf.inplace:
+    containers-0.1
+</screen>
+  <para>それ以外の点については、オプションを含め、<literal>ghc-pkg list</literal>と同じように振る舞う。</para>
+	</listitem>
+      </varlistentry>
+
+
+      <varlistentry>
 	<term><literal>ghc-pkg latest <replaceable>P</replaceable></literal></term>
 	<listitem>
           <para>パッケージ<replaceable>P</replaceable>の最新の利用可能な版を表示する。</para>
@@ -318,12 +336,34 @@ $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
       </varlistentry>
 
       <varlistentry>
-	<term><literal>ghc-pkg field <replaceable>P</replaceable> <replaceable>field</replaceable></literal></term>
+	<term><literal>ghc-pkg field <replaceable>P</replaceable> <replaceable>field</replaceable>[,<replaceable>field</replaceable>]*</literal></term>
 	<listitem>
-          <para>インストール済みパッケージ<literal>P</literal>の説明のうち、単一のフィールドだけを表示する。</para>
+          <para>インストール済みパッケージ<literal>P</literal>の説明のうち、一つのフィールドを表示する。コンマで区切ることで複数のフィールドを選択できる。</para>
 	</listitem>
       </varlistentry>
     </variablelist>
+
+    <para>
+      <literal>find-module</literal>の<replaceable>M</replaceable>、<literal>list</literal>と<literal>describe</literal>の<replaceable>P</replaceable>、そして<literal>field</literal>については、部分文字列照合ができる。その場合、部分文字列の開放端を<literal>'*'</literal>で示す。(<literal>prefix*</literal>、<literal>*suffix</literal>、<literal>*infix*</literal>のように)。例を示す(出力は省略)。
+    </para>
+    <screen>
+    -- regex関係のパッケージを全て表示する
+    ghc-pkg list '*regex*' --ignore-case
+    -- 文字列関係のパッケージを全て表示する
+    ghc-pkg list '*string*' --ignore-case
+    -- OpenGL関係のパッケージ
+    ghc-pkg list '*gl*' --ignore-case
+    -- Data階層のモジュールをエクスポートしているパッケージを一覧
+    ghc-pkg find-module 'Data.*'
+    -- Monadモジュールをエクスポートしているパッケージを一覧
+    ghc-pkg find-module '*Monad*'
+    -- 全てのパッケージの名前とメンテナを表示
+    ghc-pkg field '*' name,maintainer
+    -- 全てのパッケージのhaddockのhtmlの場所を表示
+    ghc-pkg field '*' haddock-html
+    -- データベース全体をダンプ
+    ghc-pkg describe '*'
+    </screen>
 
     <para>さらに、<literal>ghc-pkg</literal>は以下のフラグを受け付ける。</para>
 
