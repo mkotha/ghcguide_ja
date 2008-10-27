@@ -29,8 +29,7 @@
 
    <para>言語オプションは全て、「<option>No</option>」を前置することによって無効にすることができる。例えば「<option>-XNoTemplateHaskell</option>」のように。</para>
 
-   <para> Language options recognised by Cabal can also be enabled using the <literal>LANGUAGE</literal> pragma,
-   thus <literal>{-# LANGUAGE TemplateHaskell #-}</literal> (see <xref linkend="language-pragma"/>>). </para>
+   <para>Cabalが認識する言語オプションは<literal>LANGUAGE</literal>プラグマを使って有効にすることもできる。<literal>{-# LANGUAGE TemplateHaskell #-}</literal>のように。(<xref linkend="language-pragma"/>を見よ)</para>
 
     <para>専用の構文を有効にするオプションを使うと、Haskell 98で動作していたコードがコンパイルできなくなる<emphasis>可能性がある</emphasis>。これは大抵、変数名として使われていたものが予約語になることが原因である。このため、以下の各オプションには、そのオプションによって有効になる専用の構文の一覧が付されている。ここではHaskell 98の字句構文(Haskell 98レポートを見よ)の記法と非終端記号を使っている。専用の構文には次の二種類がある。</para>
 
