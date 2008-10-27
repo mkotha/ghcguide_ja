@@ -414,7 +414,8 @@ module B where
 <indexterm><primary><literal>hs-boot</literal>
       files</primary></indexterm> <indexterm><primary>importing,
       <literal>hi-boot</literal> files</primary></indexterm>
-ここで<filename>A</filename>は<filename>B</filename>をインポートしているが、<filename>B</filename>は<filename>A</filename>を<literal>{-# SOURCE #-}</literal>プラグマ付きでインポートしているので、環状の依存性が解消されている。このように<literal>{-# SOURCE #-}</literal>付でインポートされる全てのモジュール<filename>A.hs</filename>に対して、<filename>A.hs-boot</filename>というソースファイルが存在しなければならない。このファイルは<filename>A.hs</filename>の縮訳版を含む。つまり、
+ここで<filename>A</filename>は<filename>B</filename>をインポートしているが、<filename>B</filename>は<filename>A</filename>を<literal>{-# SOURCE #-}</literal>プラグマ付きでインポートしているので、環状の依存性が解消されている。モジュールのインポートグラフに存在する全てのループは<literal>{-# SOURCE #-}</literal>付きインポートで解消されていなければいけない。言い換えると、<literal>{-# SOURCE #-}</literal>付きインポートを無視した場合にモジュールのインポートグラフに閉路がなくなるようになっていなければならない。</para>
+<para>このように<literal>{-# SOURCE #-}</literal>付でインポートされる全てのモジュール<filename>A.hs</filename>に対して、<filename>A.hs-boot</filename>というソースファイルが存在しなければならない。このファイルは<filename>A.hs</filename>の縮訳版を含む。つまり、
 <programlisting>
 module A where
     newtype TA = MkTA Int
