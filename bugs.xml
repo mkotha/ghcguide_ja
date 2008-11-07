@@ -22,7 +22,7 @@
       
       <itemizedlist>
 	<listitem>
-          <para>GHCでは、修飾された識別子に関するある種の字句規則がHaskellレポートのものとわずかに異なる。<replaceable>module</replaceable><literal>.</literal><replaceable>reservedop</replaceable>という形のもの、例えば<literal>M.\</literal>があったとき、<literal>M</literal>と<literal>.\</literal>という二つの字句要素ではなく、一つの修飾された演算子と解釈される。</para>
+          <para>GHCでは、修飾された識別子に関して、ある種の字句規則がHaskellレポートのものとわずかに異なっている。<replaceable>module</replaceable><literal>.</literal><replaceable>reservedop</replaceable>という形のもの、例えば<literal>M.\</literal>があったとき、<literal>M</literal>と<literal>.\</literal>という二つの字句要素ではなく、一つの修飾された演算子と解釈される。</para>
 	</listitem>
       </itemizedlist>
     </sect3>
@@ -38,7 +38,7 @@
 
 <programlisting>
 main = do args &lt;- getArgs
-	  if null args then return [] else do
+          if null args then return [] else do
           ps &lt;- mapM process args
           mapM print ps</programlisting>
 
