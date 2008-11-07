@@ -77,7 +77,9 @@ main = do args &lt;- getArgs
       <sect3 id="infelicities-Modules">
 	<title>モジュールシステムとインタフェースファイル</title>
 	
-	<para>今のところなし。</para>
+	<para><xref linkend="mutual-recursion"/>にある通り、相互再帰的なモジュールのループがある場合、それを<literal>hs-boot</literal>ファイルを使って断つことをGHCは要求する。これはバグと言うより不幸な出来事である。Haskellレポートは次のように述べている(<ulink url="http://haskell.org/onlinereport/modules.html#sect5.7">5.7節</ulink>、<ulink url="http://www.sampou.org/haskell/report-revised-j/modules.html#sect5.7">和訳</ulink>)。「使うHaskell処理系によっては、相互再帰的なモジュールを分割コンパイルするとき、インポートされるモジュールに追加の情報を持たせ、そのモジュールがコンパイルされる前に参照できるようにすることが要求されるかもしれない。相互再帰に対処するため、エクスポートされる値全てについて、明示的な型シグネチャが必要とされるかもしれない。分割コンパイルの精密な詳細はこのレポートでは定義しない。」
+	</para>
+
     </sect3>
 
     <sect3 id="infelicities-numbers">
