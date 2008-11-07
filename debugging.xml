@@ -268,11 +268,21 @@
       
       <varlistentry>
 	<term>
+          <option>-ddump-simpl-phases</option>:
+          <indexterm><primary><option>-ddump-simpl-phases</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>単純化器の毎回の出力を見せる。<option>-dverbose-simpl</option>でも足りないときに使う。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <option>-ddump-simpl-iterations</option>:
           <indexterm><primary><option>-ddump-simpl-iterations</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>単純化器の毎回の<emphasis>繰り返し</emphasis>毎の出力を見せる。(単純化器の一回の実行に対して繰り返し回数の最大値が決まっている。通常4)。Used when even <option>-dverbose-simpl</option> doesn't cut it.</para>
+          <para>単純化器の毎回の<emphasis>繰り返し</emphasis>毎の出力を見せる。(単純化器の一回の実行に対して繰り返し回数の最大値が決まっている。通常4)。これは<option>-ddump-simpl-phases</option>よりさらに多くの情報を出力する。</para>
 	</listitem>
       </varlistentry>
 
@@ -377,6 +387,16 @@
 
       <varlistentry>
 	<term>
+          <option>-dsuppress-uniques</option>
+          <indexterm><primary><option>-dsuppress-uniques</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>デバッグ出力中での固有子の印字を抑制する。これによって、表示結果が曖昧になることがある(例えば、ある「x」の出現がどこで束縛されているのか不明瞭になる)が、コンパイラを二回実行したときに出力に無駄な違いが出ることを減らせるので、<command>diff</command>をまともに適用できるようになる。<command>diff</command>によってどこを見るべきか分かったら、<option>-dsuppress-uniques</option>なしでもう一回試せばよい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <option>-dppr-user-length</option>
           <indexterm><primary><option>-dppr-user-length</option></primary></indexterm>
         </term>
@@ -386,13 +406,13 @@
       </varlistentry>
 
       <varlistentry>
-	<term>
-          <option>-dshow-unused-imports</option>
-          <indexterm><primary><option>-dshow-unused-imports</option></primary></indexterm>
+        <term>
+          <option>-dno-debug-output</option>
+          <indexterm><primary><option>-dno-debug-output</option></primary></indexterm>
         </term>
-	<listitem>
-          <para>名前変更器が無意味なインポートを報告するようにする。</para>
-	</listitem>
+        <listitem>
+          <para>要求されていないデバッグ出力を全て抑制する。GHCは、<literal>DEBUG</literal>オプション付きでビルドされている場合、ときどき開発者向きのデバッグ出力を吐き出す。この追加の出力は、テストフレームワークを混乱させて誤ったテスト失敗を引き起すことがあるので、それを無効にするためにこのフラグが用意されている。</para>
+        </listitem>
       </varlistentry>
     </variablelist>
   </sect2>
@@ -537,17 +557,7 @@ Main.skip2{-r1L6-} =
 
     <para>非レジスタ化コンパイルはGHCを新しい機械に移植するときに便利である。これを使うと、予め必要なツールは<command>gcc</command>、<command>as</command>、<command>ld</command>だけになるし、さらに、非レジスタ化コンパイルが動作するようにするために書かなければならないプラットフォーム固有のコードは通常かなり少ないからである。</para>
 
-    <variablelist>
-      <varlistentry>
-	<term>
-          <option>-unreg</option>:
-          <indexterm><primary><option>-unreg</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>純粋なCのみを介してコンパイルし、プラットフォーム固有の最適化を無効にする。注意: <option>-unreg</option>を使うには、非レジスタ化コンパイルのためにビルドされたライブラリ群(RTSを含む)が必要である。これはGHCをウェイ「u」を有効にしてビルドすることに相当する。</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
+   <para>コンパイルの段階で非レジスタ化コンパイルを選ぶことはできない。GHCをビルドするときに適切なオプションを設定する必要があるのだ。詳細はGHCのビルドの手引きを参照せよ。</para>
   </sect2>
 
 </sect1>
