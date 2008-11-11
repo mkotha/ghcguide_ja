@@ -111,7 +111,7 @@ Ok, modules loaded: Main.
 
     <para>なぜコンパイル済みのコードを使う必要があるのだろうか。コンパイル済みコードは解釈実行されるコードに比べて大体10倍速いが、一方、生成するのに2倍の時間が掛かる(最適化が有効ならさらに長いかもしれない)のである。そのため、プログラムのあまり変更されない部分をコンパイルしておき、活発に開発されている部分には解釈実行器を使う、ということをするだけの価値がある。</para>
 
-    <para><literal>:load</literal>でソースファイルをロードするとき、GHCiは対応するオブジェクトファイルを探し、可能ならソースコードの解釈実行よりも優先してそれを使う。例えば、A、B、C、Dという四つのモジュールからなるプログラムがあるとしよう。モジュールBとCはどちらもDのみをインポートしていて、AはBとCをインポートしている。</para>
+    <para><literal>:load</literal>でソースモジュールをロードするとき、GHCiは対応するオブジェクトファイルを探し、可能ならソースコードの解釈実行よりも優先してそれを使う。例えば、A、B、C、Dという四つのモジュールからなるプログラムがあるとしよう。モジュールBとCはどちらもDのみをインポートしていて、AはBとCをインポートしている。</para>
 <screen>
       A
      / \
@@ -183,8 +183,19 @@ Compiling A                ( A.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
 </screen>
 
-    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc &ndash;&ndash;make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前にね)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、変更されたモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
+    <para>このようなオブジェクトファイルの自動ロードは混乱の原因になることがある。なぜなら、モジュールの最上位の、エクスポートされていない定義をプロンプトの式で使えるのは、そのモジュールが解釈実行されているときだけだからである(<xref linkend="ghci-scope"/>を見よ)。このため、解釈実行器を使ってモジュールをロードするようにGHCiに強制したいと思うことがあるかもしれない。これは、<literal>:load</literal>を使うときに、モジュール名またはファイル名の前に<literal>*</literal>を置くことで実現できる。例を挙げる。</para>
 
+<screen>
+Prelude> :load *A
+Compiling A                ( A.hs, interpreted )
+*A>
+</screen>
+
+<para><literal>*</literal>が使われている場合、GHCiはコンパイル済みオブジェクトコードがあっても無視し、そのモジュールを解釈実行する。既にモジュールをいくつかオブジェクトコードとしてロードしていて、そのうち一つを解釈実行したいなら、全部を再ロードする代わりに、<literal>:add *M</literal>を使って、<literal>M</literal>が解釈実行されて欲しいことを指定することができる。(これによって別のモジュールも解釈実行されるかもしれないことに注意。これは、コンパイル済みモジュールが解釈実行モジュールに依存できないためである)。</para>
+
+<para><literal>-fobject-code</literal>オプションを使うと、常にあらゆる物をオブジェクトコードにコンパイルし、決してインタプリタを使わないようにすることができる(<xref linkend="ghci-obj"/>を見よ)。</para>
+
+    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc &ndash;&ndash;make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前にね)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、変更されたモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
   </sect1>
 
   <sect1 id="interactive-evaluation">
@@ -233,14 +244,13 @@ hello
       <para>GHCiプロンプトが受け付ける文の構文は、Haskellの<literal>do</literal>式における文の構文と全く同じである。ただし、こちらにはモナドの多重定義はない。プロンプトに入力される文は<literal>IO</literal>モナドの中になければならない。
 <screen>
 Prelude> x &lt;- return 42
-42
 Prelude> print x
 42
 Prelude>
 </screen>
       <literal>x &lt;- return 42</literal>という文は、「<literal>return 42</literal>を<literal>IO</literal>モナドの中で実行し、結果を<literal>x</literal>に束縛する」という意味である。以降、<literal>x</literal>を文の中で使う(例えば、上でしたように、値を印字する)ことができるようになる。</para>
 
-      <para>GHCiは次の場合には(そしてその場合に限り)、文の結果を印字する。
+      <para><option>-fprint-bind-result</option>が設定されているなら、GHCiは次の場合に(そしてその場合に限り)、文の結果を印字する。
 	<itemizedlist>
 	  <listitem>
             <para>文が束縛ではないか、ただ一つの変数を束縛するモナド束縛(<literal>p &lt;- e</literal>)である。</para>
@@ -249,7 +259,8 @@ Prelude>
             <para>変数の型が多相的でなく、<literal>()</literal>でなく、<literal>Show</literal>のインスタンスである。</para>
 	  </listitem>
 	</itemizedlist>
-      束縛結果を自動的に印字する機能は<option>:set -fno-print-bind-result</option>で抑制できる(束縛以外の式の結果を印字することは抑制されない)。<indexterm><primary><option>-fno-print-bind-result</option></primary></indexterm><indexterm><primary><option>-fprint-bind-result</option></primary></indexterm>これは、例えば、束縛の結果が印字のために完全に評価されるのを防ぐのに使うことができる。</para>
+      <indexterm><primary><option>-fprint-bind-result</option></primary></indexterm><indexterm><primary><option>-fno-print-bind-result</option></primary></indexterm>
+      </para>
 
       <para>もちろん、非IOの式を<literal>let</literal>文を使って束縛することもできる。</para>
 <screen>
@@ -337,7 +348,9 @@ Compiling Main             ( Main.hs, interpreted )
 
       <para><literal>*<replaceable>module</replaceable></literal>という構文は、プロンプトから入力される式に対して、<replaceable>module</replaceable>の完全なトップレベルスコープが使われるということを示している。<literal>*</literal>がない場合、そのモジュールがエクスポートしているものだけが可視である。</para>
 
-      <para>扱えるのは単一のモジュールだけではない。GHCiは複数のモジュールのスコープを組み合わせることができ、このとき<literal>*</literal>が付く形式と<literal>*</literal>なしの形式を混合して用いることができる。GHCiはこれらのモジュールのスコープを全て組み合わせ、プロンプトのスコープとする。技術的な理由から、GHCiは解釈実行されるモジュールについてしか<literal>*</literal>形式をサポートしない。そのため、コンパイル済みモジュールは、それがエクスポートしたものでしかプロンプトのスコープに寄与できない。</para>
+      <para>扱えるのは単一のモジュールだけではない。GHCiは複数のモジュールのスコープを組み合わせることができ、このとき<literal>*</literal>が付く形式と<literal>*</literal>なしの形式を混合して用いることができる。GHCiはこれらのモジュールのスコープを全て組み合わせ、プロンプトのスコープとする。</para>
+      
+      <para>注意: 技術的な理由から、GHCiは解釈実行されるモジュールについてしか<literal>*</literal>形式をサポートしない。そのため、コンパイル済みモジュールとパッケージのモジュールは、それがエクスポートしたものでしかプロンプトのスコープに寄与できない。GHCiがモジュールの解釈実行版を使っていることを確実にするには、モジュールをロードする時に<literal>*</literal>を加えれば良い。例えば<literal>:load *M</literal>のように。</para>
 
       <para>スコープは<literal>:module</literal>コマンドで操作できる。例えば、現在のスコープが<literal>Prelude</literal>なら、次のようにして、<literal>IO</literal>モジュールでエクスポートされたものをスコープに導入することができる。</para>
 
@@ -365,9 +378,27 @@ Prelude IO>
       </para>
 
       <sect3>
+        <title><literal>:module</literal>と<literal>:load</literal></title>
+
+        <para><literal>:module</literal>と<literal>:load</literal>は似たようなことをするように思えるかもしれない。どちらも、モジュールをスコープに入れるのに使うことができる。しかし、この二つには明確な違いがある。GHCiは、以下の二つのモジュール集合を意識する。</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>現在<emphasis>ロードされている</emphasis>モジュールの集合。この集合は、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>によって変更される。
+            </para>
+          </listitem>
+          <listitem>
+            <para>現在<emphasis>スコープにある</emphasis>モジュールの集合。この集合は<literal>:module</literal>によって変更される。また、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の後に自動的に設定される</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>ロードされていないモジュールをスコープに入れることはできない。新しいモジュールをロードするために<literal>:module</literal>を使おうとすると「<literal>module M is not loaded</literal>」というメッセージが表示されるのはこのためである。</para>
+      </sect3>
+
+      <sect3 id="ghci-import-qualified">
 	<title>修飾名</title>
 
-        <para>手間をすこし省くことができるように、GHCiのプロンプトは、全てのパッケージの全てのモジュールと、現在GHCiにロードされている全てのモジュールについて、暗黙の<literal>import qualified</literal>宣言があるかのように振る舞う。</para>
+        <para>手間をすこし省くことができるように、GHCiのプロンプトは、全てのパッケージの全てのモジュールと、現在GHCiにロードされている全てのモジュールについて、暗黙の<literal>import qualified</literal>宣言があるかのように振る舞う。これは<option>-fno-implicit-import-qualified</option><indexterm><primary><option>-fno-implicit-import-qualified</option></primary></indexterm>というフラグで無効にできる。</para>
 
       </sect3>
 
@@ -670,6 +701,7 @@ right :: [a]
 
       <para>実行は、前に停止した点から再開し、同じブレークポイントで再び停止した。</para>
 
+
       <sect3 id="setting-breakpoints">
         <title>ブレークポイントを設定する</title>
 
@@ -870,7 +902,7 @@ a :: a
 <screen>
 *Main> :set -fbreak-on-exception
 *Main> :trace qsort ("abc" ++ undefined)
-"Stopped at &lt;exception thrown&gt;
+&ldquo;Stopped at &lt;exception thrown&gt;
 _exception :: e
 [&lt;exception thrown&gt;] *Main&gt; :hist
 -1  : qsort.hs:3:24-38
@@ -1075,11 +1107,11 @@ $ ghci -lm
 
       <varlistentry>
 	<term>
-          <literal>:add</literal> <replaceable>module</replaceable> ...
+          <literal>:add</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
           <indexterm><primary><literal>:add</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>module</replaceable>を現在の<firstterm>ターゲット集合</firstterm>に追加し、リロードを行う。</para>
+          <para><replaceable>module</replaceable>を現在の<firstterm>ターゲット集合</firstterm>に追加し、リロードを行う。通常、可能ならそのモジュールのコンパイル済みコードがロードされ、そうでなければそのモジュールはバイトコードにコンパイルされる。接頭辞<literal>*</literal>を使うことでモジュールがバイトコードとしてロードされることを強制できる。</para>
 	</listitem>
       </varlistentry>
 
@@ -1300,6 +1332,7 @@ Prelude> :. cmds.ghci
       </varlistentry>
 
       <varlistentry>
+
 	<term>
           <literal>:history [<replaceable>num</replaceable>]</literal>
           <indexterm><primary><literal>:history</literal></primary></indexterm>
@@ -1332,13 +1365,15 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
-          <literal>:load</literal> <replaceable>module</replaceable> ...
+          <literal>:load</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
           <indexterm><primary><literal>:load</literal></primary></indexterm>
         </term>
 	<listitem>
           <para>指定された<replaceable>module</replaceable>とそれが依存するモジュールすべてを再帰的にロードする。ここで、個々の<replaceable>module</replaceable>はモジュール名またはファイル名でなければならない。また、パッケージ中のモジュールの名前であってはいけない。</para>
 
           <para>以前にロードされていたモジュールは、パッケージ中のものを除いて、忘れ去られる。この新しいモジュールの集合を<firstterm>ターゲット集合</firstterm>と呼ぶ。<literal>:load</literal>を引数なしで使うと、ロードされているモジュールや束縛を全て未ロードにできることに注意。</para>
+
+          <para>通常、可能ならそのモジュールのコンパイル済みコードがロードされ、そうでなければそのモジュールはバイトコードにコンパイルされる。接頭辞<literal>*</literal>を使うことでモジュールがバイトコードとしてロードされることを強制できる。</para>
 
           <para><literal>:load</literal>コマンドの後、以下のものが文脈として設定される。</para>
 
@@ -1398,6 +1433,7 @@ Prelude> :run bar ["foo", "bar baz"]
 bar
 ["foo","bar baz"]
 </screen>
+
         </listitem>
       </varlistentry>
 
@@ -1738,7 +1774,7 @@ Prelude> :set -fno-glasgow-exts
 
     <para>GHCiは、開始するとき、<literal>-ignore-dot-ghci</literal>フラグが与えられていない限り、以下の各ファイルが存在していれば、この順で読み、書かれているコマンドを実行する。</para>
 
-    <enumeratedlist>
+    <orderedlist>
     <listitem>
       <para><filename>./.ghci</filename></para>
     </listitem>
@@ -1751,7 +1787,7 @@ Prelude> :set -fno-glasgow-exts
     <listitem>
       <para><literal>$HOME/.ghci</literal></para>
     </listitem>
-   </enumeratedlist>
+   </orderedlist>
 
     <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトがGHC拡張とCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
 
