@@ -247,7 +247,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-odir</option> <replaceable>dir</replaceable></entry>
-	      <entry>出力ディレクトリを設定する</entry>
+	      <entry>オブジェクトファイルのディレクトリを設定する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -266,6 +266,12 @@
 	    <row>
 	      <entry><option>-stubdir</option> <replaceable>dir</replaceable></entry>
               <entry>FFIのスタブファイルの出力先を変更する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-outputdir</option> <replaceable>dir</replaceable></entry>
+	      <entry>出力ディレクトリを設定する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -499,14 +505,20 @@
               <entry><option>-fno-print-evld-with-show</option></entry>
             </row>
 	    <row>
-	      <entry><option>-fno-print-bind-result</option></entry>
-	      <entry><link linkend="ghci-stmts">GHCiで束縛の結果を表示するのを無効にする</link></entry>
+	      <entry><option>-fprint-bind-result</option></entry>
+	      <entry><link linkend="ghci-stmts">GHCiで束縛の結果を表示するのを有効にする</link></entry>
 	      <entry>動</entry>
-	      <entry>-</entry>
+	      <entry>-fno-printbind-result</entry>
 	    </row>
 	    <row>
 	      <entry><option>-fno-print-bind-contents</option></entry>
 	      <entry><link linkend="breakpoints">GHCiで束縛の中身を表示するのを無効にする</link></entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-implicit-import-qualified</option></entry>
+	      <entry><link linkend="ghci-import-qualified">GHCiで、あらゆるものが暗黙にimport qualifiedされるのを無効にする</link></entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -722,6 +734,12 @@
 	      <entry><option>-XNoTemplateHaskell</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XQuasiQuotes</option></entry>
+	      <entry><link linkend="th-quasiquotation">準クォート</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoQuasiQuotes</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XBangPatterns</option></entry>
 	      <entry><link linkend="bang-patterns">びっくりパターン</link>を有効にする</entry>
 	      <entry>動</entry>
@@ -740,6 +758,12 @@
 	      <entry><option>-XNoPatternGuards</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XViewPatterns</option></entry>
+	      <entry><link linkend="view-patterns">ビューパターン</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoViewPatterns</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XUnicodeSyntax</option></entry>
 	      <entry>Unicode構文を有効にする。</entry>
 	      <entry>動</entry>
@@ -747,9 +771,15 @@
 	    </row>
 	    <row>
 	      <entry><option>-XMagicHash</option></entry>
-	      <entry>「magic hash」を有効にする。</entry>
+	      <entry>「#」を<link linkend="magic-hash">識別子につける後置修飾子</link>として認める。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoMagicHash</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XNewQualifiedOperators</option></entry>
+	      <entry><link linkend="new-qualified-operators">被修飾演算子の新しい構文</link>を有効にする。 </entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoNewQualifiedOperators</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPolymorphicComponents</option></entry>
@@ -770,6 +800,12 @@
 	      <entry><option>-XNoRankNTypes</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XImpredicativeTypes</option></entry>
+	      <entry><link linkend="impredicative-polymorphism">非述語的な型</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoImpredicativeTypes</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XExistentialQuantification</option></entry>
 	      <entry><link linkend="existential-quantification">存在量化</link>を有効にする。</entry>
 	      <entry>動</entry>
@@ -782,12 +818,6 @@
 	      <entry><option>-XNoKindSignatures</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XPatternSignatures</option></entry>
-	      <entry><link linkend="pattern-type-sigs">パターン型シグネチャ</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoPatternSignatures</option></entry>
-	    </row>
-	    <row>
 	      <entry><option>-XEmptyDataDecls</option></entry>
 	      <entry>空のデータ型宣言を有効にする。</entry>
 	      <entry>動</entry>
@@ -798,6 +828,12 @@
 	      <entry><link linkend="parallel-list-comprehensions">並行リスト内包表記</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoParallelListComp</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XTransformListComp</option></entry>
+	      <entry><link linkend="generalised-list-comprehensions">transform list comprehensions</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoTransformListComp</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XUnliftedFFITypes</option></entry>
@@ -836,10 +872,10 @@
 	      <entry><option>-XNoRecordWildCards</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XRecordPuns</option></entry>
+	      <entry><option>-XNamedFieldPuns</option></entry>
 	      <entry><link linkend="record-puns">record pun</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoRecordPuns</option></entry>
+	      <entry><option>-XNoNamedFieldPuns</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XDisambiguateRecordFields</option></entry>
@@ -907,6 +943,12 @@
 	      <entry>動</entry>
 	      <entry><option>-XNoFunctionalDependencies</option></entry>
  	    </row>
+	    <row>
+	      <entry><option>-XPackageImports</option></entry>
+	      <entry><link linkend="package-imports">パッケージ修飾されたインポート</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoPackageImports</option></entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -959,12 +1001,18 @@
 	    <entry>-Werror</entry>
 	  </row>
 	  <row>
-	    <entry><option>-fwarn-deprecations</option></entry>
-	    <entry>非推奨の関数・型が使われているときに警告する</entry>
+	    <entry><option>-fwarn-warnings-deprecations</option></entry>
+	    <entry>WARNINGおよびDEPRECATEDプラグマの付いた関数・型が使われているときに警告する</entry>
 	    <entry>動</entry>
-	    <entry><option>-fno-warn-deprecations</option></entry>
+	    <entry><option>-fno-warn-warnings-deprecations</option></entry>
 	  </row>
 
+	  <row>
+	    <entry><option>-fwarn-deprecated-flags</option></entry>
+	    <entry>非推奨のコマンド行フラグが使われているときに警告する</entry>
+ 	    <entry>動</entry>
+	    <entry><option>-fno-warn-deprecated-flags</option></entry>
+ 	  </row>
 	  <row>
 	    <entry><option>-fwarn-duplicate-exports</option></entry>
 	    <entry>実体が複数回エクスポートされているときに警告する</entry>
@@ -1160,6 +1208,13 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-fmethod-sharing</option></entry>
+	      <entry>多重定義関数の特殊化を共有する(デフォルト)</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-method-sharing</option></entry>
+	    </row>
+
+	    <row>
 	      <entry><option>-fdo-eta-reduction</option></entry>
 	      <entry>イータ簡約を有効にする。<option>-O</option>によって有効になる。</entry>
 	      <entry>動</entry>
@@ -1205,6 +1260,13 @@
 	      <entry><option>-fmax-worker-args</option></entry>
 	      <entry>ワーカにこれだけの引数があるとき、これ以上アンパックしない(デフォルト: 10)</entry>
 	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fsimplifier-phases</option></entry>
+	      <entry>単純化器の段階の数を設定する(デフォルトは2)。<option>-O0</option>が与えられたときには無視される。</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 
@@ -1258,6 +1320,20 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-fspec-constr-threshold</option>=<replaceable>n</replaceable></entry>
+	      <entry>SpecConstr変換の大きさ閾値を<replaceable>n</replaceable>にする。(デフォルト: 200)</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-spec-constr-threshold</option></entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fspec-constr-count</option>=<replaceable>n</replaceable></entry>
+	      <entry>一つの関数についてSpecConstr変換で作られる特殊化の数の最大値を<replaceable>n</replaceable>にする。(デフォルト: 3)</entry>
+	      <entry>静</entry>
+	      <entry><option>-fno-spec-constr-count</option></entry>
+	    </row>
+
+	    <row>
 	      <entry><option>-fliberate-case</option></entry>
 	      <entry>liberate-case変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
 	      <entry>動</entry>
@@ -1265,10 +1341,17 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fspec-threshold</option>=<replaceable>n</replaceable></entry>
-	      <entry>liberate-caseとSpecConstrの両変換について、関数特殊化に関するサイズの閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
-	      <entry>静</entry>
-	      <entry><option>-</option></entry>
+	      <entry><option>-fstatic-argument-transformation</option></entry>
+	      <entry>静的引数変換を有効にする。<option>-O2</option>によって有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-static-argument-transformation</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fliberate-case-threshold</option>=<replaceable>n</replaceable></entry>
+	      <entry>liberate-case変換における大きさ閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
+ 	      <entry>静</entry>
+	      <entry><option>-fno-liberate-case-threshold</option></entry>
  	    </row>
  
 	    <row>
@@ -2024,6 +2107,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-ddump-simpl-phases</option></entry>
+	      <entry>単純化器の段階毎の出力を表示</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-ddump-simpl-iterations</option></entry>
 	      <entry>単純化器の繰り返し毎の出力を表示</entry>
 	      <entry>動</entry>
@@ -2102,8 +2191,20 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-dno-debug-output</option></entry>
+	      <entry>要求された以外のデバッグ出力を抑制する</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-dppr-debug</option></entry>
 	      <entry>デバッグ表示を有効にする(さらなる多弁)</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dsuppress-uniques</option></entry>
+	      <entry>デバッグ出力中で固有子を表示することを抑制する(<command>diff</command>が使いやすくなる。</entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
@@ -2167,12 +2268,6 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
-	    <row>
-	      <entry><option>-unreg</option></entry>
-	      <entry>非レジスタ化コンパイルを有効にする</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -2201,12 +2296,6 @@
 	    <row>
 	      <entry><option>-dno-black-holing</option></entry>
 	      <entry>ブラックホール化を無効にする(おそらく動作しない)</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-fno-method-sharing</option></entry>
-	      <entry>多重定義された関数の特殊化を共有しない</entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
