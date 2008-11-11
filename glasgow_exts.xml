@@ -31,169 +31,8 @@
 
    <para>Cabalが認識する言語オプションは<literal>LANGUAGE</literal>プラグマを使って有効にすることもできる。<literal>{-# LANGUAGE TemplateHaskell #-}</literal>のように。(<xref linkend="language-pragma"/>を見よ)</para>
 
-    <para>専用の構文を有効にするオプションを使うと、Haskell 98で動作していたコードがコンパイルできなくなる<emphasis>可能性がある</emphasis>。これは大抵、変数名として使われていたものが予約語になることが原因である。このため、以下の各オプションには、そのオプションによって有効になる専用の構文の一覧が付されている。ここではHaskell 98の字句構文(Haskell 98レポートを見よ)の記法と非終端記号を使っている。専用の構文には次の二種類がある。</para>
+    <para><option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグは、以下の拡張を有効にするのと同じである。<option>-XPrintExplicitForalls</option>、<option>-XForeignFunctionInterface</option>、<option>-XUnliftedFFITypes</option>、<option>-XGADTs</option>、<option>-XImplicitParams</option>、<option>-XScopedTypeVariables</option>、<option>-XUnboxedTuples</option>、<option>-XTypeSynonymInstances</option>、<option>-XStandaloneDeriving</option>、<option>-XDeriveDataTypeable</option>、<option>-XFlexibleContexts</option>、<option>-XFlexibleInstances</option>、<option>-XConstrainedClassMethods</option>、<option>-XMultiParamTypeClasses</option>、<option>-XFunctionalDependencies</option>、<option>-XMagicHash</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>、<option>-XUnicodeSyntax</option>、<option>-XPostfixOperators</option>、<option>-XPatternGuards</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRankNTypes</option>、<option>-XImpredicativeTypes</option>、<option>-XTypeOperators</option>、<option>-XRecursiveDo</option>、<option>-XParallelListComp</option>、<option>-XEmptyDataDecls</option>、<option>-XKindSignatures</option>、<option>-XGeneralizedNewtypeDeriving</option>、<option>-XTypeFamilies</option>。<option>-fglasgow-exts</option>の効果は、これらのオプションを有効にすること<emphasis>だけ</emphasis>である。我々はこの多目的フラグをやめて、機能を個別に有効にする方向に移行しようとしている。</para>
 
-    <itemizedlist>
-      <listitem>
-        <para>新しい予約語や予約シンボル。もはやプログラムで識別子として使うことのできない文字列である。</para>
-      </listitem>
-      <listitem>
-        <para>その他の専用構文。特定のオプションが有効になっていると別の意味を持つような文字の列。</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>構文の変更については、既存の正しいプログラムに影響する可能性のあるもの(「盗まれた」構文)のみを列挙している。多くの拡張は新しい文脈自由な構文を導入するが、これらの場合は例外なく、新しい構文を使って書かれたプログラムは適当なオプションなしではコンパイルできない。</para>
-
-    <variablelist>
-
-      <varlistentry>
-	<term>
-          <option>-fglasgow-exts</option>:
-          <indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>これは、<xref linkend="ghc-language-features"/>で解説されているHaskell 98への拡張を、別途記載がない限り、全て同時に有効にする。我々はこの多目的フラグをやめて、機能を個別に有効にする方向に移行しようとしている。</para>
-
-          <para>新しい予約語は、<literal>forall</literal>(型中のみ)、<literal>mdo</literal>。</para>
-
-          <para>その他の盗まれる構文は、<replaceable>varid</replaceable>{<literal>&num;</literal>}、<replaceable>char</replaceable><literal>&num;</literal>、<replaceable>string</replaceable><literal>&num;</literal>、<replaceable>integer</replaceable><literal>&num;</literal>、<replaceable>float</replaceable><literal>&num;</literal>、<replaceable>float</replaceable><literal>&num;&num;</literal>、<literal>(&num;</literal>、<literal>&num;)</literal>、<literal>|)</literal>、<literal>{|</literal>である。</para>
-
-	  <para>以下の個別言語フラグが有効になる。<option>-XForeignFunctionInterface</option>、<option>-XImplicitParams</option>、<option>-XScopedTypeVariables</option>、<option>-XGADTs</option>、<option>-XTypeFamilies</option>。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XForeignFunctionInterface</option> and <option>-XForeignFunctionInterface</option>:
-          <indexterm><primary><option>-XForeignFunctionInterface</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>このオプションは、Haskell 98への追補である「Foreign Function Interface」で定義されている言語拡張を有効にする。</para>
-
-          <para>新しい予約語は、<literal>foreign</literal>。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XNoMonomorphismRestriction</option>,<option>-XNoMonoPatBinds</option>:
-        </term>
-	<listitem>
-          <para>このフラグはどのように一般化が行われるかを制御する。<xref linkend="monomorphism"/>を見よ。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XExtendedDefaultRules</option>:
-          <indexterm><primary><option>-XExtendedDefaultRules</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>通常のモジュールに対してGHCiの拡張デフォルト化規則を使う。(<xref linkend="extended-default-rules"/>)。<option>-fglasgow-exts</option>とは独立。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XOverlappingInstances</option>
-          <indexterm><primary><option>-XOverlappingInstances</option></primary></indexterm>
-        </term>
-	<term>
-          <option>-XUndecidableInstances</option>
-          <indexterm><primary><option>-XUndecidableInstances</option></primary></indexterm>
-        </term>
-	<term>
-          <option>-XIncoherentInstances</option>
-          <indexterm><primary><option>-XIncoherentInstances</option></primary></indexterm>
-        </term>
-	<term>
-          <option>-fcontext-stack=N</option>
-          <indexterm><primary><option>-fcontext-stack</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para><xref linkend="instance-decls"/>を見よ。<option>-fglasgow-exts</option>を使っているときのみ効力を持つ。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-finline-phase</option>
-          <indexterm><primary><option>-finline-phase</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para><xref linkend="rewrite-rules"/>を見よ。<option>-fglasgow-exts</option>を使っているときのみ効力を持つ。</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XArrows</option>
-          <indexterm><primary><option>-XArrows</option></primary></indexterm>
-        </term>
-	<listitem>
-	  <para><xref linkend="arrow-notation"/>を見よ。<option>-fglasgow-exts</option>とは独立。</para>
-
-          <para>新しい予約語/予約シンボルは、<literal>rec</literal>、<literal>proc</literal>、<literal>-&lt;</literal>、<literal>&gt;-</literal>、<literal>-&lt;&lt;</literal>、<literal>&gt;&gt;-</literal>である。</para>
-
-	  <para>その他の盗まれる構文は、<literal>(|</literal>、<literal>|)</literal>である。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-XGenerics</option>
-          <indexterm><primary><option>-XGenerics</option></primary></indexterm>
-        </term>
-	<listitem>
-	  <para><xref linkend="generic-classes"/>を見よ。<option>-fglasgow-exts</option>とは独立。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-XNoImplicitPrelude</option></term>
-	<listitem>
-	  <para><indexterm><primary>-XNoImplicitPrelude
-          option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-XNoImplicitPrelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならない)</para>
-
-          <para>Preludeをインポートしない場合でさえ、組込み構文の大部分は相変わらず組込みのHaskell Preludeを参照する。これはHaskellレポートで定義された振る舞いである。例えば、<literal>[Int]</literal>という型の意味は相変わらず<literal>Prelude.[] Int</literal>であり、タプルは標準Preludeのタプルのままであり、リスト内包表記を展開するときは<literal>Prelude.map</literal>が使われる、という具合である。</para>
-
-          <para>一方で、<option>-XNoImplicitPrelude</option>が組込み構文の扱いを変える部分もある。<xref linkend="rebindable-syntax"/>を見よ。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-XImplicitParams</option></term>
-	<listitem>
-          <para>暗黙パラメータを有効にする。(<xref linkend="implicit-parameters"/>を見よ)。現在、<option>-fglasgow-exts</option>が使われていると自動的に有効になる。</para>
-
-          <para>盗まれる構文は<literal>?<replaceable>varid</replaceable></literal>と<literal>%<replaceable>varid</replaceable></literal>である。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-XOverloadedStrings</option></term>
-	<listitem>
-	  <para>文字列リテラルの多重定義を有効にする。(<xref linkend="overloaded-strings"/>を見よ)。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-XScopedTypeVariables</option></term>
-	<listitem>
-          <para>字句的なスコープを持つ型変数を有効にする。(<xref linkend="scoped-type-variables"/>を見よ)。<option>-fglasgow-exts</option>が使われていると自動的に有効になる。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term><option>-XTemplateHaskell</option></term>
-	<listitem>
-          <para>Template Haskellを有効にする。(<xref linkend="template-haskell"/>を見よ)。このフラグは明示的に与えねばならない。<option>-fglasgow-exts</option>が使われていても、もはや自動的には有効にならない。</para>
-
-          <para>盗まれる構文は、<literal>[|</literal>、<literal>[e|</literal>、<literal>[p|</literal>、<literal>[d|</literal>、<literal>[t|</literal>、<literal>$(</literal>、<literal>$<replaceable>varid</replaceable></literal>である。</para>
-	</listitem>
-      </varlistentry>
-
-    </variablelist>
   </sect1>
 
 <!-- UNBOXED TYPES AND PRIMITIVE OPERATIONS -->
@@ -579,14 +418,13 @@ mdoがどのように型検査され脱糖されるかの完全な詳細につ�
 
   </sect2>
 
+   <!-- ===================== REBINDABLE SYNTAX ===================  -->
 <sect2 id="rebindable-syntax">
-<title>再束縛可能な構文</title>
+<title>再束縛可能な構文とPreludeの暗黙インポート</title>
 
-
-      <para>GHCでは大部分の組込み構文が利用者によって再束縛できるようになっている。これは例えば自家製の<literal>Prelude</literal>を使うのを楽にするためである。</para>
-
-            <para>自分で数値クラスの階層を定義したいと思うことがあるかもしれない。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、このような定義をしてもまったく役に立たない。このため、<option>-XNoImplicitPrelude</option>フラグを使うと、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
-
+<para><indexterm><primary>-XNoImplicitPrelude option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-XNoImplicitPrelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならないのだ)</para>
+ 
+            <para>自分で数値クラスの階層を定義するために、自作のプレリュードを実装しているとしよう。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、これは完全な無駄骨である。このため、<option>-XNoImplicitPrelude</option>フラグを使った場合に<emphasis>も</emphasis>、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
 	    <itemizedlist>
 	      <listitem>
 		<para>整数リテラル<literal>368</literal>の意味は「<literal>fromInteger (368::Integer)</literal>」であり、「<literal>Prelude.fromInteger (368::Integer)</literal>」ではない。</para> </listitem>	    
@@ -670,6 +508,116 @@ module Foo where
 <para>
 Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-fdisambiguate-record-fields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名が散らばるのを軽減できる。
 </para>
+</sect2>
+
+<sect2 id="syntax-stolen">
+<title>盗まれた構文の概略</title>
+
+    <para>専用の構文を有効にするオプションを使うと、Haskell 98で動作していたコードがコンパイルできなくなる<emphasis>可能性がある</emphasis>。これは大抵、変数名として使われていたものが予約語になることが原因である。この節では、言語拡張によって「盗まれた」構文を列挙する。ここではHaskell 98の字句構文(Haskell 98レポートを見よ)の記法と非終端記号を使っている。構文の変更については、既存の正しいプログラムに影響する可能性のあるもの(「盗まれた」構文)のみを列挙する。多くの拡張は新しい文脈自由構文を導入するが、これらの場合は例外なく、新しい構文を使って書かれたプログラムは適当なオプションなしではコンパイルできない。</para>
+    
+    <para>専用の構文には次の二種類がある。</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>新しい予約語や予約シンボル。もはやプログラムで識別子として使うことのできない文字列である。</para>
+      </listitem>
+      <listitem>
+        <para>その他の専用構文。特定のオプションが有効になっていると別の意味を持つような文字の列。</para>
+      </listitem>
+    </itemizedlist>
+    
+<para>盗まれるのは以下の構文である。</para>
+
+    <variablelist>
+      <varlistentry>
+	<term>
+          <literal>forall</literal>
+          <indexterm><primary><literal>forall</literal></primary></indexterm>
+	</term>
+	<listitem><para><option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRank2Types</option>、<option>-XRankNTypes</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>によって盗まれる(型中において)。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>mdo</literal>
+          <indexterm><primary><literal>mdo</literal></primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XRecursiveDo</option>に盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>foreign</literal>
+          <indexterm><primary><literal>foreign</literal></primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XForeignFunctionInterface</option>に盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <literal>rec</literal>、<literal>proc</literal>、<literal>-&lt;</literal>、<literal>&gt;-</literal>、<literal>-&lt;&lt;</literal>、<literal>&gt;&gt;-</literal>、および<literal>(|</literal>、<literal>|)</literal>の括弧
+          <indexterm><primary><literal>proc</literal></primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XArrows</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <literal>?<replaceable>varid</replaceable></literal>,
+	  <literal>%<replaceable>varid</replaceable></literal>
+          <indexterm><primary>implicit parameters</primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XImplicitParams</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <literal>[|</literal>,
+	  <literal>[e|</literal>, <literal>[p|</literal>,
+	  <literal>[d|</literal>, <literal>[t|</literal>,
+	  <literal>$(</literal>,
+	  <literal>$<replaceable>varid</replaceable></literal>
+          <indexterm><primary>Template Haskell</primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XTemplateHaskell</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	  <literal>[:<replaceable>varid</replaceable>|</literal>
+          <indexterm><primary>quasi-quotation</primary></indexterm>
+	</term>
+	<listitem><para>
+	<option>-XQuasiQuotes</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+	      <replaceable>varid</replaceable>{<literal>&num;</literal>},
+	      <replaceable>char</replaceable><literal>&num;</literal>,	    
+	      <replaceable>string</replaceable><literal>&num;</literal>,    
+	      <replaceable>integer</replaceable><literal>&num;</literal>,    
+	      <replaceable>float</replaceable><literal>&num;</literal>,    
+	      <replaceable>float</replaceable><literal>&num;&num;</literal>,    
+	      <literal>(&num;</literal>, <literal>&num;)</literal>,	    
+	</term>
+	<listitem><para>
+	<option>-XMagicHash</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+    </variablelist>
 </sect2>
 </sect1>
 
