@@ -6,7 +6,7 @@
 
   <para>GHCは、Haskell 98の追補である他言語関数インタフェース1.0に(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>から得られる。</para>
 
-  <para>GHCでFFI対応を有効にするには、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>フラグか、これを含意する<option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグを与えれば良い。</para>
+  <para>GHCでFFI対応を有効にするには、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>フラグを与えれば良い。</para>
 
   <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
 
@@ -214,43 +214,11 @@ int main(int argc, char *argv[])
 
       <indexterm><primary>C calls, function headers</primary></indexterm>
 
-      <para>Cを生成する(<option>-fvia-C</option>を使って)とき、<option>-&num;include</option>指令(<xref linkend="options-C-compiler"/>)を使って、関数ヘッダのある<filename>.h</filename>ファイルを使わせることで、Cコンパイラが型エラーを発見するのを助けることができる。</para>
+      <para>Cの関数は、通常、Cのヘッダファイルでプロトタイプを使って宣言される。前の版のGHC(6.8.3以前)は、Haskellコードから生成されるCソースファイルにヘッダを<literal>&num;include</literal>していたので、FFIを介して呼ばれるCの関数が正しい型で呼ばれているかどうかを、Cコンパイラが検査することができた。</para>
 
-      <para>例を挙げる。</para>
-
-<programlisting>
-#include "HsFFI.h"
-
-void         initialiseEFS (HsInt size);
-HsInt        terminateEFS (void);
-HsForeignObj emptyEFS(void);
-HsForeignObj updateEFS (HsForeignObj a, HsInt i, HsInt x);
-HsInt        lookupEFS (HsForeignObj a, HsInt i);
-</programlisting>
-
-      <para><literal>HsInt</literal>、<literal>HsForeignObj</literal>などの型はH98 FFI追補に記されている。</para>
-
-      <para>これが<emphasis>絶対に必要</emphasis>なのは、<literal>float</literal>を返すとき(と、<literal>sizeof(int) != sizeof(int *)</literal>なとき)だけであるが、しっかりしたコードを書くことに興味のある人ならやっておくべきことだ。これをしないのは正気の沙汰じゃない。</para>
-
-<para>
-別のパッケージからモジュールをインポートしていて、モジュール間インライン化によって他言語呼び出しが露になったが、それが、対応する<option>-#include</option>を必要としている場合はどうだろう。インポート先のモジュールがコンパイル中のモジュールと同じパッケージにあるなら、インポート先のモジュールをコンパイルしたときに使った<option>-#include</option>を全て使うべきである。インポート先のモジュールが別のパッケージにあるときは、必要な<option>-#include</option>を把握しておく必要はない。この情報はパッケージ設定として記録されるので、GHCが知っているからである。このため、パッケージをCabalでビルドするなら、忘れずに全てのインクルードファイルをパッケージ記述中に記さなければならない。(Cabal説明書の<literal>includes</literal>フィールドを参照)
-</para>
-
-<para>
-FFIの仕様によれば、<option>-#include</option>オプションをforeign import宣言自体に書くこともできる。
-<programlisting>
-  foreign import "foo.h f" f :: Int -> IO Int
-</programlisting>
-このモジュールをコンパイルするとき、GHCは指定された<option>-#include</option>をincludeするCファイルを生成する。しかし、このような他言語呼び出しに関しては、GHCはモジュール間インライン化を行わない。<option>-#include</option>の情報をモジュール境界を越えて受け渡すことをしないからである。(これには深刻な理由がある訳ではない。実装が面倒だっただけである。ラッパ(引数を非ボックス化したりする)はモジュールを跨いでインライン化される)。他言語呼び出しそのものをモジュールを跨いでインライン化させたい場合、コマンド行とパッケージ設定の<option>-#include</option>を使うべきだ。
-</para>
-
-      <sect3 id="finding-header-files">
-	<title>ヘッダファイルの探索</title>
-
-	<para><option>-#include</option>オプションや<literal>foreign import</literal>宣言で指定されたヘッダファイルは通常のCコンパイラの探索パスにしたがって探索される。<option>-I</option>を使えばこのパスにディレクトリを追加することができる。(<xref linkend="c-pre-processor"/>を見よ)</para>
-
-        <para>注意: ヘッダファイルが使われるのは、Cを介してコンパイルしているときだけである。コードをネイティブコード生成器(デフォルト)を使ってコンパイルしていて、突然Cを使うのに切り替えた場合、includeファイルが足りない旨のエラーが予期せず発生することがある。Cを介したコンパイルはある種のオプションによって自動的に有効になる。(例えば、<option>-O</option>と<option>-prof</option>はどちらも<option>fvia-C</option>を含意する)</para>
-      </sect3>
+      <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、ネイティブコードのバックエンド(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、他言語呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された他言語呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に他言語呼び出しをインライン化できるようになるからである。</para>
+        
+      <para><literal>-&num;include</literal>オプションはもはや非推奨であり、Cabalのパッケージ仕様の中の<literal>include-files</literal>フィールドは無視される。</para>
 
     </sect2>
 
