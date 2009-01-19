@@ -39,15 +39,13 @@
 <sect1 id="primitives">
   <title>非ボックス化型とプリミティブ演算</title>
 
-<para>GHCは大量のプリミティブなデータ型と演算を基礎としている。高速なコードを書くためにこれらを使うこともできるが、高水準の言語機能やライブラリを使った方が、通常はずっと苦痛が少なく、長期的に見て良い結果になる。運が良ければ、書いたコードは最適化されて、結局、効率的な非ボックス化版になる。もしそうならないときは知らせてほしい。</para>
+<para>GHCは大量のプリミティブなデータ型と演算を基礎としている。(「プリミティブ」だというのは、Haskell自体では定義できないという意味である)。高速なコードを書くためにこれらを使うこともできるが、高水準の言語機能やライブラリを使った方が、通常はずっと苦痛が少なく、長期的に見て良い結果になる。運が良ければ、書いたコードは最適化されて、結局、効率的な非ボックス化版になる。もしそうならないときは知らせてほしい。</para>
 
-<para>現在、プリミティブ要素に関する、まともな、最新の内容を反映した説明書が存在しない。これはおそらく、プリミティブ要素が主に内部での利用を想定したものだからである。利用者手引きのこの位置に、プリミティブ要素についての長い節があったが、時代後れになった。そして、誤った情報を置いておくくらいなら何もない方がましである。</para>
+<para>これらのプリミティブなデータ型と演算は全て<literal>GHC.Prim</literal>というライブラリからエクスポートされている。これには<ulink url="../libraries/base/GHC.Prim.html">詳細なオンライン説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)がある。(この説明書は<filename>compiler/prelude/primops.txt.pp</filename>というファイルから生成されている)</para>
+<para>プログラム中でプリミティブなデータ型や演算に言及したいなら、まず<literal>GHC.Prim</literal>をインポートしてそれらをスコープに導入しなければならない。多くは「&num;」で終わる名前を持っているので、そのようなものに言及するには拡張<option>-XMagicHash</option>(<xref linkend="magic-hash"/>)が必要である。
+</para>
 
-<para>どんなプリミティブ型があるか、それらにどんな演算が働くか、についての真正な事実は<filename>fptools/ghc/compiler/prelude/primops.txt.pp</filename>というファイルに記されている。このファイルは直接GHCのプリミティブ演算の定義を生成するのに使われるので、内容は常に正しい。また、テキスト化処理ができるようになっている。</para>
-
-<para>じっさい、処理の結果が<ulink url="http://www.haskell.org/ghc/docs/papers/core.ps.gz">External Core language</ulink>の説明に含まれているので、活字に組まれたものを探しているならこれを使うと良い。<filename>primops.txt</filename>を処理するプログラムへのXMLバックエンドを作ってくれる人がいれば、とてもありがたい。結果をこの利用者手引きに載せられるからである。</para>
-
-<para>以下はいくつかの主要な点についての短いまとめである。</para>
+<para>プリミティブ演算は広範にわたって<link linkend="glasgow-unboxed">非ボックス化型</link>と<link linkend="unboxed-tuples">非ボックス化タプル</link>を使っている。ここではこれらについて短くまとめる。</para>
   
 <sect2 id="glasgow-unboxed">
 <title>非ボックス化型
@@ -63,7 +61,7 @@
 非ボックス化型は、Cで使う「生の機械上の」型に相当する。<literal>Int&num;</literal> (long int)、<literal>Double&num;</literal> (double)、<literal>Addr&num;</literal> (void *)などである。これらの型の上の<emphasis>プリミティブ演算</emphasis>(PrimOp)は予想される通りのものである。例えば、<literal>(+&num;)</literal>は<literal>Int&num;</literal>についての加算であり、我々が皆愛する機械上の加算(通常一命令)である。</para>
 
 <para>
-プリミティブな(非ボックス化)型はHaskellで定義できないので、言語とコンパイラに組み込まれている。プリミティブ型は決して持ち上げられていない。すなわち、プリミティブ型の値はボトムになり得ない。慣習として、プリミティブな型、値、演算には<literal>&num;</literal>を接尾辞として付ける。</para>
+プリミティブな(非ボックス化)型はHaskellで定義できないので、言語とコンパイラに組み込まれている。プリミティブ型は決して持ち上げられていない。すなわち、プリミティブ型の値はボトムになり得ない。慣習として、プリミティブな型、値、演算には<literal>&num;</literal>を接尾辞として付ける(ただし、あくまで慣習である)(<xref linkend="magic-hash"/>を見よ)。プリミティブ型には、リテラルのために特別な構文があるものもあるが、それも<link linkend="magic-hash">同じ節</link>で述べている。</para>
 
 <para>
 しばしば、プリミティブな型は単なるビットパターンで表される。例えば、<literal>Int&num;</literal>、<literal>Float&num;</literal>、<literal>Double&num;</literal>がそうである。しかし、常にそうという訳ではない。プリミティブな値がヒープに確保されたオブジェクトへのポインタで表現されていることもある。例として<literal>Array&num;</literal>、すなわちプリミティブ配列の型がある。プリミティブ配列はヒープに確保されているが、これは、大きすぎてレジスタに収まらず、コピーして持ち回るのはコストが掛かりすぎるからである。ある意味では、これがポインタで表現されているというのは偶然に過ぎない。プリミティブ型がポインタで表現されるときは、ポインタは必ずその値を指すのであって、未評価のサンクや間接参照等々を指すことはない。たくさんの数値計算を行うプログラムでは、非ボックス化型を使うことで「標準的な」書き方をしたものよりも<emphasis>ずっと</emphasis>速くなることがある。ある例では、三倍もの高速化が達成された。</para>
