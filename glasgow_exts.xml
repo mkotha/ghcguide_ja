@@ -1124,7 +1124,7 @@ GHCでは、型構築子、クラス、型変数を演算子として定義し�
 <title>型シノニムの制限緩和</title>
 
 <para>
-型シノニムは型の世界でのマクロに似ていて、GHCはいろいろな検査を<emphasis>型シノニムを展開した後にしか</emphasis>行わない。このため、型シノニムについてGHCではHaskell 98よりもずっと制限が緩い。
+型シノニムは型の世界でのマクロに似ているが、Haskell 98は型シノニムの個々の宣言にたくさんの規則を課している。拡張<option>-XLiberalTypeSynonyms</option>が有効だと、GHCはいろいろな検査を<emphasis>型シノニムを展開した後にしか</emphasis>行わない。つまり、型シノニムについてGHCはHaskell 98よりもずっと制限を緩くすることができる。
 <itemizedlist>
 <listitem> <para>次のように、型シノニム中に<literal>forall</literal>(多重定義が関係しても良い)を書くことができる。
 <programlisting>
@@ -1140,7 +1140,7 @@ GHCでは、型構築子、クラス、型変数を演算子として定義し�
 </listitem>
 
 <listitem><para>
-型シノニム中に非ボックス化型を書くことができる。
+<option>-XUnboxedTuples</option>も使っているなら、型シノニム中に非ボックス化型を書くことができる。
 <programlisting>
   type Pr = (# Int, Int #)
 
@@ -1349,7 +1349,7 @@ Baz2 :: forall b. Show b => b -> (b -> b) -> Baz
 </para>
 
 <para>
-操作的には、辞書渡し式の実装では、構築子<function>Baz1</function>と<function>Baz2</function>は<literal>Eq</literal>と<literal>Show</literal>の辞書をそれぞれ記憶しておかなければならず、パターン照合の時にはそれを展開する。
+操作的にいうと、辞書渡し式の実装では、構築子<function>Baz1</function>と<function>Baz2</function>は<literal>Eq</literal>と<literal>Show</literal>の辞書をそれぞれ記憶しておかなければならず、パターン照合の時にはそれを展開する。
 </para>
 
 </sect3>
@@ -1477,7 +1477,7 @@ f1 (MkFoo a f) = a
   f3 x = case x of Baz1 a b -> a==b
 </programlisting>
 
-一般に、存在量化された構築子についてパターン照合できるのは、<literal>case</literal>式においてと、関数定義のパターンにおいてのみである。この制約は実は実装上の理由による。束縛グループを型検査するのは既に悪夢であり、存在型はさらに問題をややこしくする。さらに、モジュールの最上位での存在的パターン束縛には意味がない。存在量化された型が抜け出すのを防ぐ方法がはっきりしないからである。このため、今のところ、述べやすい制約が科せられている。私はこの制約がどれくらい厄介か見定めている。
+一般に、存在量化された構築子についてパターン照合できるのは、<literal>case</literal>式においてと、関数定義のパターンにおいてのみである。この制約は実は実装上の理由による。束縛グループを型検査するのは既に悪夢であり、存在型はさらに問題をややこしくする。さらに、モジュールの最上位での存在的パターン束縛には意味がない。存在量化された型が抜け出すのを防ぐ方法がはっきりしないからである。このため、今のところ、述べやすい制約が科せられている。私はこの制約がどれくらい厄介か見定めているところである。
 
 </para>
 </listitem>
@@ -1728,6 +1728,10 @@ GADTは、GADT様式の構文(<xref linkend="gadt-style"/>)でなければ宣言
 </para></listitem>
 
 <listitem><para>
+GADT様式の構文を使って通常の代数的データ型を宣言することは可能である。GADTをGADTたらしめるのは構文ではなく、結果の型が単なる<literal>T a b</literal>でないような構築子の存在である。
+</para></listitem>
+
+<listitem><para>
 GADTについて<literal>deriving</literal>節を使うことはできない。通常のデータ型だけである。
 </para></listitem>
 
@@ -1753,6 +1757,17 @@ GADTについて<literal>deriving</literal>節を使うことはできない。�
   num :: Term Int -> Term Int
   arg :: Term Bool -> Term Int
 </programlisting>
+</para></listitem>
+
+<listitem><para>
+GADTから得られたデータ構築子に対してパターン照合を行なう(例えば<literal>case</literal>式で)場合、以下の規則が適用される。
+<itemizedlist>
+<listitem><para>検査対象(訳注: scrutinee; case式ならcaseとinの間に書かれる式のこと)の型は固い型でなければならない。</para></listitem>
+<listitem><para><literal>case</literal>式全体の型は固い型でなければならない。</para></listitem>
+<listitem><para><literal>case</literal>の各分岐で言及される自由変数の型はすべて固い型でなければならない。</para></listitem>
+</itemizedlist>
+型が「固い(rigid)」というのは、それが束縛された地点において、コンパイラにとって完全に既知であることをいう。ある変数の型が固い型であることを確実にしたいなら、もっとも簡単な方法はそれに型シグネチャを与えることである。より精密な詳細については<ulink url="http://research.microsoft.com/%7Esimonpj/papers/gadt">Simple unification-based type inference for GADTs</ulink>を見よ。GHCに実装されている基準はAppendixに載っている。
+
 </para></listitem>
 
 </itemizedlist>
