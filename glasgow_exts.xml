@@ -1817,7 +1817,17 @@ GHCは単独の<literal>deriving</literal>宣言を受け付けるようにな�
 
   deriving instance Eq a => Eq (Foo a)
 </programlisting>
-構文は通常のインスタンス宣言と同じであるが、(a)<literal>deriving</literal>キーワードを使うことと、(b)<literal>where</literal>部がないことが異なる。通常のインスタンス宣言でするのと全く同じように、文脈(この例では文脈は<literal>(Eq a)</literal>)を指定しなければならない。(これは、データ型宣言に付属したderiving節において文脈が推論されるのと対照を為す)。このような<literal>deriving instance</literal>の規則は、形式と停止性に関して、通常のインスタンス宣言が従うのと同じ規則に従い、同じフラグで制御される。<link linkend="instance-decls"/>を見よ。</para>
+構文は通常のインスタンス宣言と同じであるが、(a)<literal>deriving</literal>キーワードを使うことと、(b)<literal>where</literal>部がないことが異なる。通常のインスタンス宣言でするのと全く同じように、文脈(この例では文脈は<literal>(Eq a)</literal>)を指定しなければならない。(これは、データ型宣言に付属したderiving節において文脈が推論されるのと対照を為す)。<literal>deriving instance</literal>の宣言は、形式と停止性に関して、通常のインスタンス宣言が従うのと同じ規則に従い、同じフラグで制御される。<xref linkend="instance-decls"/>を見よ。</para>
+<para>
+<literal>data</literal>宣言に付属する<literal>deriving</literal>宣言と異なり、インスタンスはデータ型よりも限定的になり得る(<literal>-XFlexibleInstances</literal>を使うことを前提にすれば。<xref linkend="instance-rules"/>)。例として以下を考えよ。
+<programlisting>
+  data Foo a = Bar a | Baz String
+
+  deriving instance Eq a => Eq (Foo [a])
+  deriving instance Eq a => Eq (Foo (Maybe a))
+</programlisting>
+これによって<literal>(Foo [a])</literal>と<literal>(Foo (Maybe a))</literal>についての導出インスタンスが生成されるが、それ以外の<literal>(Foo (Int,Bool))</literal>といった型は<literal>Eq</literal>のインスタンスにならない。
+</para>
 
 <para>この独立deriving構文は、通常の<literal>deriving</literal>がnewtypeに対して一般化された(<xref linkend="newtype-deriving"/>)のと全く同じように一般化される。例えば次のように。
 <programlisting>
