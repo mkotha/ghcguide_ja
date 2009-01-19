@@ -2303,7 +2303,7 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
 <listitem><para>対応範囲条件(Coverage Condition)。クラス中のそれぞれの関数従属<replaceable>tvs</replaceable><subscript>left</subscript> <literal>-&gt;</literal> <replaceable>tvs</replaceable><subscript>right</subscript>に対して、S(<replaceable>tvs</replaceable><subscript>right</subscript>)中の型変数は全てS(<replaceable>tvs</replaceable><subscript>left</subscript>)にも現れなければならない。ただし、Sは、クラス宣言中の型変数を対応するインスタンス宣言中の型に対応させる置換写像である。
 </para></listitem>
 </orderedlist>
-これらの制約により、文脈の簡約に終わりがあることが保証される。一回簡約するごとに最悪でも構築子一つ分問題が小さくなるからである。<option>-fallow-undecidable-instances</option>フラグ(<xref linkend="undecidable-instances"/>)を与えれば、Paterson条件と対応範囲条件の両方が撤廃される。これらの制限がある理由についての沢山の背景資料が、論文<ulink  url="http://research.microsoft.com/%7Esimonpj/papers/fd%2Dchr/">Understanding functional dependencies via Constraint Handling Rules</ulink>に見つかる。</para>
+これらの制約により、文脈の簡約に終わりがあることが保証される。一回簡約するごとに最悪でも構築子一つ分問題が小さくなるからである。<option>-XUndecidableInstances</option>フラグ(<xref linkend="undecidable-instances"/>)を与えれば、Paterson条件と対応範囲条件の両方が撤廃される。これらの制限がある理由についての沢山の背景資料が、論文<ulink  url="http://research.microsoft.com/%7Esimonpj/papers/fd%2Dchr/">Understanding functional dependencies via Constraint Handling Rules</ulink>に見つかる。</para>
 
 <para>
 例を挙げると、以下のものは問題ない。
@@ -2437,11 +2437,27 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
 <literal>f</literal>の右辺から、<literal>C Int [b]</literal>という制約を得たとしよう。しかし、GHCはインスタンス(C)を使うことはない。なぜなら、<literal>f</literal>の呼び出しによっては、<literal>b</literal>が<literal>Int</literal>に実体化するかも知れず、その場合は(D)が最も特殊性の高いインスタンスになるからである。よって、GHCはこのプログラムを拒絶する。(<option>-XIncoherentInstances</option>フラグを追加すると、GHCは、後々のインスタンス化についての問題を指摘することなく、(C)を選ぶようになる)。
 </para>
 <para>
-<literal>f</literal>に型シグネチャを与えたので、<literal>f</literal>が指定した型を持っていることをGHCが<emphasis>検査</emphasis>せねばならなかったことに注意。そうでなく、型シグネチャを与えず、GHCに<emphasis>推論</emphasis>してもらったとしよう。この場合、GHCは<literal>C Int [Int]</literal>という制約を単純化することは避ける(前と同じ理由)が、プログラムを拒絶することはなく、以下の型を推論する。
+<literal>f</literal>に型シグネチャを与えたので、<literal>f</literal>が指定した型を持っていることをGHCが<emphasis>検査</emphasis>せねばならなかったことに注意。そうでなく、型シグネチャを与えず、GHCに<emphasis>推論</emphasis>してもらったとしよう。この場合、GHCは<literal>C Int [b]</literal>という制約を単純化することは避ける(前と同じ理由)が、プログラムを拒絶することはなく、以下の型を推論する。
 <programlisting>
-  f :: C Int b => [b] -> [b]
+  f :: C Int [b] => [b] -> [b]
 </programlisting>
 これは、どのインスタンスを選ぶかの問題を<literal>f</literal>の呼び出し側まで遅延する。その時には、型<literal>b</literal>についてより多くが知られているだろう。
+<link linkend="flexible-contexts"><option>-XFlexibleContexts</option></link>フラグを使えば、この型シグネチャを自分で書くことができる。
+</para>
+<para>
+インスタンス宣言自体についても、まったく同じ状況が発生し得る。以下のものがあるとしよう。
+<programlisting>
+  class Foo a where
+     f :: a -> a
+  instance Foo [b] where
+     f x = ...
+</programlisting>
+さらに、前と同じように、制約<literal>C Int [b]</literal>が<literal>f</literal>の右辺から発生するとする。制約<literal>C Int [b]</literal>は複数のインスタンス宣言に適合するので、前と同様にGHCはこの制約を解決する方法が分からないとしてこのインスタンスを拒絶する。解決策は、インスタンス宣言の文脈にこの制約を加えて、選択を後回しにすることである。次のように。
+<programlisting>
+  instance C Int [b] => Foo [b] where
+     f x = ...
+</programlisting>
+(これをするには<link linkend="instance-rules"><option>-XFlexibleInstances</option></link>が必要である)
 </para>
 <para>
 重複インスタンスや非整合(incoherent)インスタンスになるかどうかは、<emphasis>インスタンス宣言</emphasis>の性質であり、そのモジュールがコンパイルされるときに<option>-XOverlappingInstances</option>と<option>-XIncoherentInstances</option>が有効になっていたかどうかで決まる。インスタンス宣言をインポートし、利用するモジュールでは、フラグはどちらも必要ない。特に、インスタンス発見の過程では、以下が成り立つ。
