@@ -181,7 +181,40 @@
 <sect1 id="syntax-extns">
 <title>構文的拡張</title>
  
+    <sect2 id="magic-hash">
+      <title>魔法の井桁(magic hash)</title>
+      <para><option>-XMagicHash</option>という言語拡張は、識別子に対する後置修飾子として「&num;」を認めるものである。つまり、「x&num;」が変数として有効に、「T&num;」が型構築子やデータ構築子として有効になる。</para>
+
+      <para>この井桁記号はまったく意味論に影響を与えない。非ボックス化された値や型に「&num;」で終わる名前を付ける(たとえば<literal>Int&num;</literal>)傾向があるが、必須ではない。これらはただの通常の変数に過ぎないのである。また、拡張<option>-XMagicHash</option>が何かをスコープに導入することもない。例えば、<literal>Int&num;</literal>をスコープに導入するためには<literal>GHC.Prim</literal>(<xref linkend="primitives"/>を見よ)をインポートしなければならない。その後で、スコープに導入された<literal>Int&num;</literal>に<emphasis>言及</emphasis>することを可能にするのが<option>-XMagicHash</option>オプションである。</para>
+      <para>また、<option>-XMagicHash</option>は新しい形式のリテラルを何種類か有効にする。(<xref linkend="glasgow-unboxed"/>を見よ)
+	<itemizedlist> 
+	  <listitem><para> <literal>'x'&num;</literal>の型は<literal>Char&num;</literal></para> </listitem>
+	  <listitem><para> <literal>&quot;foo&quot;&num;</literal>の型は<literal>Addr&num;</literal></para> </listitem>
+	  <listitem><para> <literal>3&num;</literal>の型は<literal>Int&num;</literal>である。一般に、なんらかのHaskell 98の整数lexemeの後に<literal>&num;</literal>が付いたものは<literal>Int&num;</literal>になる。例えば<literal>-0x3A&num;</literal>や<literal>32&num;</literal>がそうである。</para></listitem>
+	  <listitem><para> <literal>3&num;&num;</literal>の型は<literal>Word&num;</literal>である。一般に、なんらかの非負なHaskell 98の整数lexemeの後に<literal>&num;&num;</literal>が付いたものは<literal>Word&num;</literal>になる。</para> </listitem>
+	  <listitem><para> <literal>3.2&num;</literal>の型は<literal>Float&num;</literal></para> </listitem>
+	  <listitem><para> <literal>3.2&num;&num;</literal>の型は<literal>Double&num;</literal></para> </listitem>
+	  </itemizedlist>
+      </para>
+   </sect2>
+
+    <sect2 id="new-qualified-operators">
+      <title>演算子を修飾する際の新しい構文</title>
+
+      <para>修飾された演算子を参照するための新しい構文をHaskell'に導入することが計画されており、GHCでは<option>-XNewQualifiedOperators</option><indexterm><primary><option>-XNewQualifiedOperators</option></primary></indexterm>オプションによって有効になる。この新しい構文では、修飾された演算子を前置形式で使うときは<literal><replaceable>module</replaceable>.(<replaceable>symbol</replaceable>)</literal>と書く。(Haskell 98ではこれは<literal>(<replaceable>module</replaceable>.<replaceable>symbol</replaceable>)</literal>になる)。また、中置形式で使うときは<literal>`<replaceable>module</replaceable>.(<replaceable>symbol</replaceable>)`</literal>と書く。(Haskell 98では<literal>`<replaceable>module</replaceable>.<replaceable>symbol</replaceable>`</literal>である)。例を挙げる。
+<programlisting>
+  add x y = Prelude.(+) x y
+  subtract y = (`Prelude.(-)` y)
+</programlisting>
+この新しい形式は、<literal>Prelude..</literal>のような奇妙な例を排除することで、構文を規則的にすることを意図している。例えば、<literal>NewQualifiedOperators</literal>が有効なとき、<literal>[Monday..]</literal>という列の生成をスペース無しで書くことができる。Haskell 98では、これは<literal>Monday</literal>というモジュールの「<literal>.</literal>」という演算子を参照することになる。</para>
+
+      <para><option>-XNewQualifiedOperators</option>が有効なとき、古いHaskell 98形式の演算子の修飾構文は受け付けられないので、このオプションは既存のHaskell 98コードを壊す可能性がある。</para>
+
+    </sect2>
+        
+
     <!-- ====================== HIERARCHICAL MODULES =======================  -->
+
 
     <sect2 id="hierarchical-modules">
       <title>階層的モジュール</title>
@@ -302,6 +335,132 @@ f x | [y] &lt;- x
 </para>
 </sect2>
 
+    <!-- ===================== View patterns ===================  -->
+
+<sect2 id="view-patterns">
+<title>ビューパターン
+</title>
+
+<para>
+ビューパターンを有効にするフラグは<literal>-XViewPatterns</literal>である。ビューパターンに関するさらなる情報と実例は<ulink url="http://hackage.haskell.org/trac/ghc/wiki/ViewPatterns">Wikiのページ</ulink>にある。
+</para>
+
+<para>
+ビューパターンは、他のパターンの中に入れ子にして使えるパターンガードに少々似ていて、抽象型に対するパターン照合の方法として便利である。例えば、プログラミング言語の実装において、その言語の型の構文を以下のように表現することがあるかもしれない。
+<programlisting>
+type Typ
+ 
+data TypView = Unit
+             | Arrow Typ Typ
+
+view :: Type -> TypeView
+
+-- さらに、Typを構築するための演算が続く...
+</programlisting>
+Typの表現は抽象的なままにされているので、実装では手の込んだ表現(例えば共有を管理するためのhash-consing)を使うこともできる。
+
+ビューパターンがないと、このシグネチャを使うのは少々不便である。
+<programlisting>
+size :: Typ -> Integer
+size t = case view t of
+  Unit -> 1
+  Arrow t1 t2 -> size t1 + size t2
+</programlisting>
+等式を使った関数定義は使えず、このcaseを繰り返すしかない。さらに、<literal>t</literal>に関する照合が別のパターンの深くに埋まっている場合、状況はもっと悪くなる。</para>
+
+<para>
+ビューパターンを使うと、関数viewをパターンの中で呼んで、その結果に対して照合を行うことができる。
+<programlisting>
+size (view -> Unit) = 1
+size (view -> Arrow t1 t2) = size t1 + size t2
+</programlisting>
+つまり、<replaceable>expression</replaceable> <literal>-></literal> <replaceable>pattern</replaceable>と書かれる新しい形式のパターンを追加したのである。これは、「照合対象にexpressionを適用し、その適用の結果をpatternに対して照合せよ」という意味である。expressionは関数の型を持つ任意のHaskellの式であり、ビューパターンはパターンが使えるところならどこにでも使える。
+</para>
+
+<para>
+<literal>(</literal><replaceable>exp</replaceable> <literal>-></literal> <replaceable>pat</replaceable> <literal>)</literal>というパターンの意味論は以下の通り。
+
+<itemizedlist>
+
+<listitem>スコープ規則:
+
+<para>このビューパターンによって束縛される変数は、<replaceable>pat</replaceable>によって束縛される変数である。
+</para>
+
+<para>
+<replaceable>exp</replaceable>中の変数は全て束縛された出現である(訳注: 変数はどれも束縛されていなければいけない、換言すればスコープにある変数しか使ってはいけないということ)が、「左の方」のパターン中で束縛された変数はスコープにある。この特徴によって、例えば、ある関数のある引数を、別の引数のビューの中で使うことができる。例えば、<xref linkend="pattern-guards"/>に登場した関数<literal>clunky</literal>は、ビューパターンを使って次のように書ける。
+
+<programlisting>
+clunky env (lookup env -> Just val1) (lookup env -> Just val2) = val1 + val2
+...clunkyのその他の等式...
+</programlisting>
+</para>
+
+<para>
+より精密に言うと、スコープ規則は以下の通りである。
+<itemizedlist>
+<listitem>
+<para>
+単一のパターンの中で、ビューパターンの左にあるパターンで束縛された変数はスコープにある。例。
+<programlisting>
+example :: Maybe ((String -> Integer,Integer), String) -> Bool
+example Just ((f,_), f -> 4) = True
+</programlisting>
+
+さらに、関数定義において、カリー化された引数を照合することで束縛された変数は、その後の引数におけるビューパターン内で使うことができる。
+<programlisting>
+example :: (String -> Integer) -> String -> Bool
+example f (f -> 4) = True
+</programlisting>
+つまり、この場合のスコープ割り当ては、カリー化された引数をタプルにまとめた場合と同じになる。
+</para>
+</listitem>
+
+<listitem>
+<para>
+<literal>let</literal>や<literal>where</literal>、もしくは最上位のような相互再帰的な束縛において、ある宣言中のビューパターンが別の宣言によって束縛された変数に言及することはできない。つまり、それぞれの宣言が自己完結していなければならない。例えば、以下のプログラムは許されない。
+<programlisting>
+let {(x -> y) = e1 ;
+     (y -> x) = e2 } in x
+</programlisting>
+
+(将来、この制限を取り除くかもしれない。唯一のコストは、パターンの型検査がもう少し複雑になることである。)
+
+</para>
+</listitem>
+</itemizedlist>
+
+</para>
+</listitem>
+
+<listitem><para>型付け: もし<replaceable>exp</replaceable>の型が<replaceable>T1</replaceable> <literal>-></literal> <replaceable>T2</replaceable>で<replaceable>pat</replaceable>が<replaceable>T2</replaceable>型の値に照合するなら、ビューパターン全体で<replaceable>T1</replaceable>型の値に照合する。</para></listitem>
+
+<listitem><para>照合: <ulink url="http://www.haskell.org/onlinereport/">Haskell 98レポート</ulink>の3.17.3節(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.3">和訳</ulink>)の等式群に、以下のものを加える。
+<programlisting>
+case v of { (e -> p) -> e1 ; _ -> e2 } 
+ = 
+case (e v) of { p -> e1 ; _ -> e2 }
+</programlisting>
+つまり、<literal>(</literal> <replaceable>exp</replaceable> <literal>-></literal> <replaceable>pat</replaceable> <literal>)</literal>というパターンに変数<replaceable>v</replaceable>を照合するには、<literal>(</literal><replaceable>exp</replaceable> <replaceable> v</replaceable><literal>)</literal>を評価し、その結果を<replaceable>pat</replaceable>に対して照合する。
+</para></listitem>
+
+<listitem><para>効率性: ある関数定義やcase式の中で、同じビュー関数が複数の選択肢の中で使われている(例えば上の<literal>size</literal>)場合、ビュー関数が一回しか適用されないように、GHCはその関数の適用を集約して一つのネストしたcase式にしようとする。GHCのパターンのコンパイルは、<ulink url="http://research.microsoft.com/~simonpj/Papers/slpj-book-1987/">The Implementation of Functional Programming Languages</ulink>の第四章にある行列アルゴリズムに従っている。ある行列の最初の列の上部の行いくつか(訳注: top rows)が全て「同じ」式を持つビューパターンであった場合、それらのパターンは一つのネストされたcaseに変換される。これには、例えば、tuple中で整列したの隣接ビューパターンが含まれる。以下のような場合である。
+<programlisting>
+f ((view -> A, p1), p2) = e1
+f ((view -> B, p3), p4) = e2
+</programlisting>
+</para>
+
+<para>二つのビューパターンがどんなときに「同じ」であるかの現在の描像は非常に制限されたもので、完全な構文的同値性ですらない。それでも、変数、リテラル、適用、それにタプルを含んでいる。例えば、<literal>view ("hi", "there")</literal>が二つあった場合、それはまとめられる。一方、現在の実装はα同値性に従った比較を行わないので、<literal>(x, view x -> y)</literal>が二つあっても合体することはない。
+</para>
+
+</listitem>
+
+</itemizedlist>
+</para>
+
+</sect2>
+
     <!-- ===================== Recursive do-notation ===================  -->
 
 <sect2 id="mdo-notation">
@@ -363,10 +522,6 @@ mdoがどのように型検査され脱糖されるかの完全な詳細につ�
 </para>
 
 <para>
-ウェブページ<ulink url="http://www.cse.ogi.edu/PacSoft/projects/rmb/">http://www.cse.ogi.edu/PacSoft/projects/rmb/</ulink>には、再帰的モナド束縛に関する最新の情報がある。
-</para>
-
-<para>
 歴史的な参考事項: mdo記法の古い実装(および既存の文書の大部分)は、ライブラリとクラスの名として<literal>MonadRec</literal>を使っていたが、GHCはこの名前をサポートしない。
 </para>
 
@@ -415,6 +570,132 @@ mdoがどのように型検査され脱糖されるかの完全な詳細につ�
     <para>ここで、「zipN」は、枝の数に応じた適切なzipである。</para>
 
   </sect2>
+  
+  <!-- ===================== TRANSFORM LIST COMPREHENSIONS ===================  -->
+
+  <sect2 id="generalised-list-comprehensions">
+    <title>一般化(SQL風)リスト内包表記</title>
+    <indexterm><primary>list comprehensions</primary><secondary>generalised</secondary>
+    </indexterm>
+    <indexterm><primary>extended list comprehensions</primary>
+    </indexterm>
+    <indexterm><primary>group</primary></indexterm>
+    <indexterm><primary>sql</primary></indexterm>
+
+
+    <para>一般化リスト内包表記は、SQLでおなじみのソートやグループ化といった操作を可能にするための、リスト内包表記という構文糖に対するさらなる強化である。これは、論文<ulink url="http://research.microsoft.com/~simonpj/papers/list-comp">Comprehensive comprehensions: comprehensions with "order by" and "group by"</ulink>で完全に記述されている。ただし、我々が使う構文は論文のものと僅かに異なる。</para>
+<para>例を示す。
+<programlisting>
+employees = [ ("Simon", "MS", 80)
+, ("Erik", "MS", 100)
+, ("Phil", "Ed", 40)
+, ("Gordon", "Ed", 45)
+, ("Paul", "Yale", 60)]
+
+output = [ (the dept, sum salary)
+| (name, dept, salary) &lt;- employees
+, then group by dept
+, then sortWith by (sum salary)
+, then take 5 ]
+</programlisting>
+この例では、リスト<literal>output</literal>の値は次のようになる。
+<programlisting>
+[("Yale", 60), ("Ed", 85), ("MS", 180)]
+</programlisting>
+</para>
+<para>新しいキーワードが三つある。<literal>group</literal>、<literal>by</literal>、<literal>using</literal>である。(関数<literal>sortWith</literal>はキーワードではない。<literal>GHC.Exts</literal>からエクスポートされている普通の関数である。)</para>
+
+<para>内包表記修飾子の新しい形式が五つあり、すべて(既存の)キーワード<literal>then</literal>で導入される。
+    <itemizedlist>
+    <listitem>
+    
+<programlisting>
+then f
+</programlisting>
+
+この文は、<literal>f</literal>が型<literal>forall a. [a] -> [a]</literal>を持つことを要求する。これの使用例として、最初にあげた例では<literal>take 5</literal>を適用するのに使われている。
+    
+    </listitem>
+    
+    
+    <listitem>
+<para>
+<programlisting>
+then f by e
+</programlisting>
+
+この形式は上のものに似ているが、fの最初の引数として渡される関数を作ることができる。そのため、fの型は<literal>forall a. (a -> t) -> [a] -> [a]</literal>でなければならない。型から分かるように、この関数は、変形対象のリストの要素からfがなんらかの情報を「射影抽出(project out)」できるようにするものである。</para>
+
+    <para>ひとつの例が最初の例にある。この例では、変換されるリストの任意の要素について<literal>sortWith</literal>が<literal>sum salary</literal>を見つけ出すのに使われる関数が、<literal>sortWith</literal>への引数として与えられている。</para>
+
+    </listitem>
+
+
+    <listitem>
+
+<programlisting>
+then group by e using f
+</programlisting>
+
+    <para>グループ化系統の文のうち、最も一般的な形がこれである。この形式では、fの型が<literal>forall a. (a -> t) -> [a] -> [[a]]</literal>であることが要求される。上の<literal>then f by e</literal>の場合と同様、最初の引数はコンパイラによってfに与えられる。これは、変換対象のリストの各要素についてfがeを計算することができるようにする関数である。しかし、グループ化以外の場合と異なり、fはさらに対象のリストをいくつかの部分リストに分割する。これによって、この文以降のあらゆる点において、内包表記中でこれ以前に現われた束縛は、単一の値ではなく可能な値の<emphasis>リスト</emphasis>を指すようになる。これを理解する助けになるように、ひとつの例を見てみよう。</para>
+    
+<programlisting>
+-- これはGHC.ExtsのgroupWithと同様に働くが、最初に入力をソートしない
+groupRuns :: Eq b => (a -> b) -> [a] -> [[a]]
+groupRuns f = groupBy (\x y -> f x == f y)
+
+output = [ (the x, y)
+| x &lt;- ([1..3] ++ [1..2])
+, y &lt;- [4..6]
+, then group by x using groupRuns ]
+</programlisting>
+
+    <para>結果として、変数<literal>output</literal>は次に示す値を取る。</para>
+
+<programlisting>
+[(1, [4, 5, 6]), (2, [4, 5, 6]), (3, [4, 5, 6]), (1, [4, 5, 6]), (2, [4, 5, 6])]
+</programlisting>
+
+    <para>関数<literal>the</literal>を使って、xの型をリストから元の数値型に戻したのに注意。対照的に、変数yは、グループ化によって導入されたリスト形式のままにしてある。</para>
+
+    </listitem>
+
+    <listitem>
+
+<programlisting>
+then group by e
+</programlisting>
+
+    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="../libraries/base/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Exts.html">web上の最新版</ulink>)で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
+
+    </listitem>
+    
+    
+    <listitem>
+
+<programlisting>
+then group using f
+</programlisting>
+
+    <para>この形式のgroup文では、fの型は単純に<literal>forall a. [a] -> [[a]]</literal>である必要があり、ここまでの内包を直接グループ化するのに使われる。この形式の例を以下に示す。</para>
+    
+<programlisting>
+output = [ x
+| y &lt;- [1..5]
+, x &lt;- "hello"
+, then group using inits]
+</programlisting>
+
+    <para>結果は、「hello」という単語を五回並べた文字列の、すべての前方部分列(prefix)を含むリストになる。</para>
+
+<programlisting>
+["","h","he","hel","hell","hello","helloh","hellohe","hellohel","hellohell","hellohello","hellohelloh",...]
+</programlisting>
+
+    </listitem>
+</itemizedlist>
+</para>
+  </sect2>
 
    <!-- ===================== REBINDABLE SYNTAX ===================  -->
 <sect2 id="rebindable-syntax">
@@ -461,7 +742,7 @@ fromInteger :: Integer -> Bool -> Bool
 <title>後置演算子</title>
 
 <para>
-GHCは演算子の左セクションの構文に小さな拡張を認めていて、これを使って後置演算子を定義することができる。拡張とはこうである。以下のような左セクションがあったとしよう。
+<option>-XPostfixOperators</option>フラグを使うと、演算子の左セクションの構文に小さな拡張が有効になり、これを使って後置演算子を定義することができるようになる。拡張とはこうである。以下のような左セクションがあったとしよう。
 <programlisting>
   (e !)
 </programlisting>
@@ -474,8 +755,6 @@ GHCは演算子の左セクションの構文に小さな拡張を認めてい�
   (\y -> (!) e y)
 </programlisting>
 つまり、演算子は二引数の関数でなければならない。GHCでは一引数の関数であっても良く、結果として、関数を後置記法で書くことができるようになる。
-</para>
-<para>この拡張はHaskell 98を逸脱しているので、本来ならフラグで有効にされるべきものである。しかし、実際には常に有効になっている。(もちろん、この拡張によってHaskell 98プログラムが振る舞いを変えることはない)
 </para>
 <para>この拡張は関数定義の左辺には及ばない。従って、このような関数を定義するときには前置形を使わなければならない。</para>
 
@@ -508,6 +787,151 @@ Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-f
 </para>
 </sect2>
 
+    <!-- ===================== Record puns ===================  -->
+
+<sect2 id="record-puns">
+<title>レコード同名利用
+</title>
+
+<para>
+レコード同名利用(record puns; punは「駄洒落」「語呂合わせ」の意)は、<literal>-XNamedFieldPuns</literal>フラグによって有効になる。
+</para>
+
+<para>
+レコードを使うとき、フィールド名と同じ名前の変数を束縛するようなパターンを書くことがよくある。以下のような場合である。
+
+<programlisting>
+data C = C {a :: Int}
+f (C {a = a}) = a
+</programlisting>
+</para>
+
+<para>
+レコード同名利用は、この変数名を省略することを可能にする。よって、上と同じことを単に次のように書くことができる。
+
+<programlisting>
+f (C {a}) = a
+</programlisting>
+
+つまり、レコードパターン中において、<literal>a</literal>というパターンは<literal>a = a</literal>というパターン(同じ<literal>a</literal>という名前についての)に展開される。
+</para>
+
+<para>
+同じレコード中で、同名利用と通常のパターンを混ぜることもできるのに注意。
+<programlisting>
+data C = C {a :: Int, b :: Int}
+f (C {a, b = 4}) = a
+</programlisting>
+また、同名利用は、レコードパターンが使えるところ(例えば<literal>let</literal>束縛の中や最上位)ならどこでも使うことができる。
+</para>
+
+<para>
+レコード同名利用は式中でも使える。例えば、次のように書く。
+<programlisting>
+let a = 1 in C {a}
+</programlisting>
+これは次のものと同等である。
+<programlisting>
+let a = 1 in C {a = a}
+</programlisting>
+
+この展開は純粋に構文上のものであるため、レコード同名利用の式は、そのフィールド名と同じ綴りを持つなかで、最も内側の変数を参照することに注意。
+</para>
+
+</sect2>
+
+    <!-- ===================== Record wildcards ===================  -->
+
+<sect2 id="record-wildcards">
+<title>レコードワイルドカード
+</title>
+
+<para>
+レコードワイルドカードは<literal>-XRecordWildCards</literal>フラグによって有効になる。
+</para>
+
+<para>
+沢山のフィールドのあるレコードでは、レコードパターンにおいてフィールドをいちいち書き下すのが面倒なことがある。次のような場合である。
+<programlisting>
+data C = C {a :: Int, b :: Int, c :: Int, d :: Int}
+f (C {a = 1, b = b, c = c, d = d}) = b + c + d
+</programlisting>
+</para>
+
+<para>
+レコードワイルドカード構文では、レコードパターン中に(<literal>..</literal>)を使えるようになる。そうすると、省略したそれぞれの<literal>f</literal>が<literal>f = f</literal>というパターンに置換される。例として、上のパターンは次のように書ける。
+<programlisting>
+f (C {a = 1, ..}) = b + c + d
+</programlisting>
+</para>
+
+<para>
+ワイルドカードは他のパターン(同名利用(<xref linkend="record-puns"/>)も含む)と併用できることに注意。例えば<literal>C {a = 1, b, ..})</literal>というパターンでのように。さらに、レコードワイルドカードはレコードパターンが使えるところならどこでも使えるので、<literal>let</literal>束縛や最上位でも使える。例えば、次の最上位の束縛は、<literal>b</literal>と<literal>c</literal>と<literal>d</literal>を定義する。
+<programlisting>
+C {a = 1, ..} = e
+</programlisting>
+</para>
+
+<para>
+レコードワイルドカードは式中でも使える。次のように書くことができる。
+
+<programlisting>
+let {a = 1; b = 2; c = 3; d = 4} in C {..}
+</programlisting>
+
+これは以下のように書くのと同じである。
+
+<programlisting>
+let {a = 1; b = 2; c = 3; d = 4} in C {a=a, b=b, c=c, d=d}
+</programlisting>
+
+この展開は純粋に構文上のものなので、レコードワイルドカード式は、省略されたフィールド名と同じ綴りの変数のうちもっとも内側にあるものを参照することに注意。
+</para>
+
+</sect2>
+
+    <!-- ===================== Local fixity declarations ===================  -->
+
+<sect2 id="local-fixity-declarations">
+<title>局所結合性宣言
+</title>
+
+<para>Haskell 98レポートを注意深く読むと、<literal>let</literal>や<literal>where</literal>で導入される局所束縛の内部に結合性宣言(<literal>infix</literal>、<literal>infixl</literal>、<literal>infixr</literal>)が出現することが許されていることが分かる。しかし、このような束縛の意味論について、Haskellレポートはあまり詳しく規定していない。
+</para>
+
+<para>GHCでは、次のように、局所束縛に結合性宣言が付属していてもよい。
+<programlisting>
+let f = ...
+    infixr 3 `f`
+in 
+    ...
+</programlisting>
+そして、この結合性宣言は、この束縛がスコープにあるようなあらゆる場所で適用される。例えば、<literal>let</literal>式なら、他の<literal>let</literal>束縛の右辺と<literal>let</literal>式の本体で適用される。また、再帰的<literal>do</literal>式(<xref linkend="mdo-notation"/>)では、<literal>let</literal>文の局所結合性宣言は、束縛される名前と同様に、そのグループの全ての文に渡るスコープを持つ。
+</para>
+
+<para>
+さらに、局所結合性宣言にはその名前についての局所束縛が付属「していなければならない」。次のように、別の場所で束縛された名前の結合性を設定しなおすことは不可能である。
+<programlisting>
+let infixr 9 $ in ...
+</programlisting>
+
+局所結合性宣言は技術的にHaskell 98なので、有効にするのにフラグは必要ない。
+</para>
+</sect2>
+
+<sect2 id="package-imports">
+  <title>パッケージ修飾されたインポート</title>
+
+  <para><option>-XPackageImports</option>フラグが有効なら、GHCは、インポート宣言を、インポート先のモジュールが属しているべきパッケージ名で修飾することを認める。例をあげる。</para>
+
+<programlisting>
+import "network" Network.Socket
+</programlisting>
+  
+  <para>こうすると、<literal>network</literal>パッケージ(のいずれかのバージョン)から<literal>Network.Socket</literal>をインポートすることになる。これは、同じモジュールが複数のパッケージから利用できたり、現在ビルド中のパッケージと外部のパッケージの両方にあったりする場合に、インポートの曖昧性を取り除くために使うことができる。</para>
+
+  <para>注意: おそらく、あなたがこの機能を使う必要はないだろう。この機能は、主に我々がAPIの変更に際して後方互換なパッケージのバージョンをビルドすることができるように追加されたものである。一般的な事例では、この機能を使うと脆い依存が発生しやすい。モジュールはあるパッケージから別のパッケージに移ることがあり、その場合パッケージ修飾されたインポートは壊れるからである。</para>
+</sect2>
 <sect2 id="syntax-stolen">
 <title>盗まれた構文の概略</title>
 
