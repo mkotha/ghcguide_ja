@@ -5879,6 +5879,7 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
      ;;; Local Variables: ***
      ;;; mode: xml ***
      ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; ispell-local-dictionary: "british" ***
      ;;; End: ***
  -->
 
