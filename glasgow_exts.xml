@@ -2576,6 +2576,339 @@ main = do
 </sect2>
 </sect1>
 
+<sect1 id="type-families">
+<title>型の族</title>
+
+<para><firstterm>添字付けされた型の族</firstterm>は、型レベルのプログラミングを容易にするための新しいGHC拡張である。型の族は、<firstterm>関連データ型</firstterm>(&ldquo;<ulink url="http://www.cse.unsw.edu.au/~chak/papers/CKPM05.html">Associated Types with Class</ulink>&rdquo;, M. Chakravarty, G. Keller, S. Peyton Jones, and S. Marlow. In Proceedings of &ldquo;The 32nd Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL'05)&rdquo;, pages 1-13, ACM Press, 2005)および<firstterm>関連型シノニム</firstterm>(&ldquo;<ulink url="http://www.cse.unsw.edu.au/~chak/papers/CKP05.html">Type Associated Type Synonyms</ulink>&rdquo;. M. Chakravarty, G. Keller, and S. Peyton Jones. In Proceedings of &ldquo;The Tenth ACM SIGPLAN International Conference on Functional Programming&rdquo;, ACM Press, pages 241-253, 2005)の一般化である。型の族自体は論文&ldquo;<ulink url="http://www.cse.unsw.edu.au/~chak/papers/SPCS08.html">Type Checking with Open Type Functions</ulink>&rdquo;, T. Schrijvers, S. Peyton-Jones, M. Chakravarty, and M. Sulzmann, in Proceedings of &ldquo;ICFP 2008: The 13th ACM SIGPLAN International Conference on Functional Programming&rdquo;, ACM Press, pages 51-62, 2008 Functional Programming&rdquo;, ACM Press, pages 241-253, 2005)に記述されている。型の族は、要するに、型で添字付けされたデータ型と、型についての名前の付いた関数を提供する。これらは、総称(generic)プログラミングや高度にパラメタ化されたライブラリインタフェース、さらには、依存型と同様に、静的な情報の強化されたインタフェースに有用である。また、型の族は関数従属の代わりとなるものとも見なされている。関数従属では型レベルのプログラミングを関係的に行うのに対して、型の族はより関数的な様式を可能にする。
+</para>
+<para>添字付けされた型の族(indexed type family)、短くいうと型族(type family)は、型の集合を表すような型構築子である。集合の要素は、型族構築子に型引数(<firstterm>型添字</firstterm>と呼ぶ)を与えることで記述される。通常のパラメタ付きの型構築子と族構築子との違いは、パラメタ多相な関数と型クラスの(アドホック多相な)メソッドとの違いによく似ている。パラメタ多相な関数はあらゆる具体的な型に対して等しく振る舞うのに対し、クラスのメソッドはクラスの型パラメタに依存して振る舞いを変える。同様に、通常の型構築子はあらゆる具体的な型に対して同じデータ表現を使うことになるが、型族構築子は異なる型添字に対して異なる表現型を持つことができる。</para>
+<para>添字付けされた型の族には二つの系統がある。<firstterm>データ族</firstterm>と<firstterm>型シノニム族</firstterm>である。これらは、それぞれ代数的データ型と型シノニムを添字付けされた型の族にしたものである。データの族のインスタンスとしてはデータ型とnewtypeがありえる。
+</para>
+<para>型の族は<option>-XTypeFamilies</option>フラグによって有効になる。GHCで型の族を使うことについてのさらなる情報が<ulink url="http://www.haskell.org/haskellwiki/GHC/Indexed_types">型の族についてのHaskell wikiのページ</ulink>にある。
+</para>
+
+<sect2 id="data-families">
+  <title>データ族</title>
+
+  <para>データ族には次の二つの系統がある。(1)最上位で定義されるもの (2)型クラスの中に現れるもの(この場合、これは関連型と言われる)。前者の方が一般性の高い系統である。なぜなら、型添字がクラスのパラメータと一致する必要がないからである。一方、後者の方が明確に構造化されたコードにつながりやすく、なんらかの型インスタンスが(もしかすると意図せずに)省略された場合、コンパイラが警告を発する。以下では常に、まず一般的な最上位の形式について議論し、その後で関連型に課せられる追加の制約を扱う。
+  </para>
+
+  <sect3 id="data-family-declarations"> 
+    <title>データ族宣言</title>
+
+    <para>添字付けされたデータ族は次のようなシグネチャによって導入される。
+<programlisting>
+data family GMap k :: * -> *
+</programlisting>
+この特別な<literal>family</literal>が、族を標準的なデータ宣言から区別する。結果の類注釈は省略可能であり、省かれた場合は通常同様に<literal>*</literal>が使われる。例を示す。
+<programlisting>
+data family Array e
+</programlisting>
+名前の付いた引数にも必要なら明示的な類シグネチャを与えることができる。[http://www.haskell.org/ghc/docs/latest/html/users_guide/gadt.html GADT宣言]の場合と同様、名前付き引数は完全に省略可能なので、<literal>Array</literal>を次のように宣言することもできる。
+<programlisting>
+data family Array :: * -> *
+</programlisting>
+    </para>
+
+    <sect4 id="assoc-data-family-decl">
+      <title>関連データ族宣言</title>
+      <para>データ族が型クラスの一部として宣言される場合、特別子<literal>family</literal>は使わない。<literal>GMap</literal>の宣言は次のような形をとる。
+<programlisting>
+class GMapKey k where
+  data GMap k :: * -> *
+  ...
+</programlisting>
+最上位の宣言とは対照的に、型添字として使われる予定の全ての型パラメタについて、名前付き引数が用いられねばならない。さらに、それらの引数名はクラスのパラメタでなければならない。それぞれのクラスパラメタは一つの関連型につき一回しか使えないが、使われないクラスパラメタがあってもよく、順序はクラス頭部と異っていてもよい。従って、以下の人為的な例は正当である。
+<programlisting>
+  class C a b c where
+  data T c a :: *
+</programlisting>
+      </para>
+    </sect4>
+  </sect3>
+
+  <sect3 id="data-instance-declarations"> 
+    <title>データインスタンス宣言</title>
+
+    <para>データとnewtypeの族についてのインスタンス宣言は、通常のデータおよびnewtypeの宣言と良く似ている。ただ二つの違いは、<literal>data</literal>あるいは<literal>newtype</literal>キーワードの後に<literal>instance</literal>が書かれることと、型引数の一部または全てが変数でない型であってもよいということである。ただし、これにforall型や型シノニム族が含まれていてはいけない。しかし、一般にデータ族が型パラメタ中にあってもよく、型シノニムも、それが完全に適用されていて、しかも展開結果が合法であるなら、認められる。これはクラスインスタンスのパラメタにおいて型シノニムが現れてよい条件と全く同じである。例として、<literal>GMap</literal>の<literal>Either</literal>インスタンスは次のようになる。
+<programlisting>
+data instance GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
+</programlisting>
+この例では、宣言にただ一つのvariantしかないが、一般にはいくつあってもよい(訳注: データ構築子が複数あってもいいということ？)。
+    </para>
+    <para>データインスタンス宣言およびnewtypeインスタンス宣言は適切な族宣言がスコープにある場合のみ認められる。これはちょうど、クラスインスタンスにクラス宣言が可視であることが必要なのと同じである。さらに、各インスタンス宣言は、その族宣言によって決まる類に準拠していなければならない。つまり、インスタンス宣言のパラメタの個数は、その族の類から決まるアリティと一致するということである。全てのデータ族は<literal>data</literal>キーワードを使って宣言されるが、インスタンスは<literal>data</literal>であっても<literal>newtype</literal>であってもよく、両者の混合であってもよい。
+    </para>
+    <para>
+型族が最上位の宣言によって定義されている場合でも、異なる族インスタンスに対して異なる計算を行う関数は相変らず型クラスのメソッドとして定義されねばならない。特に、以下は不可能である。
+<programlisting>
+data family T a
+data instance T Int  = A
+data instance T Char = B
+nonsence :: T a -> Int
+nonsence A = 1             -- 間違い: この二つの等式をいっしょにすると...
+nonsence B = 2             -- ...型エラーが発生する
+</programlisting>
+GADT(一般化代数的データ型)の提供する機能を見ると、上のような定義が可能であるべきだと思えるかもしれない。しかし、型族は、GADTとは対照的に、<emphasis>開かれて</emphasis>いる。つまり、常に新しいインスタンスを加えることが可能な(しかも別モジュールでかもしれない)のである。異なるデータインスタンスに跨がるパターン照合に対応するには、一種の拡張可能なcase構造が必要になることだろう。
+    </para>
+
+    <sect4 id="assoc-data-inst">
+      <title>関連データインスタンス</title>
+      <para>関連データ族インスタンスが型クラスインスタンスの中で宣言される場合、族インスタンスにおける<literal>instance</literal>キーワードは使わない。そのため、<literal>GMap</literal>の<literal>Either</literal>インスタンスは次のようになる。
+<programlisting>
+instance (GMapKey a, GMapKey b) => GMapKey (Either a b) where
+  data GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
+  ...
+</programlisting>
+関連族インスタンスに関して最も重要な点は、クラスパラメタに対応する型添字が、インスタンス頭部で与えられる型と同一でなければならないということである。この例ではこれは<literal>GMap</literal>の第一引数である<literal>Either a b</literal>であるが、これは(一つしかない)クラスパラメタと同じになっている。族構築子の引数のうち、クラスパラメタに対応しないものは、すべてのインスタンスにおいて変数でなければならない。ここではこれは変数<literal>v</literal>である。
+      </para>
+      <para>関連族のインスタンスは、その族が宣言されたクラスのインスタンス宣言の一部としてしか、現れることができない。これはクラスのメソッドの等式についてと同じである。また、これもメソッドの扱いと対応するが、クラスインスタンスにおいて関連型の宣言を省略することができる。関連族インスタンスが省略された場合、それに対応するインスタンス型は無内容(not inhabited)になる。すなわち、<literal>undefined</literal>などの発散する式のみがその型を持てる。
+      </para>
+    </sect4>
+
+    <sect4 id="scoping-class-params">
+      <title>クラスパラメタのスコープ規則</title>
+      <para>複数引数の型クラスの場合、クラスパラメタが関連族インスタンスの右辺から可視かどうかは、そのデータ族のパラメタによって<emphasis>のみ</emphasis>決まる。例として、次の単純なクラス宣言を考える。
+<programlisting>
+class C a b where
+  data T a
+</programlisting>
+二つのクラスパラメタのうち一つだけがデータ族のパラメタになっている。このため、次のインスタンス宣言は不正である。
+<programlisting>
+instance C [c] d where
+  data T [c] = MkT (c, d)    -- 間違ってるよ!!  「d」はスコープにない
+</programlisting>
+ここでは、データインスタンスの左辺に現れない型変数<literal>d</literal>が右辺で言及されている。このようなデータインスタンスを認めると型安全性を犠牲にすることになるので、これは認められていない。
+      </para>
+    </sect4>
+
+    <sect4 id="family-class-inst">
+      <title>族インスタンスについての型クラスインスタンス</title>
+      <para>データ族のインスタンスについての型クラスインスタンスは通常と同じように定義できる。特に、データインスタンス宣言は<literal>deriving</literal>節を持つことができる。例えば、以下のように書くことができる。
+<programlisting>
+data GMap () v = GMapUnit (Maybe v)
+               deriving Show
+</programlisting>
+これは、以下のような形のインスタンスを暗黙に定義する。
+<programlisting>
+instance Show v => Show (GMap () v) where ...
+</programlisting>
+      </para>
+      <para>クラスインスタンスは常にデータ族の特定の<emphasis>インスタンス</emphasis>を対象にするのであって、族全体を対象にするのではないことに注意。この理由は、本質的には、一つの型族の<emphasis>異なる</emphasis>インスタンスのデータ構築子についてパターン照合を行う最上位の関数を定義できない理由と同じである。これには、一種の拡張可能なcase構造が必要になるだろう。
+      </para>
+    </sect4>
+
+    <sect4 id="data-family-overlap">
+      <title>データインスタンスの重複</title>
+      <para>一つのプログラムの中で、あるデータ族のインスタンス宣言に少しでも重複部分があってはならない。このことは関連族かそうでないかによらない。型クラスのインスタンスの場合と異なり、これは単なる整合性の問題ではなく、型安全性の問題である。
+      </para>
+    </sect4>
+
+  </sect3>
+
+  <sect3 id="data-family-import-export">
+    <title>インポートとエクスポート</title>
+
+    <para>型族とデータ構築子の関連は、通常のデータ型とnewtypeの宣言の場合と比べて動的である。通常の場合、インポートリストやエクスポートリストにおける<literal>T(..)</literal>という記法は、その型構築子と、その宣言で導入された全てのデータ構築子を記述するものである。一方、族宣言はデータ構築子を導入することがない。代わりに、データ構築子は族インスタンスによって導入される。結果として、ある型族にどのデータ構築子が関連しているかは、その族についてのインスタンス宣言として現在どれが可視であるかに依存する。従って、<literal>T(..)</literal>という形のインポート/エクスポート項目は、その族構築子と、それの現在可視である全てのデータ構築子を意味する。エクスポート項目の場合は、これはそのモジュールにインポートされたか、そのモジュールで定義されたものである。<literal>GMap(GMapEither)</literal>のように、データ構築子を明示的に列挙したエクスポート/インポート項目の扱いも同様である。
+    </para>
+
+    <sect4 id="data-family-impexp-assoc">
+      <title>関連族</title>
+      <para>期待される通り、<literal>C(..)</literal>という形式のインポート/エクスポート項目は、そのクラスのメソッドと関連型全てを示す。しかし、クラスの部分項目として関連型が明示的に列挙される場合、なんらかの新しい構文が必要になる。なぜなら、大文字の部分項目は通常データ構築子であって型構築子ではないからである。ここで型を示しているということを明確にするために、個々の関連型の名前の前に<literal>type</literal>を置く必要がある。よって、例えば、<literal>GMapKey</literal>クラスの内容を明示的に列挙する場合、<literal>GMapKey(type GMap, empty, lookup, insert)</literal>と書く。
+      </para>
+    </sect4>
+
+    <sect4 id="data-family-impexp-examples">
+      <title>例</title>
+      <para>ここまで使ってきた<literal>GMapKey</literal>クラスの例を使って、エクスポートリストとその意味をいくつか見てみよう。
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>module GMap (GMapKey) where...</literal>: クラス名だけをエクスポートする。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap (GMapKey(..)) where...</literal>: クラスと、関連型<literal>GMap</literal>と、メンバ関数<literal>empty</literal>、<literal>lookup</literal>、<literal>insert</literal>をエクスポートする。データ構築子は全くエクスポートされない。</para>
+	  </listitem> 
+	  <listitem>
+	    <para><literal>module GMap (GMapKey(..), GMap(..)) where...</literal>: 上と同じだが、データ構築子<literal>GMapInt</literal>、<literal>GMapChar</literal>、<literal>GMapUnit</literal>、<literal>GMapPair</literal>、<literal>GMapUnit</literal>をもエクスポートする。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap (GMapKey(empty, lookup, insert), GMap(..)) where...</literal>: 上と同じ。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap (GMapKey, empty, lookup, insert, GMap(..)) where...</literal>: 上と同じ。</para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+      <para>最後に、<literal>GMapKey(type GMap)</literal>と書くことで、クラス<literal>GMapKey</literal>とその関連型<literal>GMap</literal>の両方を示すことができる。しかし、<literal>GMapKey(type GMap(..))</literal>と書くことはできない。つまり、部分要素は入れ子にできないのである。<literal>GMap</literal>のデータ構築子を指定するなら、<literal>GMap</literal>を(訳注: <literal>GMapKey</literal>とは)別に書かねばならない。
+      </para>
+    </sect4>
+
+    <sect4 id="data-family-impexp-instances">
+      <title>インスタンス</title>
+      <para>クラスインスタンスと同様に、族インスタンスは暗黙にインポートされる。ただし、これはインスタンスの頭部についてだけで、インスタンスが定義するデータ構築子には適用されない。
+      </para>
+    </sect4>
+
+  </sect3>
+
+</sect2>
+
+<sect2 id="synonym-families">
+  <title>シノニム族</title>
+
+  <para>型族が出現する方法には二通りの系統がある。(1)最上位で定義されるか、(2)型クラスの内部に出現する(この場合、これは関連型シノニムと言われる)かである。前者の系統は、型添字がクラスパラメタと一致しなければならないという制限がないので、より一般性が高い。一方、後者の方が明確に構造化されたコードにつながりやすく、なんらかの型インスタンスが(もしかしたら意図せず)省略された場合、コンパイラが警告を発する。以下では常に、まず一般的な最上位の形式について議論し、その後で関連型に課せられる追加の制約を扱う。
+  </para>
+
+  <sect3 id="type-family-declarations">
+    <title>型族宣言</title>
+
+    <para>添字付けされた型族は次のようなシグネチャによって導入される。
+<programlisting>
+type family Elem c :: *
+</programlisting>
+この特別な<literal>family</literal>によって、通常の型宣言と族宣言が区別される。結果の類注釈は省略可能であり、通常と同様に、省略された場合は<literal>*</literal>が使われる。例えば次のようになる。
+<programlisting>
+type family Elem c
+</programlisting>
+必要ならパラメタにも明示的な類シグネチャを付けることができる。型族宣言におけるパラメタの数をその族のアリティと呼び、その型族の適用は全てそのアリティに対して完全に飽和していなければ(訳注: つまり部分適用であっては)ならない。この制限は通常の型シノニムにはないものである<!-- 訳注: ほんとか？ -->。これにより、型族の類を知っただけではその族のアリティを決定できないので、型族の適用が正しいものかどうかも一般的には判断できない。例として、次の宣言を考える。
+<programlisting>
+type family F a b :: * -> *   -- Fの類は全体として見れば * -> * -> * -> *
+                              -- しかし、アリティは2である
+</programlisting>
+この宣言のもとで、以下に正しい型と間違った型の例を示す。
+<programlisting>
+F Char [Int]       -- 正 類: * -> *
+F Char [Int] Bool  -- 正 類: *
+F IO Bool          -- 誤 最初の引数で類が不一致
+F Bool             -- 誤 適用が飽和していない
+</programlisting>
+      </para>
+
+    <sect4 id="assoc-type-family-decl">
+      <title>関連型族宣言</title>
+      <para>型族が型クラスの一部として宣言される場合、<literal>family</literal>特別子は使わない。<literal>Elem</literal>の宣言は次のような形になる。
+<programlisting>
+class Collects ce where
+  type Elem ce :: *
+  ...
+</programlisting>
+型族の引数名はクラスパラメタでなければならない。各クラスパラメタは一つの関連型について一回しか出現してはならないが、一回も出現しないものがあったり、クラスの頭部と異なる順序であっても良い。よって、以下の人為的な例は認められる。
+<programlisting>
+class C a b c where
+  type T c a :: *
+</programlisting>
+これらの規則は関連データ族の場合とまったく同じである。
+      </para>
+    </sect4>
+  </sect3>
+
+  <sect3 id="type-instance-declarations">
+    <title>型インスタンス宣言</title>
+    <para>型族のインスタンス宣言は通常の型シノニム宣言によく似ている。違いは、<literal>type</literal>キーワードの後に<literal>instance</literal>が書かれることと、型引数の一部または全部が変数でなくてもよいことの二点だけである。ただし、型引数は、forall型や型シノニム族を含んでいてはならない。一方、一般にデータ族はあってもよく、型シノニムも、完全に適用されており、かつ展開結果が合法であるなら認められる。これらはデータインスタンスの場合と全く同じ制限である。例として、<literal>[e]</literal>の<literal>Elem</literal>インスタンスは次のようになる。
+<programlisting>
+type instance Elem [e] = e
+</programlisting>
+    </para>
+    <para>型族インスタンス宣言は、適切な族宣言がスコープにあるときのみ認められる。これはちょうど、クラスインスタンスにはクラス宣言が可視であることが必要なのと同じである。さらに、個々のインスタンス宣言は、その族宣言によって決まる類に準拠していなければならず、インスタンス宣言の型パラメタの数は族宣言の型パラメタの数と一致していなければならない。最後に、型インスタンスの右辺は単相型でなければ(つまり、forallを含んでいては)ならず、また飽和した通常の(訳注: vanilla; 型シノニム族でない)型シノニムを全て展開した時点で、族シノニム以外のシノニムが残っていてはならない。許される型インスタンスとそうでない型インスタンスの例をいくつか挙げる。
+<programlisting>
+type family F a :: *
+type instance F [Int]              = Int         -- OK!
+type instance F String             = Char        -- OK!
+type instance F (F a)              = a           -- 誤: 型パラメタが型族に言及している
+type instance F (forall a. (a, b)) = b           -- 誤: 型パラメタの中にforall型がある
+type instance F Float              = forall a.a  -- 誤: 右辺がforall型であってはならない
+
+type family G a b :: * -> *
+type instance G Int            = (,)     -- 誤: 引数は二つでないといけない
+type instance G Int Char Float = Double  -- 誤: 引数は二つでないといけない
+</programlisting>
+    </para>
+
+    <sect4 id="assoc-type-instance">
+      <title>関連型インスタンス宣言</title>
+      <para>型クラスインスタンスの中で関連族インスタンスを宣言するときは、族インスタンス中に<literal>instance</literal>キーワードを使わない。よって、<literal>Elem</literal>の<literal>[e]</literal>インスタンスは次のようになる。
+<programlisting>
+instance (Eq (Elem [e])) => Collects ([e]) where
+  type Elem [e] = e
+  ...
+</programlisting>
+関連族インスタンスに関して最も重要なのは、クラスパラメタに対応する型添字が、インスタンス頭部で与えられたものと同一であることである。これはここでは<literal>[e]</literal>であり、一つしかないクラスパラメタと一致している。
+      </para>
+      <para>
+関連族のインスタンスは、その族が宣言されたクラスについてのインスタンス宣言の一部としてしか現れ得ない。クラスのメソッドの等式とちょうど同じである。また、同じくメソッドの扱いに対応することとして、クラスインスタンス中での関連型の宣言を省くことができる。関連型族インスタンスが省かれた場合、対応するインスタンス型は無内容(not inhabited)になる。すなわち、<literal>undefined</literal>のような発散する式以外に、その型を持てる式は存在しない。
+      </para>
+    </sect4>
+
+    <sect4 id="type-family-overlap">
+      <title>型シノニムインスタンスの重複</title>
+      <para>
+ある一つのプログラム内で使われる型族のインスタンス宣言に関して、重複が許されるのは、重複するインスタンスの右辺が共通部分の型に対しては一致する場合だけである。より形式的に言うと、二つのインスタンス宣言が重複するとは、インスタンスの左辺を構文的に一致させるような代入(substitution)が存在するときである。これに該当する場合は必ず、この同じ代入のもとでインスタンスの右辺も構文的に同じにならなければならない。この条件は族が関連族であるかどうかに拠らない。また、これは単なる整合性の問題ではなく、型安全性の問題である。
+      </para>
+      <para>
+重複が許される条件を説明するために二つの例を用意した。
+<programlisting>
+type instance F (a, Int) = [a]
+type instance F (Int, b) = [b]   -- 重複が許される
+
+type instance G (a, Int)  = [a]
+type instance G (Char, a) = [a]  -- 非合法な重複、[Char] /= [Int]であるため
+</programlisting>
+      </para>
+    </sect4>
+
+    <sect4 id="type-family-decidability">
+      <title>型シノニムインスタンスの決定可能性</title>
+      <para>
+	      型族の存在下での型推論が決定可能であることを保証するため、型インスタンス宣言の形式に追加で制限を課す必要がある。(&ldquo;<ulink url="http://www.cse.unsw.edu.au/~chak/papers/SPCS08.html">Type Checking with Open Type Functions</ulink>&rdquo;のDefinition 5 (Relaxed Condition)も参照)。インスタンス宣言の一般形式は次の通りである。
+<programlisting>
+type instance F t1 .. tn = t
+</programlisting>
+ここで、<literal>t</literal>中のすべての型族適用<literal>(G s1 .. sm)</literal>に対して、以下のことを要求する。
+	<orderedlist>
+	  <listitem>
+		  <para><literal>s1 .. sm</literal>に、型族構築子が一つも含まれない。</para>
+	  </listitem>
+	  <listitem>
+		  <para><literal>s1 .. sm</literal>中のシンボル(データ型構築子および型変数)の数が、<literal>t1 .. tn</literal>における数よりも厳密に小さい。</para>
+	  </listitem>
+	  <listitem>
+		  <para>全ての型変数<literal>a</literal>について、aが<literal>s1 .. sm</literal>に現れる回数が、<literal>t1 .. tn</literal>に現れる回数を超えない。</para>
+	  </listitem>
+	</orderedlist>
+これらの制限は容易に検査することができ、型インスタンスが停止することを保証する。しかし、<literal>a ~ [F a]</literal>のように、型構築子が族適用とデータ構築子適用の下にある、いわゆる「ループ的同値」の存在下では、型推論の完全性を保証するのに足りない。詳細については上で挙げた論文を参照のこと。</para>
+      <para><option>-XUndecidableInstances</option>オプションがコンパイラに渡されると、上記の制約は強制されず、型推論中に型族の正規化が停止することを保証するのはプログラマの責任になる。
+      </para>
+    </sect4>
+  </sect3>
+
+  <sect3 id-="equality-constraints">
+    <title>同値性制約</title>
+    <para>型文脈には<literal>t1 ~ t2</literal>という形の同値性制約を含めることができる。これは、<literal>t1</literal>と<literal>t2</literal>の二つの型が同じでなければならないということを示す。型族の存在下では、一般に二つの型が等しいかどうかを局所的に決めることは出来ない。このため、次の例のように、関数のシグネチャの文脈に同値性制約が使われることがある。
+<programlisting>
+sumCollects :: (Collects c1, Collects c2, Elem c1 ~ Elem c2) => c1 -> c2 -> c2
+</programlisting>
+ここでは、<literal>c1</literal>と<literal>c2</literal>の要素の型が同じであることを要求している。一般に、同値性制約における<literal>t1</literal>と<literal>t2</literal>は任意の単相型であってよい。単相型であるというのは、ランクの高い型が有効になっているかどうかにかかわらず、量化子を含んでいてはならないということである。
+    </para>
+    <para>
+同値性制約は、クラスとインスタンスの文脈でも使うことができる。前者によって、関数従属を使うプログラムから、代わりに族シノニムを使うプログラムへの、単純な翻訳が出来るようになる。一般的な考え方として、次のような形のクラス宣言があったとする。
+<programlisting>
+class C a b | a -> b
+</programlisting>
+これを、以下のように書き換える。
+<programlisting>
+class (F a ~ b) => C a b where
+  type F a
+</programlisting>
+つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の同値性で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
+    </para>
+    <para>
+注意: スーパークラス文脈における同値性はGHC 6.10では完全には実装されていない。
+    </para>
+  </sect3>
+
+</sect2>
+
+</sect1>
+
 <sect1 id="other-type-extensions">
 <title>型システムへのその他の拡張</title>
 
