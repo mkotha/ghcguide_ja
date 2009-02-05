@@ -5070,9 +5070,7 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 <indexterm><primary>rewrite rules</primary></indexterm></title>
 
 <para>
-プログラマは、ソースプログラムの一部として(プラグマで)書き換え規則を指定することができる。これらは可能なら必ず適用される。ただし、<option>-O</option>フラグ(<xref linkend="options-optimise"/>)が有効であり、かつ<option>-fno-rewrite-rules</option>フラグが指定されておらず、かつ<option>-fglasgow-exts</option>(<xref linkend="options-language"/>)が指定されていることが条件である。</para>
-
-<para>
+プログラマは、ソースプログラムの一部として(プラグマで)書き換え規則を指定することができる。
 以下に例を示す。
 
 <programlisting>
@@ -5080,6 +5078,9 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
   "map/map"    forall f g xs.  map f (map g xs) = map (f.g) xs
     #-}
 </programlisting>
+</para>
+<para>
+どの規則が発火したかを見るには<option>-ddump-simpl-stats</option>というデバッグフラグを使えばよい。もっと情報が必要な場合は、<option>-ddump-rule-firings</option>によって、個々の規則発火を詳細に見ることができる。
 </para>
 
 <sect2>
@@ -5168,7 +5169,20 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 <listitem>
 
 <para>
-規則は、インスタンス宣言と同様、自動的にモジュールからエクスポートされる。
+規則は全て暗黙にモジュールからエクスポートされ、したがって規則を定義したモジュールを直接または間接にインポートしたモジュールの全てで有効である。(つまり、AがBをインポートしていて、BがCをインポートしている場合、AをコンパイルするときにCの規則が有効である)この状況はインスタンス宣言の場合と非常に良く似ている。
+</para>
+</listitem>
+
+<listitem>
+
+<para>
+RULEの内部において、「<literal>forall</literal>」は他のフラグ設定の如何にかかわらずキーワードとして扱われる。さらに、RULE内部では、言語拡張<option>-XScopedTypeVariables</option>が自動的に有効になる。<xref linkend="scoped-type-variables"/>を見よ。
+</para>
+</listitem>
+<listitem>
+ 
+<para>
+他のプラグマと同様、RULEプラグマは常にスコープの誤りを検査され、型検査される。型検査というのは、規則の左辺と右辺が型検査され、さらに同じ型でなければならないということである。しかし、規則が<emphasis>有効になる</emphasis>のは<option>-fenable-rewrite-rules</option>フラグが有効な時だけである(<xref linkend="rule-semantics"/>を見よ)。
 </para>
 </listitem>
 
@@ -5178,7 +5192,7 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 
 </sect2>
 
-<sect2>
+<sect2 id="rule-semantics">
 <title>意味論</title>
 
 <para>
@@ -5188,20 +5202,13 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 <listitem>
 
 <para>
-規則は<option>-O</option>フラグを使ったときのみ適用される。
+規則は<option>-fenable-rewrite-rules</option>フラグによって有効になる(つまり、最適化に使われる)。このフラグは<option>-O</option>によって有効になり、(いつも通り)<option>-fno-enable-rewrite-rules</option>で解除できる。(注意: 一方、<option>-O</option>なしで<option>-fenable-rewrite-rules</option>を有効にしても期待通りにはならないかもしれない。なぜなら<option>-O</option>なしではGHCはインタフェースファイル中の全ての最適化情報を無視するからである。<option>-fignore-interface-pragmas</option>、<xref linkend="options-f"/>を見よ。)<option>-fenable-rewrite-rules</option>は<emphasis>最適化</emphasis>フラグであって、パースや型検査には効果を及ぼさないことに注意。
 </para>
 </listitem>
 
 <listitem>
 <para>
 規則は左から右への書き換えの規則だとみなされる。規則の左辺の置換例であるような式が見付かると、その式は右辺(に適切な置換を施したもの)に置き換えられる。「置換例」というのは、左辺に、パターン変数について置換を施すことで、その式と等しくすることができる、という意味である。
-
-</para>
-</listitem>
-<listitem>
-
-<para>
-規則の両辺は型検査される。これらは同じ型を持っていなければならない。
 
 </para>
 </listitem>
@@ -5260,34 +5267,24 @@ GHCは、最適化過程において、常に規則を適用しようとする�
 <listitem>
 
 <para>
-コンパイル中の早い段階では、GHCは<emphasis>規則の左辺に現れるものをインライン化することはない</emphasis>。それを置換してしまったら、それとの照合が成功することがないからである。
-
+通常のインライン化は規則による書き換えと同時に起きる。これによって予期せぬ結果につながることがある。次の(人為的な)例を考えよ。
 <programlisting>
-        "map/map"       forall f,g.  map f . map g = map (f.g)
+f x = x
+{-# RULES "f" f True = False #-}
+
+g y = f y
+
+h z = g True
+</programlisting>
+<literal>f</literal>の右辺は小さいので、<literal>g</literal>へとインライン化され、次のような結果になる。
+<programlisting>
+g y = y
 </programlisting>
 
-従って、これは<literal>map f (map g xs)</literal>という式には適合<emphasis>しない</emphasis>。これが適合するのは明示的に「.」を使っている式だけである。といってもこれも不正確だ。次の式には確かに適合する。
-
-<programlisting>
-wibble f g xs
-</programlisting>
-
-ただし、<function>wibble</function>は次のように定義されている。
-
-<programlisting>
-wibble f g = map f . map g
-</programlisting>
-
-<function>wibble</function>がインライン化されるからである(小さいからね)。
-
-コンパイルの後の方になると、規則の左辺にある物もインライン化するようになるが、規則は有効なままである。このインライン化ポリシーは<option>-finline-phase</option><emphasis>n</emphasis>という単純化パス毎のフラグで制御できる。
-
+次に<literal>g</literal>が<literal>h</literal>へとインライン化されるが、<literal>f</literal>のRULEが発火する機会はない。GHCが逆にまず<literal>g</literal>を<literal>h</literal>へとインライン化していたら、<literal>f</literal>のRULEが発火する機会はより大きかっただろう。
 </para>
-</listitem>
-<listitem>
-
 <para>
-全ての規則は暗黙裡にモジュールからエクスポートされ、従って、定義モジュールを直接/間接にインポートしたモジュールで効力を持つ。(つまり、AがBをインポートしており、BがCをインポートしている場合、Cの規則はAをコンパイルするときに効力を持つ)。この状況はインスタンス宣言の場合と良く似ている。
+振る舞いを予測可能にするには、<literal>f</literal>にNOINLINEプラグマを使って、RULEに発火の機会があるうちにインライン化されることがないようにすれば良い。
 </para>
 </listitem>
 
