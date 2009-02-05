@@ -4169,14 +4169,15 @@ $ ./main
 <para>
 &ldquo;Generalising Monads to Arrows&rdquo;,
 John Hughes, in <citetitle>Science of Computer Programming</citetitle> 37,
-pp67&ndash;111, May 2000.
+pp67&ndash;111, May 2000。アローを導入した論文である。平易な入門であり、動機付けとしてプログラミングの例が使われている。
 </para>
 </listitem>
 
 <listitem>
 <para>
 &ldquo;<ulink url="http://www.soi.city.ac.uk/~ross/papers/notation.html">A New Notation for Arrows</ulink>&rdquo;,
-Ross Paterson, in <citetitle>ICFP</citetitle>, Sep 2001.
+Ross Paterson, in <citetitle>ICFP</citetitle>, Sep 2001。
+ここで記述されている記法を導入した。
 </para>
 </listitem>
 
@@ -4188,8 +4189,31 @@ Palgrave, 2003.
 </para>
 </listitem>
 
+<listitem>
+<para>
+&ldquo;<ulink url="http://www.cs.chalmers.se/~rjmh/afp-arrows.pdf">Programming with Arrows</ulink>&rdquo;,
+John Hughes, in <citetitle>5th International Summer School on
+Advanced Functional Programming</citetitle>,
+<citetitle>Lecture Notes in Computer Science</citetitle> vol. 3622,
+Springer, 2004。
+この論文にもこの記法への入門が含まれており、実際的な例もついている。
+</para>
+</listitem>
+
+<listitem>
+<para>
+&ldquo;<ulink url="http://www.haskell.org/ghc/docs/papers/arrow-rules.pdf">Type and Translation Rules for Arrow Notation in GHC</ulink>&rdquo;,
+Ross Paterson and Simon Peyton Jones, September 16, 2004.
+形式的な規則を簡潔に列挙したもの(ソースコード中のコメントから抽出された)。
+</para>
+</listitem>
+
+<listitem>
+<para><ulink url="http://www.haskell.org/arrows/"><literal>http://www.haskell.org/arrows/</literal></ulink>にアローのウェブページがある。</para>
+</listitem>
+
 </itemizedlist>
-また、<ulink url="http://www.haskell.org/arrows/"><literal>http://www.haskell.org/arrows/</literal></ulink>にアローのウェブページがある。<option>-XArrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。この記法は、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。
+<option>-XArrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。この記法は、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。
 </para>
 
 <para>この拡張によって、アローを定義するための新しい種類の式が追加される。
@@ -4383,7 +4407,8 @@ arr k >>> (f &lt;+> g) = (arr k >>> f) &lt;+> (arr k >>> g)
 <programlisting>
 untilA :: ArrowChoice a => a e () -> a e Bool -> a e ()
 untilA body cond = proc x ->
-        if cond x then returnA -&lt; ()
+        b &lt;- cond -&lt; x
+        if b then returnA -&lt; ()
         else do
                 body -&lt; x
                 untilA body cond -&lt; x
