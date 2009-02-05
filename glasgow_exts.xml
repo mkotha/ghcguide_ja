@@ -3896,14 +3896,14 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 <para>Template HaskellはHaskellでコンパイル時メタプログラミングをすることを可能にする。主要な技術的革新の背景は"<ulink url="http://research.microsoft.com/~simonpj/papers/meta-haskell/">Template Meta-programming for Haskell</ulink>" (Proc Haskell Workshop 2002)で議論されている。
 </para>
 <para>
-Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/haskellwiki/Template_Haskell">http://www.haskell.org/th/</ulink>にある。また、<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">オンラインHaskellライブラリリファレンス</ulink>を参照することもできる(ExpQという型で検索すると良い)。[一時的: 元の設計からの多くの変更点が<ulink url="http://research.microsoft.com/~simonpj/tmp/notes2.ps">"http://research.microsoft.com/~simonpj/tmp/notes2.ps"</ulink>に記されている。これらの変更点が全てGHC 6.6にある訳ではない。]
+Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/haskellwiki/Template_Haskell">http://www.haskell.org/haskellwiki/Template_Haskell/</ulink>にある。また、<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">オンラインHaskellライブラリリファレンス</ulink>を参照することもできる(<literal>Language.Haskell.TH</literal>というモジュールを探すと良い)。元の設計からの多くの変更点が<ulink url="http://research.microsoft.com/~simonpj/tmp/notes2.ps">Notes on Template Haskell version 2</ulink>に記されている。しかし、これらの変更点が全てGHCにある訳ではない。
 </para>
 
-<para>以下では、入門用の例として、論文の最初の例を使っている。
+<para>下(<xref linkend="th-example"/>)では、入門用の例として、論文の最初の例を使っている。
 </para>
 
 <para>
-この文書ではGHCで実現されていることを述べる。(現在のところこれはかなり流動的である。Tim Sheardが拡張を加える予定)
+この文書は、GHCにおいてTemplate Haskellがどういう形で実現されているかを述べるものであり、Template Haskellを理解できるほど詳細ではない。<ulink url="http://haskell.org/haskellwiki/Template_Haskell">Wikiページ</ulink>を見よ。
 </para>
 
     <sect2>
@@ -3918,36 +3918,44 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 		  <itemizedlist>
 		    <listitem><para>式。接合される式の型は<literal>Q Exp</literal>でなければならない。</para></listitem>
 		    <listitem><para>トップレベル宣言のリスト。接合される式の型は<literal>Q [Dec]</literal>でなければならない。</para></listitem>
-		    <listitem><para>[計画があるが、未実装] 型。接合される式の型は<literal>Q Typ</literal>でなければならない。</para></listitem>
 		    </itemizedlist>
-            (論文では接合の構文では「<literal>splice</literal>」が使われていたが、代わりに「<literal>$</literal>」を使うことに注意。また、論文では中の式の型が<literal>[Q Dec]</literal>であったが、これは<literal>Q [Dec]</literal>でなければならない。)
-		</para></listitem>
+		</para>
+接合の中ではインポートしたモジュールで定義された関数しか呼ぶことができず、同じモジュールの別の場所で定義された関数は呼ぶことが出来ない。</listitem>
 
 
 	      <listitem><para>
                   式クォートは次のようにオックスフォード角括弧で囲んで書かれる。
 		  <itemizedlist>
-		    <listitem><para> <literal>[| ... |]</literal>、ただし「...」は式。このクォートの型は<literal>Expr</literal>である。</para></listitem>
+		    <listitem><para> <literal>[| ... |]</literal>、ただし「...」は式。このクォートの型は<literal>Q Exp</literal>である。</para></listitem>
 		    <listitem><para> <literal>[d| ... |]</literal>、ただし「...」は最上位の宣言の列。このクォートの型は<literal>Q [Dec]</literal>である。</para></listitem>
-		    <listitem><para> <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Type</literal>である。</para></listitem>
+		    <listitem><para> <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Q Typ</literal>である。</para></listitem>
 		  </itemizedlist></para></listitem>
 
 	      <listitem><para>
-                  reification(具体化)は次のように書く。
+準クォートはパターン文脈または式文脈に出現可能で、これもオックスフォード括弧を使って書く。
 		  <itemizedlist>
-		    <listitem><para> <literal>reifyDecl T</literal>、ただし<literal>T</literal>は型構築子。この式の型は<literal>Dec</literal>である。</para></listitem>
-		    <listitem><para> <literal>reifyDecl C</literal>、ただし<literal>C</literal>はクラス。この式の型は<literal>Dec</literal>である。</para></listitem>
-		    <listitem><para> <literal>reifyType f</literal>、ただし<literal>f</literal>は識別子。この式の型は<literal>Typ</literal>である。</para></listitem>
-                    <listitem><para>まだない: 結合性</para></listitem>
-		    
-		  </itemizedlist></para>
+		    <listitem><para> <literal>[:<replaceable>varid</replaceable>| ... |]</literal>、
+ただし「...」は任意の文字列である。準クォート機能の完全な記述は<xref linkend="th-quasiquotation"/>にある。</para></listitem>
+		  </itemizedlist></para></listitem>
+
+	      <listitem><para>
+名前は、一つか二つの一重引用符を前置することで、クォートすることができる。
+		  <itemizedlist>
+		    <listitem><para> <literal>'f</literal>の型は<literal>Name</literal>であり、関数<literal>f</literal>を指す。同様に<literal>'C</literal>の型は<literal>Name</literal>であり、データ構築子<literal>C</literal>を指す。一般に、<literal>'</literal><replaceable>thing</replaceable>は<replaceable>thing</replaceable>を式文脈の中で解釈する。
+		     </para></listitem> 
+		    <listitem><para> <literal>''T</literal>の型は<literal>Name</literal>であり、型構築子<literal>T</literal>を指す。つまり、<literal>''</literal><replaceable>thing</replaceable>は<replaceable>thing</replaceable>を型文脈の中で解釈する。
+		     </para></listitem> 
+		  </itemizedlist>
+	          これらの<literal>Name</literal>は、Template Haskellの式やパターンや宣言などを構築するのに使うことができる。また、関数<literal>reify</literal>へ引数として与えることもできる。
+	         </para>
 		</listitem>
 
 		  
 	</itemizedlist>
+(元の論文と比較すると、細部に多くの違いがある。宣言接合では「<literal>splice</literal>」でなく「<literal>$</literal>」が使われる。中身の式の型は<literal>[Q Dec]</literal>でなく<literal>Q [Dec]</literal>でなければならない。型接合は実装されておらず、パターン接合やクォーテーションも同じである。
 </sect2>
 
-<sect2>  <title>Template Haskellを使う</title>
+<sect2 id="th-example">  <title>Template Haskellを使う</title>
 <para>
 <itemizedlist>
     <listitem><para>Template Haskell用のデータ型とモナド構築関数はライブラリ<literal>Language.Haskell.THSyntax</literal>にある。
@@ -4011,14 +4019,14 @@ parse s   = [ L s ]
 -- パースされた書式文字列の表現からHaskellのソースコー
 -- ドを生成する。生成されたコードは、「pr」を呼んだモジ
 -- ュールにコンパイル時に接合される。
-gen :: [Format] -> ExpQ
+gen :: [Format] -> Q Exp
 gen [D]   = [| \n -> show n |]
 gen [S]   = [| \s -> s |]
 gen [L s] = stringE s
 
 -- 入力の書式文字列から、接合するHaskellコードを生成する。
-pr :: String -> ExpQ
-pr s      = gen (parse s)
+pr :: String -> Q Exp
+pr s = gen (parse s)
 </programlisting>
 
 <para>次にコンパイラを走らせる。(これはWindows上のCygwinプロンプトである)
@@ -4053,6 +4061,97 @@ Hello
 
 </listitem>
 </orderedlist>
+</sect2>
+
+<sect2 id="th-quasiquotation">  <title>Template Haskellの準クォート</title>
+<para>準クォートは、パターンおよび式をプログラマが定義した具象構文を使って書くことを可能にする。この拡張の背後にある動機といくつかの例が"<ulink url="http://www.eecs.harvard.edu/~mainland/ghc-quasiquoting/">Why It's Nice to be Quoted: Quasiquoting for Haskell</ulink>" (Proc Haskell Workshop 2007)に述べられている。以下の例では、単純な式言語のための準クォータをどうやって書くかを紹介する。</para>
+
+<para>
+この例において、準クォータ<literal>expr</literal>は<literal>Language.Haskell.TH.Quote.QuasiQuoter</literal>型の値に束縛されている。この型は二つの関数を含み、それぞれ式とパターンをクォートするのに用いられる。それぞれのクォータの最初の引数はオックスフォード括弧で囲まれた(任意の)文字列であり、準クォート文の文脈によって二つのパーサのどちらが呼ばれるかが決まる。準クォートが式文脈で現れたなら式パーサが呼ばれ、パターン文脈で現れたならパターンパーサが呼ばれる。</para>
+
+<para>
+以下では、<literal>'int:n</literal>という構文を使って、変数<literal>n</literal>を逆クォートしたものを表していることに注意(逆クォートにこの構文を使うことはこのパーサの作者が決めたことであり、GHCによって決められたことでは<emphasis>ない</emphasis>)。パターン照合の際、これは<literal>n</literal>を構築子<literal>IntExpr</literal>の整数引数に束縛する。逆クォートに関する更なる詳細については参照した論文を見てほしい。この論文には<literal>String -> a</literal>という型の単一のパーサを活用して、<literal>Q Exp</literal>型の値を返す式パーサと、<literal>Q Pat</literal>型の値を返すパターンパーサの両方を生成するためのSYBを使ったテクニックの説明もある。
+</para>
+
+<para>一般に、準クォートは<literal>[$<replaceable>quoter</replaceable>| <replaceable>string</replaceable> |]</literal>という形をしている。<replaceable>quoter</replaceable>はインポートされたクォータの名前でなければならない。ここでは任意の式が使える訳ではない。クォートされる<replaceable>string</replaceable>は任意のものであってよく、改行を含んでいてもよい。
+</para>
+<para>
+準クォータはTemplate Haskellと同じステージ制限に従わねばならない。たとえば、この例において<literal>expr</literal>は<literal>Main.hs</literal>で使われているので、そこで定義されることはできず、インポートされねばならない。
+</para>
+
+<programlisting>
+
+{- Main.hs -}
+module Main where
+
+import Expr
+
+main :: IO ()
+main = do { print $ eval [$expr|1 + 2|]
+          ; case IntExpr 1 of
+              { [$expr|'int:n|] -> print n
+              ;  _              -> return ()
+              }
+          }
+
+
+{- Expr.hs -}
+module Expr where
+
+import qualified Language.Haskell.TH as TH
+import Language.Haskell.TH.Quasi
+
+data Expr  =  IntExpr Integer
+           |  AntiIntExpr String
+           |  BinopExpr BinOp Expr Expr
+           |  AntiExpr String
+    deriving(Show, Typeable, Data)
+
+data BinOp  =  AddOp
+            |  SubOp
+            |  MulOp
+            |  DivOp
+    deriving(Show, Typeable, Data)
+
+eval :: Expr -> Integer
+eval (IntExpr n)        = n
+eval (BinopExpr op x y) = (opToFun op) (eval x) (eval y)
+  where
+    opToFun AddOp = (+)
+    opToFun SubOp = (-)
+    opToFun MulOp = (*)
+    opToFun DivOp = div
+
+expr = QuasiQuoter parseExprExp parseExprPat
+
+-- Exprをパースし、その表現をQ ExpまたはQ Patとして返す。
+-- 二つのパーサを別々に書くことなく、一つのString -> Expr
+-- という型のパーサを書くだけで済ますために、
+-- SYBをどう使えばよいかについては、参照先の論文を見よ。
+
+parseExprExp :: String -> Q Exp
+parseExprExp ...
+
+parseExprPat :: String -> Q Pat
+parseExprPat ...
+</programlisting>
+
+<para>ではコンパイラを走らせよう。
+</para>
+<programlisting>
+$ ghc --make -XQuasiQuotes Main.hs -o main
+</programlisting>
+
+<para>
+"main"を走らせれば次のような出力になる。
+</para>
+
+<programlisting>
+$ ./main
+3
+1
+</programlisting>
+
 </sect2>
 
 </sect1>
