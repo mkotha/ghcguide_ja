@@ -4755,34 +4755,40 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
       <para><literal>INCLUDE</literal>プラグマは、<option>-#include</option>オプション(<xref linkend="options-C-compiler" />)の、より良い代替手段である。<literal>INCLUDE</literal>プラグマは他のコンパイラでも解釈されるからである。<literal>foreign import</literal>宣言それぞれにインクルードファイルを書く方法もあるが、この方法はGHCでは推奨されない。</para>
     </sect2>
 
-    <sect2 id="deprecated-pragma">
-      <title>DEPRECATEDプラグマ</title>
-      <indexterm><primary>DEPRECATED</primary>
-      </indexterm>
+    <sect2 id="warning-deprecated-pragma">
+      <title>WARNINGおよびDEPRECATEDプラグマ</title>
+      <indexterm><primary>WARNING</primary></indexterm>
+      <indexterm><primary>DEPRECATED</primary></indexterm>
 
-      <para>DEPRECATEDプラグマを使うと、特定の関数やクラスや型が、非推奨・廃止予定であると指定できる。これには二つの形式がある。
+      <para>WARNINGプラグマを使うと、特定の関数やクラスや型に任意の警告を付属させることができる。DEPRECATEDプラグマを使うと、特定の関数やクラスや型が、非推奨・廃止予定であると指定できる。これらのプラグマを使うには二つの方法がある。
 
       <itemizedlist>
 	<listitem>
-	  <para>モジュール全体を非推奨として宣言することができる。</para>
+	  <para>モジュール全体を相手にすることができる。</para>
 <programlisting>
    module Wibble {-# DEPRECATED "Use Wobble instead" #-} where
+     ...
+</programlisting>
+      <para>あるいは、</para>
+<programlisting>
+   module Wibble {-# WARNING "This is an unstable interface." #-} where
      ...
 </programlisting>
           <para><literal>Wibble</literal>をインポートしているモジュールをコンパイルするときはいつでも、GHCは指定されたメッセージを印字する。</para>
 	</listitem>
 
 	<listitem>
-	  <para>次のような最上位の宣言を使うことで、関数、クラス、型、データ構築子を非推奨とすることができる。</para>
+	  <para>次のような最上位の宣言を使うことで、関数、クラス、型、データ構築子に警告を付属させることができる。</para>
 <programlisting>
    {-# DEPRECATED f, C, T "Don't use these" #-}
+   {-# WARNING unsafePerformIO "This is unsafe; I hope you know what you're doing" #-}
 </programlisting>
 	  <para>指定された実体をインポートして使用しているモジュールをコンパイルするとき、GHCは指定されたメッセージを印字する。</para>
-          <para>非推奨として宣言できるのは、コンパイル中のモジュールの最上位で宣言されている実体だけである。また、非推奨の実体を宣言する際には未修飾名を使わなければならない。<literal>T</literal>のように大文字から始まる名前は、型構築子<literal>T</literal>かデータ構築子<literal>T</literal>かの<emphasis>いずれか</emphasis>であり、両方がスコープにあるなら両方である。両方がスコープにあるとき、片方だけを非推奨とすることは今のところできない。(<xref linkend="infix-tycons"/>と比較せよ)</para>
+          <para>付属させることができるのは、コンパイル中のモジュールの最上位で宣言されている実体だけである。また、実体を宣言する際には未修飾名を使わなければならない。<literal>T</literal>のように大文字から始まる名前は、型構築子<literal>T</literal>かデータ構築子<literal>T</literal>かの<emphasis>いずれか</emphasis>であり、両方がスコープにあるなら両方である。両方がスコープにあるとき、片方だけを指定することは今のところできない。(<xref linkend="infix-tycons"/>と比較せよ)</para>
 	</listitem>
       </itemizedlist>
-      非推奨とされた要素、あるいは非推奨モジュールに由来するものを使うと、適切なメッセージでそれと知らされる。しかし、(a)定義モジュール中で非推奨関数を使った場合、および(b)エクスポートリスト中で非推奨関数を使った場合、は報告されない。後者のおかげで、一つのモジュールが複数のモジュールがエクスポートしているものを集めて再エクスポートするという構造のライブラリで、余計な文句を言うことがない。</para>
-      <para>フラグ<option>-fno-warn-deprecations</option>を使ってこの警告を抑制することができる。</para>
+警告と非推奨報告は次のものに対しては為されない。(a) 定義されたモジュール中での使用、および (b) エクスポートリスト中での使用。後者のおかげで、一つのモジュールが複数のモジュールがエクスポートしているものを集めて再エクスポートするという構造のライブラリで、余計な文句を言うことがない。</para>
+      <para>フラグ<option>-fno-warn-warnings-deprecations</option>を使ってこの警告を抑制することができる。</para>
     </sect2>
 
     <sect2 id="inline-noinline-pragma">
@@ -4800,15 +4806,25 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
 <programlisting>
 key_function :: Int -> String -> (Bool, Double)
-
-#ifdef __GLASGOW_HASKELL__
 {-# INLINE key_function #-}
-#endif
 </programlisting>
 
-        <para>(コードをHBCに通すつもりがなければCプリプロセッサを持ち出す必要はない。HBCは<literal>INLINE</literal>プラグマとの相性が悪い)</para>
-
-        <para><literal>INLINE</literal>プラグマの主要な効果は、ある関数の「コスト」がとても低いと宣言することである。これによって、通常の展開機構がインライン化に積極的になる。</para>
+        <para><literal>INLINE</literal>プラグマの主要な効果は、ある関数の「コスト」がとても低いと宣言することである。これによって、通常の展開機構がインライン化に非常に積極的になる。一方、関数「<literal>f</literal>」に関する<literal>INLINE</literal>プラグマには、他の効果がいくつかある。
+<itemizedlist>
+<listitem><para>
+関数が<literal>f</literal>にインライン化されることがない。こうなっていなければ、GHCは<literal>f</literal>の右辺に大きな関数をインライン化して、<literal>f</literal>を大きくし、その後で盲目的に<literal>f</literal>をインライン化するかもしれない。
+</para></listitem>
+<listitem><para>
+<literal>f</literal>の本体において、float-in、float-out、共通部分式の変換が適用されない。
+</para></listitem>
+<listitem><para>
+INLINE関数は正格性解析によってworker/wrapperされることがない。そうでなく、全部まとめてインライン化される。
+</para></listitem>
+</itemizedlist>
+これらの効果はすべて、期待したものだけがインライン化され、インライン化が多すぎたり少なすぎたりしないようにすることが目的である。
+</para>
+<para>
+GHCはインライン化が永遠に続くことがないことを保証する。相互再帰的な一団はすべて、一個以上の決してインライン化されない<emphasis>ループ破り</emphasis>によって切り離される。(<ulink url="http://research.microsoft.com/%7Esimonpj/Papers/inlining/index.htm"> Secrets of the GHC inliner, JFP 12(4) July 2002</ulink>を見よ)。GHCはループ破りとしてINLINEプラグマのついた関数を選ばないことを試みるが、選択肢がないときはINLINE関数でも選択され得、この場合INLINEプラグマは無視される。例えば、自己再帰的な関数では、ループ破りはその関数自体でしかありえないので、INLINEプラグマは常に無視される。</para>
 
         <para>構文的には、ある関数についての<literal>INLINE</literal>プラグマは、その関数の型シグネチャが置けるところならどこに置いても良い。</para>
 
@@ -4822,6 +4838,9 @@ key_function :: Int -> String -> (Bool, Double)
 </programlisting>
 
 	<para><literal>NOINLINE</literal>プラグマ(<xref linkend="noinline-pragma"/>)も見よ。</para>
+
+	<para>注意: HBCコンパイラは<literal>INLINE</literal>プラグマと相性が悪いので、コードをHBC互換にしたいなら<literal>#ifdef __GLASGOW_HASKELL__</literal>...<literal>#endif</literal>というCプリプロセッサ指令でプラグマを囲む必要があるだろう。</para>
+
       </sect3>
 
       <sect3 id="noinline-pragma">
