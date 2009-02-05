@@ -2917,7 +2917,7 @@ class (F a ~ b) => C a b where
 
 <sect3 id="flexible-contexts"><title>型シグネチャの文脈</title>
 <para>
-Haskell 98と異なり、型シグネチャは<emphasis>(クラス 型変数)</emphasis>または<emphasis>(クラス (型変数 型変数 ...))</emphasis>という形をとる必要はない。よって、以下のような型シグネチャは完全に正しい。
+<option>-XFlexibleContexts</option>フラグを使うと、型シグネチャ中の型クラス制約が<emphasis>(class type-variable)</emphasis>または<emphasis>(class (type-variable type-variable ...))</emphasis>という形でなければならないという、Haskell 98の制限を撤廃する。<option>-XFlexibleContexts</option>が有効な場合、以下のような型シグネチャは完全に正しい。
 <programlisting>
   g :: Eq [a] => ...
   g :: Ord (T a ()) => ...
@@ -3405,7 +3405,7 @@ Haskellの型シグネチャは暗黙に量化される。新しいキーワー�
 関数<literal>f3</literal>はランク3の型を持っている。関数矢印の左にランク2の型があるからである。
 </para>
 <para>
-GHC has three flags to control higher-rank types:
+GHCには、ランクの高い型を制御するための三つのフラグがある。
 <itemizedlist>
 <listitem><para>
  <option>-XPolymorphicComponents</option>: データ構築子(だけ)が、多相的な引数の型を持てる。
@@ -3624,7 +3624,7 @@ GHCは、可能な最も内側の量化点を探したり<emphasis>しない</em
 <sect2 id="impredicative-polymorphism">
 <title>非叙述的多相
 </title>
-<para>GHCは<emphasis>非叙述的多相</emphasis>(impredicative polymorphism)を扱える。つまり、多相的関数を多相型で呼ぶことができるし、データ構造に多相的な型をパラメタとして与えることができる。例を挙げる。
+<para>GHCは<emphasis>非叙述的多相</emphasis>(impredicative polymorphism)を扱え、<option>-XImpredicativeTypes</option>で有効になる。これは、多相的関数を多相型で呼ぶことができ、データ構造に多相的な型をパラメタとして与えることができるということである。例を挙げる。
 <programlisting>
   f :: Maybe (forall a. [a] -> [a]) -> Maybe ([Int], [Char])
   f (Just g) = Just (g [3], g "hello")
@@ -3658,7 +3658,7 @@ f xs = ys ++ ys
 <para>以下の原則に沿って設計されている。
 <itemizedlist>
 <listitem><para>スコープを持つ型変数は型<emphasis>変数</emphasis>を表すものであり、<emphasis>型</emphasis>を表すものではない。(これはGHCの以前の設計との相異点である)</para></listitem>
-<listitem><para>さらに、異なる字句的な型変数は異なる型変数を表す。従って、プログラマの書いた型シグネチャ(スコープを持つ型変数を含む物も)は<emphasis>固い</emphasis>(rigit)型を表す。つまり、その型は型検査器にとって完全に既知であり、推論は関与しない。</para></listitem>
+<listitem><para>さらに、異なる字句的な型変数は異なる型変数を表す。従って、プログラマの書いた型シグネチャ(スコープを持つ型変数を含む物も)は<emphasis>固い</emphasis>(rigid)型を表す。つまり、その型は型検査器にとって完全に既知であり、推論は関与しない。</para></listitem>
 <listitem><para>字句的スコープを持つ型変数は、プログラムの意味を変えることなく、自由にα改名できる。</para></listitem>
 </itemizedlist>
 </para>
@@ -3885,22 +3885,6 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 </para>
 </sect2>
 
-<sect2 id="type-families">
-<title>型の族
-</title>
-
-<para>
-GHCは、型を添字とする型の族(type family)を定義することに対応している。これは、Haskell 98における、クラスによる値の多重定義を、型にまで拡張したものと見ることができる。型の族がクラス中で宣言された場合、それを関連型(associated type)とも呼ぶ。
-</para>
-<para>
-型の族には二種類ある。データの族と型シノニムの族である。現在、完全に実装されているのは前者だけで、後者についてはまだ作業中である。結果として、この言語拡張の仕様はまだある程度流動的である。よって、この言語拡張とその使い方の詳しい説明は現在<ulink url="http://www.haskell.org/haskellwiki/GHC/Indexed_types">Haskell wikiの型の族についてのページ</ulink>にある。安定したら、この資料はこの利用の手引きに移されるだろう。
-</para>
-<para>
-型の族は<option>-XTypeFamilies</option>によって有効になる。
-</para>
-
-</sect2>
- 
 </sect1>
 <!-- ==================== End of type system extensions =================  -->
 
