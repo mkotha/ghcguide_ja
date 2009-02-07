@@ -157,6 +157,20 @@
       </varlistentry>
 
       <varlistentry>
+        <term>
+          <option>-g</option><replaceable>threads</replaceable>
+          <indexterm><primary><option>-g</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>&lsqb;デフォルト: 1&rsqb; &lsqb;GHC 6.10にて新出&rsqb; ガベッジコレクションに用いるスレッドの数を設定する。このオプションはプログラムが<option>-threaded</option>オプション付きでリンクされていた場合にのみ受け付けられる。<xref linkend="options-linker"/>を見よ。</para>
+
+          <para>ガベッジコレクタは、複数のOSスレッドを与えられた場合、並列に仕事を行うことができる。これは、三コア以上の場合、通常、性能の向上につながることが実験によって示されている。二コアでは負荷によって有益なこともそうでないこともある。大きいヒープの方が並列GCとよく合うので、<option>-H</option>の値を高く(最大内容量の三倍以上)するとよい。並列GCによって恩恵を受けているのかどうか確認するには、<option>+RTS -s</option>で時間統計情報を見ればよい。並列GCが直列GCよりも著しく(経過時間で計って)<emphasis>遅い</emphasis>場合は、バグとして報告していただきたい。</para>
+
+          <para><option>-N</option>オプションが使われた場合この値は自動的に設定されるので、<option>-g</option>を使う唯一の理由は、実行に使うスレッドの数とGCに使うスレッドの数を違う値にしたいときだろう。たとえば、厳密に単一スレッドのプログラムがあり、それでも並列GCの恩恵を受けたいなら、<option>-N</option>でなく<option>-g</option>を使うことに意味があるだろう。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term>
           <option>-H</option><replaceable>size</replaceable>
           <indexterm><primary><option>-H</option></primary><secondary>RTS option</secondary></indexterm>
@@ -236,30 +250,166 @@
       </varlistentry>
 
       <varlistentry>
+        <term>
+          <option>-t</option><optional><replaceable>file</replaceable></optional>
+          <indexterm><primary><option>-t</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
 	<term>
-          <option>-s</option><replaceable>file</replaceable>
+          <option>-s</option><optional><replaceable>file</replaceable></optional>
           <indexterm><primary><option>-s</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<term>
-          <option>-S</option><replaceable>file</replaceable>
+          <option>-S</option><optional><replaceable>file</replaceable></optional>
           <indexterm><primary><option>-S</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-          <para>GCに関する簡潔な(<option>-s</option>)または詳細な(<option>-S</option>)統計情報をファイル<replaceable>file</replaceable>に書く。<replaceable>file</replaceable>のデフォルトは<filename><replaceable>progam</replaceable>.stat</filename>である。<replaceable>file</replaceable>に<constant>stderr</constant>と指定すると特別に扱われ、出力は本当に<constant>stderr</constant>に送られる。</para>
+	  <para>これらのオプションはランタイムシステムの統計情報を生成する。プログラムを実行するのに使った時間、ガベッジコレクタで使った時間、確保されたメモリの量、ヒープの最大サイズ、といったものである。この三種類のオプションは、詳細さの度合いが異なる。<option>-t</option>は、GHCの<option>-Rghc-timing</option>オプションと同じ形式で一行だけの出力を生成する。<option>-s</option>はプログラムの最後にもっと詳細なまとめを生成し、<option>-S</option>はさらにガベッジコレクション一回一回について情報を生成する。</para>
 
-          <para>このオプションは、記憶域管理器がどのように現在の生存データの量に基づいてヒープの大きさを調整しているか見るのに便利である。</para>
-	</listitem>
-      </varlistentry>
+          <para>出力内容は<replaceable>file</replaceable>に置かれる。<replaceable>file</replaceable>が省略された場合、出力は<constant>stderr</constant>に送られる。</para>
 
-      <varlistentry>
-	<term>
-          <option>-t<replaceable>file</replaceable></option>
-          <indexterm><primary><option>-t</option></primary><secondary>RTS option</secondary></indexterm>
-        </term>
-	<listitem>
-          <para>プログラムを走らせた後、GCの統計情報の一行要約を書き出す。出力は<option>-Rghc-timing</option>オプションで出力される物と同じ書式である。</para>
+    <para>
+        <literal>-t</literal>フラグを使った場合、プログラムの終了時、次のようなものを見ることになるだろう。
+    </para>
 
-          <para><option>-s</option>と同様に、デフォルトでは<replaceable>file</replaceable>は<filename><replaceable>program</replaceable>.stat</filename>である。<replaceable>file</replaceable>に<constant>stderr</constant>と指定すると特別に扱われ、出力は本当に<constant>stderr</constant>に送られる。</para>
+<programlisting>
+&lt;&lt;ghc: 36169392 bytes, 69 GCs, 603392/1065272 avg/max bytes residency (2 samples), 3M in use, 0.00 INIT (0.00 elapsed), 0.02 MUT (0.02 elapsed), 0.07 GC (0.07 elapsed) :ghc&gt;&gt;
+</programlisting>
+
+    <para>
+        これは以下のことを伝えている。
+    </para>
+
+    <itemizedlist>
+      <listitem>
+        <para>プログラムによって確保されたバイトの総量。これはメモリ使用量の最大値よりも低いことがある。一部は開放されたかもしれないからである。
+        </para>
+      </listitem>
+      <listitem>
+        <para>発生したガベッジコレクションの合計回数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>プログラムによって使われた空間の平均値および最大値。これは大GCのときにしか検査されないから、単なる近似値である。標本(sample)の数によって何回検査されたかが分かる。
+        </para>
+      </listitem>
+      <listitem>
+        <para>RTSがOSから確保したメモリの最大値。
+        </para>
+      </listitem>
+      <listitem>
+        <para>ランタイムシステムの初期化(INIT)、プログラム自体の実行(MUT, the mutator)、ガベッジコレクション(GC)それぞれのCPU時間と経過した実時間。
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <para><literal>-s</literal>フラグを使った場合、プログラムの終了時に次のようなものを目にすることになるだろう。(細部が厳密にどうなるかは使っているRTSの種類によって異なる。例えば、プロファイルのデータを見られるのはRTSがプロファイル用にコンパイルされている場合だけである)
+    </para>
+
+<programlisting>
+      36,169,392 bytes allocated in the heap
+       4,057,632 bytes copied during GC
+       1,065,272 bytes maximum residency (2 sample(s))
+          54,312 bytes maximum slop
+               3 MB total memory in use (0 MB lost due to fragmentation)
+
+  Generation 0:    67 collections,     0 parallel,  0.04s,  0.03s elapsed
+  Generation 1:     2 collections,     0 parallel,  0.03s,  0.04s elapsed
+
+  INIT  time    0.00s  (  0.00s elapsed)
+  MUT   time    0.01s  (  0.02s elapsed)
+  GC    time    0.07s  (  0.07s elapsed)
+  EXIT  time    0.00s  (  0.00s elapsed)
+  Total time    0.08s  (  0.09s elapsed)
+
+  %GC time      89.5%  (75.3% elapsed)
+
+  Alloc rate    4,520,608,923 bytes per MUT second
+
+  Productivity  10.5% of total user, 9.1% of total elapsed
+</programlisting>
+
+    <itemizedlist>
+      <listitem>
+        <para>"bytes allocated in the heap"はプログラムによって確保されたバイトの総量である。これはメモリ使用量の最大値よりも低いことがある。一部は開放されたかもしれないからである。
+        </para>
+      </listitem>
+      <listitem>
+        <para>GHCはコピーGCを使っている。"bytes copied during GC"はガベッジコレクション中にコピーしなければならなかったバイトの数を示す。
+        </para>
+      </listitem>
+      <listitem>
+        <para>プログラムによって実際に使われた空間の最大値が"bytes maximum residency"の数値である。これは大GCのときにしか検査されないから、単なる近似値である。標本(sample)の数によって何回検査されたかが分かる。
+        </para>
+      </listitem>
+      <listitem>
+        <para>"bytes maximum slop"は、GHCがデータをいわゆる「megablock」に詰めることによって無駄になった空間の最大値である。
+        </para>
+      </listitem>
+      <listitem>
+        <para>"total memory in use"はRTSがOSから確保したメモリの最大値である。
+        </para>
+      </listitem>
+      <listitem>
+        <para>次に、行われたガベッジコレクションについての情報がある。それぞれの世代について、ガベッジコレクションが何回行われたか、そのうち何回が複数のスレッドを使っていたか、その世代をGCするために使われたCPU時間の合計、その世代をGCするために経過した実時間の合計、が示されている。
+        </para>
+      </listitem>
+      <listitem>
+        <para>次に、CPU時間と経過した実時間を、そのときランタイムシステムが何をしていたかによって項目分けしたものがある。INITはランタイムシステムの初期化である。MUTはmutator time、すなわち実際にあなたのコードを走らせるのに掛かった時間である。GCはガベッジコレクションを行うのに掛かった時間である。RPは維持原因プロファイルを行うのに掛かった時間である。PROFはその他のプロファイルを行うのに掛かった時間である。EXITはランタイムシステムの終了処理時間である。最後に、Totalは、もちろん、合計である。
+        </para>
+        <para>%GCは、GCが全体の何%を占めるかを表している。"Alloc rate"は"bytes allocated in the heap"をMUT CPU時間で割ったものである。"Productivity"はCPU時間および経過した実時間の合計の何%がmutator(MUT)で消費されたかである。
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <para><literal>-S</literal>フラグは、<literal>-s</literal>フラグと同じものを出力するのに加え、GCが発生するたびにそれについての情報を表示する。
+    </para>
+
+<programlisting>
+    Alloc    Copied     Live    GC    GC     TOT     TOT  Page Flts
+    bytes     bytes     bytes  user  elap    user    elap
+   528496     47728    141512  0.01  0.02    0.02    0.02    0    0  (Gen:  1)
+[...]
+   524944    175944   1726384  0.00  0.00    0.08    0.11    0    0  (Gen:  0)
+</programlisting>
+
+    <para>個々のガベッジコレクションについて、表示するのは以下のものである。
+    </para>
+
+    <itemizedlist>
+      <listitem>
+        <para>このGCで確保したバイト数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>このGCでコピーしたバイト数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>現在生存しているバイト数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>このGCに掛かった時間(CPU時間および経過した実時間)。
+        </para>
+      </listitem>
+      <listitem>
+        <para>これまでにプログラムが実行された時間(CPU時間および経過した実時間)。
+        </para>
+      </listitem>
+      <listitem>
+        <para>このGCで起こったページフォールトの個数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>直近のGCの終了以降に起こったページフォールトの個数。
+        </para>
+      </listitem>
+      <listitem>
+        <para>GC対象の世代。
+        </para>
+      </listitem>
+    </itemizedlist>
+ 
 	</listitem>
       </varlistentry>
     </variablelist>
@@ -267,9 +417,28 @@
   </sect2>
 
   <sect2>
-    <title>プロファイルと並列性に関するRTSオプション</title>
+    <title>並行性と並列性に関するRTSオプション</title>
 
-    <para>プロファイルに関するRTSオプションは<xref linkend="rts-options-heap-prof"/>で、並行実行に関わる物は<xref linkend="using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
+    <para>並行実行に関わるRTSオプションは<xref linkend="using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
+  </sect2>
+
+  <sect2 id="rts-profiling">
+    <title>プロファイルに関するRTSオプション</title>
+
+    <para>プロファイルについてのランタイムオプションの大部分は、プログラムをプロファイル用にコンパイルした場合にのみ利用可能である。(<xref linkend="prof-compiler-options" />を見よ、またランタイムオプションについては<xref linkend="rts-options-heap-prof" />を見よ)。ただし、通常の非プロファイル版実行ファイルでも利用できるプロファイルオプションがただ一つ存在する。</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-hT</option>
+          <indexterm><primary><option>-hT</option></primary><secondary>RTS
+              option</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>基本的なヒーププロファイルを、<literal><replaceable>prog</replaceable>.hp</literal>というファイルに生成する。ヒーププロファイルのグラフを作成するには、<command>hp2ps</command>(<xref linkend="hp2ps" />を見よ)を使えばよい。この基本的なヒーププロファイルは、データ構築子ごとに分類され、その他の種類のクロージャは<literal>FUN</literal>や<literal>THUNK</literal>といった広い範疇ごとにまとめられている。より詳細なプロファイルを得るには、完全なプロファイルサポート(<xref linkend="profiling"/>)を使えばよい。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
   </sect2>
 
   <sect2 id="rts-options-debugging">
