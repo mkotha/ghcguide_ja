@@ -490,7 +490,8 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fPIC</option></primary></indexterm>
         </term>
         <listitem>
-          <para>位置独立なコード(共有ライブラリに置けるコード)を生成する。これは今のところMac OS Xで動作する。PowerPC Linuxではネイティブコード生成器を使っているとき(-fasm)には動作する。x86 Linuxではまだ十分に使える状態ではない。Windowsでは、位置独立コードが使われることはなく、PowerPC64 Linuxでは常に位置独立コードが使われるので、これらのプラットフォームではこのフラグは効力を持たない。</para>
+          <para>位置独立なコード(共有ライブラリや共有バイナリに置けるコード)を生成する。</para>
+          <para>このオプションはリンク時にGHCに共有ライブラリを使わせるという効果もあることに注意。</para>
         </listitem>
       </varlistentry>
 
@@ -499,8 +500,8 @@ $ cat foo.hspp</screen>
           <option>-dynamic</option>
         </term>
         <listitem>
-          <para>コードを生成するとき、別のパッケージからインポートされた実体は別の共有ライブラリ・バイナリにあると考える。これは今のところMac OS Xで動作する。PowerPC Linuxではネイティブコード生成器を使っているとき(-fasm)には動作する。<option>-fPIC</option>と同様に、x86 Linuxではまだ十分に使える状態ではない。Windowsではサポートされておらず、PowerPC64 Linuxでは効力を持たない。</para>
-          <para>このオプションはリンク時にGHCに共有ライブラリを使わせるという効果もあることに注意。</para>
+          <para>このフラグは、リンク時に共有Haskellライブラリを使うようにする。それらを作る方法については<xref linkend="building-packages"/>を見よ。</para>
+          <para>このオプションもコード生成に影響を与えることに注意。(上記参照)</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -611,6 +612,23 @@ $ cat foo.hspp</screen>
           <para>このオプションはコード生成にも影響を与えることに注意。(上記参照)</para>
         </listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-shared</option>
+          <indexterm><primary><option>-shared</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>このフラグが与えられると、実行可能形式を作る代わりにGHCは共有オブジェクトを生み出す。対象のOSによって、これはELF DSOだったり、Windows DLLだったり、Mac OSのdylibだったりする。GHCはこの統一フラグのもとにOSの詳細を隠す。</para>
+
+	  <para>生成される共有オブジェクトが<option>-package</option>オプションで与えられたHaskellのパッケージライブラリに静的にリンクされるか動的にリンクされるかは、<option>-dynamic</option>/<option>-static</option>フラグによって制御される。Haskell以外のライブラリはそのシステムでgccが通常にリンクするのと同じようにリンクされる。例えば、大部分のELFシステムでは、動的ライブラリが見つかった場合はそれが使われる。</para>
+
+	  <para>共有オブジェクトへとリンクされるオブジェクトファイルは<option>-fPIC</option>でコンパイルされなければならない。<xref linkend="options-codegen"/>を見よ。</para>
+
+	  <para>Haskellパッケージのために共有オブジェクトを作る場合、そのパッケージにリンクされるときにGHCがその共有オブジェクトを認識できるように、その共有オブジェクトには正しい名前が付けられねばならない。共有オブジェクトの名前manglingを見よ。</para>
+        </listitem>
+      </varlistentry>
+
 
       <varlistentry>
         <term>
