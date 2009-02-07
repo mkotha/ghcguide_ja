@@ -23,7 +23,7 @@
     </listitem>
 
     <listitem>
-      <para>プロファイルオプションのどれか(例えば<literal>+RTS -p -RTS</literal>)を付けてプログラムを実行する。プロファイル情報のファイルが生成される。</para>
+      <para>プロファイルオプションのどれか(例えば<literal>+RTS -p -RTS</literal>)を付けてプログラムを実行する。プロファイル情報のファイルが生成される。プロファイル中は複数プロセッサによる実行(例えば<literal>+RTS -N2</literal>)に対応していないことに注意。</para>
       <indexterm><primary><option>-p</option></primary><secondary>RTS
       option</secondary></indexterm>
     </listitem>
@@ -189,6 +189,22 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
 </programlisting>
 
       <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。(SCCは「Set Cost Centre」(コスト集約点を設定せよ)の意である)</para>
+
+      <para>SCCをいくつか使ったプログラムの例を示す。</para>
+
+<programlisting>
+main :: IO ()
+main = do let xs = {-# SCC "X" #-} [1..1000000]
+          let ys = {-# SCC "Y" #-} [1..2000000]
+          print $ last xs
+          print $ last $ init xs
+          print $ last ys
+          print $ last $ init ys
+</programlisting>
+
+      <para>実行すると、次のようなヒーププロファイルが得られる。</para>
+
+      <imagedata fileref="prof_scc.png"/>
 
     </sect2>
 
