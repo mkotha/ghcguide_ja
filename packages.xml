@@ -9,7 +9,7 @@
 
   <para>パッケージを使うのはこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
-  <para>自分のパッケージをビルドするのもとても単純である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未（ｒｙ <ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
+  <para>自分のパッケージをビルドするのもとても単純である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
 
   <sect2 id="using-packages">
   <title>パッケージを使う
