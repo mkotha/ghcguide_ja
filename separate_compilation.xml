@@ -149,7 +149,7 @@
             <para>オブジェクトファイルの出力先を<replaceable>dir</replaceable>に変更する。例えば以下のように。</para>
 
 <screen>
-$ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
+$ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 </screen>
 
             <para><filename>Foo.o</filename>、<filename>Bar.o</filename>、<filename>Bumble.o</filename>の各オブジェクトファイルは、実行中の機械のアーキテクチャの名前(<filename>x86</filename>、<filename>mips</filename>など)のサブディレクトリに置かれる。</para>
@@ -191,6 +191,17 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
             <para>生成されるFFIのスタブファイルの出力先を<replaceable>dir</replaceable>に変更する。スタブファイルは、Haskellソースが<literal>foreign export</literal>または<literal>foreign import "&amp;wrapper"</literal>という宣言を含むときに生成される(<xref linkend="foreign-export-ghc"/>を見よ)。階層的モジュール名に関しては、<option>-stubdir</option>オプションは<option>-odir</option>や<option>-hidir</option>と全く同様に振る舞う。</para>
 	  </listitem>
 	</varlistentry>
+
+        <varlistentry>
+          <term>
+            <option>-outputdir</option> <replaceable>dir</replaceable>
+            <indexterm><primary><option>-outputdir</option></primary></indexterm>
+          </term>
+          <listitem>
+            <para><option>-outputdir</option>オプションは<option>-odir</option>、<option>-hidir</option>、<option>-stubdir</option>の組み合わせの略記である。
+            </para>
+          </listitem>
+        </varlistentry>
 
 	<varlistentry>
 	  <term>
@@ -331,7 +342,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
             <indexterm><primary><option>-ddump-hi-diffs</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para>一般に、新しい<filename>.hi</filename>が既存のものと同じなら、上書きは行われない。これは<command>make</command>とうまく協調する。インタフェースが実際に変更されたとき、これはしばしば知るに値することである。<option>-ddump-hi-diffs</option>が与えられると、GHCは新旧の<filename>.hi</filename>ファイルに対して<command>diff</command>を走らせる。</para>
+            <para>一般に、新しい<filename>.hi</filename>が既存のものと同じなら、上書きは行われない。これは<command>make</command>とうまく協調する。インタフェースが実際に変更されたとき、これはしばしば知るに値することである。<option>-ddump-hi-diffs</option>が与えられると、GHCは新旧の<filename>.hi</filename>ファイルの差異を報告する。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -379,9 +390,9 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `arch`
 
       <para>これはもはやうまく行かない。モジュール<literal>C</literal>がモジュール<literal>B</literal>をインポートし、<literal>B</literal>がモジュール<literal>A</literal>をインポートしているとしよう。このとき、モジュール<literal>A</literal>が変更されたなら、モジュール<literal>C</literal>を再コンパイルしなければならないかもしれない。したがって、<filename>A.hi</filename>が変更されたときは<literal>C</literal>が再コンパイルされるべきか確かめねばならない。しかし、<literal>C</literal>の依存関係一覧に載るのは<literal>B.hi</literal>だけであって、<literal>A.hi</literal>ではない。そのため、<literal>A</literal>になんらかの変更(例えば、ある関数の定義が変更され、<literal>B</literal>がエクスポートする関数のインライン展開結果にその関数が現れる場合)が加えられても<literal>B.hi</literal>には一切の変化がないということも考えられる。そういうわけで&hellip;</para>
 
-      <para>GHCは、インタフェースファイルそれぞれ、およびその中の型シグネチャそれぞれについて版数を覚えておく。さらに、全てのインタフェースファイルに、最後にコンパイルされたときに使われたもの全ての版数一覧を記録しておく。ソースファイルの変更日時が<filename>.o</filename>よりも古く(つまり最後にコンパイルされたときからソースが変更されていない)、再コンパイル検査が有効なら、GHCは賢い振る舞いをする。今回必要なものの版数一覧と前回必要とされたものの版数一覧(これはコンパイルされているモジュールのインタフェースファイルから拾ってくる)を比較し、全て同じなら「Compilation IS NOT required」と言ってコンパイルをかなり早い段階で中断するのである。何と美しい眺めであろうか！</para>
+      <para>GHCは、インタフェースファイルそれぞれ、およびその中の宣言それぞれについて指紋(実はMD5ハッシュ)を計算する。さらに、全てのインタフェースファイルに、最後にコンパイルされたときに使われたもの全ての指紋一覧を記録しておく。ソースファイルの変更日時が<filename>.o</filename>よりも古く(つまり最後にコンパイルされたときからソースが変更されていない)、再コンパイル検査が有効なら、GHCは賢い振る舞いをする。今回必要なものの指紋一覧と前回必要とされたものの指紋一覧(これはコンパイルされているモジュールのインタフェースファイルから拾ってくる)を比較し、全て同じなら「Compilation IS NOT required」と言ってコンパイルをかなり早い段階で中断するのである。何と美しい眺めであろうか！</para>
 
-      <para>Partick Sansomはこれら全てがどういう仕組みかについての研究会論文を書いた(ただし細部はかなり変更されているが)。コピーが欲しければ<ulink url="mailto:sansom@dcs.gla.ac.uk">彼に頼む</ulink>こと。</para>
+      <para>GHC commentaryで<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance">これら全てがどうやって動いているか</ulink>について読むことができる。</para>
 
     </sect2>
 
@@ -709,7 +720,7 @@ ghc -M -optdep-f -optdep.depend ...
 
 <para>Haskellの規定によると、モジュールMをコンパイルするとき、M「以下」の全てのモジュールの全てのインスタンス宣言が可視である。(モジュールAがM「以下」であるとは、Aが直接Mにインポートされているか、または直接MにインポートされているモジュールBが存在して、AがB以下であることである)。したがって、理論上は、GHCはM以下の全てのモジュールのインタフェースファイルを読まなければならない。それらにMに関係するインスタンス宣言が含まれているかもしれないからである。しかし実際的にはこれは最悪なので、GHCはより賢く振る舞おうとする。</para>
 
-<para>特に、あるインスタンス宣言について、その宣言の頭部で言及されている型やクラスのいずれかが、そのインスタンス宣言があるのと同じモジュールで定義されているなら、GHCはいずれにせよそのインタフェースファイルを訪れねばならない。例えば、以下のような場合である。</para>
+<para>特に、あるインスタンス宣言について、その宣言の<emphasis>頭部</emphasis>(&ldquo;<literal>=&gt;</literal>&rdquo;より後の部分のこと。<xref linkend="instance-rules"/>を見よ)で言及されている型やクラスのいずれかが、そのインスタンス宣言があるのと同じモジュールで定義されているなら、GHCはいずれにせよそのインタフェースファイルを訪れねばならない。例えば、以下のような場合である。</para>
 <programlisting>
   module A where
     instance C a =&gt; D (T a) where ...
@@ -760,7 +771,8 @@ ghc -M -optdep-f -optdep.depend ...
   <listitem><para>モジュールMにある書き換え規則が<emphasis>孤立規則</emphasis>なのは、<indexterm><primary>orphan rule</primary></indexterm>規則の左辺に自由変項として現れる変数、型構築子、クラスがどれもMで宣言されていないときである。</para></listitem>
  </itemizedlist>
 
-<para>「-fwarn-orphan-module」を追加すれば、あなたが孤立モジュールを作ったときにGHCがそれを警告する。孤立モジュールをそれと知るには、<link linkend="modes"><option>--show-iface</option>モード</link>を使ってそのインタフェースファイル<filename>M.hi</filename>を見れば良い。最初の行に<literal>[orphan module]</literal>があれば、GHCはそれを孤立モジュールだと判断している。</para>
+<para><option>-fwarn-orphans</option>フラグを使っているなら、あなたが孤立モジュールを作ったときにGHCがそれを警告する。他の警告と同様、<option>-fno-warn-orphans</option>とすればこの警告を無効にすることができ、<option>-Werror</option>とすればこの警告が発生したときにコンパイルが失敗するようにできる。</para>
+<para>孤立モジュールをそれと知るには、<link linkend="modes"><option>--show-iface</option>モード</link>を使ってそのインタフェースファイル<filename>M.hi</filename>を見れば良い。最初の行に<literal>[orphan module]</literal>があれば、GHCはそれを孤立モジュールだと判断している。</para>
 </sect2>
 
   </sect1>
