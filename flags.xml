@@ -801,7 +801,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XImpredicativeTypes</option></entry>
-	      <entry><link linkend="impredicative-polymorphism">非述語的な型</link>を有効にする。</entry>
+	      <entry><link linkend="impredicative-polymorphism">非叙述的な型</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoImpredicativeTypes</option></entry>
 	    </row>
@@ -831,7 +831,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XTransformListComp</option></entry>
-	      <entry><link linkend="generalised-list-comprehensions">transform list comprehensions</link>を有効にする。</entry>
+	      <entry><link linkend="generalised-list-comprehensions">変換リスト内包表記</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoTransformListComp</option></entry>
 	    </row>
@@ -867,13 +867,13 @@
 	    </row>
 	    <row>
 	      <entry><option>-XRecordWildCards</option></entry>
-	      <entry><link linkend="record-wildcards">record wildcard</link>を有効にする</entry>
+	      <entry><link linkend="record-wildcards">レコードワイルドカード</link>を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecordWildCards</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XNamedFieldPuns</option></entry>
-	      <entry><link linkend="record-puns">record pun</link>を有効にする。</entry>
+	      <entry><link linkend="record-puns">レコード同名利用</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoNamedFieldPuns</option></entry>
 	    </row>
