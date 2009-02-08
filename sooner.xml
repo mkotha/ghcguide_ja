@@ -23,7 +23,7 @@
       <varlistentry>
 	<term>たくさんのメモリを使う</term>
 	<listitem>
-          <para>ヒープ空間のためにメモリを多く使う(合理的な範囲内で)と、GHCのGC回数を減らし、結果としてコンパイル時間を減らすことができる。<option>-Rghc-timing</option>オプションを使うと、GCの動作報告が得られる。(<option>+RTS -Sstderr -RTS</option>オプションを使ってGC統計情報を直接標準出力に送ることもできる。)</para>
+          <para>ヒープ空間のためにメモリを多く使う(合理的な範囲内で)と、GHCのGC回数を減らし、結果としてコンパイル時間を減らすことができる。<option>-Rghc-timing</option>オプションを使うと、GCの動作報告が得られる。(この場合も、安かろう悪かろうな<option>+RTS -S -RTS</option>オプションを使ってGC統計情報を直接標準エラー出力に送ることもできる。)</para>
 
           <para>全体のうち20%以上の時間ををGCで使っているなら、メモリを増やすのが効果的かもしれない。これには<option>-H&lt;size&gt;</option><indexterm><primary><option>-H</option></primary></indexterm>オプションを使う。コンパイラのデフォルトの確保領域の大きさを増やすのも効果的かもしれない。これには、<option>+RTS -A&lt;size&gt; -RTS</option><indexterm><primary>-A&lt;size&gt; option</primary></indexterm>オプションを使う。</para>
 
@@ -317,14 +317,9 @@ f (Wibble x y)  # 醜いが、それで良い
 </para>
 
 <para>
-&ldquo;I think I have a space leak&hellip;&rdquo; Re-run your program
-with <option>+RTS -Sstderr</option>, and remove all doubt!  (You'll
-see the heap usage get bigger and bigger&hellip;)
-&lsqb;Hmmm&hellip;this might be even easier with the
-<option>-G1</option> RTS option; so&hellip; <command>./a.out +RTS
--Sstderr -G1</command>...]
+&ldquo;空間リークがあるみたいなんです&hellip;&rdquo; あなたのプログラムを<option>+RTS -S</option>付きで走らせて、全ての疑いを取り除きましょう！(ヒープ使用量が刻々と増していくのが分かるでしょう&hellip;) &lsqb;うーん&hellip;これは<option>-G1</option> RTS optionを付けるともっと簡単になるかもしれないね、つまり&hellip; <command>./a.out +RTS -S -G1</command>...]
 <indexterm><primary>-G RTS option</primary></indexterm>
-<indexterm><primary>-Sstderr RTS option</primary></indexterm>
+<indexterm><primary>-S RTS option</primary></indexterm>
 </para>
 
 <para>
