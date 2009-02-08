@@ -5,9 +5,6 @@
 <address>
 <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
 </address>
-<releaseinfo>
-<ulink url="http://www.kotha.net/ghcguide_ja/about.html">日本語訳について</ulink>
-</releaseinfo>
 </bookinfo>
 
 &license;
@@ -26,6 +23,11 @@
 &bugs;
 
 <index/>
+
+<colophon>
+  <para><ulink url="http://www.kotha.net/ghcguide_ja/about.html">日本語訳について</ulink></para>
+</colophon>
+
 <!-- Emacs stuff:
      ;;; Local Variables: ***
      ;;; mode: xml ***
