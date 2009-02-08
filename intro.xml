@@ -146,7 +146,7 @@
     <title>GHCのバージョン番号付け規則</title>
     <indexterm><primary>version, of ghc</primary></indexterm>
 
-    <para>GHCバージョン6.8の時点で、GHCのバージョン番号を割り当てるのに我々は次のような規則を採用している。</para>
+    <para>GHCバージョン6.8以降、GHCのバージョン番号を割り当てるのに我々は次のような規則を採用している。</para>
 
     <variablelist>
       <varlistentry>
