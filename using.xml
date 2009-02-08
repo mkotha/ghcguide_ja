@@ -637,7 +637,7 @@ ghc -c Foo.hs</screen>
     <indexterm><primary>warnings</primary></indexterm>
 
 
-    <para>GHCでは、いくつかのオプションを使って、生成する致命的でないエラーメッセージ(警告ともいう)の種類を選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-deprecations</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
+    <para>GHCでは、いくつかのオプションを使って、生成する致命的でないエラーメッセージ(警告ともいう)の種類を選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
     <variablelist>
 
       <varlistentry>
@@ -687,14 +687,44 @@ ghc -c Foo.hs</screen>
     <variablelist>
 
       <varlistentry>
-	<term><option>-fwarn-deprecations</option>:</term>
+	<term><option>-fwarn-warnings-deprecations</option>:</term>
 	<listitem>
-	  <indexterm><primary><option>-fwarn-deprecations</option></primary>
+	  <indexterm><primary><option>-fwarn-warnings-deprecations</option></primary>
 	  </indexterm>
+	  <indexterm><primary>warnings</primary></indexterm>
 	  <indexterm><primary>deprecations</primary></indexterm>
-          <para>非推奨の関数や型が使われたときに警告する。何かを非推奨と宣言するにはプラグマを使う。<xref linkend="deprecated-pragma"/>を見よ。</para>
+          <para>WARNINGまたはDEPRECATEDプラグマの付いたモジュール・関数・型が使われたときに警告を発する。このプラグマについて詳しくは<xref linkend="warning-deprecated-pragma"/>を見よ。</para>
 
           <para>このオプションはデフォルトで有効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-deprecated-flags</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-deprecated-flags</option></primary>
+	  </indexterm>
+	  <indexterm><primary>deprecated-flags</primary></indexterm>
+	  <para>非推奨のコマンド行フラグが使われたときに警告を発する。</para>
+
+          <para>このオプションはデフォルトで有効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-dodgy-foreign-imports</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-dodgy-foreign-imports</option></primary>
+	  </indexterm>
+	  <para>次の形式のforeign importに対して警告を発する。</para>
+<programlisting>
+foreign import "f" f :: FunPtr t
+</programlisting>
+          <para>なぜなら、これはおそらく次のようになっているべきだからである。</para>
+<programlisting>
+foreign import "&amp;f" f :: FunPtr t
+</programlisting>
+          <para>最初の形式は、引数を取らず、「t」型のC関数へのポインタを返す(純粋な)C関数として「f」を宣言する。一方、二番目の形式は「f」自体が「t」型のC関数であると宣言する。前者は通常ミスであり、クラッシュを引き起すためデバッグが難しい。そのためこの警告がある。</para>
 	</listitem>
       </varlistentry>
 
@@ -736,9 +766,9 @@ ghc -c Foo.hs</screen>
         <listitem>
           <indexterm><primary><option>-fwarn-implicit-prelude</option></primary></indexterm>
           <indexterm><primary>implicit prelude, warning</primary></indexterm>
-          <para>Preludeが暗黙にインポートされたときにコンパイラが警告するようにする。これは、Preludeモジュールを<literal>import ... Prelude ...</literal>で明示的にイポートしたり、暗黙のインポートが無効にされたりしていない限り発生する。(暗黙のインポートを無効にするには、<option>-fno-implicit-prelude</option>か<literal>LANGUAGE NoImplicitPrelude</literal>プラグマを使う)</para>
+          <para>Preludeが暗黙にインポートされたときにコンパイラが警告するようにする。これは、Preludeモジュールを<literal>import ... Prelude ...</literal>で明示的にイポートしたり、暗黙のインポートが無効にされたりしていない限り発生する。(暗黙のインポートを無効にするには、<option>-XNoImplicitPrelude</option>か<literal>LANGUAGE NoImplicitPrelude</literal>プラグマを使う)</para>
 
-          <para>暗黙にPreludeを参照する構文については警告が生成されない。<option>-fno-implicit-prelude</option>によって、その構文がPreludeを参照するかどうかが変わったとしても同じである。例えば、<literal>368</literal>が<literal>Prelude.fromInteger (368::Prelude.Integer)</literal>(ここで<literal>Prelude</literal>は、コンパイル中のモジュールが何をインポートしているかに関わらず、実際のPreludeモジュールを指す)を意味したとしても警告はされない。</para>
+          <para>暗黙にPreludeを参照する構文については警告が生成されない。<option>-XNoImplicitPrelude</option>によって、その構文がPreludeを参照するかどうかが変わったとしても同じである。例えば、<literal>368</literal>が<literal>Prelude.fromInteger (368::Prelude.Integer)</literal>(ここで<literal>Prelude</literal>は、コンパイル中のモジュールが何をインポートしているかに関わらず、実際のPreludeモジュールを指す)を意味したとしても警告はされない。</para>
 
           <para>この警告はデフォルトで無効である。</para>
         </listitem>
@@ -843,7 +873,7 @@ f foo = foo { x = 6 }
 	  <indexterm><primary>orphan rules, warning</primary></indexterm>
 	  
           <para>このオプションが有効なら、モジュールに「孤立した」インスタンス宣言や書き換え規則があるときに警告する。インスタンス宣言が孤立インスタンス宣言なのは、クラスおよびインスタンス化される型の両方と別のモジュールに置かれているときである。規則が孤立規則なのは、それが別のモジュールで宣言された関数についての規則であるときである。「孤立した」ものを含むモジュールは孤立モジュールと呼ばれる。</para>
-          <para>問題は、孤立モジュールについては、そのインスタンスや規則が意味を持つ場合に備えて、他に理由がなくても、GHCが積極的にインタフェースファイルを読まなければいけないということである。特に理由がないなら、孤立モジュールを避けること。(訳注: 孤立モジュールについて詳しくは<xref linkend="orphan-modules"/>を参照)</para>
+          <para>問題は、孤立モジュールについては、そのインスタンスや規則が意味を持つ場合に備えて、他に理由がなくても、GHCが積極的にインタフェースファイルを読まなければいけないということである。詳しくは<xref linkend="orphan-modules"/>を参照せよ。</para>
 	</listitem>
       </varlistentry>
 
@@ -1109,11 +1139,31 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-fno-state-hack</option>
-            <indexterm><primary><option>-fno-state-hack</option></primary></indexterm>
+            <option>-fspec-constr</option>
+            <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><literal>State#</literal>トークンを引数として持っているラムダは全て単一進入(訳注: single entry。クロージャが一回しかenterされない(呼ばれない)こと)であるとみなし、したがってその内部にいろんな物をインライン化しても良いとみなされる、という「stateハック」を無効にする。このハックはIOとSTモナドを使うコードの性能を向上させることがあるが、共有が阻害される危険も伴っている。</para>
+	    <para>呼び出しパターンの特殊化(call-pattern specialization)を有効にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fliberate-case</option>
+            <indexterm><primary><option>-fliberate-case</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>liberate-case変換を有効にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fstatic-argument-transformation</option>
+            <indexterm><primary><option>-fstatic-argument-transformation</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>static argument変換を有効にする</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1218,7 +1268,7 @@ f "2"    = 2
     <para>とはいうものの、この二つの用語は確かに関連している。複数のCPUを使うことで、複数の並行スレッドを並列に実行することができるようになる。GHCのSMP並列計算サポートはまさにこれを行う。しかし、並行性を利用しないプログラムにおいて、並列計算によってパフォーマンスを改善することも、また可能である。この節では、GHCを使って並列プログラムをコンパイル・実行する方法を解説し、<xref linkend="lang-parallel"/>では並列性に影響する言語機能を説明する。</para>
     
     <sect2 id="parallel-options">
-      <title>SMP並列計算を有効にするオプション</title>
+      <title>SMP並列計算に関するオプション</title>
 
       <para>複数のCPUを利用するには、プログラムが<option>-threaded</option>オプション付きでリンクされていなればならない。(<xref linkend="options-linker"/>を見よ)。その上で、複数のCPU上でプログラムを走らせるには、RTSの<option>-N</option>オプションを使う。</para>
       
@@ -1226,20 +1276,43 @@ f "2"    = 2
 	<varlistentry>
 	  <term><option>-N<replaceable>x</replaceable></option></term>
 	  <listitem>
-	    <para><indexterm><primary><option>-N<replaceable>x</replaceable></option></primary><secondary>RTS option</secondary></indexterm>プログラムの実行中、同時に<replaceable>x</replaceable>個のスレッドを使う。通常、<replaceable>x</replaceable>は機械のCPUコア数と一致するべきである。プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
+	    <para><indexterm><primary><option>-N<replaceable>x</replaceable></option></primary><secondary>RTS option</secondary></indexterm>プログラムの実行中、同時に<replaceable>x</replaceable>個のスレッドを使う。通常、<replaceable>x</replaceable>は機械のCPUコア数と一致するべきである<footnote><para>hyperthreadingコアの数を含めるべきかどうかは未解決の問題である。遠慮なく実験して結果を知らせてほしい。</para></footnote>。例えば、デュアルコアの機械ではおそらく<literal>+RTS -N2 -RTS</literal>を使うことになるだろう。</para>
 
-            <para>例えば、デュアルコアの機械ではおそらく<literal>+RTS -N2 -RTS</literal>を使うことになるだろう。</para>
-
-	    <para>hyperthreadingコアの数を含めるべきかどうかは未解決の問題である。遠慮なく実験して結果を知らせてほしい。</para>
+            <para><option>-N</option>を設定することには、<option>-g</option>(GCに使うOSスレッドの数)も同じ値に設定するという効果もある。</para>
+            
+            <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
+
+      <para>以下のオプションは、ランタイムがスレッドをCPUに割り振る方法に影響する。</para>
+
+      <variablelist>
+	<varlistentry>
+	  <term><option>-qm</option></term>
+          <indexterm><primary><option>-qm</option></primary><secondary>RTS
+          option</secondary></indexterm>
+	  <listitem>
+            <para>負荷の平衡のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。これが役に立つのは、おそらく<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールしているときだけだろう。</para>
+          </listitem>
+        </varlistentry>
+	<varlistentry>
+	  <term><option>-qw</option></term>
+          <indexterm><primary><option>-qw</option></primary><secondary>RTS
+          option</secondary></indexterm>
+	  <listitem>
+            <para>スレッドが目覚めたとき、それを現在のCPUに移住させる。通常、スレッドがブロックしていて目覚めた場合、最後に走っていたCPUに割り振られる。このオプションによって、スレッドがブロックを解いたCPUに即座に移住できるようになる。</para>
+ 
+            <para>この積極的な移住を可能にする根拠となるのは、これによって相互に連絡し合うスレッドが同じCPUに集められる傾向があることである。しかし、これが悪い戦略になるような病理的な例が存在する。プログラム中の連絡パターンによって、これは良案になるかもしれず、そうでないかもしれない。</para>
+          </listitem>
+        </varlistentry>
+       </variablelist>
     </sect2>
       
     <sect2>
       <title>SMP並列計算を使うにあたってのヒント</title>
 
-      <para>プログラムを実行するときに<literal>-sstderr</literal>というRTSオプションを加えると、時間統計情報を見ることができる。これを使って、使うCPUの数を増やしたことでプログラムが速くなったかどうかを確認できる。ユーザ(user)時間が消費(elapsed)時間よりも大きいなら、プログラムは単一のCPUよりも多くを使ったことになる。比較のために<literal>-N</literal>オプションなしでも走らせてみると良いだろう。</para>
+      <para>プログラムを実行するときに<literal>-s</literal>というRTSオプションを加えると、時間統計情報を見ることができる。これを使って、使うCPUの数を増やしたことでプログラムが速くなったかどうかを確認できる。ユーザ(user)時間が消費(elapsed)時間よりも大きいなら、プログラムは単一のCPUよりも多くを使ったことになる。比較のために<literal>-N</literal>オプションなしでも走らせてみると良いだろう。</para>
 
       <para>GHCの並列計算サポートは新しく、実験的である。プログラムは速くなるかもしれないし、遅くなるかもしれない。どちらにしても、我々に報告を頂けるなら興味深く聞くだろう。</para>
       
@@ -1283,7 +1356,7 @@ statements or clauses.
 
   <indexterm><primary>intermediate code generation</primary></indexterm>
 
-  <para>GHCは、コンパイルの副作用として、最適化済み中間コード(「コア」形式と呼ぶ)をファイルに出力することができる。コアファイル(接尾辞は<filename>.hcr</filename>)は、GHC以外のバックエンドツールで読んだり処理したりすることができる。コア形式は<ulink url="http://www.haskell.org/ghc/docs/papers/core.ps.gz"><citetitle>An External Representation for the GHC Core Language</citetitle></ulink>で形式的に解説されており、コアファイルを操作するツールのサンプル(Haskell製)はGHCのソース配布ディレクトリ<literal>/fptools/ghc/utils/ext-core</literal>から入手できる。<literal>.hcr</literal>ファイルの形式はデバッグのために生成されるコア出力(<xref linkend="options-debugging"/>)とは<emphasis>異なる</emphasis>(似てはいるが)ことに注意。</para>
+  <para>GHCは、コンパイルの副作用として、最適化済み中間コード(「コア」形式と呼ぶ)をファイルに出力することができる。GHC以外のバックエンドツールがコアファイルを読んで処理することができる。このファイルは接尾辞<filename>.hcr</filename>を持つ。コア形式は<ulink url="../ext-core/core.pdf"><citetitle>An External Representation for the GHC Core Language</citetitle></ulink>に記述されており、コアファイルを操作するツールのサンプル(Haskell製)はGHCのソース配布ディレクトリ<literal>utils/ext-core</literal>にある。<literal>.hcr</literal>ファイルの形式はデバッグのためにGHCが生成するコア出力(<xref linkend="options-debugging"/>)とは<emphasis>異なる</emphasis>ことに注意。(この二つの形式はやや似ているように見えるけれども)</para>
 
   <para>コア形式は注釈(note)を最初からサポートしている。注釈を加えるには、ソースコード中で<literal>CORE</literal>プラグマ(<xref linkend="pragmas"/>を見よ)を使えば良い。</para>
 
@@ -1301,7 +1374,8 @@ statements or clauses.
 
     </variablelist>
 
-<para>また、GHCは外部コアをソースとして読み込むこともできる。これには、単に<literal>.hcr</literal>ファイルを<literal>.hs</literal>や<literal>.lhs</literal>のHaskellソースの代わりにコマンド行から与えれば良い。現状の問題点として、このとき<literal>-fglasgow-exts</literal>フラグも与えなければならない。これは、通常のHaskell 98でも、外部コアに翻訳されると、ランク2の型などを使うようになるからである。</para>
+<para>現在(バージョン6.8.2以降)、GHCは外部コアファイルをソースとして読み込む能力を持たない。GHCにこの機能があって欲しいと思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームにその願いを伝え</ulink>てほしい。</para>
+
 </sect1>
 
 &debug;
