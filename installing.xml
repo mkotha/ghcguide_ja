@@ -55,11 +55,11 @@
 <title>インストール</title>
 
 <para>
-よろしい、では選んだ束を展開したとしよう。次はなんだ？よろしい、まず束を<literal>設定</literal><indexterm><primary>configure</primary></indexterm>(configure)する必要がある。これには、束のトップレベルディレクトリに移動し、<literal>./configure</literal>と打てば良い。これで<literal>Makefile-vars.in</literal>が<literal>Makefile-vars</literal>に変換される。
+よろしい、では選んだ束を展開したとしよう。次はなんだ？えーと、まず束を<literal>設定</literal><indexterm><primary>configure</primary></indexterm>(configure)する必要がある。これには、束のトップレベルディレクトリに移動し、<literal>./configure</literal>と打てば良い。これで<literal>Makefile-vars.in</literal>が<literal>Makefile-vars</literal>に変換される。
 </para>
 
 <para>
-<literal>configure</literal>スクリプトはいくつかのフラグを取る。最も広く使われるのは<literal>--prefix=<replaceable>/path/to/install/in</replaceable></literal>フラグで、デフォルトの場所(/usr/local)でなく<replaceable>/path/to/install/in</replaceable>にインストールされるように指示するものである。configureが受け付ける全てのフラグを見るには、<literal>configure --help</literal>を実行せよ。</para>
+<literal>configure</literal>スクリプトはいくつかのフラグを受け取る。最も広く使われるのは<literal>--prefix=<replaceable>/path/to/install/in</replaceable></literal>フラグで、デフォルトの場所(/usr/local)でなく<replaceable>/path/to/install/in</replaceable>にインストールされるように指示するものである。configureが受け付ける全てのフラグを見るには、<literal>configure --help</literal>を実行せよ。</para>
 
 <para>
 その後、次のことを行う必要がある。
@@ -246,8 +246,7 @@ GHCツリーを空白を含むパスに置いても問題ない。しかし、Cy
 <sect1 id="install-files"><title>インストールされたファイルの配置</title>
 
 <para>
-この節では、どのファイルがどこにインストールされるかを説明する。GHCをインストールするだけなら
-これを知っている必要はないが、実装を変えようというときは必須の情報である。
+この節では、どのファイルがどこにインストールされるかを説明する。GHCをインストールするだけならこれを知っている必要はないが、実装を変えようというときは必須の情報である。
 </para>
 <para>GHCは二つのディレクトリツリーにインストールされる。</para>
 <variablelist>
