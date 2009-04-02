@@ -188,6 +188,20 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
     </variablelist>
       
     </sect2>
+
+  <sect2 id="ffi-divergence">
+    <title>FFI仕様からの逸脱</title>
+    
+    <variablelist>
+      <varlistentry>
+        <term><literal>hs_exit()</literal>の後に<literal>hs_init()</literal>を呼ぶことが許されない</term>
+        <listitem>
+          <para>FFI仕様の要求するところによると、実装は、<literal>hs_exit()</literal>によって停止した後に再び初期化を行うのに対応していなければならないが、GHCは現在これを行えない。</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </sect2>
+    
   </sect1>
 
 
