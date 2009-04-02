@@ -618,26 +618,13 @@ M.o : X.hi-boot
 
         <para>コンパイル時に使うのと同じ<option>-package</option>オプションを<literal>ghc -M</literal>にも渡すのを忘れないように。こうすることで、依存関係生成器がパッケージ由来の被インポートモジュールの場所を把握できるようになる。ただし、パッケージモジュールは生成される依存関係には含まれない。(しかし下記の<option>&ndash;&ndash;include-pkg-deps</option>オプションを見よ)</para>
 
-        <para>GHCの依存関係生成の段階にいくつかのオプションを渡すことができるので、活用すると便利かもしれない。歴史的な理由から、GHCのコマンド行から依存関係生成器に渡されるオプションには一つ一つ<literal>-optdep</literal>を前置しなければならない。例えば、依存関係生成器に<literal>-f .depend</literal>を渡すには、次のようにする。
-
-<screen>
-ghc -M -optdep-f -optdep.depend ...
-</screen>
-
-        依存関係生成器に影響を与えるオプションは以下のものである。</para>
+        <para>GHCの依存関係生成の段階にいくつかのオプションを渡すことができるので、活用すると便利かもしれない。依存関係生成器に影響を与えるオプションは以下のものである。</para>
 
 	<variablelist>
 	  <varlistentry>
 	    <term><option>-ddump-mod-cycles</option></term>
 	    <listitem>
-	      <para>モジュールグラフにおけるサイクルの一覧を表示する。こういうサイクルを排除しようとしているときに便利である。このフラグには、<literal>-optdep</literal>を前置する必要がない。</para>
-	    </listitem>
-	  </varlistentry>
-
-	  <varlistentry>
-	    <term><option>-w</option></term>
-	    <listitem>
-              <para>インタフェースファイルの隠蔽(訳注: 現在のディレクトリにあるインタフェースファイルが探索パスにある同名のインタフェースファイルを隠すことだと思う)に関する警告を無効にする。</para>
+	      <para>モジュールグラフにおけるサイクルの一覧を表示する。こういうサイクルを排除しようとしているときに便利である。</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -649,29 +636,16 @@ ghc -M -optdep-f -optdep.depend ...
 	  </varlistentry>
 
 	  <varlistentry>
-	    <term><option>-f</option> <replaceable>file</replaceable></term>
+	    <term><option>-dep-makefile</option> <replaceable>file</replaceable></term>
 	    <listitem>
-              <para><filename>makefile</filename>や<filename>Makefile</filename>の代わりに<replaceable>file</replaceable>をmakefileとして使う。もし<replaceable>file</replaceable>が存在しないなら、<command>mkdependHS</command><!-- 訳注: これはもはや存在しない。作るのはおそらくGHC -->が作る。我々はしばしば、<option>-f .depend</option>として依存関係を<filename>.depend</filename>に置き、それを<filename>Makefile</filename>に<command>include</command>する、ということを行う。</para>
+              <para><filename>makefile</filename>や<filename>Makefile</filename>の代わりに<replaceable>file</replaceable>をmakefileとして使う。もし<replaceable>file</replaceable>が存在しないなら、<command>mkdependHS</command><!-- 訳注: これはもはや存在しない。作るのはおそらくGHC -->が作る。我々はしばしば、<option>-dep-makefile .depend</option>として依存関係を<filename>.depend</filename>に置き、それを<filename>Makefile</filename>に<command>include</command>する、ということを行う。</para>
 	    </listitem>
 	  </varlistentry>
 
-<!-- Retired with the move away from 'mkdependHS'.
 	  <varlistentry>
-	    <term><option>-o &lt;osuf&gt;</option></term>
+	    <term><option>-dep-suffix &lt;suf&gt;</option></term>
 	    <listitem>
-	      <para>Use <filename>.&lt;osuf&gt;</filename> as the
-              "target file" suffix ( default: <literal>o</literal>).
-              Multiple <option>-o</option> flags are permitted
-              (GHC2.05 onwards).  Thus "<option>-o hc -o o</option>"
-              will generate dependencies for <filename>.hc</filename>
-              and <filename>.o</filename> files.</para>
-	    </listitem>
-	  </varlistentry>
--->
-	  <varlistentry>
-	    <term><option>-s &lt;suf&gt;</option></term>
-	    <listitem>
-              <para>追加の依存関係として、接尾辞<filename>.&lt;suf&gt;&lowbar;&lt;osuf&gt;</filename>のファイルから接尾辞<filename>.&lt;suf&gt;&lowbar;hi</filename>のファイルまたは(<literal>&lcub;-&num; SOURCE &num;-&rcub;</literal>インポートなら)<filename>.hi-boot</filename>への依存性を宣言する。複数の<option>-s</option>フラグを指定しても良い。例えば、<option>-o hc -s a -s b</option><!-- 訳注: -oはもはや存在しない。代わりにghcのオプション-osufを使う -->とすると、<filename>.hc</filename>から<filename>hi</filename>へ、<filename>.a&lowbar;hc</filename>から<filename>.a&lowbar;hi</filename>へ、<filename>.b&lowbar;hc</filename>から<filename>.b&lowbar;hi</filename>への依存性が作られる。(これはNoFibの「way」を使うときに便利である)</para>
+              <para>追加の依存関係として、接尾辞<filename>.&lt;suf&gt;&lowbar;&lt;osuf&gt;</filename>のファイルから接尾辞<filename>.&lt;suf&gt;&lowbar;hi</filename>のファイルまたは(<literal>&lcub;-&num; SOURCE &num;-&rcub;</literal>インポートなら)<filename>.hi-boot</filename>への依存性を宣言する。複数の<option>-dep-suffix</option>フラグを指定しても良い。例えば、<option>-dep-suffix a -dep-suffix b</option>とすると、<filename>.hs</filename>から<filename>hi</filename>へ、<filename>.a&lowbar;hs</filename>から<filename>.a&lowbar;hi</filename>へ、<filename>.b&lowbar;hs</filename>から<filename>.b&lowbar;hi</filename>への依存性が作られる。(これはNoFibの「way」を使うときに便利である)</para>
 	    </listitem>
 	  </varlistentry>
 
@@ -681,29 +655,6 @@ ghc -M -optdep-f -optdep.depend ...
               <para><filename>&lt;file&gt;</filename>が「安定して」いるとみなす。つまり、このファイルへの依存性を含めない。</para>
 	    </listitem>
 	  </varlistentry>
-
-	  <varlistentry>
-	    <term><option>-x</option></term>
-	    <listitem>
-              <para><option>&ndash;&ndash;exclude-module</option>と同じ。</para>
-	    </listitem>
-	  </varlistentry>
-
-<!-- Not currently implemented:
-	  <varlistentry>
-	    <term><option>&ndash;&ndash;exclude-directory=&lt;dirs&gt;</option></term>
-	    <listitem>
-              <para>コロン区切りのディレクトリ<filename>&lt;dirs&gt;</filename>が安定したファイルを含んでいるとみなし、そこにあるモジュールへの依存性を生成しない。</para>
-	    </listitem>
-	  </varlistentry>
-
-	  <varlistentry>
-	    <term><option>&ndash;&ndash;include-module=&lt;file&gt;</option></term>
-	    <listitem>
-              <para><filename>&lt;file&gt;</filename>が「安定して」いないとみなす。つまり、このファイルへの依存性が(もしあれば)生成される。このオプションはふつう<option>&ndash;&ndash;exclude-directory</option>と同時に使われる。</para>
-	    </listitem>
-	  </varlistentry>
-+-->
 
 	  <varlistentry>
 	    <term><option>&ndash;&ndash;include-pkg-deps</option></term>
