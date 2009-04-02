@@ -192,15 +192,6 @@
       </varlistentry>
       <varlistentry>
         <term>
-          <option>-optdep</option>  <replaceable>option</replaceable>
-          <indexterm><primary><option>-optdep</option></primary></indexterm>
-        </term>
-        <listitem>
-          <para><replaceable>option</replaceable>を依存関係生成器に渡す。</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>
           <option>-optwindres</option>  <replaceable>option</replaceable>
           <indexterm><primary><option>-optwindres</option></primary></indexterm>
         </term>
