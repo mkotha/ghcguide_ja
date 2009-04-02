@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 
         <para>Haskellの関数を呼び出し終えた後、<literal>hs_exit()</literal>を呼んでRTSを終了させることができる。</para>
 
-        <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。</para></footnote>を呼ぶ必要がある。</para>
+        <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。<xref linkend="ffi-divergence" />を見よ。</para></footnote>を呼ぶ必要がある。</para>
 
 	<para>参考: 最終的なプログラムをリンクする際、通常最も簡単なのは、GHCを使ってリンクすることである。(絶対に必要な訳ではないが)。GHCを使うなら、フラグ<option>-no-hs-main</option><indexterm><primary><option>-no-hs-main</option></primary></indexterm>を使うことを忘れないように。さもないと、GHCは<literal>Main</literal>というHaskellモジュールをリンクしようとする。</para>
       </sect3>
