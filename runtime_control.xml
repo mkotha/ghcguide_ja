@@ -75,6 +75,21 @@
          <para>yes(デフォルト)なら、RTSはctrl-Cの類を捕捉するためのシグナルハンドラを設置する。このオプションは、HaskellコードをDLLとして使っていて、自分でシグナルハンドラを設定したいときに特に有用である。</para>
        </listitem>
      </varlistentry>
+
+     <varlistentry>
+       <term><option>-xm<replaceable>address</replaceable></option>
+       <indexterm><primary><option>-xm</option></primary><secondary>RTS
+       option</secondary></indexterm></term>
+       <listitem>
+         <para>
+           警告: このオプションはメモリ確保の問題を回避するためだけのものである。GHCiが「<literal>failed to mmap() memory below 2Gb</literal>」のようなメッセージを表示して失敗するのでない限り、使ってはいけない。あなたの機械でGHCiを動かすのにこのオプションを使う必要があるなら、バグとして報告してほしい。
+         </para>
+         
+         <para>
+           64ビットの機械では、RTSはアドレス空間の下方2Gbの中にメモリを確保する必要がある。種々のOSにおけるこれの対応は不完全であり、ときどき失敗する。このオプションは、アドレス空間の下方2Gbの中でどこのメモリを確保できるかについてRTSにヒントを与えるために存在する。例えば、<literal>+RTS -xm20000000 -RTS</literal>とすれば、RTSが0.5Gb markから確保を開始すべきというヒントになる。デフォルトは、可能なら下方2Gb中にメモリを確保するためのOS組み込みの手段(例えばLinuxなら<literal>MAP_32BIT</literal>付きの<literal>mmap</literal>)を使い、それがなければ<literal>-xm40000000</literal>である。
+         </para>
+       </listitem>
+     </varlistentry>
     </variablelist>
   </sect2>
 
@@ -262,6 +277,10 @@
           <option>-S</option><optional><replaceable>file</replaceable></optional>
           <indexterm><primary><option>-S</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
+	<term>
+          <option>--machine-readable</option>
+          <indexterm><primary><option>--machine-readable</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
 	<listitem>
 	  <para>これらのオプションはランタイムシステムの統計情報を生成する。プログラムを実行するのに使った時間、ガベッジコレクタで使った時間、確保されたメモリの量、ヒープの最大サイズ、といったものである。この三種類のオプションは、詳細さの度合いが異なる。<option>-t</option>は、GHCの<option>-Rghc-timing</option>オプションと同じ形式で一行だけの出力を生成する。<option>-s</option>はプログラムの最後にもっと詳細なまとめを生成し、<option>-S</option>はさらにガベッジコレクション一回一回について情報を生成する。</para>
 
@@ -301,6 +320,25 @@
         </para>
       </listitem>
     </itemizedlist>
+
+    <para><literal>-t --machine-readable</literal>とすれば、よりfuture-proofな、機械可読の形式でこれを得ることができる。
+    </para>
+
+<programlisting>
+ [("bytes allocated", "36169392")
+ ,("num_GCs", "69")
+ ,("average_bytes_used", "603392")
+ ,("max_bytes_used", "1065272")
+ ,("num_byte_usage_samples", "2")
+ ,("peak_megabytes_allocated", "3")
+ ,("init_cpu_seconds", "0.00")
+ ,("init_wall_seconds", "0.00")
+ ,("mutator_cpu_seconds", "0.02")
+ ,("mutator_wall_seconds", "0.02")
+ ,("GC_cpu_seconds", "0.07")
+ ,("GC_wall_seconds", "0.07")
+ ]
+</programlisting>
 
     <para><literal>-s</literal>フラグを使った場合、プログラムの終了時に次のようなものを目にすることになるだろう。(細部が厳密にどうなるかは使っているRTSの種類によって異なる。例えば、プロファイルのデータを見られるのはRTSがプロファイル用にコンパイルされている場合だけである)
     </para>
@@ -586,17 +624,110 @@ char *ghc_rts_opts = "-H128m -K1m";
     <para>RTSに、自分自身の情報をいくらか表示させることが可能である。これをするには<option>--info</option>フラグを使う。例えば次のように。</para>
 <screen>
 $ ./a.out +RTS --info
- [("GHC RTS", "Yes")
+ [("GHC RTS", "YES")
  ,("GHC version", "6.7")
  ,("RTS way", "rts_p")
  ,("Host platform", "x86_64-unknown-linux")
+ ,("Host architecture", "x86_64")
+ ,("Host OS", "linux")
+ ,("Host vendor", "unknown")
  ,("Build platform", "x86_64-unknown-linux")
+ ,("Build architecture", "x86_64")
+ ,("Build OS", "linux")
+ ,("Build vendor", "unknown")
  ,("Target platform", "x86_64-unknown-linux")
+ ,("Target architecture", "x86_64")
+ ,("Target OS", "linux")
+ ,("Target vendor", "unknown")
+ ,("Word size", "64")
  ,("Compiler unregisterised", "NO")
  ,("Tables next to code", "YES")
  ]
 </screen>
-    <para>この情報は、<literal>[(String, String)]</literal>型の値として読めるように整形されている。</para>
+    <para>この情報は、<literal>[(String, String)]</literal>型の値として読めるように整形されている。現在、以下のフィールドが存在する。</para>
+
+    <variablelist>
+
+      <varlistentry>
+        <term><literal>GHC RTS</literal></term>
+        <listitem>
+          <para>このプログラムはGHC RTSにリンクされているか？(常に"YES")</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>GHC version</literal></term>
+        <listitem>
+          <para>このプログラムをコンパイルするのに用いられたGHCのバージョン</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>RTS way</literal></term>
+        <listitem>
+          <para>ランタイムの種類(「way」)。特によくある値は、<literal>rts</literal>(バニラ)、<literal>rts_thr</literal>(スレッド化されたランタイム、つまり<literal>-threaded</literal>オプション付きでリンクされたもの)、<literal>rts_p</literal>(プロファイル用ランタイム、つまり<literal>-prof</literal>オプション付きでリンクされたもの)である。他の種類には、<literal>debug</literal>(<literal>-debug</literal>を使ってリンクされたもの)、<literal>dyn</literal>(RTSが動的にリンクされる、つまり実行ファイルに静的にリンクされているのでない共有ライブラリである)などがある。これらは組み合わせることができる。例えば、<literal>rts_thr_debug_p</literal>というものが可能である。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+            <literal>Target platform</literal>,
+            <literal>Target architecture</literal>,
+            <literal>Target OS</literal>,
+            <literal>Target vendor</literal>
+        </term>
+        <listitem>
+          <para>プログラムが走ることを意図されたプラットフォーム。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+            <literal>Build platform</literal>,
+            <literal>Build architecture</literal>,
+            <literal>Build OS</literal>,
+            <literal>Build vendor</literal>
+        </term>
+        <listitem>
+          <para>プログラムがビルドされたプラットフォーム。(つまり、GHC自身のターゲットプラットフォームである)。通常これはターゲットプラットフォームと同じである。(クロスコンパイルの際には異なることが考えられる)</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+            <literal>Host platform</literal>,
+            <literal>Host architecture</literal>
+            <literal>Host OS</literal>
+            <literal>Host vendor</literal>
+        </term>
+        <listitem>
+          <para>GHC自身がコンパイルされたプラットフォーム。これも、通常はビルドおよびターゲットのプラットフォームと同じである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>Word size</literal></term>
+        <listitem>
+          <para>ターゲットプラットフォームのワードの大きさに応じて、<literal>"32"</literal>または<literal>"64"</literal>。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>Compiler unregistered(訳注: unregisteredでなくunregisterisedが正しいものと思われる)</literal></term>
+        <listitem>
+          <para>このプログラムは「非レジスタ化」版のGHC(すなわち、通常未対応のプラットフォームであるために、プラットフォーム固有の最適化なしでコンパイルされたGHC)によってコンパイルされたか？実験的なGHCのビルドを使っているのでない限り、この値は通常noである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>Tables next to code</literal></term>
+        <listitem>
+          <para>info tableをコードに直接隣接させて配置するという最適化は有用であるが、全てのプラットフォームで対応されている訳ではない。このフィールドは、プログラムがこの最適化を使ってコンパイルされているかどうかを示すものである。(珍しいプラットフォームでなければ通常yesである)</para>
+        </listitem>
+      </varlistentry>
+
+    </variablelist>
+
   </sect2>
 </sect1>
 
