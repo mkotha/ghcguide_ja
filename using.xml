@@ -687,6 +687,19 @@ ghc -c Foo.hs</screen>
     <variablelist>
 
       <varlistentry>
+	<term><option>-fwarn-unrecognised-pragmas</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-unrecognised-pragmas</option></primary>
+	  </indexterm>
+	  <indexterm><primary>warnings</primary></indexterm>
+	  <indexterm><primary>pragmas</primary></indexterm>
+	  <para>GHCが認識できないプラグマが使われているときに警告を発する。GHCは、自身が使うプラグマの他に、他のツールが使うことが知られているプラグマも認識する。例えば<literal>OPTIONS_HUGS</literal>や<literal>DERIVE</literal>といったものである。</para>
+
+          <para>このオプションはデフォルトで有効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-fwarn-warnings-deprecations</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-warnings-deprecations</option></primary>
