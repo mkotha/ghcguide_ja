@@ -783,7 +783,7 @@ module Foo where
 スコープには二つの<literal>x</literal>があるが、<literal>ok1</literal>の定義中のパターンにおける<literal>x</literal>は、型<literal>S</literal>のフィールドを指す他にないということが明白である。関数<literal>ok2</literal>についても同様である。しかし、<literal>bad1</literal>におけるレコード更新と、<literal>bad2</literal>におけるレコード選択では、どちらの型が意図されているか明確でない。
 </para>
 <para>
-Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-fdisambiguate-record-fields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名が散らばるのを軽減できる。
+Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-XDisambiguateRecordFields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名が散らばるのを軽減できる。
 </para>
 </sect2>
 
@@ -4099,7 +4099,7 @@ main = do { print $ eval [$expr|1 + 2|]
 module Expr where
 
 import qualified Language.Haskell.TH as TH
-import Language.Haskell.TH.Quasi
+import Language.Haskell.TH.Quote
 
 data Expr  =  IntExpr Integer
            |  AntiIntExpr String
@@ -4533,7 +4533,14 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 <title>びっくりパターン
 <indexterm><primary>Bang patterns</primary></indexterm>
 </title>
-<para>GHCは<emphasis>びっくりパターン</emphasis>と呼ばれるパターン照合の拡張をサポートしている。びっくりパターンはHaskell Primeへの採用が検討されている。<ulink url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell primeの特徴まとめ</ulink>には、以下にあるのよりも多くの議論と例が載っている。
+<para>GHCは<emphasis>びっくりパターン</emphasis>と呼ばれるパターン照合の拡張をサポートしている。これは<literal>!<replaceable>pat</replaceable></literal>と書く。びっくりパターンはHaskell Primeへの採用が検討されている。<ulink url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell primeの特徴まとめ</ulink>には、以下にあるのよりも多くの議論と例が載っている。
+</para>
+<para>
+鍵となる変更は、<ulink url="http://haskell.org/onlinereport/exps.html#sect3.17.2">Haskell98レポート中のパターン照合の意味論</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.2">和訳</ulink>)に規則を一つ追加するというものである。第十項目として次を付け加える。「パターン<literal>!pat</literal>の値<literal>v</literal>への照合は、次のように振る舞う」
+<itemizedlist>
+<listitem><para>もし<replaceable>v</replaceable>がボトムなら、照合は発散する</para></listitem>
+<listitem><para>そうでなければ、<replaceable>pat</replaceable>が<replaceable>v</replaceable>へと照合される</para></listitem>
+</itemizedlist>
 </para>
 <para>
 びっくりパターンはフラグ<option>-XBangPatterns</option>で有効になる。
@@ -4560,7 +4567,27 @@ f3 !(x,y) = [x,y]
 f4 (x,y)  = [x,y]
 </programlisting>
 ここでは、<literal>f3</literal>と<literal>f4</literal>は等しい。もともと評価を強制するパターンの前にびっくりマークを置いても何も変わらない。
-</para><para>
+</para>
+<para>
+この、「びっくりマークは変数かワイルドカードの前に置かれたときのみ違いがある」という一般的な法則には、(見掛け上の)例外が一つある。<literal>let</literal>または<literal>where</literal>束縛の最上位におけるびっくりマークは、パターンに関係なく、その束縛を正格にする。例を示す。
+<programlisting>
+let ![x,y] = e in b
+</programlisting>
+これは正格な束縛である。操作的に言うと、まず<literal>e</literal>が評価され、パターン<literal>[x,y]</literal>に対して照合され、そして<literal>b</literal>が評価される。(「見掛け上の」例外と言ったのは、束縛の最上位にあるびっくりマークは<emphasis>パターン</emphasis>の一部ではないと考えるのが正しいからである。そうではなく、これは<emphasis>束縛</emphasis>の構文の一部である。)
+パターン束縛中に入れ子になったびっくりパターンは、他のあらゆる形式のパターンと同様に振る舞う。例を挙げる。
+<programlisting>
+let (!x,[y]) = e in b
+</programlisting>
+これは以下と同等である。
+<programlisting>
+let { t = case e of (x,[y]) -> x `seq` (x,y)
+      x = fst t
+      y = snd t }
+in b
+</programlisting>
+この束縛は遅延するが、<literal>x</literal>か<literal>y</literal>のいずれかが<literal>b</literal>によって評価されると、パターン全体が照合され、それに伴って<literal>x</literal>の評価が強制される。
+</para>
+<para>
 もちろん、びっくりパターンは<literal>case</literal>式でも使える。
 <programlisting>
 g5 x = let y = f x in body
@@ -4568,12 +4595,6 @@ g6 x = case f x of { y -&gt; body }
 g7 x = case f x of { !y -&gt; body }
 </programlisting>
 関数<literal>g5</literal>と<literal>g6</literal>は全く同じである。一方、<literal>g7</literal>では<literal>(f x)</literal>が評価され、その結果が<literal>y</literal>に束縛された後、<literal>body</literal>が評価される。
-</para><para>
-びっくりパターンは<literal>let</literal>や<literal>where</literal>での定義でも使える。例。
-<programlisting>
-let ![x,y] = e in b
-</programlisting>
-これは正格パターンである。操作的に言うと、まず<literal>e</literal>が評価され、これがパターン<literal>[x,y]</literal>に対して照合され、その後で<literal>b</literal>が評価される。ここでの「<literal>!</literal>」はパターンの一部とみなされるべきではない。関数引数では<literal>![x,y]</literal>は<literal>[x,y]</literal>と同じ意味なのであるから。そうではなく、この「<literal>!</literal>」は<literal>let</literal>束縛の構文の一部である。
 </para>
 </sect2>
 
@@ -4702,7 +4723,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
     <para>GHCはいくつかのプラグマ(ソースコード中に置かれるコンパイラへの指示)に対応している。プラグマは通常プログラムの意味には影響を与えないが、生成されるコードの効率性には影響し得る。</para>
 
-    <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。必要なら、この後に続けて、その種類のプラグマに特有の情報を書く。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。認識できない<replaceable>word</replaceable>を持ったプラグマは(無言で)無視される。プラグマ中ではレイアウト規則が適用されるので、閉じ括弧<literal>#-}</literal>は開き括弧<literal>{-#</literal>よりも右のカラムで始まっていなければならない。</para>
+    <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。必要なら、この後に続けて、その種類のプラグマに特有の情報を書く。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。認識できない<replaceable>word</replaceable>を持ったプラグマは無視される。プラグマ中ではレイアウト規則が適用されるので、閉じ括弧<literal>#-}</literal>は開き括弧<literal>{-#</literal>よりも右のカラムで始まっていなければならない。</para>
 
     <para>ある種のプラグマは<emphasis>ファイルヘッダプラグマ</emphasis>である。ファイルヘッダプラグマは、ファイル中で<literal>module</literal>キーワードよりも前になければならない。ファイルヘッダプラグマはいくつあっても良いし、コメントの前にあっても後にあっても良い。</para>
 
@@ -5624,7 +5645,7 @@ g x = show x
 
 <sect1 id="special-ids">
 <title>特殊な組込み関数</title>
-<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="../libraries/base/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
+<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="../libraries/ghc-prim/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
 </sect1>
 
 
