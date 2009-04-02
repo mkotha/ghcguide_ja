@@ -644,10 +644,10 @@
 	      <entry><option>-XNoArrows</option></entry>
 	    </row>
  	    <row>
-	      <entry><option>-fdisambiguate-record-fields</option></entry>
+	      <entry><option>-XDisambiguateRecordFields</option></entry>
 	      <entry><link linkend="disambiguate-fields">レコードフィールドの曖昧性除去</link>を有効にする</entry>
  	      <entry>動</entry>
-	      <entry><option>-fno-disambiguate-record-fields</option></entry>
+	      <entry><option>-XNoDisambiguateRecordFields</option></entry>
  	    </row>
 	    <row>
 	      <entry><option>-XForeignFunctionInterface</option></entry>
@@ -1000,6 +1000,13 @@
 	    <entry>動</entry>
 	    <entry>-Werror</entry>
 	  </row>
+	  <row>
+	    <entry><option>-fwarn-unrecognised-pragmas</option></entry>
+	    <entry>GHCが認識できないプラグマが使われているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unrecognised-pragmas</option></entry>
+	  </row>
+
 	  <row>
 	    <entry><option>-fwarn-warnings-deprecations</option></entry>
 	    <entry>WARNINGおよびDEPRECATEDプラグマの付いた関数・型が使われているときに警告する</entry>
@@ -1900,12 +1907,6 @@
 	    <row>
 	      <entry><option>-optdll</option> <replaceable>option</replaceable></entry>
 	      <entry><replaceable>option</replaceable>をDLL生成器に渡す</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-optdep</option> <replaceable>option</replaceable></entry>
-	      <entry><replaceable>option</replaceable>を依存関係生成器に渡す</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
