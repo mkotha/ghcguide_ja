@@ -16,6 +16,14 @@
 
   <para>GHCにはいくつかのライブラリが付属している。これらのライブラリの説明は別の文書にある。</para>
 
+  <sect1 id="getting">
+    <title>GHCを入手する</title>
+
+    <para><ulink url="http://www.haskell.org/ghc/">GHC home page</ulink>に行って、「download」のリンクを辿れば、あなたのプラットフォーム用のGHCをダウンロードできる。</para>
+
+    <para>別の選択肢として、自分でGHCをビルドしたいなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">GHC Building Guide</ulink>に行って、ソースのどうやってソースを入手してあなたのシステム上でビルドするかを知ればよい。GHCはそれ自体Haskellで書かれているので、ビルドするためにもGHCをインストールする必要があることに注意。</para>
+  </sect1>
+
   <sect1 id="mailing-lists-GHC">
     <title>メタ情報: ウェブサイト、メーリングリストなど</title>
 
@@ -26,24 +34,16 @@
 
     <itemizedlist>
       <listitem>
-	<para><ulink url="http://www.haskell.org/" >Haskell home
-	page</ulink></para>
-      </listitem>
-
-      <listitem>
 	<para><ulink url="http://www.haskell.org/ghc/">GHC home
 	page</ulink></para>
       </listitem>
 
       <listitem>
-	<para><ulink
-	url="http://www.cs.nott.ac.uk/~gmh/faq.html">comp.lang.functional
-	FAQ</ulink></para>
+	<para><ulink url="http://hackage.haskell.org/trac/ghc/">GHC Developers Home</ulink> (開発者向け情報、wiki、バグトラッキングシステム)</para>
       </listitem>
-
     </itemizedlist>
 
-    <para>我々は、グラスゴーのHaskell実装に関する以下のメーリングリストを運営している。適切と思うものが有れば、是非参加して頂きたい。</para>
+    <para>我々は、GHCに関する以下のメーリングリストを運営している。適切と思うものが有れば、是非参加して頂きたい。</para>
 
     <variablelist>
       <varlistentry>
@@ -85,6 +85,45 @@
 	</listitem>
       </varlistentry>
 
+      <varlistentry>
+	<term>glasgow-haskell-bugs:</term>
+	<listitem>
+	  <para>これはGHCのバグを報告したり議論したりするためのリストである。ただし、ここに投稿する前に<xref linkend="bug-reporting" />を見てほしい。</para>
+
+	  <variablelist>
+	    <varlistentry>
+	      <term>リストのメールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-bugs@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>加入:</term> 
+	      <listitem>
+		<para><ulink
+	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs</literal></ulink>.</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>管理メールアドレス:</term>
+	      <listitem>
+		<para><email>glasgow-haskell-bugs-admin@haskell.org</email></para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>リストのアーカイブ:</term>
+	      <listitem>
+		<para><ulink
+                         url="http://www.haskell.org/pipermail/glasgow-haskell-bugs/"><literal>http://www.haskell.org/pipermail/glasgow-haskell-bugs/</literal></ulink></para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</listitem>
+      </varlistentry>
+      
       <varlistentry>
 	<term>cvs-ghc:</term>
 	<listitem>
