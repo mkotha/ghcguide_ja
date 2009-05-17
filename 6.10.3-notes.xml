@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-6-10-3">
+  <title>Release notes for version 6.10.3</title>
+
+  <para>
+    6.10.3 is a bugfix release over 6.10.2. Very few changes have been
+    make. They are listed below.
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+        Control-C now works again in GHCi. In 6.10.2 it was ignored
+        on some platforms due to the changes in signal handling.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        GHCi uses Haskeline, rather than editline, for line editing.
+        This fixes a crash when pressing control-C on some platforms,
+        removes a C library dependency, and provides a better user
+        interface.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        It is now possible to build PDF and PS versions of the users
+        guide, using dblatex.
+      </para>
+    </listitem>
+  </itemizedlist>
+</sect1>
+
