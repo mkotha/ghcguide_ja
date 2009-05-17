@@ -21,7 +21,7 @@
 
     <para><ulink url="http://www.haskell.org/ghc/">GHC home page</ulink>に行って、「download」のリンクを辿れば、あなたのプラットフォーム用のGHCをダウンロードできる。</para>
 
-    <para>別の選択肢として、自分でGHCをビルドしたいなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">GHC Building Guide</ulink>に行って、ソースのどうやってソースを入手してあなたのシステム上でビルドするかを知ればよい。GHCはそれ自体Haskellで書かれているので、ビルドするためにもGHCをインストールする必要があることに注意。</para>
+    <para>別の選択肢として、自分でGHCをビルドしたいなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">GHC Building Guide</ulink>に行って、どうやってソースを入手してあなたのシステム上でビルドするかを知ればよい。GHCはそれ自体Haskellで書かれているので、ビルドするにしてもGHCをインストールする必要があることに注意。</para>
   </sect1>
 
   <sect1 id="mailing-lists-GHC">
