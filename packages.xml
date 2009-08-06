@@ -7,9 +7,9 @@
   
   <para>パッケージとは、Haskellモジュールから成るライブラリで、コンパイラが把握している。GHCにはいくつかのパッケージが付属している。同梱の<ulink url="../libraries/index.html">ライブラリ説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">web上の最新版</ulink>)を見よ。また、<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>から別のライブラリを入手してインストールすることができる。</para>
 
-  <para>パッケージを使うのはこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
+  <para>パッケージを使う手順はこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
-  <para>自分のパッケージをビルドするのもとても単純である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
+  <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
 
   <sect2 id="using-packages">
   <title>パッケージを使う
@@ -86,7 +86,7 @@ exposed-modules: Network.BSD,
 	<listitem>
           <para>このオプションは<option>-package</option>の逆を行う。すなわち、指定されたパッケージを<firstterm>隠された</firstterm>状態にする。この状態では、そのパッケージのモジュールはHaskellの<literal>import</literal>指令でインポートすることができない。</para>
           
-          <para>このオプションが指定されていても、このパッケージは最終的なプログラムにリンクされるかもしれない(別の露出パッケージが直接・間接にこのパッケージに依存しているかもしれないので)ことに注意せよ。</para>
+          <para>このオプションが指定されていても、このパッケージは最終的にプログラムにリンクされるかもしれない(別の露出パッケージが直接・間接にこのパッケージに依存しているかもしれないので)ことに注意せよ。</para>
 	</listitem>
       </varlistentry>
 
@@ -117,7 +117,7 @@ exposed-modules: Network.BSD,
   <sect2 id="package-main">
     <title>mainパッケージ</title>
 
-  <para>完全なHaskellプログラムは全て、<literal>main</literal>パッケージの<literal>Main</literal>モジュールの<literal>main</literal>を定義せねばならない。(<option>-package-name</option>フラグを省略すると<literal>main</literal>パッケージ用のコードがコンパイルされる)。これを怠ると、やや不明瞭なリンク時のエラーメッセージが出る。
+  <para>完全なHaskellプログラムは全て、<literal>main</literal>パッケージの<literal>Main</literal>モジュールの<literal>main</literal>を定義せねばならない。(<option>-package-name</option>フラグを省略すると<literal>main</literal>パッケージ用のコードがコンパイルされる)。これを怠ると、やや不明瞭なリンク時エラーのメッセージが出る。
 <programlisting>
 /usr/bin/ld: Undefined symbols:
 _ZCMain_main_closure
@@ -140,7 +140,7 @@ ___stginit_ZCMain
   <sect2 id="package-databases">
     <title>パッケージデータベース</title>
       
-    <para>パッケージデータベースは一つのファイルであり、通常<literal>package.conf</literal>と呼ばれ、インストールされているパッケージの説明が書かれている。GHCが知っているパッケージデータベースは、通常、以下の二つである。</para>
+    <para>パッケージデータベースは一つのファイルであり、通常<literal>package.conf</literal>と呼ばれ、インストールされているパッケージについての記述を含む。GHCが知っているパッケージデータベースは、通常、以下の二つである。</para>
 
     <itemizedlist>
       <listitem>
@@ -225,7 +225,7 @@ $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
 	
       </listitem>
       <listitem>
-	<para>パッケージを共有オブジェクトとしてビルドする場合、GHCはリンカのラッパとして働き、基礎となるリンカを隠す。これによって、GHCが対応している全ての共有オブジェクト形式(DLL、ELF DSO、Mac OSのdylib)に対して共通のインタフェースが得られる。共有オブジェクトは特定の方法で命名されねばならないが、これは次の二つの理由による。(1)GHCのコンパイラバージョンが名前に含まれていなければならない。これは、ライブラリを二つの異なるバージョンのGHCでコンパイルすると、呼び出し規約の点でまず間違いなく非互換になるので、これらが衝突しないようにするためである。(2)この名前は、静的ライブラリの名前とは異なっていなければならない。さもなくば、精密にリンカを制御することができず、<option>-static</option>/<option>-dynamic</option>フラグが動作するようにできなくなるだろう。<xref linkend="options-linker"/>を見よ。</para>
+	<para>パッケージを共有オブジェクトとしてビルドする場合、GHCはリンカのラッパとして働き、内部的に使うリンカを隠す。これによって、GHCが対応している全ての共有オブジェクト形式(DLL、ELF DSO、Mac OSのdylib)に対して共通のインタフェースが得られる。共有オブジェクトは特定の方法で命名されねばならないが、これは次の二つの理由による。(1)GHCのコンパイラバージョンが名前に含まれていなければならない。これは、ライブラリを二つの異なるバージョンのGHCでコンパイルすると、呼び出し規約の点でまず間違いなく非互換になるので、これらが衝突しないようにするためである。(2)この名前は、静的ライブラリの名前とは異なっていなければならない。さもなくば、精密にリンカを制御することができず、<option>-static</option>/<option>-dynamic</option>フラグが動作するようにできなくなるだろう。<xref linkend="options-linker"/>を見よ。</para>
 
 <screen>ghc -shared libHSfoo-1.0-ghc<replaceable>GHCVersion</replaceable>.so A.o B.o C.o</screen>
         <para>共有オブジェクトの名前の中にGHCのバージョン番号を使うことで、異なるバージョンのGHCでコンパイルした異なるバージョンのライブラリをシステムの標準の場所(たとえば*nixの/usr/lib以下)にインストールすることが可能になる。GHCのバージョン番号を得るには、<literal>ghc --numeric-version</literal>を起動して、その出力を<replaceable>GHCVersion</replaceable>として使えばよい。共有オブジェクトをリンクするためにオブジェクトファイルを準備する方法について、<xref linkend="options-codegen"/>も参照せよ。</para>
