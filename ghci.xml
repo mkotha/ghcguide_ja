@@ -1482,6 +1482,16 @@ bar
 
       <varlistentry>
 	<term>
+          <literal>:run</literal>
+          <indexterm><primary><literal>:run</literal></primary></indexterm>
+        </term>
+	<listitem>
+	  <para><literal>:main</literal>を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:set</literal> <optional><replaceable>option</replaceable>...</optional>
           <indexterm><primary><literal>:set</literal></primary></indexterm>
         </term>
@@ -1524,7 +1534,7 @@ bar
            <literal>:set</literal> <literal>prompt</literal> <replaceable>prompt</replaceable>
         </term>
 	<listitem>
-          <para>GHCiのプロンプトとして使われる文字列を設定する。<replaceable>prompt</replaceable>の中では、<literal>%s</literal>という並びは現在スコープにあるモジュールの名前に置き換えられ、<literal>%%</literal>は<literal>%</literal>に置き換えられる。</para>
+          <para>GHCiのプロンプトとして使われる文字列を設定する。<replaceable>prompt</replaceable>の中では、<literal>%s</literal>という並びは現在スコープにあるモジュールの名前に置き換えられ、<literal>%%</literal>は<literal>%</literal>に置き換えられる。<replaceable>prompt</replaceable>が&quot;で始まる場合、HaskellのStringとしてパースされる。そうでない場合はそのまま文字列として扱われる。</para>
         </listitem>
       </varlistentry>
 
