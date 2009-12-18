@@ -388,7 +388,7 @@ Private Declare Function adder Lib "adder.dll" Alias "adder@8"
 <sect2>
 <title>DllMain()に注意！</title>
 
-<para>関数<literal>DllMain()</literal>の本体は極めて危険な場所である。これは、プロセスの終了時、DLLがアンロードされる順番が規定されていないからである。つまり、あなたのDLLが脱初期化するときに呼ぶ関数の含まれているDLLがアンロードされた後に、あなたのDLLの<literal>DllMain()</literal>が呼ばれるかもしれないのである。言い換えると、終了処理のコードを<literal>DllMain()</literal>に置くことはできない。但し、終了処理のコードが、利用できることが保証されているある種の関数(詳しくはPlatform SDKを見よ)しか呼ばないなら別である。</para>
+<para>関数<literal>DllMain()</literal>の本体は極めて危険な場所である。これは、プロセスの終了時、DLLがアンロードされる順番が規定されていないことによる。つまり、あなたのDLLの<literal>DllMain()</literal>が呼ばれた時点で既に、あなたのDLLが脱初期化に際して呼ぶ関数の含まれているDLLがアンロードされた後かもしれないのである。言い換えると、終了処理のコードを<literal>DllMain()</literal>に置くことはできない。但し、終了処理のコードが、利用できることが保証されているある種の関数(詳しくはPlatform SDKを見よ)しか呼ばないなら別である。</para>
 
 
 <para>解決策は、常にDLLから関数<literal>Begin()</literal>と<literal>End()</literal>をエクスポートし、このDLLを使うアプリケーションからそれらを呼んで、End()関数にある終了処理コードが必要とする全てのDLLが、呼ばれた時点で利用可能状態であることを保証することである。</para>

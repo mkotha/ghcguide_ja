@@ -1875,7 +1875,7 @@ GHCはこれを拡張し、新たに二つのクラスが自動的に導出で�
 
 <sect3> <title>deriving節の一般化</title>
 <para>
-このようなことをしなくても、GHCでは、<option>-XGeneralizedNewtypeDeriving</option>を使ってこの種のインスタンスは導出できるようになった。従って、次のように書くことができる。
+このようなことをしなくても、GHCでは、<option>-XGeneralizedNewtypeDeriving</option>を使ってこの種のインスタンスを導出できるようになった。従って、次のように書くことができる。
 <programlisting>
   newtype Dollars = Dollars Int deriving (Eq,Show,Num)
 </programlisting>
@@ -1992,7 +1992,7 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 
 我々は、多引数型クラスには通常ひとつの「主要な」引数があり、それについてのインスタンス導出が最も重視される、という仮説を立てている。
 </para>
-<para>最後に、これら全ては<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>の各クラスには適用されない。これらには、組込みの導出規則(Haskellレポートの4.3.3節)が適用される。(<literal>Eq</literal>、<literal>Ord</literal>、<literal>Ix</literal>、<literal>Bounded</literal>の各標準クラスについては、どちらの方法を使うかは重要でない)
+<para>最後に、これら全ては<literal>Read</literal>、<literal>Show</literal>、<literal>Typeable</literal>、<literal>Data</literal>の各クラスには適用されない。これらには、組込みの導出規則(Haskellレポートの4.3.3節)が適用される。(<literal>Eq</literal>、<literal>Ord</literal>、<literal>Ix</literal>、<literal>Bounded</literal>の各標準クラスについては、どちらの方法を使っても関係ない)
 </para>
 </sect3>
 
@@ -5319,7 +5319,7 @@ g y = y
 <title>リストの融合変換</title>
 
 <para>
-RULES機構は、良く使われるリスト関数についての融合変換(伐採)を実装するのに使われている。「優良消費者」が「優良生産者」の構築した中間リストを消費する場合、このリストは完全に排除されるはずである。
+RULES機構は、良く使われるリスト関数についての融合変換(伐採)を実装するのに使われている。「優良生産者」の構築した中間リストを「優良消費者」が消費する場合、このリストは完全に排除されるはずである。
 </para>
 
 <para>
