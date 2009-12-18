@@ -594,7 +594,7 @@
     <sect2>
       <title>言語オプション</title>
 
-      <para><xref linkend="options-language"/></para>
+      <para>言語オプションを有効にするには、<option>-Xなんたら</option>というコマンド行オプションを使うか、ファイル自体に<literal>{-# LANGUAGE なんたら #-}</literal>というプラグマを置く。<xref linkend="options-language"/>を見よ。</para>
 
       <informaltable>
 	<tgroup cols="4" align="left" colsep="1" rowsep="1">
@@ -686,6 +686,12 @@
 	      <entry><option>-XMonomorphismRestriction</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XNoNPlusKPatterns</option></entry>
+	      <entry><literal>n+k</literal>パターンへの対応を無効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNPlusKPatterns</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XNoMonoPatBinds</option></entry>
 	      <entry><link linkend="monomorphism">パターン束縛を多相的に</link>する。</entry>
 	      <entry>動</entry>
@@ -728,6 +734,13 @@
 	      <entry><option>-XNoScopedTypeVariables</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XMonoLocalBinds</option></entry>
+	      <entry><link linkend="mono-local-binds">局所的な束縛を一般化しない</link>を有効にする。
+	      </entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoMonoLocalBinds</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XTemplateHaskell</option></entry>
 	      <entry><link linkend="template-haskell">Template Haskell</link>を有効にする。もはや<option>-fglasgow-exts</option>によって有効にはならない</entry>
 	      <entry>動</entry>
@@ -765,7 +778,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XUnicodeSyntax</option></entry>
-	      <entry>Unicode構文を有効にする。</entry>
+	      <entry><link linkend="unicode-syntax">Unicode構文</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoUnicodeSyntax</option></entry>
 	    </row>
@@ -780,6 +793,13 @@
 	      <entry><link linkend="new-qualified-operators">被修飾演算子の新しい構文</link>を有効にする。 </entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoNewQualifiedOperators</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XExplicitForALl</option></entry>
+	      <entry><link linkend="explicit-foralls">明示的な全称量化</link>を有効にする。以下の各オプションによっても有効になる。<option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRank2Types</option>、<option>-XRankNTypes</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>。
+              </entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoExplicitForAll</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XPolymorphicComponents</option></entry>
@@ -831,7 +851,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XTransformListComp</option></entry>
-	      <entry><link linkend="generalised-list-comprehensions">変換リスト内包表記</link>を有効にする。</entry>
+	      <entry><link linkend="generalised-list-comprehensions">一般化リスト内包表記</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoTransformListComp</option></entry>
 	    </row>
@@ -909,7 +929,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XTypeSynonymInstances</option></entry>
-	      <entry><link linkend="type-synonyms">型シノニム</link>を有効にする。</entry>
+	      <entry><link linkend="flexible-instance-head">インスタンス頭部中の型シノニム</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoTypeSynonymInstances</option></entry>
 	    </row>
@@ -1144,6 +1164,20 @@
 	    <entry>パターン中に未使用の変数があれば警告する</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-unused-matches</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-unused-do-bind</option></entry>
+	    <entry><literal>()</literal>以外の型の値を捨てているように見えるdo bindingがあれば警告する。</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unused-do-bind</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-wrong-do-bind</option></entry>
+	    <entry>束縛するべきだったモナドな値を捨てているように見えるdo bindingがあれば警告する。</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-wrong-do-bind</option></entry>
 	  </row>
 
 	  </tbody>
@@ -1402,6 +1436,13 @@
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
+
+	    <row>
+	      <entry><option>-feager-blackholing</option></entry>
+	      <entry><link linkend="parallel-compile-options">eager blackholing</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1426,19 +1467,19 @@
 	    <row>
 	      <entry><option>-auto</option></entry>
 	      <entry>全てのエクスポートされている関数に自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry><option>-no-auto</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-auto-all</option></entry>
 	      <entry>全ての最上位の関数に自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry><option>-no-auto-all</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-caf-all</option></entry>
 	      <entry>全てのCAFに自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry><option>-no-caf-all</option></entry>
 	    </row>
 	    <row>
@@ -1449,7 +1490,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-ticky</option></entry>
-	      <entry>ticky-tickyプロファイルを有効にする</entry>
+	      <entry><link linkend="ticky-ticky">ticky-tickyプロファイルを有効にする</link></entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1564,32 +1605,6 @@
     </sect2>
 
     <sect2>
-      <title>Cコンパイルオプション</title>
-
-      <para><xref linkend="options-C-compiler"/></para>
-      <informaltable>
-	<tgroup cols="4" align="left" colsep="1" rowsep="1">
-	  <thead>
-	    <row>
-	      <entry>フラグ</entry>
-	      <entry>解説</entry>
-	      <entry>動静</entry>
-	      <entry>逆</entry>
-	    </row>
-	  </thead>
-	  <tbody>
-	    <row>
-	      <entry><option>-#include</option> <replaceable>file</replaceable></entry>
-              <entry><filename>.hc</filename>ファイルをコンパイルするときに<replaceable>file</replaceable>をインクルードする</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	  </tbody>
-	</tgroup>
-      </informaltable>
-    </sect2>
-
-    <sect2>
       <title>コード生成オプション</title>
 
       <para><xref linkend="options-codegen"/></para>
@@ -1657,6 +1672,12 @@
 	  </thead>
 	  <tbody>
 	    <row>
+  	      <entry><option>-shared</option></entry>
+	      <entry>(実行ファイルでなく)共有ライブラリを生成する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-fPIC</option></entry>
 	      <entry>(可能なら)位置独立コードを生成する</entry>
 	      <entry>静</entry>
@@ -1665,6 +1686,12 @@
 	    <row>
 	      <entry><option>-dynamic</option></entry>
 	      <entry>(可能なら)動的なHaskellライブラリを使う</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dynload</option></entry>
+	      <entry>実行時に共有ライブラリを見つけるための方法として、いくつかから一つ選ぶ。</entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1741,6 +1768,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-eventlog</option></entry>
+	      <entry>ランタイムのevent tracingを有効にする</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-fno-gen-manifest</option></entry>
 	      <entry>マニフェストファイルを生成しない(Windowsのみ)</entry>
 	      <entry>動</entry>
@@ -1749,6 +1782,12 @@
 	    <row>
 	      <entry><option>-fno-embed-manifest</option></entry>
 	      <entry>マニフェストファイルを実行ファイルに埋め込まない(Windowsのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-shared-implib</option></entry>
+	      <entry>DLL用のインポートライブラリを生成しない(Windowsのみ)</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1968,7 +2007,7 @@
 	    <row>
 	      <entry><option>-fext-core</option></entry>
 	      <entry>外部コアファイル<filename>.hcr</filename>を生成する</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
