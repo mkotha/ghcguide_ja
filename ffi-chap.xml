@@ -39,6 +39,15 @@
 </para>
       </sect2>
 
+
+      <sect2 id="ffi-prim">
+        <title>プリミティブのインポート</title>
+	<para>GHCはFFIを拡張して、<literal>prim</literal>という呼び出し規約を追加している。例をあげる。
+<programlisting>
+   foreign import prim "foo" foo :: ByteArray# -> (# Int#, Int# #)
+</programlisting>
+これは、GHCの内部的な呼び出し規約に従う、Cmmコードで書かれた関数群をインポートするのに使う。この機能は、専らGHC付属の中核ライブラリでのみ使うことを意図している。さらなる詳細はGHC開発者wikiを見よ。</para>
+      </sect2>
   </sect1>
 
   <sect1 id="ffi-ghc">
@@ -195,22 +204,10 @@ int main(int argc, char *argv[])
 
         <para>この初期化ルーチン<literal>mylib_init</literal>は、通常どおり<literal>hs_init()</literal>と<literal>hs_add_root()</literal>を呼んでHaskellランタイムを初期化する。これに対応する脱初期化関数<literal>mylib_end()</literal>は<literal>hs_exit()</literal>を呼んでランタイムを終了させる。</para>
       </sect3>
-
-      <sect3 id="hs-exit">
-        <title><literal>hs_exit()</literal>の使用について</title>
-
-        <para>通常、<literal>hs_exit()</literal>によって、そのシステムで実行中のすべてのHaskellスレッドは終了し、<literal>hs_exit()</literal>が返る時点では、もはやHaskellスレッドは一つも走っていない。この後、ランタイムは、必要ならプロファイル出力や統計情報を生成したり、持っているメモリをすべて開放したりして、システムを規則正しく終了させる。</para>
-
-        <para>Haskellスレッドを強制的に終了させることができない場合もある。例えば、スレッドが他言語呼び出しを実行中かもしれないが、他言語の呼び出しを終了させる方法はない。さらに、ランタイムは、Haskellコードとランタイムがメモリから削除予定であるという最悪の場合を想定しなければならない。(例えば、<link linkend="win32-dlls">WindowsのDLL</link>では、<literal>hs_exit()</literal>が呼ばれるのは、通常そのDLLをアンロードする前である)。そのため、<literal>hs_exit()</literal>は、実行中のすべての他言語呼び出しが返るまで待ってからでないと、自分自身返ることができない。</para>
-
-        <para>要するに、他言語呼び出しでブロックしているHaskellスレッドがあるなら、その呼び出しが返るまで<literal>hs_exit()</literal>はハングする(場合によってはビジーウェイト)ということだ。よって、<literal>hs_exit()</literal>を呼び出すときにそのようなスレッドがシステム中にないようにするのが良い。これには、I/Oをしているあらゆるスレッドも含まれる。I/Oはブロックする他言語呼び出しを使って実装されているかもしれない(プラットフォームとI/Oの種類によってはそうでないかもしれない)からである。</para>
-
-        <para>GHCのランタイムは、プログラムが終了する場合を特別扱いして、スタンドアローンの実行ファイルが終了するときにブロックしているスレッドを待つ必要がないようにしている。コードがメモリから取り除かれるのと同時にプログラムとそのすべてのスレッドが終了するのだから、スレッドが先に終了するように保証する必要がない。(非公式だが、この、早くていい加減な<literal>hs_exit()</literal>が欲しいなら、代わりに<literal>shutdownHaskellAndExit()</literal>を呼ぶと良い)</para>
-      </sect3>
     </sect2>
     
     <sect2 id="glasgow-foreign-headers">
-      <title>関数ヘッダを使う</title>
+      <title>ヘッダファイルを使う</title>
 
       <indexterm><primary>C calls, function headers</primary></indexterm>
 
@@ -260,6 +257,44 @@ int main(int argc, char *argv[])
 	  </listitem>
 	</varlistentry>
       </variablelist>
+    </sect2>
+    
+    <sect2 id="ffi-threads">
+      <title>マルチスレッドとFFI</title>
+      <para>マルチスレッド環境でFFIを使うには、<option>-threaded</option>オプションを使う必要がある。(<xref linkend="options-linker" />を見よ)</para>
+        
+      <sect3>
+        <title>foreign importとマルチスレッド</title>
+        
+        <para><literal>safe</literal>注釈(デフォルトである)付きで<literal>foreign import</literal>された関数を呼ぶ場合、プログラムが<option>-threaded</option>を使ってリンクされているなら、その呼び出しは他のHaskellスレッドと並行に走る。プログラムが<option>-threaded</option>なしでリンクされている時は、その呼び出しが返るまで他のHaskellスレッドはブロックされる。</para>
+        
+        <para>つまり、長い時間が掛かったり、いつまでブロックするか分からない関数を他言語呼び出しする必要があるなら、それを<literal>safe</literal>にして、<option>-threaded</option>を使うべきである。ライブラリ関数の中には、内部的にこの種の呼び出しを行うものもある。その場合は説明文書にその旨記載があるべきである。</para>
+        <para>複数のHaskellスレッドから他言語呼び出しを行い、しかも<option>-threaded</option>を使っている場合、呼んでいる外部コードがスレッドセーフでなければならないことに注意すること。特に、ある種のGUIライブラリはスレッドセーフでなく、GUIメソッドを一つのスレッドからのみ呼ぶことを要求する。この場合、GUI操作は一つのHaskellスレッドからのみ行い、さらに結合スレッド(<xref linkend="haskell-threads-and-os-threads"/>を見よ)を使う必要があるかもしれない。</para>
+
+        <para>複数のHaskellスレッドでなされた他言語呼び出しは<emphasis>並列</emphasis>に実行され得るのに注意。これは<literal>+RTS -N</literal>フラグ(<xref linkend="parallel-options"/>)を使っていない場合でもそうである。<literal>+RTS -N</literal>フラグはHaskellスレッドの並列実行を制御するが、ある時点での他言語の呼び出しは、<literal>+RTS -N</literal>の値に関係なく、いくらでも多くなり得る。</para>
+      </sect3>
+
+      <sect3 id="haskell-threads-and-os-threads">
+        <title>HaskellスレッドとOSスレッドの関係</title>
+        
+        <para>通常、HaskellスレッドとOSスレッドの間に固定された関係はない。つまり、他言語呼び出しを行った時、それがどのOSスレッドで起こるのかは規定されない。さらに、一つのHaskellスレッドが複数回の呼び出しを行ったとしても、それが同じOSスレッド上で実行される保証はない。</para>
+
+        <para>このことは普通問題にならないし、このおかげでGHCのランタイムシステムがOSのスレッド資源を効率的に利用することが可能になっている。しかし、例えばスレッドローカルな状態を使う外部コードを呼ぶ場合など、どのOSスレッドを使うかをもっと制御できた方が便利なことがある。このような場合のために、<emphasis>結合スレッド</emphasis>(bound thread)を用意している。これは、特定のOSスレッドに結び付けられたHaskellスレッドである。結合スレッドについての情報は、<ulink url="../libraries/base/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>モジュールの説明を見よ。</para>
+      </sect3>
+      
+      <sect3>
+        <title>foreign exportとマルチスレッド</title>
+        
+        <para>プログラムが<option>-threaded</option>付きでリンクされているなら、<literal>foreign export</literal>された関数を複数のOSスレッドから並行に呼び出してよい。通常通り、ランタイムシステムは<literal>hs_init()</literal>と<literal>hs_add_root</literal>を呼んで初期化せねばならない。また、これらの呼び出しは<literal>foreign export</literal>されたいかなる関数をも呼び出す前に完了していなければならない。</para>
+      </sect3>
+
+      <sect3 id="hs-exit">
+        <title><literal>hs_exit()</literal>の使用について</title>
+        <para>通常、<literal>hs_exit()</literal>によって、そのシステムで実行中のすべてのHaskellスレッドは終了し、<literal>hs_exit()</literal>が返る時点では、もはやHaskellスレッドは一つも走っていない。この後、ランタイムは、必要ならプロファイル出力や統計情報を生成したり、持っているメモリをすべて開放したりして、システムを規則正しく終了させる。</para>
+        <para>Haskellスレッドを強制的に終了させることができない場合もある。例えば、スレッドが他言語呼び出しを実行中かもしれないが、他言語の呼び出しを終了させる方法はない。さらに、ランタイムは、Haskellコードとランタイムがメモリから削除予定であるという最悪の場合を想定しなければならない。(例えば、<link linkend="win32-dlls">WindowsのDLL</link>では、<literal>hs_exit()</literal>が呼ばれるのは、通常そのDLLをアンロードする前である)。そのため、<literal>hs_exit()</literal>は、実行中のすべての他言語呼び出しが返るまで待ってからでないと、自分自身返ることができない。</para>
+        <para>要するに、他言語呼び出しでブロックしているHaskellスレッドがあるなら、その呼び出しが返るまで<literal>hs_exit()</literal>はハングする(場合によってはビジーウェイト)ということだ。よって、<literal>hs_exit()</literal>を呼び出すときにそのようなスレッドがシステム中にないようにするのが良い。これには、I/Oをしているあらゆるスレッドも含まれる。I/Oはブロックする他言語呼び出しを使って実装されているかもしれない(プラットフォームとI/Oの種類によってはそうでないかもしれない)からである。</para>
+        <para>GHCのランタイムは、プログラムが終了する場合を特別扱いして、スタンドアローンの実行ファイルが終了するときにブロックしているスレッドを待つ必要がないようにしている。コードがメモリから取り除かれるのと同時にプログラムとそのすべてのスレッドが終了するのだから、スレッドが先に終了するように保証する必要がない。(非公式だが、この、早くていい加減な<literal>hs_exit()</literal>が欲しいなら、代わりに<literal>shutdownHaskellAndExit()</literal>を呼ぶと良い)</para>
+      </sect3>
     </sect2>
   </sect1>
 </chapter>
