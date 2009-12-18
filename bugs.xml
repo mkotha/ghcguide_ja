@@ -135,9 +135,9 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
 	  </varlistentry>
 
           <varlistentry>
-            <term>文字列がISO-8859-1として扱われる</term>
+            <term><literal>hGetContents</literal></term>
             <listitem>
-              <para><literal>putStrLn</literal>などの各種のライブラリ関数が、文字列をUTF-8でなくISO-8859-1であるかのように扱う。</para>
+              <para>遅延I/Oにおいてエラーが発生した場合、Haskell 98の仕様ではそれを捨てることになっている(Haskell 98レポートの21.2.2節を見よ)が、それに反して例外が投げられる。投げられるのは、原因となったIO操作がIOモナド中で実行された場合に投げられるであろう通常のIO例外であり、<literal>System.IO.Error.catch</literal>か<literal>Control.Exception.catch</literal>で捕捉できる。</para>
             </listitem>
           </varlistentry>
 	</variablelist>
