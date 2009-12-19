@@ -25,13 +25,14 @@
 
     <para>言語オプションのフラグは、言語のどの変種が許されるか制御するものである。これらを一つも使わない場合は、標準のHaskell 98になる。</para>
 
-    <para>一般的に、全ての言語オプションは「<option>-X</option>」で始まる。例えば<option>-XTemplateHaskell</option>のように。</para>
+    <para>言語オプションは二つの方法で制御できる。
+    <itemizedlist>
+      <listitem><para>全ての言語オプションは"<option>-X...</option>"というコマンド行フラグ(例えば<option>-XTemplateHaskell</option>)によって有効に、"<option>-XNo...</option>"というフラグ(例えば<option>-XNoTemplateHaskell</option>)によって無効にできる。</para></listitem>
+      <listitem><para>Cabalが認識する言語オプションなら、<literal>LANGUAGE</literal>プラグマを使って有効にすることもできる。<literal>{-# LANGUAGE TemplateHaskell #-}</literal>のように。(<xref linkend="language-pragma"/>を見よ)</para>
+          </listitem>
+      </itemizedlist></para>
 
-   <para>言語オプションは全て、「<option>No</option>」を前置することによって無効にすることができる。例えば「<option>-XNoTemplateHaskell</option>」のように。</para>
-
-   <para>Cabalが認識する言語オプションは<literal>LANGUAGE</literal>プラグマを使って有効にすることもできる。<literal>{-# LANGUAGE TemplateHaskell #-}</literal>のように。(<xref linkend="language-pragma"/>を見よ)</para>
-
-    <para><option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグは、以下の拡張を有効にするのと同じである。<option>-XPrintExplicitForalls</option>、<option>-XForeignFunctionInterface</option>、<option>-XUnliftedFFITypes</option>、<option>-XGADTs</option>、<option>-XImplicitParams</option>、<option>-XScopedTypeVariables</option>、<option>-XUnboxedTuples</option>、<option>-XTypeSynonymInstances</option>、<option>-XStandaloneDeriving</option>、<option>-XDeriveDataTypeable</option>、<option>-XFlexibleContexts</option>、<option>-XFlexibleInstances</option>、<option>-XConstrainedClassMethods</option>、<option>-XMultiParamTypeClasses</option>、<option>-XFunctionalDependencies</option>、<option>-XMagicHash</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>、<option>-XUnicodeSyntax</option>、<option>-XPostfixOperators</option>、<option>-XPatternGuards</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRankNTypes</option>、<option>-XImpredicativeTypes</option>、<option>-XTypeOperators</option>、<option>-XRecursiveDo</option>、<option>-XParallelListComp</option>、<option>-XEmptyDataDecls</option>、<option>-XKindSignatures</option>、<option>-XGeneralizedNewtypeDeriving</option>、<option>-XTypeFamilies</option>。<option>-fglasgow-exts</option>の効果は、これらのオプションを有効にすること<emphasis>だけ</emphasis>である。我々はこの多目的フラグをやめて、機能を個別に有効にする方向に移行しようとしている。</para>
+    <para><option>-fglasgow-exts</option><indexterm><primary><option>-fglasgow-exts</option></primary></indexterm>フラグは、以下の拡張を有効にするのと同じである。<option>-XPrintExplicitForalls</option>、<option>-XForeignFunctionInterface</option>、<option>-XUnliftedFFITypes</option>、<option>-XGADTs</option>、<option>-XImplicitParams</option>、<option>-XScopedTypeVariables</option>、<option>-XUnboxedTuples</option>、<option>-XTypeSynonymInstances</option>、<option>-XStandaloneDeriving</option>、<option>-XDeriveDataTypeable</option>、<option>-XFlexibleContexts</option>、<option>-XFlexibleInstances</option>、<option>-XConstrainedClassMethods</option>、<option>-XMultiParamTypeClasses</option>、<option>-XFunctionalDependencies</option>、<option>-XMagicHash</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>、<option>-XUnicodeSyntax</option>、<option>-XPostfixOperators</option>、<option>-XPatternGuards</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XExplicitForAll</option>、<option>-XRankNTypes</option>、<option>-XImpredicativeTypes</option>、<option>-XTypeOperators</option>、<option>-XDoRec</option>、<option>-XParallelListComp</option>、<option>-XEmptyDataDecls</option>、<option>-XKindSignatures</option>、<option>-XGeneralizedNewtypeDeriving</option>、<option>-XTypeFamilies</option>。<option>-fglasgow-exts</option>の効果は、これらのオプションを有効にすること<emphasis>だけ</emphasis>である。我々はこの多目的フラグをやめて、機能を個別に有効にする方向に移行しようとしている。</para>
 
   </sect1>
 
