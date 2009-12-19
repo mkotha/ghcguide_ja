@@ -2317,7 +2317,7 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 <sect3>
 <title>多引数の型クラス</title>
 <para>
-以下のような、多引数の型クラスが許される。
+<option>-XMultiParamTypeClasses</option>フラグが有効なら、以下のような、多引数の型クラスが許される。
 
 
 <programlisting>
@@ -2329,12 +2329,11 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 </para>
 </sect3>
 
-<sect3>
+<sect3 id="superclass-rules">
 <title>クラス宣言のスーパークラス</title>
 
 <para>
-クラス宣言の文脈(スーパークラスを導入する)には、クラス階層に循環があってはならないということ以外に、制約はない。従って、以下のようなクラス宣言が認められる。
-
+Haskell 98では、クラス宣言の文脈(スーパークラスを導入するのはこれである)は単純でなければならない。すなわち、すべての述語が、型変数にクラスを適用した形でなければならない。<option>-XFlexibleContexts</option>フラグ(<xref linkend="flexible-contexts"/>)はこの制限を外し、クラス宣言の文脈には、クラス階層に循環があってはならないという制約のみがかかるようにする。従って、以下のようなクラス宣言が認められる。
 
 <programlisting>
   class Functor (m k) => FiniteMap m k where
@@ -2401,7 +2400,7 @@ Haskell 98では<literal>elem</literal>の型は不正である。制約<literal
 
 <sect3><title>関数従属に関する諸規則</title>
 <para>
-クラス宣言では、全てのメソッドについて、そのメソッドの型中の自由変数から、クラス型変数が全て(<xref linkend="type-restrictions"/>で言われている意味で)到達可能でなければならない。例を挙げる。
+クラス宣言では、全てのメソッドについて、そのメソッドの型中の自由変数から、クラス型変数が全て(<xref linkend="flexible-contexts"/>で言われている意味で)到達可能でなければならない。例を挙げる。
 
 <programlisting>
   class Coll s a where
@@ -2575,9 +2574,6 @@ fではxとyの値を一つの集まりに対して順番にinsertしようと�
 <sect2 id="instance-decls">
 <title>インスタンス宣言</title>
 
-<sect3 id="instance-rules">
-<title>インスタンス宣言に関する規則の緩和</title>
-
 <para>インスタンス宣言は以下のような形をとる
 <screen>
   instance ( <replaceable>assertion</replaceable><subscript>1</subscript>, ..., <replaceable>assertion</replaceable><subscript>n</subscript>) =&gt; <replaceable>class</replaceable> <replaceable>type</replaceable><subscript>1</subscript> ... <replaceable>type</replaceable><subscript>m</subscript> where ...
@@ -2585,11 +2581,60 @@ fではxとyの値を一つの集まりに対して順番にinsertしようと�
 「<literal>=&gt;</literal>」より前の部分は<emphasis>文脈</emphasis>であり、「<literal>=&gt;</literal>」より後の部分はこのインスタンス宣言の<emphasis>頭部</emphasis>と呼ばれる。
 </para>
 
+<sect3 id="flexible-instance-head">
+<title>インスタンス頭部に関する規則の緩和</title>
+
 <para>
-Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)</literal>という形でなければならない。ここで、<literal>C</literal>はクラス、<literal>T</literal>は型構築子、<literal>a1 ... an</literal>は相異なる型変数である。さらに、インスタンス宣言中の文脈における表明は<literal>C a</literal>という形でなければならない。ここで<literal>a</literal>は頭部に出現する型変数である。
+Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)</literal>という形でなければならない。ここで、<literal>C</literal>はクラス、<literal>T</literal>はデータ型構築子、<literal>a1 ... an</literal>は相異なる型変数である。GHCはこれを二通りの方向に緩和する。
+<itemizedlist>
+<listitem>
+<para>
+<option>-XFlexibleInstances</option>フラグは、インスタンス宣言の頭部が任意のネストした型に言及するのを許す。例として、これが合法なインスタンス宣言になる。
+<programlisting>
+  instance C (Maybe Int) where ...
+</programlisting>
+<link linkend="instance-overlap">重複に関する規則</link>も見よ。
+</para></listitem>
+<listitem><para>
+<option>-XTypeSynonymInstances</option>フラグが有効なら、インスタンスの頭部が型シノニムを使ってもよい。他の場合と同様、型シノニムは、その定義の右辺の型を書くための略記法に過ぎない。例えば、以下は合法である。
+
+
+<programlisting>
+  type Point = (Int,Int)
+  instance C Point   where ...
+  instance C [Point] where ...
+</programlisting>
+
+
+一方、以下のものを付け加えると、コンパイラは、重複(実は全く同じ)インスタンスだとして文句をいう。
+
+
+<programlisting>
+  instance C (Int,Int) where ...
+</programlisting>
+
+
+他の場合と同様に、型シノニムは完全に適用されていなければならない。例えば、以下のように書くことはできない。
+
+
+<programlisting>
+  type P a = [[a]]
+  instance Monad P where ...
+</programlisting>
+
+</para></listitem>
+</itemizedlist>
 </para>
+</sect3>
+
+<sect3 id="instance-rules">
+<title>インスタンス文脈に関する規則の緩和</title>
+
+<para>Haskell 98では、インスタンス宣言中の文脈における表明は<literal>C a</literal>という形でなければならない。ここで<literal>a</literal>は頭部に出現する型変数である。
+</para>
+
 <para>
-<option>-XFlexibleInstances</option>フラグが使われていると、この規則は大幅に緩められる。まず、複数引数の型クラスが許される。次に、インスタンス宣言の文脈および頭部は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
+<option>-XFlexibleContexts</option>フラグは、この規則を緩め、さらに型シグネチャについての同様の規則も緩める(<xref linkend="flexible-contexts"/>を見よ)。このフラグが有効なら、インスタンス宣言の文脈は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
 <orderedlist>
 <listitem><para>
 Paterson条件: 文脈中の各表明に対して、次が求められる。
@@ -2774,42 +2819,6 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
 あるインスタンスが<option>-XOverlappingInstances</option>なしでコンパイルされると、より特殊性の高いインスタンスでそのインスタンスを部分的に覆い隠すことは不可能である。場合によってはこれは不便かもしれない。もしかしたら、<emphasis>覆い隠される</emphasis>方のインスタンスではなく<emphasis>覆い隠す</emphasis>方のインスタンスがフラグ付きでコンパイルされなければならない、という規則にした方が良いのかもしれない。あるいは、利用地点で<option>-XOverlappingInstances</option>フラグが使われていれば、元のインスタンス宣言がどのようにコンパイルされたかにかかわらず、利用地点においてそれを覆い隠すインスタンスを宣言し、使うことを認めるべきかもしれない。(ただし、利用地点の正確な位置を特定するのは難しいことがあるのに注意)。我々はこれらの点に関するフィードバックを待っている。
 </para>
 <para><option>-XIncoherentInstances</option>フラグを使うと、<option>-XOverlappingInstances</option>フラグは自動的に有効になる。逆は真でない。
-</para>
-</sect3>
-
-<sect3>
-<title>インスタンス頭部に型シノニムを使う</title>
-
-<para>
-<emphasis>Haskell 98と異なり、インスタンスの頭部には型シノニムを使っても良い</emphasis>。(インスタンスの「頭部」とはインスタンス宣言中で「=>」より後の部分である)。他の場合と同様、型シノニムは、その定義の右辺の型を書くための略記法に過ぎない。例えば、以下は合法である。
-
-
-<programlisting>
-  type Point = (Int,Int)
-  instance C Point   where ...
-  instance C [Point] where ...
-</programlisting>
-
-
-一方、以下のものを付け加えると、コンパイラは、重複(実は全く同じ)インスタンスだとして文句をいう。
-
-
-<programlisting>
-  instance C (Int,Int) where ...
-</programlisting>
-
-
-他の場合と同様に、型シノニムは完全に適用されていなければならない。例えば、以下のように書くことはできない。
-
-
-<programlisting>
-  type P a = [[a]]
-  instance Monad P where ...
-</programlisting>
-
-
-この設計上の決定は、他の全てのものと独立であり、簡単に覆すことができるが、私には合理的に思える。
-
 </para>
 </sect3>
 
