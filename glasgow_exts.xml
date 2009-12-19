@@ -2944,19 +2944,50 @@ data instance GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
 </programlisting>
 この例では、宣言にただ一つのvariantしかないが、一般にはいくつあってもよい(訳注: データ構築子が複数あってもいいということ？)。
     </para>
-    <para>データインスタンス宣言およびnewtypeインスタンス宣言は適切な族宣言がスコープにある場合のみ認められる。これはちょうど、クラスインスタンスにクラス宣言が可視であることが必要なのと同じである。さらに、各インスタンス宣言は、その族宣言によって決まる類に準拠していなければならない。つまり、インスタンス宣言のパラメタの個数は、その族の類から決まるアリティと一致するということである。全てのデータ族は<literal>data</literal>キーワードを使って宣言されるが、インスタンスは<literal>data</literal>であっても<literal>newtype</literal>であってもよく、両者の混合であってもよい。
+    <para>データインスタンス宣言およびnewtypeインスタンス宣言は適切な族宣言がスコープにある場合のみ認められる。これはちょうど、クラスインスタンス宣言にクラス宣言が可視であることが必要なのと同じである。さらに、各インスタンス宣言は、その族宣言によって決まる類に準拠していなければならない。つまり、インスタンス宣言のパラメタの個数は、その族の類から決まるアリティと一致するということである。
     </para>
+    <para>データ族インスタンス宣言は、通常の<literal>data</literal>や<literal>newtype</literal>宣言が持つ表現力を完全に利用できる。
+      <itemizedlist>
+      <listitem><para>データ族は「<literal>data</literal>」キーワードを使って<emphasis>導入される</emphasis>が、族の<emphasis>インスタンス</emphasis>は<literal>data</literal>であっても<literal>newtype</literal>であってもよく、両者の混合であってもよい。例を示す。
+<programlisting>
+data family T a
+data    instance T Int  = T1 Int | T2 Bool
+newtype instance T Char = TC Bool
+</programlisting>
+      </para></listitem>
+      <listitem><para><literal>data instance</literal>はデータ構築子にGADT構文を使うことができ、また実際にGADTを定義することができる。例。
+<programlisting>
+data family G a b
+data instance G [a] b where
+   G1 :: c -> G [Int] b
+   G2 :: G [a] Bool
+</programlisting>
+      </para></listitem>
+      <listitem><para><literal>data instance</literal>や<literal>newtype instance</literal>宣言に<literal>deriving</literal>節を使うことができる。
+      </para></listitem>
+      </itemizedlist>
+    </para>
+
     <para>
-型族が最上位の宣言によって定義されている場合でも、異なる族インスタンスに対して異なる計算を行う関数は相変らず型クラスのメソッドとして定義されねばならない。特に、以下は不可能である。
+型族が最上位の宣言によって定義されている場合でも、異なる族インスタンスに対して異なる計算を行う関数は相変らず型クラスのメソッドとして定義されねばならないことがある。特に、以下は不可能である。
 <programlisting>
 data family T a
 data instance T Int  = A
 data instance T Char = B
-nonsence :: T a -> Int
-nonsence A = 1             -- 間違い: この二つの等式をいっしょにすると...
-nonsence B = 2             -- ...型エラーが発生する
+foo :: T a -> Int
+foo A = 1             -- 間違い: この二つの等式をいっしょにすると...
+foo B = 2             -- ...型エラーが発生する
 </programlisting>
-GADT(一般化代数的データ型)の提供する機能を見ると、上のような定義が可能であるべきだと思えるかもしれない。しかし、型族は、GADTとは対照的に、<emphasis>開かれて</emphasis>いる。つまり、常に新しいインスタンスを加えることが可能な(しかも別モジュールでかもしれない)のである。異なるデータインスタンスに跨がるパターン照合に対応するには、一種の拡張可能なcase構造が必要になることだろう。
+代わりに、<literal>foo</literal>をクラスの演算として書かなければならないだろう。
+<programlisting>
+class C a where 
+  foo :: T a -> Int
+instance Foo Int where
+  foo A = 1
+instance Foo Char where
+  foo B = 2
+</programlisting>
+(GADT(一般化代数的データ型)の提供する機能を見ると、上のような定義が可能であるべきだと思えるかもしれない。しかし、型族は、GADTとは対照的に、<emphasis>開かれて</emphasis>いる。つまり、常に新しいインスタンスを加えることが可能な(しかも別モジュールでかもしれない)のである。異なるデータインスタンスに跨がるパターン照合に対応するには、一種の拡張可能なcase構造が必要になることだろう。)
     </para>
 
     <sect4 id="assoc-data-inst">
@@ -3213,6 +3244,26 @@ class (F a ~ b) => C a b where
     </para>
   </sect3>
 
+  <sect3 id-="ty-fams-in-instances">
+    <title>型族とインスタンス宣言</title>
+    <para>型族のもとでは、インスタンス頭部の形式についての規則(<xref linkend="flexible-instance-head"/>で与えられている)を拡張する必要がある。特に、
+<itemizedlist>
+ <listitem><para>データ型族はインスタンス頭部に現れてもよい</para></listitem>
+ <listitem><para>型シノニム族はインスタンス頭部に(全く)現われてはいけない</para></listitem>
+</itemizedlist>
+後者の制約があるのは、これを検査する方法がないからである。次の例を考えよ。
+<programlisting>
+   type family F a
+   type instance F Bool = Int
+
+   class C a
+
+   instance C Int
+   instance C (F a)
+</programlisting>
+ここで、<literal>(C (F Bool))</literal>という制約は両方のインスタンスに適合する。<literal>F Bool</literal>の型インスタンスは別のモジュールにあるかもしれず、さらにはまだ書かれていないモジュールにあることさえあり得るので、この状況は特にまずい。
+</para>
+</sect3>
 </sect2>
 
 </sect1>
