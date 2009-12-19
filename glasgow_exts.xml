@@ -182,6 +182,72 @@
 <sect1 id="syntax-extns">
 <title>構文的拡張</title>
  
+    <sect2 id="unicode-syntax">
+      <title>Unicode構文</title>
+      <para>言語拡張<option>-XUnicodeSyntax</option><indexterm><primary><option>-XUnicodeSyntax</option></primary></indexterm>は、特定のASCII文字列をUnicode文字を使って表すことを可能にする。以下の代替記法が提供される。</para>
+
+      <informaltable>
+	<tgroup cols="2" align="left" colsep="1" rowsep="1">
+	  <thead>
+	    <row>
+	      <entry>ASCII</entry>
+              <entry>Unicodeによる代替</entry>
+	      <entry>コードポイント</entry>
+	      <entry>名前</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry><literal>::</literal></entry>
+	      <entry>::</entry> <!-- no special char, apparently -->
+              <entry>0x2237</entry>
+	      <entry>PROPORTION</entry>
+	    </row>
+          </tbody>
+	  <tbody>
+	    <row>
+	      <entry><literal>=&gt;</literal></entry>
+	      <entry>&rArr;</entry>
+	      <entry>0x21D2</entry>
+              <entry>RIGHTWARDS DOUBLE ARROW</entry>
+	    </row>
+          </tbody>
+	  <tbody>
+	    <row>
+	      <entry><literal>forall</literal></entry>
+	      <entry>&forall;</entry>
+	      <entry>0x2200</entry>
+              <entry>FOR ALL</entry>
+	    </row>
+          </tbody>
+	  <tbody>
+	    <row>
+	      <entry><literal>-&gt;</literal></entry>
+	      <entry>&rarr;</entry>
+	      <entry>0x2192</entry>
+              <entry>RIGHTWARDS ARROW</entry>
+	    </row>
+          </tbody>
+	  <tbody>
+	    <row>
+	      <entry><literal>&lt;-</literal></entry>
+	      <entry>&larr;</entry>
+	      <entry>0x2190</entry>
+              <entry>LEFTWARDS ARROW</entry>
+	    </row>
+          </tbody>
+	  <tbody>
+	    <row>
+	      <entry>..</entry>
+	      <entry>&hellip;</entry>
+	      <entry>0x22EF</entry>
+	      <entry>MIDLINE HORIZONTAL ELLIPSIS</entry>
+	    </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </sect2>
+
     <sect2 id="magic-hash">
       <title>魔法の井桁(magic hash)</title>
       <para><option>-XMagicHash</option>という言語拡張は、識別子に対する後置修飾子として「&num;」を認めるものである。つまり、「x&num;」が変数として有効に、「T&num;」が型構築子やデータ構築子として有効になる。</para>
@@ -462,69 +528,126 @@ f ((view -> B, p3), p4) = e2
 
 </sect2>
 
+    <!-- ===================== n+k patterns ===================  -->
+
+<sect2 id="n-k-patterns">
+<title>n+kパターン</title>
+<indexterm><primary><option>-XNoNPlusKPatterns</option></primary></indexterm>
+
+<para>
+<literal>n+k</literal>パターンへの対応はデフォルトで有効になっている。無効にするには、<option>-XNoNPlusKPatterns</option>フラグが使える。
+</para>
+
+</sect2>
+
     <!-- ===================== Recursive do-notation ===================  -->
 
 <sect2 id="mdo-notation">
 <title>再帰的do記法
 </title>
 
-<para>再帰的do記法(mdo記法とも呼ばれる)は、<ulink url="http://citeseer.ist.psu.edu/erk02recursive.html">A recursive do for Haskell</ulink>, by Levent Erkok, John Launchbury, Haskell Workshop 2002, pages: 29-37. Pittsburgh, Pennsylvaniaに記されている通りに実装されている。この論文は、mdo記法の自明でない使い方をする者にとっては必読であって、ここで内容を繰り返すことはしない。</para>
-
 <para>
-Haskellのdo記法では、<emphasis>再帰的な束縛</emphasis>が許されない。すなわち、do式中で束縛された変数は、テキスト中でそれより後ろのコードブロックからのみ可視である。これに対して、let式では、束縛変数がその束縛グループ全体から可視である。do記法でも再帰的束縛ができると恩恵を被る応用がいくつかあると分かったので、必要な構文的なサポートを提供しようというのがこの拡張である。</para>
+Haskell 98のdo記法では、<emphasis>再帰的な束縛</emphasis>が許されない。すなわち、do式中で束縛された変数は、テキスト中でそれより後ろのコードブロックからのみ可視である。これに対して、let式では、束縛変数がその束縛グループ全体から可視である。do記法でも再帰的束縛ができると恩恵を被る応用がいくつかあると分かった。これに必要な構文的なサポートが<option>-XDoRec</option>によって提供される。</para>
 <para>
-以下は単純な(しかし巧妙に作られた)例である。
-</para>
+以下は(人為的だが)単純な例である。
 <programlisting>
-import Control.Monad.Fix
-
-justOnes = mdo xs &lt;- Just (1:xs)
-               return xs
+{-# LANGUAGE DoRec #-}
+justOnes = do { rec { xs &lt;- Just (1:xs) }
+              ; return (map negate xs) }
 </programlisting>
-<para>
-推測できるだろうが、<literal>justOnes</literal>は<literal>Just [1,1,1,...</literal>に評価される。
+推測できるだろうが、<literal>justOnes</literal>は<literal>Just [-1,-1,-1,...</literal>に評価される。
 </para>
 
-<para>
-ライブラリControl.Monad.Fixで、<literal>MonadFix</literal>クラスが導入されている。定義は以下である。
+<para>再帰的do記法の動機と背景は、<ulink url="http://citeseer.ist.psu.edu/erk02recursive.html">A recursive do for Haskell</ulink>, by Levent Erkok, John Launchbury, Haskell Workshop 2002, pages: 29-37. Pittsburgh, Pennsylvaniaに記されている。モナドの値再帰の背後にある理論については、Erkokのthesisである<ulink url="http://sites.google.com/site/leventerkok/erkok-thesis.pdf">Value Recursion in Monadic Computations</ulink>がさらなる説明を与えている。ただし、GHCの使う構文はこれらの文書にあるものと異なっていることに注意。
 </para>
+
+<sect3>
+<title>再帰的do記法についての詳細</title>
+<para>再帰的do記法は、<option>-XDoRec</option>フラグか、同等の言語プラグマである<option>DoRec</option>を使って有効にする。すると、一つの新しいキーワード「<literal>rec</literal>」が導入される。これは、相互再帰的なモナド文の集りをまとめて、一つの文を作るものである。</para>
+<para><literal>let</literal>文と同様に、<literal>rec</literal>で束縛された変数はその<literal>rec</literal>グループの全体と、その<literal>rec</literal>の下で可視である。例として、次の二つを比較せよ。
+<programlisting>
+do { a &lt;- getChar              do { a &lt;- getChar                    
+   ; let { r1 = f a r2	           ; rec { r1 &lt;- f a r2	
+         ; r2 = g r1 }	                 ; r2 &lt;- g r1 }	
+   ; return (r1 ++ r2) }          ; return (r1 ++ r2) }
+</programlisting>
+どちらの場合でも、<literal>r1</literal>と<literal>r2</literal>は<literal>let</literal>や<literal>rec</literal>のブロック全体と、それ以降の文の中で使える。違いは、<literal>let</literal>が非モナド的であるのに対して、<literal>rec</literal>はモナド的であることだ。(周知のように、Haskellにおいて<literal>let</literal>とは実際には<literal>letrec</literal>のことである)
+</para>
+<para>
+<literal>rec</literal>の静的および動的な意味は以下のように述べることができる。
+<itemizedlist>
+<listitem><para>
+まず、let束縛と同様に、<literal>rec</literal>は再帰的な極小のまとまりに分割(segmentation)される。
+<programlisting>
+rec { a &lt;- getChar      ===>     a &lt;- getChar
+    ; b &lt;- f a c                 rec { b &lt;- f a c
+    ; c &lt;- f b a                     ; c &lt;- f b a }
+    ; putChar c }                putChar c 
+</programlisting>
+分割の詳細は<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>の3.2節に記述がある。分割によってよりよい多相性が得られ、再帰的な「結び目」の大きさが軽減される。さらに、この論文にあるように、意味論的な影響もある(当該モナドがright-shrinking則を満たしている場合を除く)。
+</para></listitem>
+<listitem><para>
+次に、<literal>Control.Monad.Fix.mfix</literal>の呼び出しを使って、こうしてできたそれぞれの<literal>rec</literal>が脱糖(desugar)される。例えば、前の例の<literal>rec</literal>グループはこのように脱糖される。
+<programlisting>
+rec { b &lt;- f a c     ===>    (b,c) &lt;- mfix (\~(b,c) -> do { b &lt;- f a c
+    ; c &lt;- f b a }                                        ; c &lt;- f b a
+                                                          ; return (b,c) })
+</programlisting>
+一般に、<literal>rec <replaceable>ss</replaceable></literal>という文は、脱糖されて次のような文になる。
+<programlisting>
+<replaceable>vs</replaceable> &lt;- mfix (\~<replaceable>vs</replaceable> -&gt; do { <replaceable>ss</replaceable>; return <replaceable>vs</replaceable> })
+</programlisting>
+ただし、<replaceable>vs</replaceable>は<replaceable>ss</replaceable>によって束縛される変数群からなるタプルである。
+</para><para>
+元々の<literal>rec</literal>は、この脱糖された形とまったく同じように型検査される。つまり、例えば、変数群<replaceable>vs</replaceable>はラムダによって束縛されているので、<literal>rec</literal>に続く文においてすべて単相的になる。
+</para>
+<para>
+関数<literal>mfix</literal>は、<literal>Control.Monad.Fix</literal>の<literal>MonadFix</literal>で次のように定義されている。
 <programlisting>
 class Monad m => MonadFix m where
    mfix :: (a -> m a) -> m a
 </programlisting>
-<para>
-<literal>mfix</literal>関数は、必要とされる再帰演算がどのように実行されるかを規定する。例えば、<literal>justOnes</literal>は以下のように脱糖される。
-<programlisting>
-justOnes = mfix (\xs' -&gt; do { xs &lt;- Just (1:xs'); return xs }
-</programlisting>
-mdoがどのように型検査され脱糖されるかの完全な詳細については、論文<ulink url="http://citeseer.ist.psu.edu/erk02recursive.html">A recursive do for Haskell</ulink>を見よ。特に、GHCはこの論文の3.2節に記述されているsegmentation techniqueを実装している。</para>
-<para>
-あるモナドについて再帰的束縛を使いたいなら、そのモナドは<literal>MonadFix</literal>クラスのインスタンスとして宣言されていなければならない。List、Maybe、IOについては<literal>MonadFix</literal>のインスタンスが自動的に与えられている。さらに、Control.Monad.STとControl.Monad.ST.Lazyでは、Haskellの内部状態モナド(それぞれ正格版と遅延版)についてのMonadFixクラスのインスタンスが提供されている。
+</para>
+</listitem>
+</itemizedlist>
 </para>
 <para>
-再帰的do記法を使うにあたって、いくつか重要な点がある。
+再帰的do記法を使うにあたって、他にもいくつか重要な点がある。
 <itemizedlist>
 <listitem><para>
+これは<literal>-XDoRec</literal>フラグで有効になる。このフラグは<literal>-fglasgow-exts</literal>で有効になる。
 再帰的do記法ではキーワードとして(<literal>do</literal>ではなく)<literal>mdo</literal>を使う。
 </para></listitem>
 
 <listitem><para>
-これは<literal>-XRecursiveDo</literal>フラグで有効になる。このフラグは<literal>-fglasgow-exts</literal>で有効になる。
+あるモナドに再帰的な束縛を使う必要があるなら、そのモナドは<literal>MonadFix</literal>クラスのインスタンスとして宣言されていなければならない。
 </para></listitem>
 
 <listitem><para>
 通常のdo記法と異なり、<literal>let</literal>や<literal>where</literal>の束縛と同じように、名前の隠蔽は許されない。つまり、一つの<literal>mdo</literal>において束縛される名前は全て異なっていなければならない。(論文の3.3節)
+次の<literal>MonadFix</literal>インスタンスは自動的に提供される。List, Maybe, IO。さらに、Control.Monad.STとControl.Monad.ST.Lazyモジュールは、Haskellの(それぞれ正格と遅延の)内部的な状態モナドについてのMonadFixインスタンスを提供する。
 </para></listitem>
 
 <listitem><para>
-<literal>mdo</literal>中の<literal>let</literal>文で束縛された変数はその<literal>mdo</literal>において単相的である。(論文の3.1節)。ただし、GHCは、多相性を増し、停止性を改善するために、<literal>mdo</literal>を分割する。(論文の3.2節)
+<literal>let</literal>束縛や<literal>where</literal>束縛と同様に、一つの<literal>rec</literal>の中での名前の覆い隠しは許されない。つまり、一つの<literal>rec</literal>で束縛される名前は全て異なっていなければならない(論文の3.3節)。
+</para></listitem>
+
+<listitem><para>
+これは構文の再束縛(<xref linkend="rebindable-syntax"/>)に対応している。
  </para></listitem>
 </itemizedlist>
 </para>
+</sect3>
 
+<sect3> <title>mdo記法 (廃止予定)</title>
+
+<para>
+GHCは、<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>に記述されている通りの<literal>mdo</literal>キーワードを有効にする<option>-XRecursiveDo</option>フラグをサポートしていたが、これは現在非推奨である。<literal>mdo { Q; e }</literal>の代わりに<literal>do { rec Q; e }</literal>と書いてほしい。
+</para>
 <para>
 歴史的な参考事項: mdo記法の古い実装(および既存の文書の大部分)は、ライブラリとクラスの名として<literal>MonadRec</literal>を使っていたが、GHCはこの名前をサポートしない。
 </para>
+</sect3>
 
 </sect2>
 
@@ -585,6 +708,7 @@ mdoがどのように型検査され脱糖されるかの完全な詳細につ�
 
 
     <para>一般化リスト内包表記は、SQLでおなじみのソートやグループ化といった操作を可能にするための、リスト内包表記という構文糖に対するさらなる強化である。これは、論文<ulink url="http://research.microsoft.com/~simonpj/papers/list-comp">Comprehensive comprehensions: comprehensions with "order by" and "group by"</ulink>で完全に記述されている。ただし、我々が使う構文は論文のものと僅かに異なる。</para>
+<para>この拡張は<option>-XTransformListComp</option>というフラグによって有効になる。</para>
 <para>例を示す。
 <programlisting>
 employees = [ ("Simon", "MS", 80)
@@ -761,6 +885,42 @@ fromInteger :: Integer -> Bool -> Bool
 
 </sect2>
 
+<sect2 id="tuple-sections">
+<title>タプルのセクション</title>
+
+<para>
+<option>-XTupleSections</option>フラグは、タプルの構築子をPython風に部分適用することを有効にする。例として、以下のプログラム
+<programlisting>
+  (, True)
+</programlisting>
+は、次の不恰好な表記と同じ意味の書き方とみなされる。
+<programlisting>
+  \x -> (x, True)
+</programlisting>
+タプルの引数はどんな組み合わせで省略してもよい。以下のように。
+<programlisting>
+  (, "I", , , "Love", , 1337)
+</programlisting>
+これは、次のように翻訳される。
+<programlisting>
+  \a b c d -> (a, "I", b, c, "Love", d, 1337)
+</programlisting>
+</para>
+
+<para>
+<link linkend="unboxed-tuples">unboxed tuples</link>を有効にしているなら、これについてもセクションが使える。例えば、
+<programlisting>
+  (# , True #)
+</programlisting>
+非ボックス化タプルにゼロ項のものはないので、次の式
+<programlisting>
+  (# #)
+</programlisting>
+は、変わらず非ボックス化単項タプルの構築子を意味する。
+</para>
+
+</sect2>
+
 <sect2 id="disambiguate-fields">
 <title>レコードフィールドの曖昧性除去</title>
 <para>
@@ -775,7 +935,6 @@ module Foo where
   data T = MkT { x :: Int }
   
   ok1 (MkS { x = n }) = n+1   -- 曖昧でない
-
   ok2 n = MkT { x = n+1 }     -- 曖昧でない
 
   bad1 k = k { x = 3 }  -- 曖昧
@@ -786,6 +945,32 @@ module Foo where
 <para>
 Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-XDisambiguateRecordFields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名が散らばるのを軽減できる。
 </para>
+<para>
+詳細をいくつか。
+<itemizedlist>
+<listitem><para>
+フィールドの曖昧性除去は同名利用(<xref linkend="record-puns"/>を見よ)と組み合わせることができる。例。
+<programlisting>
+module Foo where
+  import M
+  x=True
+  ok3 (MkS { x }) = x+1   -- 曖昧性除去と同名利用を両方使っている
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+<option>-XDisambiguateRecordFields</option>が有効なら、対応する選択関数が<emphasis>修飾された</emphasis>形でしかスコープにない場合であっても、<emphasis>修飾されていない</emphasis>フィールド名を使うことができる。例えば、先に挙げた例と同じ<literal>M</literal>モジュールがあると仮定すると、これは合法である。
+<programlisting>
+module Foo where
+  import qualified M    -- qualifiedであることに注意
+
+  ok4 (M.MkS { x = n }) = n+1   -- 曖昧でない
+</programlisting>
+構築子<literal>MkS</literal>は修飾された形でしかスコープにないので、<literal>M.MkS</literal>と呼ばなければならない。しかし、スコープに<literal>M.x</literal>があっても<literal>x</literal>がないにもかかわらず、フィールド<literal>x</literal>を修飾する必要はない。(実質的に、これは構築子によって修飾されている)
+</para></listitem>
+</itemizedlist>
+</para>
+
 </sect2>
 
     <!-- ===================== Record puns ===================  -->
@@ -818,15 +1003,9 @@ f (C {a}) = a
 </para>
 
 <para>
-同じレコード中で、同名利用と通常のパターンを混ぜることもできるのに注意。
-<programlisting>
-data C = C {a :: Int, b :: Int}
-f (C {a, b = 4}) = a
-</programlisting>
-また、同名利用は、レコードパターンが使えるところ(例えば<literal>let</literal>束縛の中や最上位)ならどこでも使うことができる。
-</para>
-
-<para>
+以下のことに注意。
+<itemizedlist>
+<listitem><para>
 レコード同名利用は式中でも使える。例えば、次のように書く。
 <programlisting>
 let a = 1 in C {a}
@@ -836,7 +1015,33 @@ let a = 1 in C {a}
 let a = 1 in C {a = a}
 </programlisting>
 
-この展開は純粋に構文上のものであるため、レコード同名利用の式は、そのフィールド名と同じ綴りを持つなかで、最も内側の変数を参照することに注意。
+この展開は純粋に構文上のものであるため、レコード同名利用の式は、そのフィールド名と同じ綴りを持つなかで、最も内側の変数を参照する。
+</para></listitem>
+
+<listitem><para>
+同じレコード中で、同名利用と通常のパターンを混ぜることができる。
+<programlisting>
+data C = C {a :: Int, b :: Int}
+f (C {a, b = 4}) = a
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+同名利用は、レコードパターンが使えるところ(例えば<literal>let</literal>束縛の中や最上位)ならどこでも使うことができる。
+</para></listitem>
+
+<listitem><para>
+フィールド名が修飾されている場合は、その同名利用が展開されるときに修飾が取り除かれる。例えば、
+<programlisting>
+f (C {M.a}) = a
+</programlisting>
+は、
+<programlisting>
+f (M.C {M.a = a}) = a
+</programlisting>
+を意味する。(これは、構築子<literal>M.C</literal>のフィールド選択関数<literal>a</literal>が修飾された形でのみスコープにある場合に便利である)
+</para></listitem>
+</itemizedlist>
 </para>
 
 </sect2>
@@ -848,7 +1053,7 @@ let a = 1 in C {a = a}
 </title>
 
 <para>
-レコードワイルドカードは<literal>-XRecordWildCards</literal>フラグによって有効になる。
+レコードワイルドカードは<literal>-XRecordWildCards</literal>フラグによって有効になる。このフラグによって<literal>-XDisambiguateRecordFields</literal>も有効になる。
 </para>
 
 <para>
@@ -860,33 +1065,46 @@ f (C {a = 1, b = b, c = c, d = d}) = b + c + d
 </para>
 
 <para>
-レコードワイルドカード構文では、レコードパターン中に(<literal>..</literal>)を使えるようになる。そうすると、省略したそれぞれの<literal>f</literal>が<literal>f = f</literal>というパターンに置換される。例として、上のパターンは次のように書ける。
+レコードワイルドカード構文では、レコードパターン中に「<literal>..</literal>」を使えるようになる。そうすると、省略したそれぞれの<literal>f</literal>が<literal>f = f</literal>というパターンに置換される。例として、上のパターンは次のように書ける。
 <programlisting>
 f (C {a = 1, ..}) = b + c + d
 </programlisting>
 </para>
 
 <para>
-ワイルドカードは他のパターン(同名利用(<xref linkend="record-puns"/>)も含む)と併用できることに注意。例えば<literal>C {a = 1, b, ..})</literal>というパターンでのように。さらに、レコードワイルドカードはレコードパターンが使えるところならどこでも使えるので、<literal>let</literal>束縛や最上位でも使える。例えば、次の最上位の束縛は、<literal>b</literal>と<literal>c</literal>と<literal>d</literal>を定義する。
+さらなる詳細。
+<itemizedlist>
+<listitem><para>
+ワイルドカードは他のパターン(同名利用(<xref linkend="record-puns"/>)も含む)と併用できる。例えば<literal>C {a = 1, b, ..})</literal>というパターンでのように。さらに、レコードワイルドカードはレコードパターンが使えるところならどこでも使えるので、<literal>let</literal>束縛や最上位でも使える。例えば、次の最上位の束縛は、<literal>b</literal>と<literal>c</literal>と<literal>d</literal>を定義する。
 <programlisting>
 C {a = 1, ..} = e
 </programlisting>
-</para>
+</para></listitem>
 
-<para>
+<listitem><para>
 レコードワイルドカードは式中でも使える。次のように書くことができる。
-
 <programlisting>
 let {a = 1; b = 2; c = 3; d = 4} in C {..}
 </programlisting>
-
 これは以下のように書くのと同じである。
-
 <programlisting>
 let {a = 1; b = 2; c = 3; d = 4} in C {a=a, b=b, c=c, d=d}
 </programlisting>
+この展開は純粋に構文上のものなので、レコードワイルドカード式は、省略されたフィールド名と同じ綴りの変数のうちもっとも内側にあるものを参照する。
+</para></listitem>
 
-この展開は純粋に構文上のものなので、レコードワイルドカード式は、省略されたフィールド名と同じ綴りの変数のうちもっとも内側にあるものを参照することに注意。
+<listitem><para>
+「<literal>..</literal>」は省略された<emphasis>スコープにある</emphasis>レコードフィールドに展開されるのだが、ここで「スコープにある」というのは、非修飾形のものも、修飾形のみのものも含む。スコープにないフィールドは補完されない。例を示す。
+<programlisting>
+module M where
+  data R = R { a,b,c :: Int }
+module X where
+  import qualified M( R(a,b) )
+  f a b = R { .. }
+</programlisting>
+この<literal>{..}</literal>は<literal>{M.a=a,M.b=b}</literal>に展開される。<literal>c</literal>は全くスコープにないので省略される。
+</para></listitem>
+</itemizedlist>
 </para>
 
 </sect2>
@@ -957,7 +1175,7 @@ import "network" Network.Socket
           <literal>forall</literal>
           <indexterm><primary><literal>forall</literal></primary></indexterm>
 	</term>
-	<listitem><para><option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRank2Types</option>、<option>-XRankNTypes</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>によって盗まれる(型中において)。
+	<listitem><para><option>-XExplicitForAll</option>によって盗まれる(型中において)。従って、<option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRank2Types</option>、<option>-XRankNTypes</option>、<option>-XPolymorphicComponents</option>、<option>-XExistentialQuantification</option>によっても盗まれる。
 	  </para></listitem>
       </varlistentry>
 
