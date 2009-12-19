@@ -1618,12 +1618,22 @@ main = do
     display (inc (inc counterB))   -- prints "##"
 </programlisting>
 
-現在のところ、レコード更新構文はHaskell 98データ型に対してのみサポートされている。従って、下記の関数は動作しない。
+レコードの更新構文が存在的データ型(およびGADT)に対してサポートされている。
 
 <programlisting>
--- 不正。とりあえず明示的にNewCounterを使うべし
 setTag :: Counter a -> a -> Counter a
 setTag obj t = obj{ tag = t }
+</programlisting>
+レコード更新についての規則はこうである。<emphasis>更新されるフィールドの型は、データ構築子の型変数のうち、全称量化されたものにしか言及してはならない。GADTについては、フィールドは、構築子の結果の型の中で単純な型変数引数として現れるものにしか言及してはならない</emphasis>。例を挙げる。
+<programlisting>
+data T a b where { T1 { f1::a, f2::b, f3::(b,c) } :: T a b } -- cは存在的
+upd1 t x = t { f1=x }   -- 正:   upd1 :: T a b -> a' -> T a' b
+upd2 t x = t { f3=x }   -- 誤    (f3の型はcに言及するが、これは存在量化されている)
+ 
+data G a b where { G1 { g1::a, g2::c } :: G a [c] }
+upd3 g x = g { g1=x }   -- 正:   upd3 :: G a b -> c -> G c b
+upd4 g x = g { g2=x }   -- 誤  (f2の型はcに言及するが、これはG1の結果の型において
+                        --      単純な型変数の形の引数でない)
 </programlisting>
 
 </para>
@@ -1816,12 +1826,38 @@ instance Eq T where
 </para></listitem>
 
 <listitem><para>
-それぞれの構築子の型シグネチャは独立していて、通常通り暗黙に全称量化される。別々の構築子には異なる全称量化の型変数があっても良いし、異なる型制約があっても良い。例えば、これは問題ない。
+通常の型シグネチャの場合と同様、複数の構築子に一つのシグネチャを与えることができる。この例では、<literal>T1</literal>と<literal>T2</literal>に一つのシグネチャを与えている。
 <programlisting>
   data T a where
-    T1 :: Eq b => b -> T b
+    T1,T2 :: a -> T a
+    T3 :: T a
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+それぞれの構築子の型シグネチャは独立していて、通常通り暗黙に全称量化される。特に、「<literal>data T a where</literal>」のような頭部にある型変数にはスコープがなく、別々の構築子には異なる全称量化の型変数があっても良い。
+<programlisting>
+  data T a where        -- この「a」にはスコープがない
+    T1,T2 :: b -> T b   -- 意味は forall b. b -> T b
+    T3 :: T a           -- 意味は forall a. T a
+</programlisting>
+</para></listitem>
+
+<listitem><para>
+構築子のシグネチャは型クラス制約に言及してもよいし、それが構築子間で異なっていてもよい。例えば、これは問題ない。
+<programlisting>
+  data T a where
+    T1 :: Eq b => b -> b -> T b
     T2 :: (Show c, Ix c) => c -> [c] -> T c
 </programlisting>
+パターン照合の際には、照合の本体における制約を果たす(discharge)ために、これらの制約が利用できるようになる。例を挙げる。
+<programlisting>
+  f :: T a -> String
+  f (T1 x y) | x==y      = "yes"
+             | otherwise = "no"
+  f (T2 a b)             = show a
+</programlisting>
+<literal>f</literal>は多重定義されていないことに注意。<literal>==</literal>を使用したことから発生した<literal>Eq</literal>制約は、<literal>T1</literal>上のパターン照合によって果たされている。<literal>show</literal>を使用したことから発生した<literal>Show</literal>制約についても同様である。
 </para></listitem>
 
 <listitem><para>
@@ -1831,11 +1867,11 @@ Haskell 98様式のデータ型宣言と異なり、「<literal>data Set a where
 </programlisting>
 あるいは、この二つを混ぜるのでも良い。
 <programlisting>
-  data Foo a :: (* -> *) -> * where ...
+  data Bar a :: (* -> *) -> * where ...
 </programlisting>
 型変数(与えられるなら)は明示的に類付けされていても良いので、<literal>Foo</literal>のヘッダを以下のように書くこともできる。
 <programlisting>
-  data Foo a (b :: * -> *) where ...
+  data Bar a (b :: * -> *) where ...
 </programlisting>
 </para></listitem>
 
@@ -1864,24 +1900,34 @@ GADT様式のデータ型宣言で<literal>deriving</literal>節を使うこと�
 </para></listitem>
 
 <listitem><para>
+型シグネチャには、結果の型に現れない型変数があってもよい。
+<programlisting>
+  data Foo where
+     MkFoo :: a -> (a->Bool) -> Foo
+     Nil   :: Foo
+</programlisting>
+ここで、型変数<literal>a</literal>はどちらの構築子の結果の型にも現れない。構築子の型において全称量化されているが、こういう型変数はよく「存在的」であると言われる。実際、上の宣言は、<xref linkend="existential-quantification"/>の<literal>data Foo</literal>と全く同じ型を宣言している。
+</para><para>
+もちろん、その型にクラス文脈が含まれていてもよい。
+<programlisting>
+  data Showable where
+    MkShowable :: Show a => a -> Showable
+</programlisting>
+</para></listitem>
+
+<listitem><para>
 GADT様式のデータ型宣言においてレコード構文を使うこともできる。
 
 <programlisting>
   data Person where
-      Adult { name :: String, children :: [Person] } :: Person
-      Child { name :: String } :: Person
+      Adult :: { name :: String, children :: [Person] } -> Person
+      Child :: Show a => { name :: !String, funny :: a } -> Person
 </programlisting>
-通常と同じように、<literal>f</literal>というフィールドを持つ全ての構築子に関して、フィールド<literal>f</literal>の型が(α変換を法として)等しくなければならない。
-</para>
-<para>
-今のところ、レコード更新はGADTではまだ不可能である。このため、サポートされているのは、レコードの構築、選択、パターン照合だけである。例を示す。
-<programlisting>
-  aPerson = Adult { name = "Fred", children = [] }
-
-  shortName :: Person -> Bool
-  hasChildren (Adult { children = kids }) = not (null kids)
-  hasChildren (Child {})                  = False
-</programlisting>
+通常と同じように、<literal>f</literal>というフィールドを持つ全ての構築子に関して、フィールド<literal>f</literal>の型が(α変換を法として)等しくなければならない。上記の<literal>Child</literal>構築子を見ると分かるとおり、シグネチャには、レコードでない場合と同様に、文脈、存在量化された変数、正格性注釈があってもよい。(注意: 二つのコロンの後にある「型」は、レコード構文と正格性注釈を含むので正確には「型」でない。この形の「型」は構築子のシグネチャにのみ現れることができる。)
+</para></listitem>
+ 
+<listitem><para> 
+レコード更新は、以下の性質を持つフィールドについてのみ、GADT様式の宣言でも許される。「そのフィールドの型が存在的な型変数に言及しないこと」
 </para></listitem>
 
 <listitem><para> 
