@@ -204,7 +204,12 @@ main = do let xs = {-# SCC "X" #-} [1..1000000]
 
       <para>実行すると、次のようなヒーププロファイルが得られる。</para>
 
-      <imagedata fileref="prof_scc"/>
+      <!-- contentwidth/contentheight don't appear to have any effect
+           other than making the PS file generation work, rather than
+           falling over.  The result seems to be broken PS on the page
+           with the image. -->
+      <imagedata fileref="prof_scc" contentwidth="645px"
+      contentdepth="428px"/>
 
     </sect2>
 
@@ -369,6 +374,8 @@ x = nfib 25
         <para>できたヒーププロファイルを<application>Ghostview</application>のようなpostscript閲覧器を使って表示するか、Postscript対応のプリンタで印刷する。</para>
       </listitem>
     </orderedlist>
+
+    <para>ヒーププロファイルを表示するためのより高度な道具の集まり(GHCには付属していない)として、<ulink url="http://www.haskell.org/haskellwiki/Hp2any">hp2any</ulink>も見てみると良いかもしれない。</para>
 
     <sect2 id="rts-options-heap-prof">
       <title>ヒーププロファイルのためのRTSオプション</title>
@@ -1124,19 +1131,31 @@ Options:
 
     <para>(ToDo: ちゃんと書く。)</para>
 
-    <para>ものすごい数のいろんな分かるとうれしいこと(例えば、更新の回数、データ構築子への進入の回数、などなど)を数えるようにGlasgow Haskellをコンパイルすることが可能である。我々はこれを「ticky-ticky」プロファイルと呼んでいる。<indexterm><primary>ticky-ticky profiling</primary></indexterm> <indexterm><primary>profiling, ticky-ticky</primary></indexterm>これは、Sun4がこれらの数を(<emphasis>ゆっくりと</emphasis>)数えているときにこういう音を発するからである。</para>
+    <para>ものすごい数のいろんな分かるとうれしいこと(例えば、更新の回数、データ構築子への進入の回数、などなど)を数えるようにHaskellプログラムをコンパイルすることが可能である。我々はこれを「ticky-ticky」プロファイルと呼んでいる。<indexterm><primary>ticky-ticky profiling</primary></indexterm> <indexterm><primary>profiling, ticky-ticky</primary></indexterm>これは、CPUがこれらの数を(<emphasis>ゆっくりと</emphasis>)数えているときにこういう音を発するからである。</para>
 
     <para>ticky-tickyプロファイルは主に実装者向けである。通常のプロファイルシステムである「コスト集約点」式(これは全ての利用者があらゆる場合に使うように意図されている)とは大きく異なる。</para>
 
-    <para>ticky-tickyプロファイルを使えるようにするには、ticky RTSをビルドしておかなければならない。(これはビルドの手引きに記述されているべきだが、RTSを"t"というwayを有効にしてビルドすることに相当する。</para>
+    <para>ticky-tickyプロファイルを使うのに、GHCやライブラリやRTSを特別な方法でビルドする必要はない。コンパイル時の<option>-ticky</option>を使って、カウンタを含めてコンパイルするかどうかをモジュール単位で決めることができる。<option>-ticky</option>付きでコンパイルされなかったモジュールはticky-tickyプロファイルの結果に寄与しない。通常、これにはプログラムにリンクされる全てのコンパイル済みパッケージが含まれる。
+    </para>
 
-    <para>プログラムにticky-tickyの数値を出力させるには、<option>-r</option>というRTSオプション<indexterm><primary>-r RTS option</primary></indexterm>を使う。<xref linkend="runtime-control"/>を見よ。</para>
-
-    <para>プログラムを<option>-ticky</option>スイッチつきでコンパイルすればこの計測を行う実行ファイルが得られる。以下に示すのはticky-ticky統計ファイルの例であり、<command>foo +RTS -rfoo.ticky</command>というコマンドで生成されたものである。</para>
+    <para>プログラムにticky-tickyの数値を出力させるには、
+    
+      <itemizedlist>
+        <listitem>
+          <para>プログラムを<option>-debug</option>付きでリンクする(リンク時においては<option>-ticky</option>は<option>-debug</option>の同義語である)。これによって、ticky-tickyプロファイルの結果を収集して報告するためのコードを含んだデバッグ版RTSがリンクされる。
+          </para>
+        </listitem>
+        <listitem>
+          <para>プログラムをRTSオプション<option>-r</option><indexterm><primary>-r RTS option</primary></indexterm>を付けて実行する。<xref linkend="runtime-control"/>を見よ。
+          </para>
+        </listitem>
+      </itemizedlist>
+    </para>
+ 
+    <para>以下に示すのはticky-ticky統計ファイルの例であり、<command>foo +RTS -rfoo.ticky</command>というコマンドで生成されたものである。</para>
 
 <screen>
  foo +RTS -rfoo.ticky
-
 
 ALLOCATIONS: 3964631 (11330900 words total: 3999476 admin, 6098829 goods, 1232595 slop)
                                 total words:        2     3     4     5    6+
