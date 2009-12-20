@@ -401,26 +401,6 @@ $ cat foo.hspp</screen>
     </variablelist>
   </sect2>
 
-  <sect2 id="options-C-compiler">
-    <title>Cコンパイラ(もし使われているなら)に影響するオプション</title>
-
-    <indexterm><primary>include-file options</primary></indexterm>
-    <indexterm><primary>C compiler options</primary></indexterm>
-    <indexterm><primary>GCC options</primary></indexterm>
-
-    <para>大量の他言語呼び出しのあるソースをコンパイルしていると、Cコンパイラに<literal>&num;include</literal>ファイルについて伝える必要が出てくるかもしれない。これをするための「正しい方法」はソースファイルの先頭に<literal>INCLUDE</literal>プラグマを追加することである。(<xref linkend="include-pragma"/>)</para>
-
-<programlisting>{-# INCLUDE &lt;X/Xlib.h&gt; #-}</programlisting>
-      
-    <para>これが不便なこともある。そういう場合のために、同等のコマンド行オプションもある。</para>
-
-<screen>% ghc -c '-#include &lt;X/Xlib.h&gt;' Xstuff.lhs</screen>
-
-    <indexterm><primary><option>-#include</option></primary>
-    </indexterm>
-
-  </sect2>
-
   <sect2 id="options-codegen">
     <title>コード生成に影響するオプション</title>
 
@@ -481,8 +461,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fPIC</option></primary></indexterm>
         </term>
         <listitem>
-          <para>位置独立なコード(共有ライブラリや共有バイナリに置けるコード)を生成する。</para>
-          <para>このオプションはリンク時にGHCに共有ライブラリを使わせるという効果もあることに注意。</para>
+          <para>位置独立なコード(共有ライブラリや共有バイナリに置けるコード)を生成する。これは現在、Linux x86とx86-64において、ネイティブコード生成器(-fasm)を使っているときに動作する。Windowsでは位置独立コードは決して使われないので、このプラットフォームではこのフラグは何もしない。</para>
         </listitem>
       </varlistentry>
 
@@ -491,8 +470,8 @@ $ cat foo.hspp</screen>
           <option>-dynamic</option>
         </term>
         <listitem>
-          <para>このフラグは、リンク時に共有Haskellライブラリを使うようにする。それらを作る方法については<xref linkend="building-packages"/>を見よ。</para>
-          <para>このオプションもコード生成に影響を与えることに注意。(上記参照)</para>
+          <para>コード生成に際して、別パッケージからインポートされた実体は別の共有ライブラリやバイナリにあると仮定する。</para>
+          <para>このオプションをリンク時に使うと、GHCは共有ライブラリをリンクするのに注意。</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -599,7 +578,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-dynamic</option></primary></indexterm>
         </term>
         <listitem>
-          <para>可能なら共有Haskellライブラリを使うようにリンカに指示する。(このオプションは現在のところMac OS Xのみでサポートされている。また、あなたの入手したGHC配布物に共有ライブラリがないかもしれない)</para>
+          <para>このオプションは、Haskellの共有ライブラリをリンクするようにGHCに指示する。このフラグは依存するライブラリの選択に影響するだけであり、現在作っているものの形式には影響しない(-sharedを見よ)。作り方に関しては<xref linkend="using-shared-libs"/>を見よ。</para>
           <para>このオプションはコード生成にも影響を与えることに注意。(上記参照)</para>
         </listitem>
       </varlistentry>
@@ -620,6 +599,16 @@ $ cat foo.hspp</screen>
         </listitem>
       </varlistentry>
 
+      <varlistentry>
+        <term>
+          <option>-dynload</option>
+          <indexterm><primary><option>-dynload</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>このフラグは、実行時に共有ライブラリを探すときのいくつかの方式から一つを選ぶものである。それぞれの方式については<xref linkend="finding-shared-libs"/>を見よ。
+          </para>
+        </listitem>
+      </varlistentry>
 
       <varlistentry>
         <term>
@@ -680,15 +669,23 @@ $ cat foo.hspp</screen>
             <listitem>
               <para>マルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>またはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械における並列性<indexterm><primary>parallelism</primary></indexterm>。<xref linkend="using-smp"/>を見よ。</para>
 
-              <para>他のHaskellスレッドをブロックせずに他言語関数を呼び出す能力。</para>
-
-              <para>foreign exportされたHaskellの関数を複数のOSスレッドから呼び出す能力。</para>
+              <para>他のHaskellスレッドをブロックせずに他言語関数を呼び出したり、foreign exportされたHaskellの関数を複数のOSスレッドから呼び出す能力。<xref linkend="ffi-threads"/>を見よ。</para>
             </listitem>
           </itemizedlist>
+        </listitem>
+      </varlistentry>
 
-          <para><option>-threaded</option>が与えられていると、他言語関数の呼び出しは、呼び出し元のHaskellスレッドを作ったのと同じOSスレッド(そのスレッドがforeign exportされたHaskellの関数によって作られた場合)または適当なOSスレッド(そのスレッドが<literal>forkIO</literal>で作られた場合)で実行される。</para>
-
-          <para>スレッド化ランタイムがどのように「束縛スレッド」を使うかについてのさらなる詳細は、<ulink url="../libraries/base/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールにある。</para>
+      <varlistentry>
+        <term>
+          <option>-eventlog</option>
+          <indexterm><primary><option>-eventlog</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>プログラムを"eventlog"版のランタイムシステムにリンクする。この方法でリンクされたプログラムは、実行時にイベント(スレッドの開始/停止など)の追跡情報を<literal><replaceable>program</replaceable>.eventlog</literal>というバイナリファイルに生成することができる。このファイルは後でいろいろなツールによって解釈できる。さらなる情報は<xref linkend="rts-eventlog"/>を見よ。
+          </para>
+          <para>
+            <option>-eventlog</option>は<option>-threaded</option>と併用することができる。また<option>-debug</option>によって自動的に有効になる。
+          </para>
         </listitem>
       </varlistentry>
 
