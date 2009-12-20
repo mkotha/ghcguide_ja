@@ -7,7 +7,7 @@
   
   <para>パッケージとは、Haskellモジュールから成るライブラリで、コンパイラが把握している。GHCにはいくつかのパッケージが付属している。同梱の<ulink url="../libraries/index.html">ライブラリ説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">web上の最新版</ulink>)を見よ。また、<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>から別のライブラリを入手してインストールすることができる。</para>
 
-  <para>パッケージを使う手順はこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
+  <para>パッケージを使う手順はこの上なく単純である。<option>&ndash;&ndash;make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
   <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
 
@@ -17,20 +17,52 @@
     <indexterm><primary>packages</primary>
       <secondary>using</secondary></indexterm>
     
-    <para>GHCは、<emphasis>インストール済み</emphasis>のパッケージしか関知しない。どんなパッケージがインストールされているか見るためには、<literal>ghc-pkg</literal>コマンドを使えば良い。</para>
+    <para>GHCは、<emphasis>インストール済み</emphasis>のパッケージしか関知しない。どんなパッケージがインストールされているか見るためには、<literal>ghc-pkg list</literal>コマンドを使えば良い。</para>
 
 <screen>
 $ ghc-pkg list
-/usr/lib/ghc-6.4/package.conf:
-    base-1.0, haskell98-1.0, template-haskell-1.0, mtl-1.0, unix-1.0,
-    Cabal-1.0, haskell-src-1.0, parsec-1.0, network-1.0,
-    QuickCheck-1.0, HUnit-1.1, fgl-1.0, X11-1.1, HGL-3.1, OpenGL-2.0,
-    GLUT-2.0, stm-1.0, readline-1.0, (lang-1.0), (concurrent-1.0),
-    (posix-1.0), (util-1.0), (data-1.0), (text-1.0), (net-1.0),
-    (hssource-1.0), rts-1.0
-      </screen>
+/usr/lib/ghc-6.12.1/package.conf.d:
+    Cabal-1.7.4
+    array-0.2.0.1
+    base-3.0.3.0
+    base-4.2.0.0
+    bin-package-db-0.0.0.0
+    binary-0.5.0.1
+    bytestring-0.9.1.4
+    containers-0.2.0.1
+    directory-1.0.0.2
+    (dph-base-0.4.0)
+    (dph-par-0.4.0)
+    (dph-prim-interface-0.4.0)
+    (dph-prim-par-0.4.0)
+    (dph-prim-seq-0.4.0)
+    (dph-seq-0.4.0)
+    extensible-exceptions-0.1.1.0
+    ffi-1.0
+    filepath-1.1.0.1
+    (ghc-6.12.1)
+    ghc-prim-0.1.0.0
+    haskeline-0.6.2
+    haskell98-1.0.1.0
+    hpc-0.5.0.2
+    integer-gmp-0.1.0.0
+    mtl-1.1.0.2
+    old-locale-1.0.0.1
+    old-time-1.0.0.1
+    pretty-1.0.1.0
+    process-1.0.1.1
+    random-1.0.0.1
+    rts-1.0
+    syb-0.1.0.0
+    template-haskell-2.4.0.0
+    terminfo-0.3.1
+    time-1.1.4
+    unix-2.3.1.0
+    utf8-string-0.3.4
+</screen>
+    <para>インストールされているパッケージは、デフォルトで露出されているか隠されているかのいずれかである。デフォルトで隠されているパッケージは、<literal>ghc-pkg list</literal>の出力の中に括弧付きで(<literal>(lang-1.0)</literal>のように)現れるか、ターミナルが色付けに対応しているなら青で表示される。下記のコマンド行フラグを使えば、隠しパッケージを露出したり露出パッケージを隠したりできる。あなたのHaskellコードからインポートできるのは露出されているパッケージのモジュールだけである。隠しパッケージのモジュールをインポートしようとすると、GHCはエラーメッセージを出力する。</para>
 
-    <para>インストールされているパッケージは、デフォルトで露出されているか隠されているかのいずれかである。デフォルトで隠されているパッケージは、上記の出力に括弧付きで(<literal>(lang-1.0)</literal>のように)現れる。下記のコマンド行フラグを使えば、隠しパッケージを露出したり露出パッケージを隠したりできる。あなたのHaskellコードからインポートできるのは露出されているパッケージのモジュールだけである。隠しパッケージのモジュールをインポートしようとすると、GHCはエラーメッセージを出力する。</para>
+    <para>参考: Cabalを使っているなら、パッケージが露出されているか隠されているかという区別は関係しない。どのパッケージが利用可能かは<literal>.cabal</literal>の指定に列挙されている依存関係から決定される。露出されているか隠されているかの区別は<literal>ghc</literal>や<literal>ghci</literal>を直接使うときのみ影響する。</para>
 
     <para>あるパッケージがどんなモジュールを公開しているかを見るには、<literal>ghc-pkg</literal>コマンドを使う。(<xref linkend="package-management"/>を見よ)</para>
     
@@ -68,6 +100,17 @@ exposed-modules: Network.BSD,
 	</listitem>
       </varlistentry>
       
+      <varlistentry>
+        <term>
+	  <option>-package-id <replaceable>P</replaceable></option>
+	  <indexterm><primary><option>-package-id</option></primary></indexterm>
+	</term>
+	<listitem>
+          <para><option>-package</option>のようにパッケージを露出するが、パッケージは名前ではなくIDで示される。これはパッケージを示す方法としてより頑健であり、通常なら(訳注: 同名パッケージに)覆い隠されてしまうパッケージを選択するのに用いることもできる。Cabalは<option>-package-id</option>フラグをGHCに渡す。
+          </para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry>
 	<term><option>-hide-all-packages</option>
 	<indexterm><primary><option>-hide-package</option></primary>
@@ -108,7 +151,7 @@ exposed-modules: Network.BSD,
         <listitem>
           <para>コンパイルしようとしているモジュールが、パッケージ<literal>foo</literal>の一員であることを、GHCに伝える。このフラグが省略される(とてもよくある場合である)と、デフォルトのパッケージである<literal>main</literal>と推定される。</para>
 
-          <para>注意: <option>-package-name</option>の引数はそのパッケージの完全なパッケージ識別子であるべきである。つまりバージョン番号を含んでいなければならない。例えば、<literal>-package mypkg-1.2</literal>のように。</para>
+          <para>注意: <option>-package-name</option>の引数はそのパッケージの完全な<literal>パッケージ名-バージョン</literal>形式であるべきである。例えば、<literal>-package mypkg-1.2</literal>のように。</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -128,7 +171,7 @@ ___stginit_ZCMain
   </sect2>
 
   <sect2 id="package-overlaps">
-    <title>パッケージを使うことの影響</title>
+    <title>パッケージを使うことのHaskell言語への影響</title>
 
     <para>パッケージを使っていると、同じ名前の二つのモジュールができることがあり得る。例えば、あなたのプログラムがパッケージPを使っていて、Pには隠されたモジュールMがあり、さらにあなたのプログラムにもモジュールMがあるかもしれない。あるいは、利用している複数のパッケージの依存関係が重複したモジュールを含むかもしれない。パッケージの依存関係のせいで、あるプログラムが一つのパッケージの複数のバージョンを含むことさえあり得る。</para>
 
@@ -140,20 +183,25 @@ ___stginit_ZCMain
   <sect2 id="package-databases">
     <title>パッケージデータベース</title>
       
-    <para>パッケージデータベースは一つのファイルであり、通常<literal>package.conf</literal>と呼ばれ、インストールされているパッケージについての記述を含む。GHCが知っているパッケージデータベースは、通常、以下の二つである。</para>
+    <para>パッケージデータベースとは、インストール済みのパッケージについての詳細が記録されている場所である。パッケージデータベースは一つのディレクトリであり、通常<literal>package.conf.d</literal>という名前である。これには各パッケージごとのファイルと、パッケージデータのバイナリキャッシュが入った<literal>package.cache</literal>が置かれている。通常、パッケージデータベースの中身を直接見たり変更したりする必要はないはずである。パッケージデータベースの管理はすべて<literal>ghc-pkg</literal>ツールを介して行える(<xref linkend="package-management"/>を見よ)。
+    </para>
+
+    <para>
+      GHCは特定の二つのパッケージデータベースについて知っている。
+    </para>
 
     <itemizedlist>
       <listitem>
-        <para>大域的パッケージデータベース。これはGHCのインストール内容に含まれる。</para>
+        <para>大域的パッケージデータベース。これはGHCのインストール内容に含まれる。例えば、<filename>/usr/lib/ghc-6.12.1/package.conf.d</filename>。</para>
       </listitem>
       <listitem>
-        <para>各ユーザ専用のパッケージデータベース。Unixシステムではこれは<filename>$HOME/.ghc/<replaceable>arch</replaceable>-<replaceable>os</replaceable>-<replaceable>version</replaceable>/package.conf</filename>であり、Windowsでは<filename>C:\Documents&nbsp;And&nbsp;Settings\<replaceable>user</replaceable>\ghc</filename>のようなところである。<literal>ghc-pkg</literal>ツールはこのファイルがどこに置かれるべきか知っていて、存在しなければこれを作る。(<xref linkend="package-management"/>を見よ)</para>
+        <para>各ユーザ専用のパッケージデータベース。Unixシステムではこれは<filename>$HOME/.ghc/<replaceable>arch</replaceable>-<replaceable>os</replaceable>-<replaceable>version</replaceable>/package.conf.d</filename>であり、Windowsでは<filename>C:\Documents&nbsp;And&nbsp;Settings\<replaceable>user</replaceable>\ghc\package.conf.d</filename>のようなところである。<literal>ghc-pkg</literal>ツールはこのファイルがどこに置かれるべきか知っていて、存在しなければこれを作る。(<xref linkend="package-management"/>を見よ)</para>
       </listitem>
     </itemizedlist>
 
     <para>GHCは、起動すると、これらの二つのパッケージデータベースの内容を読み、既知のパッケージの一覧を作り上げる。パッケージの一覧表を見るには、GHCを<option>-v</option>フラグ付きで走らせれば良い。</para>
 
-    <para>パッケージデータベースには重複があっても良い。例えば、ユーザデータベースにあるパッケージは大域的データベースにある同名のものより優先される。</para>
+    <para>パッケージデータベースには重複があっても良い。例えば、ユーザデータベースにあるパッケージは大域的データベースにある同名同バージョンのものより優先される(それを<emphasis>覆い隠す</emphasis>)。</para>
 
     <para>どのパッケージデータベースをロードするかを制御するには、以下のオプションを使えば良い。</para>
 
@@ -179,8 +227,6 @@ ___stginit_ZCMain
       </varlistentry>
     </variablelist>
 
-    <para>新しいパッケージデータベースを作るには、単に新規ファイルを作成して文字列「<literal>[]</literal>」を書き込めば良い。このファイルにパッケージを追加するのには<literal>ghc-pkg</literal>ツール(<xref linkend="package-management"/>で説明される)を使うことができる。</para>
-
     <sect3 id="ghc-package-path">
       <title><literal>GHC_PACKAGE_PATH</literal>環境変数</title>
       <indexterm><primary>Environment variable</primary><secondary><literal>GHC_PACKAGE_PATH</literal></secondary>
@@ -197,66 +243,103 @@ $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
     </sect3>
   </sect2>
 
-  <sect2 id="building-packages">
-    <title>Haskellソースからパッケージをビルドする</title>
-    <indexterm><primary>packages</primary>
-      <secondary>building</secondary></indexterm>
+  <sect2 id="package-ids">
+    <title>パッケージID、依存関係、壊れたパッケージ</title>
 
-    <para>苦労してパッケージをビルドすることは推奨されない。代わりに、可能なら<ulink url="../Cabal/index.html">Cabal</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)を使ってほしい。しかし、あなたのパッケージが特に複雑だったリ、大量の設定を要したりするなら、低レベルな機構にフォールバックしなければならないかもしれないので、そういう強者のためにいくつか手がかりを示しておく。</para>
-    
-    <para>パッケージをインストールする際、<literal>ghc-pkg</literal>に渡すための「インストール済みパッケージ情報」ファイルを構築する必要がある。このファイルの内容は<xref linkend="installed-pkg-info"/>に説明されている。</para>
+    <para>インストール済みのパッケージにはそれぞれ固有の識別子(「インストール済みパッケージID」または単に短く「パッケージID」)があり、そのシステムにインストールされている他のパッケージと区別される。インストール済みパッケージそれぞれに決められたパッケージIDを見るには、<literal>ghc-pkg list -v</literal>を使えばよい。</para>
 
-    <para>パッケージ中のHaskellコードは、ビルドされて一つ以上のライブラリアーカイブ(例えば<filename>libHSfoo.a</filename>)になるか、あるいは単一の共有オブジェクト(例えば<filename>HSfoo.dll/.so/.dylib</filename>)になることもできる。共有オブジェクトが単一でなければいけないのは、コンパイラが共有オブジェクト間呼び出しを作るか共有オブジェクト内呼び出しを作るかの判断にパッケージシステムが用いられるからである。(共有オブジェクト間呼び出しには余分な間接参照が必要になる)。</para>
-    <itemizedlist>
-      <listitem>
-        <para>静的ライブラリをビルドするのは<literal>ar</literal>を用いて為される。次のように。</para>
+    <screen>
+$ ghc-pkg list -v
+using cache: /usr/lib/ghc-6.12.1/package.conf.d/package.cache
+/usr/lib/ghc-6.12.1/package.conf.d
+   Cabal-1.7.4 (Cabal-1.7.4-48f5247e06853af93593883240e11238)
+   array-0.2.0.1 (array-0.2.0.1-9cbf76a576b6ee9c1f880cf171a0928d)
+   base-3.0.3.0 (base-3.0.3.0-6cbb157b9ae852096266e113b8fac4a2)
+   base-4.2.0.0 (base-4.2.0.0-247bb20cde37c3ef4093ee124e04bc1c)
+   ...
+</screen>
 
-<screen>ar cqs libHSfoo-1.0.a A.o B.o C.o ...</screen>
+    <para>パッケージ名の後の括弧内にある文字列がパッケージIDである。これは通常パッケージ名とバージョンで始まり、コンパイルされたパッケージから導出されたハッシュ文字列で終わる。パッケージ間の依存関係は、単にパッケージとバージョンについてではなく、パッケージIDについて表現される。例えば、この<literal>haskell98</literal>パッケージの依存関係を見て欲しい。</para>
 
-        <para>ここで、<filename>A.o</filename>、<filename>B.o</filename>などはコンパイル済みHaskellモジュールであり、<filename>libHSfoo.a</filename>は作りたいライブラリである。システムによって構文が微妙に違うかもしれないので、問題があれば説明書を確かめること。</para>
+    <screen>
+$ ghc-pkg field haskell98 depends
+depends: array-0.2.0.1-9cbf76a576b6ee9c1f880cf171a0928d
+         base-4.2.0.0-247bb20cde37c3ef4093ee124e04bc1c
+         directory-1.0.0.2-f51711bc872c35ce4a453aa19c799008
+         old-locale-1.0.0.1-d17c9777c8ee53a0d459734e27f2b8e9
+         old-time-1.0.0.1-1c0d8ea38056e5087ef1e75cb0d139d1
+         process-1.0.1.1-d8fc6d3baf44678a29b9d59ca0ad5780
+         random-1.0.0.1-423d08c90f004795fd10e60384ce6561
+</screen>
 
-      </listitem>
-      <listitem>
-        <para>HaskellライブラリのGHCi用の版を含めることもできる。GHCiは<literal>.a</literal>ファイルを直接ロードすることができず、代わりに<filename>HSfoo.o</filename>という名前のオブジェクトファイルを探してそれをロードする。システムによっては、<literal>ghc-pkg</literal>ツールが各ライブラリのGHCi用の版を自動的にビルドすることができる。これについては<xref linkend="package-management"/>を見よ。これらのライブラリを<literal>.a</literal>アーカイブから手で作るには、GNU <command>ld</command>を次のように使うことが可能である。</para>
+    <para>パッケージを再インストールしたときに、それに依存するパッケージを再コンパイルし忘れると問題が起こるが、パッケージIDはこの問題を検出するために存在する。再コンパイルの依存関係が必要なのは、例え同じソースコードから同じコンパイラでビルドされたとしても、新しくコンパイルされたパッケージのABI(Application Binary Interface)が異なるかもしれないからである。パッケージIDがあると、再コンパイルしたパッケージは前の版とは異なるパッケージIDを持つことになるので、前の版に依存していたパッケージは宙に浮いた状態、つまり依存関係のうちどれかが満たされていない状態になる。この意味で壊れているパッケージは、<literal>ghc-pkg list</literal>の出力において、赤色(可能なら)か、さもなくば中括弧で囲まれて示される。次の例において、<literal>filepath</literal>パッケージを再コンパイル、再インストールしたので、これによって<literal>Cabal</literal>を含むいくつかの依存物が壊れている。</para>
 
-<screen>ld -r &ndash;&ndash;whole-archive -o HSfoo.o libHSfoo.a</screen>
+    <screen>
+$ ghc-pkg list
+WARNING: there are broken packages.  Run 'ghc-pkg check' for more details.
+/usr/lib/ghc-6.12.1/package.conf.d:
+    {Cabal-1.7.4}
+    array-0.2.0.1
+    base-3.0.3.0
+    ... etc ...
+</screen>
 
-        <para>(MacOS Xなら<literal>&ndash;&ndash;whole-archive</literal>の代わりに<literal>&ndash;all_load</literal>を使うこと。)</para>
-	
-      </listitem>
-      <listitem>
-	<para>パッケージを共有オブジェクトとしてビルドする場合、GHCはリンカのラッパとして働き、内部的に使うリンカを隠す。これによって、GHCが対応している全ての共有オブジェクト形式(DLL、ELF DSO、Mac OSのdylib)に対して共通のインタフェースが得られる。共有オブジェクトは特定の方法で命名されねばならないが、これは次の二つの理由による。(1)GHCのコンパイラバージョンが名前に含まれていなければならない。これは、ライブラリを二つの異なるバージョンのGHCでコンパイルすると、呼び出し規約の点でまず間違いなく非互換になるので、これらが衝突しないようにするためである。(2)この名前は、静的ライブラリの名前とは異なっていなければならない。さもなくば、精密にリンカを制御することができず、<option>-static</option>/<option>-dynamic</option>フラグが動作するようにできなくなるだろう。<xref linkend="options-linker"/>を見よ。</para>
+    <para>加えて、<literal>ghc-pkg list</literal>は壊れたパッケージがあることについて注意を促し、<literal>ghc-pkg check</literal>を勧める。これは、この失敗の性質についてさらなる情報を表示するものである。
+    </para>
 
-<screen>ghc -shared libHSfoo-1.0-ghc<replaceable>GHCVersion</replaceable>.so A.o B.o C.o</screen>
-        <para>共有オブジェクトの名前の中にGHCのバージョン番号を使うことで、異なるバージョンのGHCでコンパイルした異なるバージョンのライブラリをシステムの標準の場所(たとえば*nixの/usr/lib以下)にインストールすることが可能になる。GHCのバージョン番号を得るには、<literal>ghc --numeric-version</literal>を起動して、その出力を<replaceable>GHCVersion</replaceable>として使えばよい。共有オブジェクトをリンクするためにオブジェクトファイルを準備する方法について、<xref linkend="options-codegen"/>も参照せよ。</para>
-      </listitem>
-    </itemizedlist>
+    <screen>
+$ ghc-pkg check
+There are problems in package ghc-6.12.1:
+  dependency "filepath-1.1.0.1-87511764eb0af2bce4db05e702750e63" doesn't exist
+There are problems in package haskeline-0.6.2:
+  dependency "filepath-1.1.0.1-87511764eb0af2bce4db05e702750e63" doesn't exist
+There are problems in package Cabal-1.7.4:
+  dependency "filepath-1.1.0.1-87511764eb0af2bce4db05e702750e63" doesn't exist
+There are problems in package process-1.0.1.1:
+  dependency "filepath-1.1.0.1-87511764eb0af2bce4db05e702750e63" doesn't exist
+There are problems in package directory-1.0.0.2:
+  dependency "filepath-1.1.0.1-87511764eb0af2bce4db05e702750e63" doesn't exist
 
-    <para>GHCはパッケージをまたぐ依存関係について詳細な情報を持たない。現在のモジュールが外部パッケージのどのモジュールに依存しているかは把握しているが、それらの被インポートモジュールの中の何に依存しているかまでは知らない。</para>
-    
-      <para>新しいパッケージの一部となるべきモジュールをコンパイルするときは、<literal>-package-name</literal>オプション(<xref linkend="using-packages"/>)を使うこと。パッケージのコンパイル時に<literal>-package-name</literal>オプションを付け忘れるとおそらく惨事になるが、それが分かるのは後でそのパッケージからモジュールをインポートしようとしたときだろう。この時点でGHCは、そのモジュールがあると期待されるパッケージと、<literal>.hi</literal>ファイルに記録されたパッケージ名が異なることに文句をいう。</para>
+The following packages are broken, either because they have a problem
+listed above, or because they depend on a broken package.
+ghc-6.12.1
+haskeline-0.6.2
+Cabal-1.7.4
+process-1.0.1.1
+directory-1.0.0.2
+bin-package-db-0.0.0.0
+hpc-0.5.0.2
+haskell98-1.0.1.0
+</screen>
 
-    <para>共有オブジェクトについて注意に値することがある。それぞれのパッケージが単一の共有オブジェクトファイルとしてビルドされているとき、共有オブジェクトへの参照は余分な間接参照を必要とするので、パッケージ内での参照の方がパッケージ間参照よりもコストがかからない。もちろん、このことは<filename>main</filename>パッケージにも当てはまる。</para>
-    </sect2>
+    <para>この問題を解決するには、壊れたパッケージ群を、新しい依存関係に対して再コンパイルしなければならない。これをするのに最も簡単な方法は、<literal>cabal-install</literal>を使うか、あるいは<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>からそのパッケージをダウンロードして通常と同じようにビルド、インストールすることである。</para>
+
+    <para>GHC自身が依存しているパッケージを再コンパイルすることがないように注意。これをすると<literal>ghc</literal>パッケージ自体が壊れる可能性があり、<literal>ghc</literal>は単純にコンパイルしなおすことができない。この状態から回復するにはGHCを再インストールするしかないだろう。</para>
+  </sect2>
 
   <sect2 id="package-management">
     <title>パッケージ管理(<literal>ghc-pkg</literal>コマンド)</title>
     <indexterm><primary>packages</primary>
       <secondary>management</secondary></indexterm>
     
-    <para><literal>ghc-pkg</literal>ツールを使うと、パッケージデータベースにパッケージを追加したり削除したりすることができる。デフォルトでは、操作されるのはシステム全体のパッケージデータベースであるが、ユーザ固有のパッケージデータベースやその他指定されたファイルを使うこともできる。</para>
-
-    <para>どんなパッケージデータベースが使われているか見るには、<literal>ghc-pkg&nbsp;list</literal>とすれば良い。<literal>ghc-pkg</literal>が知っているパッケージデータベースのスタックは、<literal>GHC_PACKAGE_PATH</literal>環境変数(<xref linkend="ghc-package-path"/>を見よ)を使うか、<literal>ghc-pkg</literal>のコマンド行から<literal>--package-conf</literal>を使うことで変更できる。</para>
+    <para><literal>ghc-pkg</literal>ツールは、パッケージデータベースの情報を取得したり、これに変更を加えたりするためのものである。どんなパッケージデータベースが使われているか見るには、<literal>ghc-pkg&nbsp;list</literal>とすれば良い。<literal>ghc-pkg</literal>が知っているパッケージデータベースのスタックは、<literal>GHC_PACKAGE_PATH</literal>環境変数(<xref linkend="ghc-package-path"/>を見よ)を使うか、<literal>ghc-pkg</literal>のコマンド行から<literal>--package-conf</literal>を使うことで変更できる。</para>
 
     <para>データベースを変更するとき、<literal>ghc-pkg</literal>はデフォルトで大域的データベースを変更する。<option>--user</option>を指定すればユーザデータベースが操作される。また、<option>--package-conf</option>を使ってまったく別のデータベースを操作させることもできる。これらのオプションが複数与えられたときは、もっとも右にあるものが対象のデータベースとして使われる。</para>
 
-   <para>パッケージデータベースに問い合わせを行うコマンド(list、latest、describe、find)は、フラグ<option>--user</option>、<option>--global</option>、<option>--package-conf</option>によって指定されるデータベースの列に対して動作する。これらのフラグが一つも与えられなかった場合、デフォルトは<option>--global</option> <option>--user</option>である。</para>
+   <para>パッケージデータベースに問い合わせを行うコマンド(list、latest、describe、find、dot)は、フラグ<option>--user</option>、<option>--global</option>、<option>--package-conf</option>によって指定されるデータベースの列に対して動作する。これらのフラグが一つも与えられなかった場合、デフォルトは<option>--global</option> <option>--user</option>である。</para>
 
     <para><literal>GHC_PACKAGE_PATH</literal>環境変数が設定されていて、その値の最後が区切り子(Unixでは<literal>:</literal>、Windowsでは<literal>;</literal>)でないとき、最後のデータベースが大域データベースとみなされ、<literal>ghc-pkg</literal>はデフォルトでこれを変更する。このようになっているのは、<literal>GHC_PACKAGE_PATH</literal>を使って仮想的なパッケージ環境を構築し、そこでは他に何も指定することなくCabalパッケージをインストールできるようにすることが可能であるように、である。</para>
 
     <para><literal>ghc-pkg</literal>プログラムは下の一覧にあるような方法で実行できる。パッケージ名が必要なところでは、バージョン番号を含めて完全な形で指定しても良いし(<literal>network-1.0</literal>のように)、バージョン番号なしで指定しても良い。パッケージをバージョン番号なしで指定すると、そのパッケージの全てのバージョンが該当する。指定された操作は該当する全てのパッケージに対して行われる。パッケージの全てのバージョンが該当するという指定子は<replaceable>pkg</replaceable><literal>-*</literal>のように書くこともでき、こうすれば複数のパッケージが該当するだろうことがより明確になる。</para>
 
     <variablelist>
+      <varlistentry>
+        <term><literal>ghc-pkg init <replaceable>path</replaceable></literal></term>
+        <listitem>
+          <para><replaceable>path</replaceable>に、新しい空のパッケージデータベースを作る。<replaceable>path</replaceable>が既に存在していてはならない。</para>
+        </listitem>
+      </varlistentry>
+
       <varlistentry>
 	<term><literal>ghc-pkg register <replaceable>file</replaceable></literal></term>
 	<listitem>
@@ -356,11 +439,31 @@ c:/fptools/validate/ghc/driver/package.conf.inplace:
       </varlistentry>
 
       <varlistentry>
+        <term><literal>ghc-pkg dot</literal></term>
+        <listitem>
+          <para>パッケージの依存関係のグラフを、<ulink url="http://www.graphviz.org/">graphviz</ulink>への入力に適した形式で生成する。例えば、依存グラフのPDFを生成するには次のようにする。</para>
+<screen>
+ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
+</screen>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
         <term><literal>ghc-pkg dump</literal></term>
         <listitem>
           <para>全てのパッケージについて、<literal>InstalledPackageInfo</literal>の形式で完全な説明を出力する。複数のパッケージは<literal>---</literal>という文字列だけからなる行で区切られる。</para>
 
           <para>これは<literal>ghc-pkg describe '*'</literal>とほとんど同じである。ただし、<literal>ghc-pkg dump</literal>は結果をパースするツールによって使われることを意図しているので、例えば<literal>ghc-pkg describe '*'</literal>はパターンに照合するパッケージを見つけられなかった場合にエラーを出力するのに対し、<literal>ghc-pkg dump</literal>は何も出力しないだけである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>ghc-pkg recache</literal></term>
+        <listitem>
+          <para>選択したデータベースについて、バイナリキャッシュファイル<filename>package.cache</filename>を再作成する。これは、キャッシュが何らかの理由でデータベースの内容との同期が取れなくなった場合に必要かもしれない(この疑いがある場合、<literal>ghc-pkg</literal>が警告を発するだろう)。</para>
+          
+          <para>これ以外で<literal>ghc-pkg recache</literal>が便利なのは、パッケージを手動で登録する場合である。パッケージの登録は、適切なファイルをデータベースディレクトリに置き、<literal>ghc-pkg recache</literal>でキャッシュを更新するだけで可能である。自動化されたパッケージシステムにとっては、こちらの方法でパッケージを登録する方が便利かもしれない。
+          </para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -385,7 +488,7 @@ c:/fptools/validate/ghc/driver/package.conf.inplace:
     ghc-pkg field '*' haddock-html
     -- データベース全体をダンプ
     ghc-pkg describe '*'
-    </screen>
+</screen>
 
     <para>さらに、<literal>ghc-pkg</literal>は以下のフラグを受け付ける。</para>
 
@@ -465,6 +568,20 @@ c:/fptools/validate/ghc/driver/package.conf.inplace:
       </varlistentry>
 
       <varlistentry>
+        <term>
+          <option>-v</option><optional><replaceable>n</replaceable></optional><indexterm><primary><option>-v</option></primary><secondary>ghc-pkg 
+              option</secondary></indexterm>
+        </term>
+        <term>
+          <option>--verbose</option><optional>=<replaceable>n</replaceable></optional><indexterm><primary><option>--verbose</option></primary><secondary>ghc-pkg option</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>多弁さを制御する。多弁さの水準は0から2までであり、デフォルトは1である。<option>-v</option>のみなら2が選択される。
+          </para>
+        </listitem>
+      </varlistentry>          
+
+      <varlistentry>
 	<term>
 	  <option>-V</option><indexterm><primary><option>-V</option></primary>
 	  </indexterm>
@@ -479,10 +596,47 @@ c:/fptools/validate/ghc/driver/package.conf.inplace:
       </varlistentry>
     </variablelist>
 
-    <para><replaceable>file</replaceable>というパッケージデータベースに変更を加えるとき、元のファイルのコピーが<replaceable>file</replaceable><literal>.old</literal>に置かれるので、緊急事態には古いファイルをコピーし直すことで常に元の設定を回復することができる。</para>
-
   </sect2>
   
+  <sect2 id="building-packages">
+    <title>Haskellソースからパッケージをビルドする</title>
+    <indexterm><primary>packages</primary>
+      <secondary>building</secondary></indexterm>
+
+    <para>苦労してパッケージをビルドすることは推奨されない。代わりに、可能なら<ulink url="../Cabal/index.html">Cabal</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)を使ってほしい。しかし、あなたのパッケージが特に複雑だったリ、大量の設定を要したりするなら、低レベルな機構にフォールバックしなければならないかもしれないので、そういう強者のためにいくつか手がかりを示しておく。</para>
+    
+    <para>パッケージをインストールする際、<literal>ghc-pkg</literal>に渡すための「インストール済みパッケージ情報」ファイルを構築する必要がある。このファイルの内容は<xref linkend="installed-pkg-info"/>に説明されている。</para>
+
+    <para>パッケージ中のHaskellコードは、ビルドされて一つ以上のライブラリアーカイブ(例えば<filename>libHSfoo.a</filename>)になるか、あるいは単一の共有オブジェクト(例えば<filename>HSfoo.dll/.so/.dylib</filename>)になることもできる。共有オブジェクトが単一でなければいけないのは、コンパイラが共有オブジェクト間呼び出しを作るか共有オブジェクト内呼び出しを作るかの判断にパッケージシステムが用いられるからである。(共有オブジェクト間呼び出しには余分な間接参照が必要になる)。</para>
+    <itemizedlist>
+      <listitem>
+        <para>静的ライブラリをビルドするのは<literal>ar</literal>を用いて為される。次のように。</para>
+
+<screen>ar cqs libHSfoo-1.0.a A.o B.o C.o ...</screen>
+
+        <para>ここで、<filename>A.o</filename>、<filename>B.o</filename>などはコンパイル済みHaskellモジュールであり、<filename>libHSfoo.a</filename>は作りたいライブラリである。システムによって構文が微妙に違うかもしれないので、問題があれば説明書を確かめること。</para>
+
+      </listitem>
+      <listitem>
+        <para>HaskellライブラリのGHCi用の版を含めることもできる。GHCiは<literal>.a</literal>ファイルを直接ロードすることができず、代わりに<filename>HSfoo.o</filename>という名前のオブジェクトファイルを探してそれをロードする。システムによっては、<literal>ghc-pkg</literal>ツールが各ライブラリのGHCi用の版を自動的にビルドすることができる。これについては<xref linkend="package-management"/>を見よ。これらのライブラリを<literal>.a</literal>アーカイブから手で作るには、GNU <command>ld</command>を次のように使うことが可能である。</para>
+
+<screen>ld -r &ndash;&ndash;whole-archive -o HSfoo.o libHSfoo.a</screen>
+
+        <para>(MacOS Xなら<literal>&ndash;&ndash;whole-archive</literal>の代わりに<literal>&ndash;all_load</literal>を使うこと。)</para>
+	
+      </listitem>
+      <listitem>
+	<para>パッケージを共有ライブラリとしてビルドする場合、リンクの段階を行うためにGHCを使うことができる。これによって、内部的に使うリンカの詳細が一部隠され、GHCが対応している全ての共有オブジェクト形式(DLL、ELF DSO、Mac OSのdylib)に対して共通のインタフェースが得られる。共有オブジェクトは特定の方法で命名されねばならないが、これは次の二つの理由による。(1)GHCのコンパイラバージョンが名前に含まれていなければならない。これは、ライブラリを二つの異なるバージョンのGHCでコンパイルすると、呼び出し規約の点でまず間違いなく非互換になるので、これらが衝突しないようにするためである。(2)この名前は、静的ライブラリの名前とは異なっていなければならない。さもなくば、精密にリンカを制御することができず、<option>-static</option>/<option>-dynamic</option>フラグが動作するようにできなくなるだろう。<xref linkend="options-linker"/>を見よ。</para>
+
+<screen>ghc -shared libHSfoo-1.0-ghc<replaceable>GHCVersion</replaceable>.so A.o B.o C.o</screen>
+        <para>共有オブジェクトの名前の中にGHCのバージョン番号を使うことで、異なるバージョンのGHCでコンパイルした異なるバージョンのライブラリをシステムの標準の場所(たとえば*nixの/usr/lib以下)にインストールすることが可能になる。GHCのバージョン番号を得るには、<literal>ghc --numeric-version</literal>を起動して、その出力を<replaceable>GHCVersion</replaceable>として使えばよい。共有オブジェクトをリンクするためにオブジェクトファイルを準備する方法について、<xref linkend="options-codegen"/>も参照せよ。</para>
+      </listitem>
+    </itemizedlist>
+    
+      <para>新しいパッケージの一部となるべきモジュールをコンパイルするときは、<literal>-package-name</literal>オプション(<xref linkend="using-packages"/>)を使うこと。パッケージのコンパイル時に<literal>-package-name</literal>オプションを付け忘れるとおそらく惨事になるが、それが分かるのは後でそのパッケージからモジュールをインポートしようとしたときだろう。この時点でGHCは、そのモジュールがあると期待されるパッケージと、<literal>.hi</literal>ファイルに記録されたパッケージ名が異なることに文句をいう。</para>
+    <para>共有オブジェクトについて注意に値することがある。それぞれのパッケージが単一の共有オブジェクトファイルとしてビルドされているとき、共有オブジェクトへの参照は余分な間接参照を必要とするので、パッケージ内での参照の方がパッケージ間参照よりもコストがかからない。もちろん、このことは<filename>main</filename>パッケージにも当てはまる。</para>
+    </sect2>
+
   <sect2 id="installed-pkg-info">
     <title>
       <literal>InstalledPackageInfo</literal>: パッケージの仕様
@@ -495,44 +649,51 @@ c:/fptools/validate/ghc/driver/package.conf.inplace:
 <screen>
 $ ghc-pkg describe unix
 name: unix
-version: 1.0
+version: 2.3.1.0
+id: unix-2.3.1.0-de7803f1a8cd88d2161b29b083c94240
 license: BSD3
 copyright:
 maintainer: libraries@haskell.org
 stability:
 homepage:
 package-url:
-description:
-category:
+description: This package gives you access to the set of operating system
+             services standardised by POSIX 1003.1b (or the IEEE Portable
+             Operating System Interface for Computing Environments -
+             IEEE Std. 1003.1).
+             .
+             The package is not supported under Windows (except under Cygwin).
+category: System
 author:
 exposed: True
-exposed-modules: System.Posix,
-                 System.Posix.DynamicLinker.Module,
-                 System.Posix.DynamicLinker.Prim,
-                 System.Posix.Directory,
-                 System.Posix.DynamicLinker,
-                 System.Posix.Env,
-                 System.Posix.Error,
-                 System.Posix.Files,
-                 System.Posix.IO,
-                 System.Posix.Process,
-                 System.Posix.Resource,
-                 System.Posix.Temp,
-                 System.Posix.Terminal,
-                 System.Posix.Time,
-                 System.Posix.Unistd,
-                 System.Posix.User,
-                 System.Posix.Signals.Exts
-import-dirs: /usr/lib/ghc-6.4/libraries/unix
-library-dirs: /usr/lib/ghc-6.4/libraries/unix
-hs-libraries: HSunix
-extra-libraries: HSunix_cbits, dl
-include-dirs: /usr/lib/ghc-6.4/libraries/unix/include
-includes: HsUnix.h
-depends: base-1.0
+exposed-modules: System.Posix System.Posix.DynamicLinker.Module
+                 System.Posix.DynamicLinker.Prim System.Posix.Directory
+                 System.Posix.DynamicLinker System.Posix.Env System.Posix.Error
+                 System.Posix.Files System.Posix.IO System.Posix.Process
+                 System.Posix.Process.Internals System.Posix.Resource
+                 System.Posix.Temp System.Posix.Terminal System.Posix.Time
+                 System.Posix.Unistd System.Posix.User System.Posix.Signals
+                 System.Posix.Signals.Exts System.Posix.Semaphore
+                 System.Posix.SharedMem
+hidden-modules:
+import-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
+library-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
+hs-libraries: HSunix-2.3.1.0
+extra-libraries: rt util dl
+extra-ghci-libraries:
+include-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0/include
+includes: HsUnix.h execvpe.h
+depends: base-4.2.0.0-247bb20cde37c3ef4093ee124e04bc1c
+hugs-options:
+cc-options:
+ld-options:
+framework-dirs:
+frameworks:
+haddock-interfaces: /usr/share/doc/ghc/html/libraries/unix/unix.haddock
+haddock-html: /usr/share/doc/ghc/html/libraries/unix
 </screen>
 
-    <para>完全な<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)は(これを書いている時点では)まだ準備段階なので、いまのところはここにこのファイルの構文の簡単な解説を置いておく。</para>
+    <para>以下はこのファイルの構文の簡単な解説である。</para>
 
     <para>パッケージの仕様はいくつかのフィールド・値の対からなっている。フィールドにはまず行の左端から始まるフィールド名があり、「:」がそれに続き、さらに値が次の「左端から始まる行」またはファイル終端まで続く。</para>
 
@@ -571,6 +732,16 @@ depends: base-1.0
 	</term>
 	<listitem>
           <para>パッケージ名。(バージョンを含まない)</para>
+	</listitem>
+      </varlistentry>
+      
+      <varlistentry>
+	<term>
+	  <literal>id</literal>
+	  <indexterm><primary><literal>id</literal></primary><secondary>package specification</secondary></indexterm>
+	</term>
+	<listitem>
+	  <para>パッケージID。適切なものを選ぶのはあなたの責任である。</para>
 	</listitem>
       </varlistentry>
       
@@ -811,7 +982,7 @@ depends: base-1.0
             <indexterm><primary><literal>depends</literal></primary><secondary>package specification</secondary></indexterm>
           </term>
 	  <listitem>
-            <para>(パッケージ名の並び)このパッケージが依存するパッケージの一覧。このフィールドではパッケージに明示的なバージョン番号を付けることは必須である。ただし、<literal>ghc-pkg register</literal>にパッケージを提出するときは例外で、曖昧でなければバージョンは補完される。</para>
+            <para>(パッケージIDの並び)このパッケージが依存するパッケージの一覧。</para>
 	  </listitem>
 	</varlistentry>
 
