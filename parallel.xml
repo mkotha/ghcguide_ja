@@ -55,10 +55,10 @@
 
 <programlisting>
 infixr 0 `par`
-infixr 1 `seq`
+infixr 1 `pseq`
 
-par :: a -&#62; b -&#62; b
-seq :: a -&#62; b -&#62; b</programlisting>
+par  :: a -&#62; b -&#62; b
+pseq :: a -&#62; b -&#62; b</programlisting>
 
     <para>式<literal>(x `par` y)</literal>は、<literal>x</literal>の(弱頭部正規形までの)評価を<emphasis>発火</emphasis>させ、<literal>y</literal>を返す。発火したものはFIFO順に実行待ちに入るが、すぐには実行されない。ランタイムが待機状態のCPUを見つけると、発火したものはスレッドにされ、その新しいスレッドが待機状態のCPUで走らされる。この方法で、利用可能な並列性が実CPU間で分散されることになる。</para>
 
@@ -69,13 +69,18 @@ import Control.Parallel
 
 nfib :: Int -&#62; Int
 nfib n | n &#60;= 1 = 1
-       | otherwise = par n1 (seq n2 (n1 + n2 + 1))
+       | otherwise = par n1 (pseq n2 (n1 + n2 + 1))
                      where n1 = nfib (n-1)
                            n2 = nfib (n-2)</programlisting>
 
-    <para><varname>n</varname>の値が1より大きいときは、<function>par</function>を使って、<literal>nfib (n-1)</literal>を評価するスレッドを発火させる。次に、<function>seq</function>を使って、親スレッドで<literal>nfib (n-2)</literal>を評価し、その後でこれらの二つの部分式を加算するようにする。この分割統治法において、計算の枝の一方だけに新しいスレッドを発火させている。(一方の枝は親が評価する)。また、親が式<literal>(n1 + n2 + 1)</literal>中の<varname>n1</varname>を評価する<emphasis>前</emphasis>に<varname>n2</varname>を評価することを保証するために<function>seq</function>を使わなければならない。式を<literal>(n2 + n1 + 1)</literal>と並べ替えるだけでは不十分である。コンパイラが加数を左から順に評価するコードを生成するとは限らないからである。</para>
+    <para><varname>n</varname>の値が1より大きいときは、<function>par</function>を使って、<literal>nfib (n-1)</literal>を評価するスレッドを発火させる。次に、<function>pseq</function>を使って、親スレッドで<literal>nfib (n-2)</literal>を評価し、その後でこれらの二つの部分式を加算するようにする。この分割統治法において、計算の枝の一方だけに新しいスレッドを発火させている。(一方の枝は親が評価する)。また、親が式<literal>(n1 + n2 + 1)</literal>中の<varname>n1</varname>を評価する<emphasis>前</emphasis>に<varname>n2</varname>を評価することを保証するために<function>pseq</function>を使わなければならない。式を<literal>(n2 + n1 + 1)</literal>と並べ替えるだけでは不十分である。コンパイラが加数を左から順に評価するコードを生成するとは限らないからである。</para>
+
+    <para><literal>seq</literal>でなく<literal>pseq</literal>を使っていることに注意。この二つはほとんど同等だが、実行時の振る舞いが微妙に異なる。<literal>seq</literal>はどちらの引数を先に評価することもあるが、<literal>pseq</literal>は最初の引数を二番目の引数より先に評価することが決まっているので、<literal>par</literal>と組み合わせて評価順を制御するにはこちらの方が適している。
+    </para>
 
     <para><literal>par</literal>を使うとき、一般的な経験則としては、発火させる計算は後で必要とされるものであるべきだが、一方、あまりすぐ必要とされるものであるべきではない。また、あまり小さい計算を発火させるべきではない。得られる並列性に比べてそれをforkするコストが比較的高いからである。実際には、これらの比率を正しく把握するのは難しい。</para>
+
+    <para>実行時の統計情報から、<literal>par</literal>がどの程度うまく働いているかについての情報を少々集めることができる。<xref linkend="rts-options-gc"/>を見よ。</para>
 
     <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="../libraries/parallel/Control-Parallel-Strategies.html"><literal>Control.Parallel.Strategies</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/parallel/Control-Parallel-Strategies.html">web上の最新版</ulink>)モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
   </sect2>
