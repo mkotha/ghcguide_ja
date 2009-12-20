@@ -5115,7 +5115,14 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
     <para>全てのプラグマは<literal>{-# <replaceable>word</replaceable> ... #-}</literal>という形を取る。ここで、<replaceable>word</replaceable>はプラグマの種類を表す。必要なら、この後に続けて、その種類のプラグマに特有の情報を書く。<replaceable>word</replaceable>では大文字小文字の区別はなされない。GHCが理解する種々のプラグマは以下の節で解説されている。認識できない<replaceable>word</replaceable>を持ったプラグマは無視される。プラグマ中ではレイアウト規則が適用されるので、閉じ括弧<literal>#-}</literal>は開き括弧<literal>{-#</literal>よりも右のカラムで始まっていなければならない。</para>
 
-    <para>ある種のプラグマは<emphasis>ファイルヘッダプラグマ</emphasis>である。ファイルヘッダプラグマは、ファイル中で<literal>module</literal>キーワードよりも前になければならない。ファイルヘッダプラグマはいくつあっても良いし、コメントの前にあっても後にあっても良い。</para>
+    <para>ある種のプラグマは<emphasis>ファイルヘッダプラグマ</emphasis>である。
+      <itemizedlist>
+      <listitem><para>ファイルヘッダプラグマは、ファイル中で<literal>module</literal>キーワードよりも前になければならない。</para></listitem>
+      <listitem><para>ファイルヘッダプラグマはいくつあっても良いし、コメントの前にあっても後にあっても良い。</para></listitem>
+      <listitem><para>ファイルヘッダプラグマは、そのファイルを(例えばcppで)前処理する前に、一回だけ読まれる。</para></listitem>
+      <listitem><para>ファイルヘッダプラグマは以下のものである。<literal>{-# LANGUAGE #-}</literal>、<literal>{-# OPTIONS_GHC #-}</literal>、<literal>{-# INCLUDE #-}</literal>。</para></listitem>
+      </itemizedlist>
+      </para>
 
     <sect2 id="language-pragma">
       <title>LANGUAGEプラグマ</title>
@@ -5155,15 +5162,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
     <sect2 id="include-pragma">
       <title>INCLUDEプラグマ</title>
 
-      <para><literal>INCLUDE</literal>プラグマは、(Cを介してコンパイルしているときに)モジュールをコンパイルしてできるCソースファイルが<literal>#include</literal>すべきCのヘッダを指定するためのものである。例を示す。</para>
-
-<programlisting>
-{-# INCLUDE "foo.h" #-}
-{-# INCLUDE &lt;stdio.h&gt; #-}</programlisting>
-
-      <para><literal>INCLUDE</literal>はファイルヘッダプラグマ(<xref linkend="pragmas"/>を見よ)である。</para>
-
-      <para><literal>INCLUDE</literal>プラグマは、<option>-#include</option>オプション(<xref linkend="options-C-compiler" />)の、より良い代替手段である。<literal>INCLUDE</literal>プラグマは他のコンパイラでも解釈されるからである。<literal>foreign import</literal>宣言それぞれにインクルードファイルを書く方法もあるが、この方法はGHCでは推奨されない。</para>
+      <para>過去には、FFIを使うとき、Cを介してコンパイルしているなら、<literal>INCLUDE</literal>プラグマを使ってどのヘッダファイルをincludeする必要があるか指定しなければならなかった。これはもはやGHCにとって必要でないが、他のコンパイラとの互換性のために受け付けられる(そして無視される)。</para>
     </sect2>
 
     <sect2 id="warning-deprecated-pragma">
@@ -5302,6 +5301,73 @@ GHCはインライン化が永遠に続くことがないことを保証する�
 </itemizedlist>
 </para>
 <para>これと同じ段階番号制御はRULES(<xref linkend="rewrite-rules"/>)についても使える。</para>
+      </sect3>
+    </sect2>
+
+    <sect2 id="annotation-pragmas">
+      <title>ANNプラグマ</title>
+      
+      <para>GHCは、コードのいろいろな構成要素に、三つのプラグマを使って追加のデータを注釈として付ける機能を提供する。そうしたデータは、後でGHC-as-a-libraryを使って観察することができる。</para>
+            
+      <sect3 id="ann-pragma">
+        <title>値に注釈を付ける</title>
+        
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para>最上位の値の束縛には、<literal>ANN</literal>プラグマを使って、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスであるような任意の式を添付することができる。したがって、特に、通常の値(例えば<literal>take</literal>)だけでなくデータ構築子(例えば<literal>Just</literal>)にも<literal>ANN</literal>を使って注釈を付けられる。例として、<literal>foo</literal>という関数に<literal>Just "Hello"</literal>を注釈として付けるには、次のようにする。</para>
+        
+<programlisting>
+{-# ANN foo (Just "Hello") #-}
+foo = ...
+</programlisting>
+        
+        <para>
+        注釈の利用には、いくつか制限が課せられる。
+          <itemizedlist>
+            <listitem><para>注釈を付ける束縛は最上位のものでなければならない(つまり、ネストしていてはならない)</para></listitem>
+            <listitem><para>注釈を付ける束縛は現在のモジュールで宣言されていなければならない</para></listitem>
+            <listitem><para>注釈とする式は、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスのある型でなければならない。</para></listitem>
+            <listitem><para>注釈とする式には<ulink linkend="using-template-haskell">Template Haskellの段階制約</ulink>が課せられるので、例えばコンパイル中のモジュールの関数を走らせることはできない。</para>
+            
+            <para>正確には、注釈<literal>{-# ANN x e #-}</literal>が段階として正しい(well staged)のは、<literal>$(e)</literal>が段階として正しい場合であり、その場合に限る。(ただし、接合構文にかかる通常の型の制限は無視し、接合の中に接合を書くことについての通常の制限も無視する。<literal>$([|1|])</literal>は注釈として問題ない(冗長ではあるが)。)</para></listitem>
+          </itemizedlist>
+          
+          これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。
+        </para>
+        
+        <para>一方で、これらの制限を別にすれば、多くのことが許されており、完全に評価されていない式でさえも使うことができる。注釈式は、Template Haskellの接合がコンパイラによって評価されるのとちょうど同じように評価される。よって、この注釈は問題ない。</para>
+        
+<programlisting>
+{-# ANN f SillyAnnotation { foo = (id 10) + $([| 20 |]), bar = 'f } #-}
+f = ...
+</programlisting>
+      </sect3>
+      
+      <sect3 id="typeann-pragma">
+        <title>型に注釈を付ける</title>
+        
+        <indexterm><primary>ANN type</primary></indexterm>
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para><literal>ANN</literal>プラグマで型に注釈を付けるには、<literal>type</literal>キーワードを使う。例を示す。</para>
+        
+<programlisting>
+{-# ANN type Foo (Just "A `Maybe String' annotation") #-}
+data Foo = ...
+</programlisting>
+      </sect3>
+      
+      <sect3 id="modann-pragma">
+        <title>モジュールに注釈を付ける</title>
+        
+        <indexterm><primary>ANN module</primary></indexterm>
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para><literal>ANN</literal>プラグマでモジュールに注釈を付けるには、<literal>module</literal>キーワードを使う。例を示す。</para>
+        
+<programlisting>
+{-# ANN module (Just "A `Maybe String' annotation") #-}
+</programlisting>
       </sect3>
     </sect2>
 
