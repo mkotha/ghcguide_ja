@@ -4289,10 +4289,10 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 	      <para>接合は次の場所に現れ得る。
 		  <itemizedlist>
 		    <listitem><para>式。接合される式の型は<literal>Q Exp</literal>でなければならない。</para></listitem>
+		    <listitem><para>型。接合される式の型は<literal>Q Typ</literal>でなければならない。</para></listitem>
 		    <listitem><para>トップレベル宣言のリスト。接合される式の型は<literal>Q [Dec]</literal>でなければならない。</para></listitem>
 		    </itemizedlist>
-		</para>
-接合の中ではインポートしたモジュールで定義された関数しか呼ぶことができず、同じモジュールの別の場所で定義された関数は呼ぶことが出来ない。</listitem>
+接合の中ではインポートしたモジュールで定義された関数しか呼ぶことができず、同じモジュールの別の場所で定義された関数は呼ぶことが出来ない。</para></listitem>
 
 
 	      <listitem><para>
@@ -4306,7 +4306,7 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 	      <listitem><para>
 準クォートはパターン文脈または式文脈に出現可能で、これもオックスフォード括弧を使って書く。
 		  <itemizedlist>
-		    <listitem><para> <literal>[:<replaceable>varid</replaceable>| ... |]</literal>、
+		    <listitem><para> <literal>[$<replaceable>varid</replaceable>| ... |]</literal>、
 ただし「...」は任意の文字列である。準クォート機能の完全な記述は<xref linkend="th-quasiquotation"/>にある。</para></listitem>
 		  </itemizedlist></para></listitem>
 
@@ -4322,9 +4322,27 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 	         </para>
 		</listitem>
 
+	      <listitem><para>最上位の宣言接合においては、<literal>$(...)</literal>を省略してもよい。単に(宣言でなく)式を書けば、それが接合を意味する。例えば、以下のように書くことができる。
+<programlisting>
+module Foo where
+import Bar
+
+f x = x
+
+$(deriveStuff 'f)   -- $(...)記法を使う
+
+g y = y+1
+
+deriveStuff 'g      -- $(...)を省略する
+
+h z = z-1
+</programlisting>
+この省略によって、最上位の宣言接合がうるさくなくなり、怖い印象を与えないで済む。
+	    </para></listitem>
+
 		  
 	</itemizedlist>
-(元の論文と比較すると、細部に多くの違いがある。宣言接合では「<literal>splice</literal>」でなく「<literal>$</literal>」が使われる。中身の式の型は<literal>[Q Dec]</literal>でなく<literal>Q [Dec]</literal>でなければならない。型接合は実装されておらず、パターン接合やクォーテーションも同じである。
+(元の論文と比較すると、細部に多くの違いがある。宣言接合では「<literal>splice</literal>」でなく「<literal>$</literal>」が使われる。中身の式の型は<literal>[Q Dec]</literal>でなく<literal>Q [Dec]</literal>でなければならない。パターン接合とクォーテーションは実装されていない。)
 </sect2>
 
 <sect2 id="th-example">  <title>Template Haskellを使う</title>
