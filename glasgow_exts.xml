@@ -3271,17 +3271,35 @@ class (F a ~ b) => C a b where
 <sect1 id="other-type-extensions">
 <title>型システムへのその他の拡張</title>
 
-<sect2 id="type-restrictions">
-<title>型シグネチャ</title>
+<sect2 id="explicit-foralls"><title>明示的な全称量化(forall)</title>
+<para>
+Haskellの型シグネチャは暗黙に量化される。言語オプション<option>-XExplicitForAll</option>が使われている場合、これが正確にどういう意味なのかを<literal>forall</literal>キーワードを使って言うことができる。例えば、
+</para>
+<para>
+<programlisting>
+        g :: b -> b
+</programlisting>
+は、次のものを意味している。
+<programlisting>
+        g :: forall b. (b -> b)
+</programlisting>
+この二つは同じものとして扱われる。
+</para>
+<para>
+もちろん、<literal>forall</literal>はキーワードになる。型変数として<literal>forall</literal>を使うことはもはやできないのである。
+</para>
+</sect2>
 
-<sect3 id="flexible-contexts"><title>型シグネチャの文脈</title>
+<sect2 id="flexible-contexts"><title>型シグネチャの文脈</title>
 <para>
 <option>-XFlexibleContexts</option>フラグを使うと、型シグネチャ中の型クラス制約が<emphasis>(class type-variable)</emphasis>または<emphasis>(class (type-variable type-variable ...))</emphasis>という形でなければならないという、Haskell 98の制限を撤廃する。<option>-XFlexibleContexts</option>が有効な場合、以下のような型シグネチャは完全に正しい。
 <programlisting>
   g :: Eq [a] => ...
   g :: Ord (T a ()) => ...
 </programlisting>
+<option>-XFlexibleContexts</option>フラグは、クラス宣言(<xref linkend="superclass-rules"/>)およびインスタンス宣言(<xref linkend="instance-rules"/>)における同様の制約も撤廃する。
 </para>
+
 <para>
 GHCは、型シグネチャに関して以下の制限を課す。次の型を考える。
 
@@ -3289,7 +3307,7 @@ GHCは、型シグネチャに関して以下の制限を課す。次の型を�
   forall tv1..tvn (c1, ...,cn) => type
 </programlisting>
 
-(ここでは「forall」を明示的に書いたが、Haskellソース言語では省略される。Haskell 98では、ソース言語中の明示的な型シグネチャにおける型変数は全て全称量化される(クラス宣言中のクラス型変数の場合を除く)。ただし、GHCでは、望むならforallを与えても良い。<xref linkend="universal-quantification"/>を見よ)
+(ここでは「forall」を明示的に書いたが、Haskellソース言語では省略される。Haskell 98では、ソース言語中の明示的な型シグネチャにおける型変数は全て全称量化される(クラス宣言中のクラス型変数の場合を除く)。ただし、GHCでは、望むならforallを与えても良い。<xref linkend="explicit-foralls"/>を見よ)
 </para>
 
 <para>
@@ -3344,7 +3362,6 @@ GHCは、型シグネチャに関して以下の制限を課す。次の型を�
 </orderedlist>
 
 </para>
-</sect3>
 
 </sect2>
 
@@ -3729,21 +3746,7 @@ GHCでは、このようなことをしなくても、<option>-XKindSignatures</
 </title>
 
 <para>
-Haskellの型シグネチャは暗黙に量化される。新しいキーワード<literal>forall</literal>を使うと、これが正確にどういう意味なのか言えるようになる。例えば、以下のものを考える。
-</para>
-<para>
-<programlisting>
-        g :: b -> b
-</programlisting>
-これは以下のものを意味している。
-<programlisting>
-        g :: forall b. (b -> b)
-</programlisting>
-この二つは同じものとして扱われる。
-</para>
-
-<para>
-一方、GHCの型システムでは、型に対して<emphasis>任意ランク</emphasis>の明示的な量化が認められる。例えば、以下の例は全て合法である。
+GHCの型システムでは、型に対して<emphasis>任意ランク</emphasis>の明示的な量化が認められる。例えば、以下の例は全て合法である。
 <programlisting>
     f1 :: forall a b. a -> b -> a
     g1 :: forall a b. (Ord a, Eq  b) => a -> b -> a
@@ -3782,7 +3785,6 @@ GHCには、ランクの高い型を制御するための三つのフラグが�
 </itemizedlist>
 </para></listitem>
 </itemizedlist>
-もちろん、<literal>forall</literal>はキーワードになる。型変数として<literal>forall</literal>を使うことはもはやできない。
 </para>
 
 
@@ -3983,6 +3985,8 @@ GHCは、可能な最も内側の量化点を探したり<emphasis>しない</em
 <sect2 id="impredicative-polymorphism">
 <title>非叙述的多相
 </title>
+<para><emphasis>注意: GHC 6.12においてこの非叙述的多相の機能は非推奨であり、GHC 6.14では削除されるか、他のものに置き換えられるだろう。</emphasis></para>
+
 <para>GHCは<emphasis>非叙述的多相</emphasis>(impredicative polymorphism)を扱え、<option>-XImpredicativeTypes</option>で有効になる。これは、多相的関数を多相型で呼ぶことができ、データ構造に多相的な型をパラメタとして与えることができるということである。例を挙げる。
 <programlisting>
   f :: Maybe (forall a. [a] -> [a]) -> Maybe ([Int], [Char])
@@ -4007,7 +4011,7 @@ f xs = ys ++ ys
        ys :: [a]
        ys = reverse xs
 </programlisting>
-<literal>f</literal>の型シグネチャが型変数<literal>a</literal>をスコープに導入している。この型変数のスコープは<literal>f</literal>の定義全体である。特に、<varname>ys</varname>の型シグネチャの位置ではこれがスコープに入っている。Haskell 98では、<varname>ys</varname>の型を宣言するのは不可能であった。これが可能になったことは、型変数が字句的スコープを持つことの重要な利点の一つである。
+<literal>f</literal>の型シグネチャには明示的な<literal>forall</literal>があるので、型変数<literal>a</literal>がスコープに導入されている(<xref linkend="decl-type-sigs"/>)。<literal>forall</literal>で束縛された型変数のスコープは、それが付属している値の宣言の全体にわたる。この例では、型変数<literal>a</literal>のスコープは<literal>f</literal>の定義全体であり、<varname>ys</varname>の型シグネチャも含む。Haskell 98では、<varname>ys</varname>の型を宣言するのは不可能であった。これが可能になったことは、型変数が字句的スコープを持つことの重要な利点の一つである。
 </para>
 <para>字句的スコープを持つ型変数は<option>-XScopedTypeVariables</option>で有効になる。このフラグを指定すると、<option>-XRelaxedPolyRec</option>も有効になる。</para>
 <para>注意: GHC 6.6では、字句的スコープを持つ型変数の挙動について大幅な変更が加えられた。この節を注意深く読んでほしい。</para>
@@ -4241,6 +4245,15 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
   g :: Ord a =&gt; a -> Bool
   g y = (y &lt;= y) || f True
 </programlisting>
+</para>
+</sect2>
+
+<sect2 id="mono-local-binds">
+<title>単相的な局所束縛</title>
+<para>我々は、<emphasis>局所的な束縛を一般化しない</emphasis>ことによってGHCの型システムを単純化するという案を、活発に検討している。これについての論拠は論文<ulink url="http://research.microsoft.com/~simonpj/papers/constraints/index.htm">Let should not be generalised</ulink>に記述されている。
+</para>
+<para>
+この実験的な新しい振る舞いは、<option>-XMonoLocalBinds</option>フラグによって有効になる。これの効果は、局所的な(つまり最上位でない)束縛に型シグネチャがない場合、それが全く一般化されなくなるということである。これは、単相性限定を極端に(しかし、ずっと予測可能に)したものだと考えることができる。型シグネチャを与えた場合、このフラグに効果はない。
 </para>
 </sect2>
 
