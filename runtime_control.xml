@@ -110,7 +110,7 @@
           <indexterm><primary>allocation area, size</primary></indexterm>
         </term>
 	<listitem>
-          <para>&lsqb;デフォルト: 256k&rsqb;ガベッジコレクタが使う確保領域の大きさを設定する。確保領域(実際には世代0・段階0)は固定されており、大きさが変わることはない。(<option>-H</option>を使った場合はこの限りでない。下記参照)</para>
+          <para>&lsqb;デフォルト: 512k&rsqb;ガベッジコレクタが使う確保領域の大きさを設定する。確保領域(実際には世代0・段階0)は固定されており、大きさが変わることはない。(<option>-H</option>を使った場合はこの限りでない。下記参照)</para>
 
           <para>確保領域の大きさを増すことは、性能の向上につながるかもしれないし、そうでないかもしれない。(より大きい確保領域を使うと、キャッシュの振舞は悪化するが、ガベッジコレクションの回数は減り、昇格(promotion)も少なくなる)</para>
 
@@ -173,15 +173,32 @@
 
       <varlistentry>
         <term>
-          <option>-g</option><replaceable>threads</replaceable>
-          <indexterm><primary><option>-g</option></primary><secondary>RTS option</secondary></indexterm>
+          <option>-qg<optional><replaceable>gen</replaceable></optional></option>
+          <indexterm><primary><option>-qg</option><secondary>RTS
+          option</secondary></primary></indexterm>
         </term>
         <listitem>
-          <para>&lsqb;デフォルト: 1&rsqb; &lsqb;GHC 6.10にて新出&rsqb; ガベッジコレクションに用いるスレッドの数を設定する。このオプションはプログラムが<option>-threaded</option>オプション付きでリンクされていた場合にのみ受け付けられる。<xref linkend="options-linker"/>を見よ。</para>
+          <para>&lsqb;GHC 6.12.1から&rsqb; &lsqb;デフォルト: 0&rsqb;
+            世代<replaceable>gen</replaceable>とそれより上の世代において、並列GCを使う。<replaceable>gen</replaceable>を省略すると、並列GCは完全に無効になり、逐次GCに戻る。</para>
+          
+          <para>デフォルトの並列GC設定は、通常、並列プログラム(<literal>par</literal>やStrategyや複数のスレッドを使うもの)に適している。しかし、単一スレッドの逐次的なプログラムに関しても、並列GCを有効にする恩恵があることがある。特に、プログラムが大量のヒープデータを持ち、実行時間のかなりの部分をGCが占めるような場合である。逐次的なプログラムにおいて並列GCを使うには、適切な<literal>-N</literal>オプションを使って並列ランタイムを有効にすればよい。加えて、<literal>-qg1</literal>を使って並列GCを古い世代のみに制限すると良いかもしれない。</para>
+        </listitem>
+      </varlistentry>        
 
-          <para>ガベッジコレクタは、複数のOSスレッドを与えられた場合、並列に仕事を行うことができる。これは、三コア以上の場合、通常、性能の向上につながることが実験によって示されている。二コアでは負荷によって有益なこともそうでないこともある。大きいヒープの方が並列GCとよく合うので、<option>-H</option>の値を高く(最大内容量の三倍以上)するとよい。並列GCによって恩恵を受けているのかどうか確認するには、<option>+RTS -s</option>で時間統計情報を見ればよい。並列GCが直列GCよりも著しく(経過時間で計って)<emphasis>遅い</emphasis>場合は、バグとして報告していただきたい。</para>
-
-          <para><option>-N</option>オプションが使われた場合この値は自動的に設定されるので、<option>-g</option>を使う唯一の理由は、実行に使うスレッドの数とGCに使うスレッドの数を違う値にしたいときだろう。たとえば、厳密に単一スレッドのプログラムがあり、それでも並列GCの恩恵を受けたいなら、<option>-N</option>でなく<option>-g</option>を使うことに意味があるだろう。</para>
+      <varlistentry>
+        <term>
+          <option>-qb<optional><replaceable>gen</replaceable></optional></option>
+          <indexterm><primary><option>-qb</option><secondary>RTS
+          option</secondary></primary></indexterm>
+        </term>
+        <listitem>
+          <para>
+            &lsqb;GHC 6.12.1から&rsqb; &lsqb;デフォルト: 1&rsqb;
+            並列GCにおいて、世代<replaceable>gen</replaceable>とそれより上の世代で負荷分散を使う。<replaceable>gen</replaceable>を省略すると、負荷分散を完全に無効にする。</para>
+          
+          <para>
+            負荷分散とは、GCの作業を空いているコア間で分配することである。これは、ヒープが大きく、GCの作業を並列化する必要がある場合には良いことである。しかし、並列プログラムの若い世代における短い回収では、これは最悪である。なぜなら、データをCPUのキャッシュから動かすことで、局所性を損うからである。(訳注: 理解できないのでだれか助けて 原文は because it can harm locality by moving data from the cache of the CPU where is it being used to the cache of another CPU.)。実際、並列プログラムでは、<literal>-qb</literal>で負荷分散を完全に無効にした方が良いこともある。
+          </para>
         </listitem>
       </varlistentry>
 
@@ -300,15 +317,16 @@
 
     <itemizedlist>
       <listitem>
-        <para>プログラムによって確保されたバイトの総量。これはメモリ使用量の最大値よりも低いことがある。一部は開放されたかもしれないからである。
+        <para>この実行全体にわたってプログラムによって確保されたバイトの総量。
         </para>
       </listitem>
       <listitem>
-        <para>発生したガベッジコレクションの合計回数。
+        <para>実行されたガベッジコレクションの合計回数。
         </para>
       </listitem>
       <listitem>
-        <para>プログラムによって使われた空間の平均値および最大値。これは大GCのときにしか検査されないから、単なる近似値である。標本(sample)の数によって何回検査されたかが分かる。
+        <para>「内容量(residency)」の平均値および最大値。内容量とは、生存しているデータの量をバイト単位で表したものである。ランタイムが生存データの量を決定できるのはメジャーGCの間だけなので、標本の数がメジャーGCの数に対応する(これは比較的小さい数になる)。プログラムのヒープの性質についてのよりよい描像を得るためには、<option>-hT</option>を使うこと(<xref linkend="rts-profiling"/>)。
+        プログラムによって使われた空間の平均値および最大値。これは大GCのときにしか検査されないから、単なる近似値である。標本(sample)の数によって何回検査されたかが分かる。
         </para>
       </listitem>
       <listitem>
@@ -353,6 +371,8 @@
   Generation 0:    67 collections,     0 parallel,  0.04s,  0.03s elapsed
   Generation 1:     2 collections,     0 parallel,  0.03s,  0.04s elapsed
 
+  SPARKS: 359207 (557 converted, 149591 pruned)
+
   INIT  time    0.00s  (  0.00s elapsed)
   MUT   time    0.01s  (  0.02s elapsed)
   GC    time    0.07s  (  0.07s elapsed)
@@ -368,11 +388,11 @@
 
     <itemizedlist>
       <listitem>
-        <para>"bytes allocated in the heap"はプログラムによって確保されたバイトの総量である。これはメモリ使用量の最大値よりも低いことがある。一部は開放されたかもしれないからである。
+        <para>"bytes allocated in the heap"はこの実行全体にわたってプログラムによって確保されたバイトの総量である。
         </para>
       </listitem>
       <listitem>
-        <para>GHCはコピーGCを使っている。"bytes copied during GC"はガベッジコレクション中にコピーしなければならなかったバイトの数を示す。
+        <para>GHCはデフォルトではコピーGCを使っている。"bytes copied during GC"はガベッジコレクション中にコピーしなければならなかったバイト数を示す。
         </para>
       </listitem>
       <listitem>
@@ -380,7 +400,7 @@
         </para>
       </listitem>
       <listitem>
-        <para>"bytes maximum slop"は、GHCがデータをいわゆる「megablock」に詰めることによって無駄になった空間の最大値である。
+        <para>"bytes maximum slop"は、GHCがメモリをブロック単位で確保することによって無駄になった空間の最大値である。 slopとはブロックの無駄になった後方部分である。これを制御する方法はない。どれだけのメモリがこうやって失われたか見たいだけである。
         </para>
       </listitem>
       <listitem>
@@ -388,8 +408,11 @@
         </para>
       </listitem>
       <listitem>
-        <para>次に、行われたガベッジコレクションについての情報がある。それぞれの世代について、ガベッジコレクションが何回行われたか、そのうち何回が複数のスレッドを使っていたか、その世代をGCするために使われたCPU時間の合計、その世代をGCするために経過した実時間の合計、が示されている。
+        <para>次に、行われたガベッジコレクションについての情報がある。それぞれの世代について、ガベッジコレクションが何回行われたか、そのうち何回が並列に行われたか、その世代をGCするために使われたCPU時間の合計、その世代をGCするために経過した実時間の合計、が示されている。
         </para>
+      </listitem>
+      <listitem>
+        <para>統計情報<literal>SPARKS</literal>は、プログラム中での<literal>Control.Parallel.par</literal>やこれに関連した機能の利用に関係する。個々の火花(spark)は<literal>par</literal>の一回の呼び出しを表す。火花が「変換される(converted)」とは、それが並列に実行されることである。火花が「刈り取られる(pruned)」とは、それが既に評価済みであることが分かり、ガベッジコレクタによってプールから捨てられることである。実行が終わると残っている火花はすべて捨てられるので、「変換された」ものと「刈り取られた」ものを足しても合計に見たないことがあり得る。</para>
       </listitem>
       <listitem>
         <para>次に、CPU時間と経過した実時間を、そのときランタイムシステムが何をしていたかによって項目分けしたものがある。INITはランタイムシステムの初期化である。MUTはmutator time、すなわち実際にあなたのコードを走らせるのに掛かった時間である。GCはガベッジコレクションを行うのに掛かった時間である。RPは維持原因プロファイルを行うのに掛かった時間である。PROFはその他のプロファイルを行うのに掛かった時間である。EXITはランタイムシステムの終了処理時間である。最後に、Totalは、もちろん、合計である。
@@ -479,6 +502,59 @@
     </variablelist>
   </sect2>
 
+  <sect2 id="rts-eventlog">
+    <title>追跡情報を得る</title>
+
+    <indexterm><primary>tracing</primary></indexterm>
+    <indexterm><primary>events</primary></indexterm>
+    <indexterm><primary>eventlog files</primary></indexterm>
+
+    <para>プログラムが<option>-eventlog</option>オプション(<xref linkend="options-linker"/>)付きでリンクされている場合、実行時のイベントを二通りの方法で記録することができる。
+    </para>
+
+    <itemizedlist>
+      <listitem>
+        <para>バイナリ形式でファイルに記録し、後でいろいろなツールによって分析できるようにする。<ulink url="http://hackage.haskell.org/package/ThreadScope">ThreadScope</ulink><indexterm><primary>ThreadScope</primary></indexterm>はそのようなツールの一つであり、イベント記録を解釈して、プログラムの視覚的な並列実行プロファイルを作成する。
+        </para>
+      </listitem>
+      <listitem>
+        <para>テキストとして標準出力に出力し、デバッグに供する。
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-l<optional><replaceable>type</replaceable></optional></option>
+          <indexterm><primary><option>-l</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。ここで、<replaceable>type</replaceable>は記録するイベントの型(type)を示す。現在、対応している型はひとつだけである。すなわち、<literal>-ls</literal>でスケジューラのイベントを記録する。
+          </para>
+
+          <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>show-ghc-events</literal>というツールが使える。
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-v</option>
+          <indexterm><primary><option>-v</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>イベントを、<literal>.eventlog</literal>ファイルにではなく、テキストとして標準出力に記録する。
+          </para>
+        </listitem>
+      </varlistentry>
+
+    </variablelist>
+
+    <para>この追跡フレームワークで記録されるイベントを、デバッグオプション<option>-D<replaceable>x</replaceable></option>も生成する。デフォルトではこれらのイベントはテキストとして標準出力にダンプされる(<option>-D<replaceable>x</replaceable></option>によって<option>-v</option>が有効になる)が、<option>-l</option>を使うことでバイナリのイベント記録ファイルに保存することもできる。
+    </para>
+  </sect2>
+
   <sect2 id="rts-options-debugging">
     <title>ハックする者、デバッグする者、及び好奇心過剰な魂のためのRTSオプション</title>
 
@@ -502,11 +578,15 @@
 
       <varlistentry>
 	<term>
-          <option>-D</option><replaceable>num</replaceable>
+          <option>-D</option><replaceable>x</replaceable>
           <indexterm><primary>-D</primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-          <para>RTSのデバッグフラグ。<replaceable>num</replaceable>のどのビットが立っているかによって出力の量が異なる。RTSが<option>DEBUG</option>オプション付きでコンパイルされているときのみ効果がある。</para>
+	  <para>RTSのデバッグフラグ。RTSが<option>DEBUG</option>オプション付きでリンクされているときのみ使える。RTSのいろいろな部分について、デバッグ出力や追加の実行時の正気チェックを有効にするための<replaceable>x</replaceable>の値が用意されている。例えば、<literal>+RTS -Ds -RTS</literal>とするとスケジューラのデバッグ出力が有効になる。どういうデバッグフラグがサポートされているかを知るには<literal>+RTS&nbsp;-?</literal>が使える。
+          </para>
+
+          <para><option>-l</option>オプションを追加すると、デバッグ出力が標準出力でなくバイナリのイベント記録ファイルに送られるようになる。デバッグ追跡にかかるオーバーヘッドを減らしたいときに便利かもしれない。
+          </para>
 	</listitem>
       </varlistentry>
 
@@ -518,9 +598,9 @@
           <indexterm><primary>profiling</primary><secondary>ticky ticky</secondary></indexterm>
         </term>
 	<listitem>
-          <para>プログラムの実行終了時に「ticky-ticky」統計情報を生成する。<replaceable>file</replaceable>の扱いは<option>-S</option>RTSオプション(上にある)の場合と同じである。</para>
+          <para>プログラムの実行終了時に「ticky-ticky」統計情報を生成する(プログラムが<option>-debug</option>オプション付きでリンクされている場合にのみ利用可能)。<replaceable>file</replaceable>の扱いは上にある<option>-S</option>RTSオプションの場合と同じである。</para>
 
-          <para>「ticky-ticky」統計情報とは、種々のプログラムの動作(update、enter、など)の回数である。プログラムは<option>-ticky</option><indexterm><primary><option>-ticky</option></primary></indexterm>付きでコンパイルされていなければならなず、また、まともに使うには、適切なシステムライブラリとリンクされていなければならない。これは簡単な作業ではない。簡単に「ticky-ticky」プロファイルを使えるようにする方法についてはインストールの手引きを参照せよ。さらなる情報は、<xref linkend="ticky-ticky"/>を見よ。</para>
+          <para>ticky-tickyプロファイルについての更なる情報は、<xref linkend="ticky-ticky"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
