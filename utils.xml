@@ -303,8 +303,6 @@ tags:
 	  <term><literal>#def Cの定義</literal></term>
 	  <listitem>
 	    <para>この定義(関数定義、変数定義、構造体定義、typedef)がCファイルに書かれ、そのプロトタイプかextern宣言がCヘッダに書かれる。インライン関数も正しく扱われる。構造体定義とtypedefはCプログラムにも書き込まれる。<literal>inline</literal>、<literal>struct</literal>、<literal>typedef</literal>の各キーワードは<literal>def</literal>の直後に来なければならない。</para>
-
-	    <note><para>Cの関数の<literal>foreign import</literal>はモジュール境界を越えてインライン化されることがある。この場合、インポートする側のモジュールが<command>hsc2hs</command>の生成したCヘッダファイルを<literal>#include</literal>するようにしなければならない。(<xref linkend="glasgow-foreign-headers"/>を見よ)。このため、我々は、ライブラリ中で<literal>#def</literal>することを避けている。</para></note>
 	  </listitem>
 	</varlistentry>
 
