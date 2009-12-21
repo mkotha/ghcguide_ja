@@ -33,15 +33,17 @@ ghc [argument...]
     
       <indexterm><primary>source-file options</primary></indexterm>
 
-      <para>ソースファイルと、それが必要とするコマンド行オプションの結合をとても強くした方が便利なことがある。例えば、あるHaskellソースファイルがGHC拡張を使うなら、それは常に<option>-fglasgow-exts</option>オプション付きでコンパイルされなければならない。<filename>Makefile</filename>でファイルごとのオプションの一覧を管理する代わりに、<literal>OPTIONS_GHC</literal>プラグマを使ってソースファイルに直接これを書き込むこともできる。<indexterm><primary>OPTIONS_GHC pragma</primary></indexterm></para>
+      <para>ソースファイルと、それが必要とするコマンド行オプションの結合をとても強くした方が便利なことがある。例えば、あるHaskellソースファイルが意図的に名前の覆い隠しを使っているなら、それは<option>-fno-warn-name-shadowing</option>オプション付きでコンパイルされるべきである。<filename>Makefile</filename>でファイルごとのオプションの一覧を管理する代わりに、<literal>OPTIONS_GHC</literal>プラグマを使ってソースファイルに直接これを書き込むこともできる。<indexterm><primary>OPTIONS_GHC pragma</primary></indexterm></para>
 
 <programlisting>
-{-# OPTIONS_GHC -fglasgow-exts #-}
+{-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 module X where
 ...
 </programlisting>
       
-      <para><literal>OPTIONS_GHC</literal>プラグマはソースファイルの先頭でしか探されない。探されるのは、<literal>OPTIONS_GHC</literal>を含まない(文芸コメントでなく、空でない)最初の行までである。複数の<literal>OPTIONS_GHC</literal>プラグマも認識される。<literal>OPTIONS_GHC</literal>プラグマより前の行または同じ行にコメントを置いてはならない。</para>
+      <para><literal>OPTIONS_GHC</literal>は<emphasis>ファイルヘッダプラグマ</emphasis>である(<xref linkend="pragmas"/>を見よ)。</para>
+
+      <para><literal>OPTIONS_GHC</literal>の中で使えるのは<emphasis>動的な</emphasis>フラグだけである(<xref linkend="static-dynamic-flags"/>を見よ)</para>
 
       <para>ソースファイル中のオプションはコマンドシェルには渡されず、コンパイラが内部的に管理するコマンド行引数の配列に加えられるだけだということに注意せよ。そのため、<literal>OPTIONS_GHC</literal>の中でワイルドカードなどを使おうとすると猛烈にがっかりすることになるだろう。</para>
 
@@ -78,7 +80,7 @@ module X where
       <varlistentry>
         <term>動的フラグ</term>
 	<listitem>
-          <para>モード指定フラグ以外の大部分のフラグはこれに分類される。動的なフラグはコマンド行で使っても良いし、ソースファイルの<literal>GHC_OPTIONS</literal>プラグマ<!-- 訳注　OPTIONS_GHCの誤り -->で使っても良いし、GHCiで<literal>:set</literal>を使って設定しても良い。</para>
+          <para>モード指定フラグ以外の大部分のフラグはこれに分類される。動的なフラグはコマンド行で使っても良いし、ソースファイルの<literal>OPTIONS_GHC</literal>プラグマで使っても良いし、GHCiで<literal>:set</literal>を使って設定しても良い。</para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -637,14 +639,14 @@ ghc -c Foo.hs</screen>
     <indexterm><primary>warnings</primary></indexterm>
 
 
-    <para>GHCでは、いくつかのオプションを使って、生成する致命的でないエラーメッセージ(警告ともいう)の種類を選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
+    <para>GHCでは、いくつかのオプションを使って、生成する致命的でないエラーメッセージ(警告ともいう)の種類を選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-lazy-unlifted-bindings</option>、<option>-fwarn-wrong-do-bind</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
     <variablelist>
 
       <varlistentry>
 	<term><option>-W</option>:</term>
 	<listitem>
 	  <indexterm><primary>-W option</primary></indexterm>
-          <para>標準的な警告に加えて、 <option>-fwarn-incomplete-patterns</option>、<option>-fwarn-dodgy-imports</option>、<option>-fwarn-unused-matches</option>、<option>-fwarn-unused-imports</option>、<option>-fwarn-unused-binds</option>を提供する。</para>
+          <para>標準的な警告に加えて、 <option>-fwarn-incomplete-patterns</option>、<option>-fwarn-dodgy-exports</option>、<option>-fwarn-dodgy-imports</option>、<option>-fwarn-unused-matches</option>、<option>-fwarn-unused-imports</option>、<option>-fwarn-unused-binds</option>を提供する。</para>
 	</listitem>
       </varlistentry>
 
@@ -652,7 +654,7 @@ ghc -c Foo.hs</screen>
 	<term><option>-Wall</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-Wall</option></primary></indexterm>
-          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-simple-patterns</option>、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-implicit-prelude</option>である。</para>
+          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-simple-patterns</option>、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unused-do-bind</option>、<option>-fwarn-implicit-prelude</option>である。</para>
 	</listitem>
       </varlistentry>
 
@@ -742,11 +744,31 @@ foreign import "&amp;f" f :: FunPtr t
       </varlistentry>
 
       <varlistentry>
+	<term><option>-fwarn-dodgy-exports</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-dodgy-exports</option></primary>
+	  </indexterm>
+	  <para>データ型<literal>T</literal>が全ての構築子を伴って、つまり<literal>T(..)</literal>としてエクスポートされているが、それが型シノニムにすぎない場合に警告を発する。</para>
+          <para>また、あるモジュールが再エクスポートされているが、そのモジュールが何もエクスポートしていない場合にも警告する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-fwarn-dodgy-imports</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-dodgy-imports</option></primary>
 	  </indexterm>
 	  <para>データ型<literal>T</literal>が全ての構築子を伴ってインポート(つまり<literal>T(..)</literal>)されているものの、抽象的にエクスポート(つまり<literal>T</literal>)されている場合に警告を出力する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-lazy-unlifted-bindings</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-lazy-unlifted-bindings</option></primary>
+	  </indexterm>
+	  <para>持ち上げられていない型(訳注: unlifed type; ボトムを持たない型)が、まるで遅延するかのように束縛されている場合に警告を発する。例えば<literal>where (I# x) = ...</literal>のような場合である。代わりに<literal>where !(I# x) = ...</literal>を使うこと。GHC 6.14では、これは警告でなくエラーになる予定である。
+      </para>
 	</listitem>
       </varlistentry>
 
@@ -875,6 +897,11 @@ f foo = foo { x = 6 }
 	  <indexterm><primary>shadowing, warning</primary></indexterm>
 	  
           <para>このオプションが有効だと、内側のスコープの値と同名の外側のスコープの値があるとき、つまり内側の値が外側のものを隠すときに警告する。これはミスタイプが原因の発見しがたいバグを捕らえることがある。例えば、<literal>f = ... let f = id in ... f ...</literal>において、再帰呼び出しであるはずのものが意図せず捕捉されるというものがある。</para>
+          <para>この警告は、アンダースコアで始まる名前については抑制される。例。
+          <programlisting>
+             f x = do { _ignore &lt;- this; _ignore &lt;- that; return (the other) }
+          </programlisting>
+         </para>
 	</listitem>
       </varlistentry>
 
@@ -998,9 +1025,47 @@ f "2"    = 2
 	</listitem>
       </varlistentry>
 
+      <varlistentry>
+	<term><option>-fwarn-unused-do-bind</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-unused-do-bind</option></primary></indexterm>
+	  <indexterm><primary>unused do binding, warning</primary></indexterm>
+	  <indexterm><primary>do binding, unused</primary></indexterm>
+
+	  <para><literal>do</literal>および<literal>mdo</literal>ブロックの中の式が、情報を黙って捨てているように見える場合に報告する。例えば、<literal>do { mapM popInt xs ; return 10 }</literal>の場合、<literal>do</literal>ブロックの最初の文が怪しいと報告される。これの型は<literal>StackM [Int]</literal>であって<literal>StackM ()</literal>でなく、この<literal>[Int]</literal>の値が何にも束縛されていないからである。この警告は、何かを捨てていることをソースコード中で明示的に述べることによって抑制できる。
+	    <programlisting>
+	       do { _ &lt;- mapM popInt xs ; return 10 }
+	    </programlisting>
+            もちろん、この特定の場合にはもっと良い方法がある。
+	    <programlisting>
+	       do { mapM_ popInt xs ; return 10 }
+	    </programlisting>
+          </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-fwarn-wrong-do-bind</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-wrong-do-bind</option></primary></indexterm>
+	  <indexterm><primary>apparently erroneous do binding, warning</primary></indexterm>
+	  <indexterm><primary>do binding, apparently erroneous</primary></indexterm>
+
+	  <para><literal>do</literal>および<literal>mdo</literal>ブロックの中の式が、束縛を欠いているように見える場合に報告する。例えば、<literal>do { return (popInt 10) ; return 10 }</literal>の場合、<literal>do</literal>ブロックの最初の文が怪しいと報告される。これの型は<literal>StackM (StackM Int)</literal>(同じモナド構築子が二回適用された形)であるが、その結果を束縛することで「荷解き」がされていない。この警告は、何かを捨てていることをソースコード中で明示的に述べることによって抑制できる。
+	    <programlisting>
+	       do { _ &lt;- return (popInt 10) ; return 10 }
+	    </programlisting>
+          ほとんど全ての意味のあるプログラムについてこれはバグを示しているはずである。おそらく、意図としては次のように書きたかったのだろう。
+	    <programlisting>
+	       do { popInt 10 ; return 10 }
+	    </programlisting>
+          </para>
+	</listitem>
+      </varlistentry>
+
     </variablelist>
 
-    <para>あたたが本当に心配性なら、<option>-dcore-lint</option>オプション<indexterm><primary><option>-dcore-lint</option></primary></indexterm>を使うと良い。これは、GHC内部でのパス内正気度チェックを有効にする。(これがチェックするのはGHCの正気であり、あなたの正気ではない)</para>
+    <para>本当に偏執的な気分なら、<option>-dcore-lint</option>オプション<indexterm><primary><option>-dcore-lint</option></primary></indexterm>を使うと良い。これは、GHC内部でのパス内正気度チェックを有効にする。(これがチェックするのはGHCの正気であり、あなたの正気ではない)</para>
 
   </sect1>
 
@@ -1282,20 +1347,47 @@ f "2"    = 2
 
     <para>とはいうものの、この二つの用語は確かに関連している。複数のCPUを使うことで、複数の並行スレッドを並列に実行することができるようになる。GHCのSMP並列計算サポートはまさにこれを行う。しかし、並行性を利用しないプログラムにおいて、並列計算によってパフォーマンスを改善することも、また可能である。この節では、GHCを使って並列プログラムをコンパイル・実行する方法を解説し、<xref linkend="lang-parallel"/>では並列性に影響する言語機能を説明する。</para>
     
-    <sect2 id="parallel-options">
-      <title>SMP並列計算に関するオプション</title>
+    <sect2 id="parallel-compile-options">
+      <title>SMP並列計算に関するコンパイル時オプション</title>
 
-      <para>複数のCPUを利用するには、プログラムが<option>-threaded</option>オプション付きでリンクされていなればならない。(<xref linkend="options-linker"/>を見よ)。その上で、複数のCPU上でプログラムを走らせるには、RTSの<option>-N</option>オプションを使う。</para>
+      <para>複数のCPUを利用するには、プログラムが<option>-threaded</option>オプション付きでリンクされていなればならない。(<xref linkend="options-linker"/>を見よ)。加えて、以下のコンパイラオプションが並列性に影響する。</para>
       
       <variablelist>
+        <varlistentry>
+          <term><option>-feager-blackholing</option></term>
+          <indexterm><primary><option>-feager-blackholing</option></primary></indexterm>
+          <listitem>
+          <para>ブラックホール化(blackholing)とは、サンク(遅延された計算)に、評価中という印を付ける行為である。これは三つの理由で有用である。第一に、これによって、ある種の無限ループが検出(<literal>NonTermination</literal>例外)できる。第二に、ある種のスペースリークを避けることができる。第三に、並列プログラムにおいて一つの計算を繰り返し行うことを避けることができる。これは、計算が既に実行中である場合にそうと分かるからである。</para>
+
+          <para><option>-feager-blackholing</option>オプションは、それぞれのサンクの評価が始まってすぐにそれをブラックホール化するようにする。デフォルトは「遅延ブラックホール化」であり、こちらでは、スレッドが何らかの理由で一時停止した場合にのみサンクに評価中の印が付けられる。遅延ブラックホール化において、大部分のサンクはブラックホール化される必要がないので、典型的にはこちらの方が効率的(1-2&percnt;程度)である。しかし、並列プログラムでは積極的ブラックホール化によってより多くの計算の繰り返しを防ぐことができ、これが実際並列性にとって重要である場合がよくある。</para>
+
+          <para>我々は、並列に走ることを意図したコードは何でも<option>-feager-blackholing</option>付きでコンパイルすることを推奨する。
+          </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect2>
+
+    <sect2 id="parallel-options">
+      <title>SMP並列性のためのRTSオプション</title>
+
+      <para>プログラムを複数のCPU上で走らせるには、RTSの<option>-N</option>オプションを使う。</para>
+
+      <variablelist>
 	<varlistentry>
-	  <term><option>-N<replaceable>x</replaceable></option></term>
+	  <term><option>-N<optional><replaceable>x</replaceable></optional></option></term>
 	  <listitem>
 	    <para><indexterm><primary><option>-N<replaceable>x</replaceable></option></primary><secondary>RTS option</secondary></indexterm>プログラムの実行中、同時に<replaceable>x</replaceable>個のスレッドを使う。通常、<replaceable>x</replaceable>は機械のCPUコア数と一致するべきである<footnote><para>hyperthreadingコアの数を含めるべきかどうかは未解決の問題である。遠慮なく実験して結果を知らせてほしい。</para></footnote>。例えば、デュアルコアの機械ではおそらく<literal>+RTS -N2 -RTS</literal>を使うことになるだろう。</para>
 
-            <para><option>-N</option>を設定することには、<option>-g</option>(GCに使うOSスレッドの数)も同じ値に設定するという効果もある。</para>
+            <para><replaceable>x</replaceable>を省略する、つまり<literal>+RTS -N -RTS</literal>とすると、マシンにあるプロセッサの数に基いてランタイムが自分で値を決定する。</para>
+
+            <para>マシンの全てのプロセッサを使う時には注意すること。もし他のプログラムがプロセッサをいくつか使っているなら、これによってパフォーマンスを改善するどころか悪影響になることがある。</para>
+
+            <para><option>-N</option>を設定することには、並列ガベッジコレクタを有効にするという効果もある(<xref linkend="rts-options-gc"/>を見よ)。</para>
             
             <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
+
+            <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.numCapabilities</literal>でHaskellプログラムから得られる。</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -1304,11 +1396,20 @@ f "2"    = 2
 
       <variablelist>
 	<varlistentry>
+	  <term><option>-qa</option></term>
+          <indexterm><primary><option>-qa</option></primary><secondary>RTS
+          option</secondary></indexterm>
+	  <listitem>
+            <para>OSのaffinity(親和性)機能を使ってOSスレッドをCPUコアに固定する。これは実験的な機能であり、有用かもしれないしそうでないかもしれない。役に立ったかどうか知らせてね！</para>
+          </listitem>
+        </varlistentry>
+	<varlistentry>
 	  <term><option>-qm</option></term>
           <indexterm><primary><option>-qm</option></primary><secondary>RTS
           option</secondary></indexterm>
 	  <listitem>
-            <para>負荷の平衡のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。これが役に立つのは、おそらく<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールしているときだけだろう。</para>
+            <para>負荷分散のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。移住はスレッドにしか適用されないことに注意。<literal>par</literal>によって作られた火花は、別途work-stealingによって負荷分散される。</para>
+            <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
           </listitem>
         </varlistentry>
 	<varlistentry>
@@ -1329,9 +1430,9 @@ f "2"    = 2
 
       <para>プログラムを実行するときに<literal>-s</literal>というRTSオプションを加えると、時間統計情報を見ることができる。これを使って、使うCPUの数を増やしたことでプログラムが速くなったかどうかを確認できる。ユーザ(user)時間が消費(elapsed)時間よりも大きいなら、プログラムは単一のCPUよりも多くを使ったことになる。比較のために<literal>-N</literal>オプションなしでも走らせてみると良いだろう。</para>
 
-      <para>GHCの並列計算サポートは新しく、実験的である。プログラムは速くなるかもしれないし、遅くなるかもしれない。どちらにしても、我々に報告を頂けるなら興味深く聞くだろう。</para>
-      
-      <para>現在の実装の重大な制限の一つは、ガベッジコレクタがまだ単一スレッドであって、GCの作動中には全ての実行が停止しなければならないことである。これは並列プログラムの重大なボトルネックになり得る。特にプログラムが多くのGCを行うときはそうである。こういう事態に出会ったら、GCの設定をいじる(<xref linkend="rts-options-gc"/>)ことでGCのコストを減らそうとしてみるのが良いだろう。ヒープや確保領域を大きくすることから始めてみると良い。</para>
+      <para><literal>+RTS -s</literal>の出力によって、プログラムの実行中にいくつの「火花」(spark)が作られ、実行されたかが分かる(<xref linkend="rts-options-gc"/>を見よ)。これによって、あなたの<literal>par</literal>注釈がどの程度うまく働いているかについての感触が得られるだろう。</para>
+
+      <para>たくさんの実験とランタイムシステムのチューニングにより、GHCの並列性サポートは6.12.1で改善された。我々は、これがあなたにとってどの程度うまく働くかを聴きたいと引き続き思っている。また、我々のベンチマーク一式に加えるための並列プログラムも収集したいと思っている。</para>
     </sect2>
   </sect1>
 
