@@ -116,7 +116,7 @@ GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使
 </title>
 
 <para>
-<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。我々は将来この機能を復活できるように望んでいる。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
+<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。我々は将来この機能を復活できるように望んでいる(<xref linkend="using-shared-libs"/>を見よ)。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
 
 <!--
 <para>
