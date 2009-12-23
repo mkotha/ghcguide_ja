@@ -220,7 +220,7 @@ module X where
 	  <indexterm><primary><option>-c</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>これは伝統的な一括処理コンパイラモードである。このモードでは、GHCは一度に一つのソースファイルをコンパイルするか、オブジェクトファイルをリンクして実行可能ファイルを作る。コマンドラインでモードが指定されなかった場合も、このモードが使われる。このときは、指定されたファイルをコンパイルして、さらにリンクしてプログラムを作る、という動作になる。<xref linkend="options-order"/>を見よ。</para>
+          <para>これは伝統的な一括処理コンパイラモードである。このモードでは、GHCは一度に一つのソースファイルをコンパイルするか、オブジェクトファイルをリンクして実行可能ファイルを作る。コマンド行でモードが指定されなかった場合も、このモードが使われる。このときは、指定されたファイルをコンパイルして、さらにリンクしてプログラムを作る、という動作になる。<xref linkend="options-order"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -496,7 +496,7 @@ ghc -c Foo.hs</screen>
 	    	      <indexterm><primary><option>-x</option></primary>
 	      </indexterm></term>
 	      <listitem>
-                <para>コマンドラインにおいてこれに続く全てのファイルを<replaceable>suffix</replaceable>という接尾辞を持つかのように扱う。例えば、<literal>M.my-hs</literal>というファイルにあるHaskellモジュールをコンパイルするには、<literal>ghc -c -x hs M.my-hs</literal>とすれば良い。</para>
+                <para>コマンド行においてこれに続く全てのファイルを<replaceable>suffix</replaceable>という接尾辞を持つかのように扱う。例えば、<literal>M.my-hs</literal>というファイルにあるHaskellモジュールをコンパイルするには、<literal>ghc -c -x hs M.my-hs</literal>とすれば良い。</para>
 	      </listitem>
 	  </varlistentry>
 	</variablelist>

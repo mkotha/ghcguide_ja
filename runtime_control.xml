@@ -30,7 +30,7 @@
 
   <para><literal>+RTS -f</literal><indexterm><primary><option>-f</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
 
-  <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンドラインに加えれば良い。</para>
+  <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
 
   <sect2 id="rts-optinos-environment">
     <title>大域的なRTSオプションを設定する</title>
