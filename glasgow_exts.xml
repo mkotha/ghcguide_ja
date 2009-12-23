@@ -1804,7 +1804,7 @@ instance Eq T where
    data NumInst a 
       = Num a => MkNumInst (NumInst a)
 </programlisting>
-存在型を定義する場合と違って<literal>forall</literal>がないことに注意。これは、<literal>Num</literal>が、データ型の全称修飾された型変数<literal>a</literal>を制約するからである。ひとつの構築子に、全称と存在の両方の型変数があってもよい。例えば、以下の二つの宣言は同等である。
+存在型を定義する場合と違って<literal>forall</literal>がないことに注意。これは、<literal>Num</literal>が、データ型の全称量化された型変数<literal>a</literal>を制約するからである。ひとつの構築子に、全称と存在の両方の型変数があってもよい。例えば、以下の二つの宣言は同等である。
 <programlisting>
    data T1 a 
 	= forall b. (Num a, Eq b) => MkT1 a b
