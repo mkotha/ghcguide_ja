@@ -1,246 +1,102 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <sect1 id="using-shared-libs">
-  <title>Using shared libraries</title>
+  <title>共有ライブラリを使う</title>
   <indexterm><primary>Shared libraries</primary><secondary>using</secondary></indexterm>
   <indexterm><primary>Dynamic libraries</primary><secondary>using</secondary></indexterm>
 
-  <para>
-    On some platforms GHC supports building Haskell code into shared
-    libraries. Shared libraries are also sometimes known as dynamic
-    libraries, in particular on Windows they are referred to as dynamic link
-    libraries (DLLs).
+  <para>一部のプラットフォームでは、GHCはHaskellコードをビルドして共有ライブラリを作ることに対応している。共有ライブラリは動的(dynamic)ライブラリと言われることもある。特に、Windowsではダイナミックリンクライブラリ(DLL)と呼ばれる。
   </para>
 
-  <para>
-    Shared libraries allow a single instance of some pre-compiled code to be
-    shared between several programs. In contrast, with static linking the
-    code is copied into each program. Using shared libraries can thus save
-    disk space. They also allow a single copy of code to be shared in memory
-    between several programs that use it. Shared libraires are often used as
-    a way of structuring large projects, especially where different parts are
-    written in different programming languages. Shared libraries are also
-    commonly used as a plugin mechanism by various applications. This is
-    particularly common on Windows using COM.
+  <para>共有ライブラリは、あるコンパイル済みコードの一つのインスタンスを複数のプログラムで共有することを可能にする。対照的に、静的リンクの場合はコードが各プログラムにコピーされる。このため、共有ライブラリを使うことがディスク領域の節約になることがある。また、あるコードを使う複数のプログラムの間で、メモリ上に置かれたそのコードの単一のコピーを共有することも可能になる。共有ライブラリは、大きなプロジェクトで、特に部分ごとに異なるプログラミング言語で書かれる場合に、プロジェクトを構造化する方法として使われることもしばしばある。また、共有ライブラリは、色々なアプリケーションでプラグイン機構としても広く使われている。これは特にWindowsにおいて、COMを使って広く行なわれている。
   </para>
 
-  <para>
-    In GHC version 6.12 building shared libraries is supported for Linux on
-    x86 and x86-64 architectures and there is partial support on Windows (see
-    <xref linkend="win32-dlls"/>). The crucial difference in support on
-    Windows is that it is not currently possible to build each Haskell
-    package as a separate DLL, it is only possible to link an entire Haskell
-    program as one massive DLL.
+  <para>GHCバージョン6.12において、共有ライブラリをビルドすることに対応しているのは、x86およびx86-64アーキテクチャ上のLinuxであり、Windowsでは部分的に対応している(<xref linkend="win32-dlls"/>を見よ)。Windowsでの対応では、現在のところ、Haskellのそれぞれのパッケージを別個のDLLとしてビルドすることができず、一つのHaskellプログラム全体を一つの大きなDLLとしてリンクすることしかできないという点が重大な違いである。
   </para>
 
-  <para>
-    Building and using shared libraries is slightly more complicated than
-    building and using static libraries. When using Cabal much of the detail
-    is hidden, just use <literal>--enable-shared</literal> when configuring a
-    package to build it into a shared library, or to link it against other
-    packages built as shared libraries. The additional complexity when
-    building code is to distinguish whether the code will be used in a shared
-    library or will use shared library versions of other packages it depends
-    on. There is additional complexity when installing and distributing
-    shared libraries or programs that use shared libraries, to ensure that
-    all shared libraries that are required at runtime are present in suitable
-    locations.
+  <para>共有ライブラリをビルドしたり使ったりするのは、静的ライブラリをビルドしたり使ったりするのにくらべてやや複雑である。Cabalを使う場合は、この詳細の大部分は隠され、パッケージのconfigure時に<literal>--enable-shared</literal>を使うだけで、そのパッケージを共有ライブラリとしてビルドしたり、共有ライブラリとしてビルドされた他のパッケージとリンクさせたりできる。コードをビルドするときの込み入った点は、そのコードが共有ライブラリで使われるのか、それとも、依存する外部パッケージの共有ライブラリ版を使うのかを区別する必要があることである。共有ライブラリを使う共有ライブラリや、共有ライブラリを使うプログラムをインストールしたり配布したりするときの込み入った点は、必要な共有ライブラリが全て実行時に適切な場所にあることを保証する必要があることである。
   </para>
 
   <sect2>
-    <title>Building programs that use shared libraries</title>
-    <para>
-      To build a simple program and have it use shared libraries for the
-      runtime system and the base libraries use the
-      <literal>-dynamic</literal> flag:
+    <title>共有ライブラリを使うようにプログラムをビルドする</title>
+    <para>単純なプログラムを、ランタイムシステムと基本ライブラリ群(base libraries)について共有ライブラリを使うようにビルドするには、<literal>-dynamic</literal>フラグを使えばよい。
 <programlisting>
 ghc --make -dynamic Main.hs
 </programlisting>
-      This has two effects. The first is to compile the code in such a way
-      that it can be linked against shared library versions of Haskell
-      packages (such as base). The second is when linking, to link against
-      the shared versions of the packages' libraries rather than the static
-      versions. Obviously this requires that the packages were build with
-      shared libraries. On supported platforms GHC comes with shared
-      libraries for all the core packages, but if you install extra packages
-      (e.g. with Cabal) then they would also have to be built with shared
-      libraries (<literal>--enable-shared</literal> for Cabal).
+      これには二つの効果がある。第一に、共有ライブラリ版の(baseなどの)Haskellパッケージコードにリンクできるようにコードをコンパイルする。第二に、リンク時において、パッケージの、静的版でなく共有版のライブラリをリンクする。これには明らかに、これらのパッケージが共有ライブラリ付きでビルドされている必要がある。対応プラットフォームでは全ての中核パッケージの共有ライブラリがGHCに付属しているが、それ以外のパッケージを(例えばCabalで)インストールするなら、それらも共有ライブラリ付きでビルド(Cabalなら<literal>--enable-shared</literal>)しなければならないだろう。
     </para>
   </sect2>
 
   <sect2>
-    <title>Shared libraries for Haskell packages</title>
-    <para>
-      You can build Haskell code into a shared library and make a package to be
-      used by other Haskell programs. The easiest way is using Cabal, simply
-      configure the Cabal package with the <literal>--enable-shared</literal>
-      flag.
+    <title>Haskellパッケージの共有ライブラリ</title>
+    <para>Haskellコードをビルドして共有ライブラリにし、他のHaskellプログラムから使えるパッケージを作ることができる。最も簡単な方法はCabalを使うことで、Cabalパッケージを<literal>--enalbe-shared</literal>付きでconfigureするだけでよい。
     </para>
-    <para>
-      If you want to do the steps manually or are writing your own build
-      system then there are certain conventions that must be followed. Building
-      a shared library that exports Haskell code, to be used by other Haskell
-      code is a bit more complicated than it is for one that exports a C API
-      and will be used by C code. If you get it wrong you will usually end up
-      with linker errors.
+    <para>この手順を手動で行いたいか、あるいは独自のビルドシステムを書いているなら、いくつかの規約に従わねばならない。Haskellコードをエクスポートする共有ライブラリを、他のHaskellコードから使うためにビルドするのは、CのAPIをエクスポートし、Cのコードから使われる共有ライブラリをビルドするのに比べて少々複雑である。間違えると、通常リンクエラーが待っている。
     </para>
-    <para>
-      In particular Haskell shared libraries <emphasis>must</emphasis> be
-      made into packages. You cannot freely assign which modules go in which
-      shared libraries. The Haskell shared libraries must match the package
-      boundaries. Most of the conventions GHC expects when using packages are
-      described in <xref linkend="building-packages"/>.
+    <para>まず、Haskell共有ライブラリはパッケージに入って<emphasis>いなければならない</emphasis>。どの共有ライブラリにどのモジュールが入るかを自由に割り振ることはできない。Haskell共有ライブラリはパッケージ境界に対応していなければならない。パッケージを使うときにGHCが期待する慣習は、大部分<xref linkend="building-packages"/>に書かれている。
     </para>
-    <para>
-      GHC handles references to symbols <emphasis>within</emphasis> the same
-      shared library (or main executable binary) differently from references
-      to symbols <emphasis>between</emphasis> different shared libraries. GHC
-      needs to know for each imported module if that module lives locally in
-      the same shared lib or in a separate shared lib. The way it does this
-      is by using packages. When using <literal>-dynamic</literal>, a module
-      from a separate package is assumed to come from a separate shared lib,
-      while modules from the same package (or the default "main" package) are
-      assumed to be within the same shared lib (or main executable binary).
+    <para>GHCは、同じ共有ライブラリ(あるいは実行可能バイナリ本体)の<emphasis>中での</emphasis>シンボルへの参照と、異る共有ライブラリの<emphasis>間の</emphasis>シンボルへの参照を別に扱う。インポートするそれぞれのモジュールについて、GHCはそれが局所的に(同じ共有ライブラリの中に)あるのか、それとも別の共有ライブラリにあるのかを知る必要がある。これを知るためにパッケージが使われる。<literal>-dynamic</literal>を使っている場合、別パッケージのモジュールは別の共有ライブラリにあると仮定され、同じパッケージ(あるいはデフォルトの「main」パッケージ)にあるモジュールは同じ共有ライブラリ(あるいは実行ファイル本体)にあると仮定される。
    </para>
-    <para>
-      Most of the conventions GHC expects when using packages are described
-      in <xref linkend="building-packages"/>. In addition note that GHC
-      expects the <literal>.hi</literal> files to use the extension
-      <literal>.dyn_hi</literal>. The other requirements are the same as for
-      C libraries and are described below, in particular the use of the flags
-      <literal>-dynamic</literal>, <literal>-fPIC</literal> and
-      <literal>-shared</literal>.
+    <para>パッケージを使うときにGHCが期待する慣習は、大部分<xref linkend="building-packages"/>に書かれている。加えて、GHCは<literal>.hi</literal>ファイルの拡張子が<literal>.dyn_hi</literal>であることを期待するのに注意。これ以外の要求事項はCライブラリの場合と同じであり、以下に記述されている。特に、<literal>-dynamic</literal>、<literal>-fPIC</literal>、<literal>-shared</literal>の各フラグの使用である。
     </para>
   </sect2>
 
   <sect2>
-    <title>Shared libraries that export a C API</title>
-    <para>
-      Building Haskell code into a shared library is a good way to include
-      Haskell code in a larger mixed-language project. While with static
-      linking it is recommended to use GHC to perform the final link step,
-      with shared libaries a Haskell library can be treated just like any
-      other shared libary. The linking can be done using the normal system C
-      compiler or linker.
+    <title>CのAPIをエクスポートする共有ライブラリ</title>
+    <para>Haskellコードを、より大きな多言語プロジェクトに含める場合、Haskellコードを一つの共有ライブラリにビルドするのは良い方法である。静的リンクの場合、最終リンクの段階をGHCに行わせることが推奨されるが、共有ライブラリでは、Haskellライブラリは他のあらゆる共有ライブラリとまったく同じように扱える。リンクは、通常のシステムのCコンパイラとリンカを使って行なえる。
     </para>
-    <para>
-      It is possible to load shared libraries generated by GHC in other
-      programs not written in Haskell, so they are suitable for using as
-      plugins. Of course to construct a plugin you will have to use the FFI
-      to export C functions and follow the rules about initialising the RTS.
-      See <xref linkend="ffi-library"/>. In particular you will probably want
-      to export a C function from your shared library to initialise the
-      plugin before any Haskell functions are called.
+    <para>GHCによって生成された共有ライブラリは、Haskell以外で書かれた他のプログラムからロードすることができるので、プラグインとして使うのに適している。もちろん、プラグインを構築するには、FFIを使ってC関数をエクスポートし、RTSの初期化に関する規則を守らなければならない。<xref linkend="ffi-library"/>を見よ。特に、Haskellの関数が呼ばれる前にプラグインを初期化できるように、共有ライブラリからC関数をエクスポートする必要がおそらくあるだろう。
     </para>
-    <para>
-      To build Haskell modules that export a C API into a shared library use
-      the <literal>-dynamic</literal>, <literal>-fPIC</literal> and
-      <literal>-shared</literal> flags:
+    <para>CのAPIをエクスポートするHaskellモジュールを共有ライブラリへとビルドするには、<literal>-dynamic</literal>、<literal>-fPIC</literal>、<literal>-shared</literal>フラグを使う。
 <programlisting>
 ghc --make -dynamic -shared -fPIC Foo.hs -o libfoo.so
 </programlisting>
-      As before, the <literal>-dynamic</literal> flag specifies that this
-      library links against the shared library versions of the rts and base
-      package. The <literal>-fPIC</literal> flag is required for all code
-      that will end up in a shared library. The <literal>-shared</literal>
-      flag specifies to make a shared library rather than a program. To make
-      this clearer we can break this down into separate compliation and link
-      steps:
+      前と同じく、<literal>-dynamic</literal>フラグは、このライブラリがrtsおよびbaseパッケージの共有ライブラリ版にリンクされるように指定する。<literal>-fPIC</literal>は、最終的に共有ライブラリに入るあらゆるコードについて必要である。<literal>-shared</literal>フラグは、プログラムではなく共有ライブラリを作ることを指定する。より明快にするために、コンパイルとリンクの段階を別にしてみる。
 <programlisting>
 ghc -dynamic -fPIC -c Foo.hs
 ghc -dynamic -shared Foo.o -o libfoo.so
 </programlisting>
-      In principle you can use <literal>-shared</literal> without
-      <literal>-dynamic</literal> in the link step. That means to
-      statically link the rts all the base libraries into your new shared
-      library. This would make a very big, but standalone shared library.
-      Indeed this is exactly what we must currently do on Windows where
-      -dynamic is not yet supported (see <xref linkend="win32-dlls"/>).
-      On most platforms however that would require all the static libraries
-      to have been built with <literal>-fPIC</literal> so that the code is
-      suitable to include into a shared library and we do not do that at the
-      moment.
+      原理的には、リンク時において、<literal>-dynamic</literal>なしに<literal>-shared</literal>を使うことが可能である。これは、rtsとすべての基本ライブラリとを、新しく作る共有ライブラリに対して静的にリンクするということである。これによって、極めて大きいものの単独動作する共有ライブラリが作られることになる。実際Windowsでは、-dynamicがまだ対応されていない(<xref linkend="win32-dlls"/>を見よ)ので、現在のところまさにこれを行うしかない。しかし、大部分のプラットフォームにおいては、これにはすべての静的ライブラリが、コードを共有ライブラリに含めることができるように<literal>-fPIC</literal>付きでビルドされていなければならない。しかし現時点で我々はそれを行なっていない。
     </para>
     <para>
-      <emphasis>Warning:</emphasis> if your shared library exports a Haskell
-      API then you cannot directly link it into another Haskell program and
-      use that Haskell API. You will get linker errors. You must instead make
-      it into a package as described in the section above.
+      <emphasis>警告:</emphasis> 共有ライブラリがHaskellのAPIをエクスポートする場合、それを直接別のHaskellプログラムにリンクしてそのAPIを使うことはできない。リンクエラーが発生するだろう。そうでなく、上の節にあるようにパッケージに仕立てなければならない。
     </para>
   </sect2>
 
   <sect2 id="finding-shared-libs">
-    <title>Finding shared libraries at runtime</title>
-    <para>
-      The primary difficulty with managing shared libraries is arranging
-      things such that programs can find the libraries they need at runtime.
-      The details of how this works varies between platforms, in particular
-      the three major systems: Unix ELF platforms, Windows and Mac OS X.
+    <title>実行時における共有ライブラリの発見</title>
+    <para>共有ライブラリを管理する上での最大の困難は、プログラムが実行時に必要なライブラリを見つけられるように諸々を配置することである。これがどのように働くかの詳細はプラットフォームによって異なる。特に、Unix ELF、Windows、Mac OS Xの三つの主要なプラットフォームである。
     </para>
-    <para>
-      On Unix there are two mechanisms. Shared libraries can be installed
-      into standard locations that the dynamic linker knows about. For
-      example <literal>/usr/lib</literal> or
-      <literal>/usr/local/lib</literal> on most systems. The other mechanism
-      is to use a "runtime path" or "rpath" embedded into programs and
-      libraries themselves. These paths can either be absolute paths or on at
-      least Linux and Solaris they can be paths relative to the program or
-      libary itself. In principle this makes it possible to construct fully
-      relocatable sets of programs and libraries.
+    <para>Unixには二つの機構がある。共有ライブラリは、標準的な、動的リンカの知っている場所にインストールすることができる。例えば大部分のシステムでは<literal>/usr/lib</literal>か<literal>/usr/local/lib</literal>である。もう一つの機構は、プログラムやライブラリ自体に埋めこまれた「runtime path」(rpathともいう)を使うことである。このパスは、絶対パスであってもよいし、少くともLinuxとSolarisにおいてはプログラムやライブラリ自体からの相対パスでもよい。理論的には、これによって、プログラムとライブラリ群を合わせて、どこに置いても使えるようにまとめることができる。
     </para>
-    <para>
-      GHC has a <literal>-dynload</literal> linking flag to select the method
-      that is used to find shared libraries at runtime. There are currently
-      three modes:
+    <para>GHCには<literal>-dynload</literal>というリンク時フラグがあり、これを使って実行時に共有ライブラリを見つける方法を選択することができる。現在、次の三つの方法がある。
       <variablelist>
 	<varlistentry>
 	  <term>sysdep</term>
 	  <listitem>
-	    <para>
-	      A system-dependent mode. This is also the default mode. On Unix
-	      ELF systems this embeds rpaths into the shared library or
-	      executable. In particular it uses absolute paths to where the
-	      shared libraries for the rts and each package can be found.
-	      This means the program can immediately be run and it will be
-	      able to find the libraries it needs. However it may not be
-	      suitable for deployment if the libraries are installed in a
-	      different location on another machine.
+	    <para>システム依存の方式。デフォルトのモードでもある。Unix ELFシステムでは、これはrpathを共有ライブラリや実行ファイルに埋め込むことである。なかでも、rtsと各パッケージの共有ライブラリが見つかった場所への絶対パスを使う。従って、プログラムは即座に実行でき、必要なライブラリを発見できるはずである。一方、他のマシンで使う場合、そのマシンでライブラリが別の場所にインストールされているのであれば、この方法は適さないかもしれない。
 	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>deploy</term>
 	  <listitem>
-	    <para>
-	      This does not embed any runtime paths. It relies on the shared
-	      libraries being available in a standard location or in a
-	      directory given by the <literal>LD_LIBRARY_PATH</literal>
-	      environment variable.
+	    <para>この方式はランタイムパスを埋めこまない。共有ライブラリは、標準の場所か、あるいは環境変数<literal>LD_LIBRARY_PATH</literal>によって与えられたディレクトリに存在することが期待される。
 	    </para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>wrapped</term>
 	  <listitem>
-	    <para>
-	      This mode generates a wrapper program which in turn calls the
-	      real program (in the same directory but with a .dyn extension)
-	      in such a way that it can find the shared libraries that it
-	      needs. At the current time this mode is somewhat experimental.
+	    <para>この方式はラッパプログラムを生成し、このラッパプログラムがプログラム本体(同じディレクトリに.dynという拡張子付きで存在する)を呼ぶ。このとき、プログラム本体が必要な共有ライブラリを見つけられるような方法で呼ぶ。現在のことろこの方式はやや実験的である。
 	    </para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
-      To use relative paths for dependent libraries on Linux and Solaris you
-      can use the <literal>deploy</literal> mode and pass suitable a -rpath
-      flag to the linker:
+      LinuxおよびSolarisにおいて、依存しているライブラリのパスとして相対パスを使うには、<literal>deploy</literal>方式を使って、適切な-rpathフラグをリンカに渡せばよい。
 <programlisting>
 ghc -dynamic Main.hs -o main -lfoo -L. -optl-Wl,-rpath,'$ORIGIN'
 </programlisting>
-      This assumes that the library <literal>libfoo.so</literal> is in the
-      current directory and will be able to be found in the same directory as
-      the executable <literal>main</literal> once the program is deployed.
-      Similarly it would be possible to use a subdirectory relative to the
-      executable e.g. <literal>-optl-Wl,-rpath,'$ORIGIN/lib'</literal>.
+      これは、<literal>libfoo.so</literal>というライブラリがカレントディレクトリにあり、このプログラムが(訳注: 別の場所、あるいは別マシンに)配置されたときには実行ファイル<literal>main</literal>と同じディレクトリで見付かることを仮定している。同様に、実行ファイルから相対的に見てサブディレクトリを使うことも可能である。例えば、<literal>-optl-Wl,-rpath,'$ORIGIN/lib'</literal>。
     </para>
   </sect2>
 
