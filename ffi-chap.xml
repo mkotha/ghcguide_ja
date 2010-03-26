@@ -186,14 +186,14 @@ int main(int argc, char *argv[])
    int argc = ...
    char *argv[] = ...
 
-   // Initialize Haskell runtime
+   // Haskellのラインタイムを初期化する
    hs_init(&amp;argc, &amp;argv);
 
-   // Tell Haskell about all root modules
+   // 全てのルートモジュールをHaskellに通知する
    hs_add_root(__stginit_Foo);
 
-   // do any other initialization here and
-   // return false if there was a problem
+   // その他の初期化があればここで行ない、
+   // 問題があればfalseを返す
    return HS_BOOL_TRUE;
  }
 
