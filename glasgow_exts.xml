@@ -1614,8 +1614,8 @@ counterB = NewCounter
     { _this = "", _inc = ('#':), _display = putStrLn, tag = "B" }
 
 main = do
-    display (inc counterA)         -- prints "1"
-    display (inc (inc counterB))   -- prints "##"
+    display (inc counterA)         -- "1" と表示する
+    display (inc (inc counterB))   -- "##"と表示する
 </programlisting>
 
 レコードの更新構文が存在的データ型(およびGADT)に対してサポートされている。
