@@ -23,3 +23,4 @@
 <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
 <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
 <!ENTITY libraryBaseLocation    "../libraries/base-4.2.0.1">
+<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.8.0.4">
