@@ -30,7 +30,7 @@
    <sect2><title>Software Transactional Memory</title>
 
     <para>GHCは、Concurrent Haskellのスレッドの動作を統括するための新しい方法をサポートするようになった。これはSoftware Transactional Memory(STM)と呼ばれる。<ulink url="http://research.microsoft.com/%7Esimonpj/papers/stm/index.htm">STMの論文</ulink>は、STMとは何か、どう使うのか、についての素晴らしい入門文書である。</para> 
-   <para>STMを使うのに必要な主ライブラリは<ulink url="../libraries/stm/Control-Concurrent-STM.html">Control.Concurrent.STM</ulink>である。サポートされる主な機能は以下の通り。
+   <para>使うのに必要な主要ライブラリは<ulink url="http://hackage.haskell.org/package/stm">stmライブラリ</ulink>である。サポートされる主な機能は以下の通り。
 <itemizedlist>
 <listitem><para>分割不能ブロック。</para></listitem>
 <listitem><para>トランザクション変数</para></listitem>
@@ -51,7 +51,7 @@
   <sect2>
     <title>純粋なコードに並列計算用の注釈を加える</title>
 
-  <para>通常の単一スレッドのHaskellプログラムは、SMP並列性を有効にしただけではその恩恵を被ることができない。並列性をコンパイラから見えるようにしてやる必要があるのだ。これには、Concurrent Haskell(<xref linkend="concurrent-haskell"/>)を使ってスレッドをforkするという方法もあるが、純粋なコードから並列性を取り出す場合、最も単純な方法は<literal>par</literal>コンビネータを使うことである。これは、<literal>seq</literal>と強く関連している(また、良く一緒に使われる)。これらはどちらも<ulink url="../libraries/parallel/Control-Parallel.html"><literal>Control.Parallel</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/parallel/Control-Parallel.html">web上の最新版</ulink>)にある。</para>
+  <para>通常の単一スレッドのHaskellプログラムは、SMP並列性を有効にしただけではその恩恵を被ることができない。並列性をコンパイラから見えるようにしてやる必要があるのだ。これには、Concurrent Haskell(<xref linkend="concurrent-haskell"/>)を使ってスレッドをforkするという方法もあるが、純粋なコードから並列性を取り出す場合、最も単純な方法は<literal>par</literal>コンビネータを使うことである。これは、<literal>seq</literal>と強く関連している(また、良く一緒に使われる)。これらはどちらも<ulink url="http://hackage.haskell.org/package/parallel"><literal>parallelライブラリ</literal></ulink>にある。</para>
 
 <programlisting>
 infixr 0 `par`
@@ -82,7 +82,7 @@ nfib n | n &#60;= 1 = 1
 
     <para>実行時の統計情報から、<literal>par</literal>がどの程度うまく働いているかについての情報を少々集めることができる。<xref linkend="rts-options-gc"/>を見よ。</para>
 
-    <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="../libraries/parallel/Control-Parallel-Strategies.html"><literal>Control.Parallel.Strategies</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/parallel/Control-Parallel-Strategies.html">web上の最新版</ulink>)モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
+    <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="http://hackage.haskell.org/package/parallel">parallelパッケージ</ulink>の<literal>Control.Parallel.Strategies</literal>モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
   </sect2>
 
 <sect2><title>Data Parallel Haskell</title>
