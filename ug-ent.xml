@@ -24,3 +24,4 @@
 <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
 <!ENTITY libraryBaseLocation    "../libraries/base-4.2.0.1">
 <!ENTITY libraryCabalLocation   "../libraries/Cabal-1.8.0.4">
+<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.2.0.0">
