@@ -526,11 +526,11 @@
     <variablelist>
       <varlistentry>
         <term>
-          <option>-l<optional><replaceable>type</replaceable></optional></option>
+          <option>-l<optional><replaceable>flags</replaceable></optional></option>
           <indexterm><primary><option>-l</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
         <listitem>
-          <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。ここで、<replaceable>type</replaceable>は記録するイベントの型(type)を示す。現在、対応している型はひとつだけである。すなわち、<literal>-ls</literal>でスケジューラのイベントを記録する。
+          <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。ここで、<replaceable>flags</replaceable>は、どの種類のイベントを記録するかを示す文字の零個以上の並びである。現在、対応している型はひとつだけである。すなわち、<literal>-ls</literal>でスケジューラのイベントを記録する。
           </para>
 
           <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>show-ghc-events</literal>というツールが使える。
@@ -540,11 +540,11 @@
 
       <varlistentry>
         <term>
-          <option>-v</option>
+          <option>-v</option><optional><replaceable>flags</replaceable></optional>
           <indexterm><primary><option>-v</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
         <listitem>
-          <para>イベントを、<literal>.eventlog</literal>ファイルにではなく、テキストとして標準出力に記録する。
+          <para>イベントを、<literal>.eventlog</literal>ファイルにではなく、テキストとして標準出力に記録する。<replaceable>flags</replaceable>は<option>-l</option>の場合と同じであるが、追加のオプション<literal>t</literal>があって、これは、表示される個々のイベントの前にタイムスタンプを表示することを示す。(バイナリの<literal>.eventlog</literal>ファイルでは、全てのイベントは自動的にタイムスタンプと結び付けられる)
           </para>
         </listitem>
       </varlistentry>
