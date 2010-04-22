@@ -10,7 +10,7 @@
 
   <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
 
-  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Foreign</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールを見よ。</para>
+  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Foreign</literal></ulink>モジュールを見よ。</para>
 
   <sect1 id="ffi-ghcexts">
     <title>FFI追補に対するGHCの拡張</title>

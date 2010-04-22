@@ -42,7 +42,7 @@
 
 <para>GHCは大量のプリミティブなデータ型と演算を基礎としている。(「プリミティブ」だというのは、Haskell自体では定義できないという意味である)。高速なコードを書くためにこれらを使うこともできるが、高水準の言語機能やライブラリを使った方が、通常はずっと苦痛が少なく、長期的に見て良い結果になる。運が良ければ、書いたコードは最適化されて、結局、効率的な非ボックス化版になる。もしそうならないときは知らせてほしい。</para>
 
-<para>これらのプリミティブなデータ型と演算は全て<literal>GHC.Prim</literal>というライブラリからエクスポートされている。これには<ulink url="&libraryGhcPrimLocation;/GHC.Prim.html">詳細なオンライン説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)がある。(この説明書は<filename>compiler/prelude/primops.txt.pp</filename>というファイルから生成されている)</para>
+<para>これらのプリミティブなデータ型と演算は全て<literal>GHC.Prim</literal>というライブラリからエクスポートされている。これには<ulink url="&libraryGhcPrimLocation;/GHC.Prim.html">詳細なオンライン説明書</ulink>がある。(この説明書は<filename>compiler/prelude/primops.txt.pp</filename>というファイルから生成されている)</para>
 <para>プログラム中でプリミティブなデータ型や演算に言及したいなら、まず<literal>GHC.Prim</literal>をインポートしてそれらをスコープに導入しなければならない。多くは「&num;」で終わる名前を持っているので、そのようなものに言及するには拡張<option>-XMagicHash</option>(<xref linkend="magic-hash"/>)が必要である。
 </para>
 
@@ -791,7 +791,7 @@ output = [ (the x, y)
 then group by e
 </programlisting>
 
-    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="&libraryBaseLocation;/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Exts.html">web上の最新版</ulink>)で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
+    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="&libraryBaseLocation;/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
 
     </listitem>
     
@@ -4675,7 +4675,7 @@ proc x -> do
         t &lt;- h -&lt; x*z
         returnA -&lt; t+z
 </screen>
-これは通常の<literal>do</literal>記法と大体同じように読むことができる。ただし、モナドな式の代わりにコマンドが使われている。最初の行では、<literal>x+1</literal>の値がアロー<literal>f</literal>に入力として送られ、出力が<literal>y</literal>に対して照合される。次の行では、出力は捨てられている。<function>returnA</function>というアローは、<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)モジュールで、<literal>arr id</literal>として定義されている。上の例は次のものの略記として扱われる。
+これは通常の<literal>do</literal>記法と大体同じように読むことができる。ただし、モナドな式の代わりにコマンドが使われている。最初の行では、<literal>x+1</literal>の値がアロー<literal>f</literal>に入力として送られ、出力が<literal>y</literal>に対して照合される。次の行では、出力は捨てられている。<function>returnA</function>というアローは、<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールで、<literal>arr id</literal>として定義されている。上の例は次のものの略記として扱われる。
 <screen>
 arr (\ x -> (x, x)) >>>
         first (arr (\ x -> x+1) >>> f) >>>
@@ -4894,7 +4894,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 
 <listitem>
 <para>
-モジュールは<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)をインポートしなければならない。
+モジュールは<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>をインポートしなければならない。
 </para>
 </listitem>
 
@@ -5142,7 +5142,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
       </para>
       <para>対応している言語拡張の一覧は、<literal>ghc --supported-languages</literal>を実行することで得られる。(<xref linkend="modes"/>を見よ)</para>
 
-      <para><ulink url="&libraryCabalLocation;/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Language-Haskell-Extension.html">web上の最新版</ulink>)で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
+      <para><ulink url="&libraryCabalLocation;/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
     </sect2>
 
     <sect2 id="options-pragma">
@@ -6101,7 +6101,7 @@ g x = show x
 
 <sect1 id="special-ids">
 <title>特殊な組込み関数</title>
-<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
+<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>モジュールに解説がある。</para>
 </sect1>
 
 
