@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-6-12-2">
+  <title>Release notes for version 6.12.2</title>
+
+  <para>
+    The significant changes to the various parts of the compiler are
+    listed in the following sections. There have also been numerous bug
+    fixes and performance improvements over the 6.10 branch.
+  </para>
+
+  <sect2>
+    <title>Compiler and Runtime system</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          A new flag <literal>-no-rtsopts</literal> flag allows you to
+          disable parsing of <literal>+RTS ...</literal> options by the
+          run-time system.
+        </para>
+        <para>
+          In some use-cases, when a program can be run as another user,
+          this can cause security problems. For example,
+          <literal>myprog -tsomefile</literal> will overwrite
+          <literal>somefile</literal> if the other user has permissions
+          to do so.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          The mingw installation bundled with GHC on Windows now
+          includes a C++ compiler again.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          Support for the FreeBSD, Dragonfly and Haiku OSes has been
+          improved.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          Datatypes with a context but no constructors, e.g.
+        </para>
+<programlisting>
+data Show a => T a
+</programlisting>
+        <para>
+          are accepted again.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          Importing qualified names is now an error.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          <literal>ghc-pkg</literal> now ensures that the conf files
+          it writes are UTF8.
+        </para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          The parsing of tracing flags has changed;
+          see <xref linkend="rts-eventlog" /> for details.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Template Haskell</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          A bug in the kind parser has been fixed.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Libraries</title>
+
+    <sect3>
+      <title>array</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.3.0.0.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>base</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 4.2.0.1 (was 4.2.0.0)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>bytestring</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 0.9.1.6 (was 0.9.1.5).
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>Cabal</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 1.8.0.4 (was 1.8.0.2)
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>
+            <literal>Distribution.ModuleName.simple</literal> has been
+            deprecated; use
+            <literal>Distribution.ModuleName.fromString</literal>
+            instead.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>containers</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.3.0.0.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>directory</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 1.0.1.1 (was 1.0.1.0)
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>
+            <literal>System.Directory.doesFileExist</literal> on Unix-like
+            OSes now correctly identifies various types of special file
+            as files.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>
+        dph
+        (dph-base, dph-par, dph-prim-interface, dph-prim-par,
+        dph-prim-seq, dph-seq)
+      </title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            All the dph packages are version 0.4.0.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>extensible-exceptions</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.1.1.1.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>filepath</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 1.1.0.4 (was 1.1.0.3)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>ghc-binary</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            This is an internal package, and should not be used.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>ghc-prim</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.2.0.0.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>haskell98</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.0.1.1.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>hpc</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 0.5.0.5 (was 0.5.0.4)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>integer-gmp</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 0.2.0.1 (was 0.2.0.0)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>integer-simple</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.1.0.0.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>old-locale</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.0.0.2.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>old-time</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 1.0.0.4 (was 1.0.0.3)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>pretty</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.0.1.1.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>process</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.0.1.2.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>random</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.0.0.2.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>syb</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 0.1.0.2.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>template-haskell</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 2.4.0.1 (was 2.4.0.0)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>time</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            No change; version 1.1.4.
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>unix</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 2.4.0.1 (was 2.4.0.0)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+
+    <sect3>
+      <title>Win32</title>
+      <itemizedlist>
+        <listitem>
+          <para>
+            Version number 2.2.0.2 (was 2.2.0.1)
+          </para>
+        </listitem>
+      </itemizedlist>
+    </sect3>
+  </sect2>
+</sect1>
+
