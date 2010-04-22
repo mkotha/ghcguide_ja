@@ -42,7 +42,7 @@
 
 <para>GHCは大量のプリミティブなデータ型と演算を基礎としている。(「プリミティブ」だというのは、Haskell自体では定義できないという意味である)。高速なコードを書くためにこれらを使うこともできるが、高水準の言語機能やライブラリを使った方が、通常はずっと苦痛が少なく、長期的に見て良い結果になる。運が良ければ、書いたコードは最適化されて、結局、効率的な非ボックス化版になる。もしそうならないときは知らせてほしい。</para>
 
-<para>これらのプリミティブなデータ型と演算は全て<literal>GHC.Prim</literal>というライブラリからエクスポートされている。これには<ulink url="../libraries/ghc-prim/GHC.Prim.html">詳細なオンライン説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)がある。(この説明書は<filename>compiler/prelude/primops.txt.pp</filename>というファイルから生成されている)</para>
+<para>これらのプリミティブなデータ型と演算は全て<literal>GHC.Prim</literal>というライブラリからエクスポートされている。これには<ulink url="&libraryGhcPrimLocation;/GHC.Prim.html">詳細なオンライン説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)がある。(この説明書は<filename>compiler/prelude/primops.txt.pp</filename>というファイルから生成されている)</para>
 <para>プログラム中でプリミティブなデータ型や演算に言及したいなら、まず<literal>GHC.Prim</literal>をインポートしてそれらをスコープに導入しなければならない。多くは「&num;」で終わる名前を持っているので、そのようなものに言及するには拡張<option>-XMagicHash</option>(<xref linkend="magic-hash"/>)が必要である。
 </para>
 
@@ -6101,7 +6101,7 @@ g x = show x
 
 <sect1 id="special-ids">
 <title>特殊な組込み関数</title>
-<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="../libraries/ghc-prim/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
+<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim/GHC-Prim.html">web上の最新版</ulink>)モジュールに解説がある。</para>
 </sect1>
 
 
