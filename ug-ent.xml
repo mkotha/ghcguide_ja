@@ -22,6 +22,8 @@
 <!ENTITY win32-dll      SYSTEM "win32-dlls.xml">
 <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
 <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
-<!ENTITY libraryBaseLocation    "../libraries/base-4.2.0.1">
-<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.8.0.4">
-<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.2.0.0">
+<!-- library locations are modified to point to the web,
+     to make them suitable for www.kotha.net -->
+<!ENTITY libraryBaseLocation    "http://www.haskell.org/ghc/docs/latest/html/libraries/base-4.2.0.1">
+<!ENTITY libraryCabalLocation   "http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal-1.8.0.4">
+<!ENTITY libraryGhcPrimLocation "http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim-0.2.0.0">
