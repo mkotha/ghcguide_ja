@@ -791,7 +791,7 @@ output = [ (the x, y)
 then group by e
 </programlisting>
 
-    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="../libraries/base/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Exts.html">web上の最新版</ulink>)で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
+    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="&libraryBaseLocation;/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/GHC-Exts.html">web上の最新版</ulink>)で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
 
     </listitem>
     
@@ -4603,7 +4603,7 @@ Ross Paterson and Simon Peyton Jones, September 16, 2004.
 </listitem>
 
 </itemizedlist>
-<option>-XArrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。この記法は、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。
+<option>-XArrows</option>フラグが与えられると、GHCは二番目の論文に記述されているアロー記法をサポートする。この記法は、<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>モジュールのコンビネータを使って通常のHaskellに翻訳される。以下に示すのは、この記法の短い紹介である。Hughesの論文を読まないとあまり意味が分からないだろう。
 </para>
 
 <para>この拡張によって、アローを定義するための新しい種類の式が追加される。
@@ -4675,7 +4675,7 @@ proc x -> do
         t &lt;- h -&lt; x*z
         returnA -&lt; t+z
 </screen>
-これは通常の<literal>do</literal>記法と大体同じように読むことができる。ただし、モナドな式の代わりにコマンドが使われている。最初の行では、<literal>x+1</literal>の値がアロー<literal>f</literal>に入力として送られ、出力が<literal>y</literal>に対して照合される。次の行では、出力は捨てられている。<function>returnA</function>というアローは、<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)モジュールで、<literal>arr id</literal>として定義されている。上の例は次のものの略記として扱われる。
+これは通常の<literal>do</literal>記法と大体同じように読むことができる。ただし、モナドな式の代わりにコマンドが使われている。最初の行では、<literal>x+1</literal>の値がアロー<literal>f</literal>に入力として送られ、出力が<literal>y</literal>に対して照合される。次の行では、出力は捨てられている。<function>returnA</function>というアローは、<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)モジュールで、<literal>arr id</literal>として定義されている。上の例は次のものの略記として扱われる。
 <screen>
 arr (\ x -> (x, x)) >>>
         first (arr (\ x -> x+1) >>> f) >>>
@@ -4687,7 +4687,7 @@ arr (\ x -> (x, x)) >>>
         arr (\ (t, z) -> t+z) >>>
         returnA
 </screen>
-それ以降使われない変数は射影で捨てられていることに注意。これに<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>で定義されている書き換え規則(<xref linkend="rewrite-rules"/>を見よ)を使って単純化を施すと、以下のように簡約される。
+それ以降使われない変数は射影で捨てられていることに注意。これに<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>で定義されている書き換え規則(<xref linkend="rewrite-rules"/>を見よ)を使って単純化を施すと、以下のように簡約される。
 <screen>
 arr (\ x -> (x+1, x)) >>>
         first f >>>
@@ -4894,7 +4894,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 
 <listitem>
 <para>
-モジュールは<ulink url="../libraries/base/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)をインポートしなければならない。
+モジュールは<ulink url="&libraryBaseLocation;/Control-Arrow.html"><literal>Control.Arrow</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Arrow.html">web上の最新版</ulink>)をインポートしなければならない。
 </para>
 </listitem>
 

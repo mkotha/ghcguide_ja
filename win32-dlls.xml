@@ -41,7 +41,7 @@ Notice how the "%1" argument is quoted (or not).
 
   <para>例外がひとつある。<literal>CYGWIN</literal>環境変数に<literal>tty</literal>が含まれない場合、Cygwinのシェルを使うことができる。このモードでは、CygwinのシェルはWindowsのコンソールシェルとして振る舞い、コンソールイベントは子プロセスに伝播される。<literal>CYGWIN</literal>環境変数はCygwinのシェルを起動する<emphasis>前</emphasis>に設定されねばならぬことに注意。後で変更してもシェルには何の影響も与えられない。</para>
 
-  <para>この問題が影響するのはGHCiだけでなく、GHCでコンパイルされたプログラムで、コンソールイベントを補足したいあらゆるプログラムに影響する。 <ulink url="../libraries/base/GHC-ConsoleHandler.html">GHC.ConsoleHandler</ulink>モジュールを見よ。</para>
+  <para>この問題が影響するのはGHCiだけでなく、GHCでコンパイルされたプログラムで、コンソールイベントを補足したいあらゆるプログラムに影響する。 <ulink url="&libraryBaseLocation;/GHC-ConsoleHandler.html">GHC.ConsoleHandler</ulink>モジュールを見よ。</para>
 </sect1>
 
 <sect1 id="terminal-interaction">

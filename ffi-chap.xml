@@ -10,7 +10,7 @@
 
   <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
 
-  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<ulink url="../libraries/base/Control-Concurrent.html"><literal>Foreign</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールを見よ。</para>
+  <para>FFIライブラリの説明は一緒に配布されているライブラリ説明書にある。例えば<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Foreign</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)モジュールを見よ。</para>
 
   <sect1 id="ffi-ghcexts">
     <title>FFI追補に対するGHCの拡張</title>
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
         
         <para>通常、HaskellスレッドとOSスレッドの間に固定された関係はない。つまり、他言語呼び出しを行った時、それがどのOSスレッドで起こるのかは規定されない。さらに、一つのHaskellスレッドが複数回の呼び出しを行ったとしても、それが同じOSスレッド上で実行される保証はない。</para>
 
-        <para>このことは普通問題にならないし、このおかげでGHCのランタイムシステムがOSのスレッド資源を効率的に利用することが可能になっている。しかし、例えばスレッドローカルな状態を使う外部コードを呼ぶ場合など、どのOSスレッドを使うかをもっと制御できた方が便利なことがある。このような場合のために、<emphasis>結合スレッド</emphasis>(bound thread)を用意している。これは、特定のOSスレッドに結び付けられたHaskellスレッドである。結合スレッドについての情報は、<ulink url="../libraries/base/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>モジュールの説明を見よ。</para>
+        <para>このことは普通問題にならないし、このおかげでGHCのランタイムシステムがOSのスレッド資源を効率的に利用することが可能になっている。しかし、例えばスレッドローカルな状態を使う外部コードを呼ぶ場合など、どのOSスレッドを使うかをもっと制御できた方が便利なことがある。このような場合のために、<emphasis>結合スレッド</emphasis>(bound thread)を用意している。これは、特定のOSスレッドに結び付けられたHaskellスレッドである。結合スレッドについての情報は、<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>モジュールの説明を見よ。</para>
       </sect3>
       
       <sect3>

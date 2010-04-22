@@ -1320,7 +1320,7 @@ f "2"    = 2
     <title>Concurrent Haskellを使う</title>
     <indexterm><primary>Concurrent Haskell</primary><secondary>using</secondary></indexterm>
 
-    <para>GHCはデフォルトでConcurrent Haskellをサポートしていて、特別なオプションが必要だったリ、特別な方法でコンパイルされたライブラリが必要だったりはしない。Concurrent Haskellのサポートライブラリにアクセスするには、単に<ulink url="../libraries/base/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)をインポートすれば良い。Concurrent Haskellについてのさらなる情報はこのモジュールの付属文書にある。</para>
+    <para>GHCはデフォルトでConcurrent Haskellをサポートしていて、特別なオプションが必要だったリ、特別な方法でコンパイルされたライブラリが必要だったりはしない。Concurrent Haskellのサポートライブラリにアクセスするには、単に<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/base/Control-Concurrent.html">web上の最新版</ulink>)をインポートすれば良い。Concurrent Haskellについてのさらなる情報はこのモジュールの付属文書にある。</para>
 
     <para>以下のRTSオプションがConcurrent Haskellプログラムの振る舞いに影響する。<indexterm><primary>RTS options, concurrent</primary></indexterm></para>
 
