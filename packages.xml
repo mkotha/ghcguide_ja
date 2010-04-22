@@ -9,7 +9,7 @@
 
   <para>パッケージを使う手順はこの上なく単純である。<option>&ndash;&ndash;make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
-  <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="../libraries/Cabal/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
+  <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="&libraryCabalLocation;/Distribution-Simple.html">Distribution.Simple</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-Simple.html">web上の最新版</ulink>))を見よ。</para>
 
   <sect2 id="using-packages">
   <title>パッケージを使う
@@ -642,7 +642,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
       <literal>InstalledPackageInfo</literal>: パッケージの仕様
     </title>
 
-    <para>パッケージの仕様は一つのHaskellレコードである。具体的には、Distribution.InstalledPackageInfoモジュールにあるレコード<ulink url="../libraries/Cabal/Distribution-InstalledPackageInfo.html#%tInstalledPackageInfo">InstalledPackageInfo</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-InstalledPackageInfo.html#%tInstalledPackageInfo">web上の最新版</ulink>)<!-- 訳注: %tではなくt%3A -->である。これはCabalパッケージの一部であり、GHCに付属している。</para>
+    <para>パッケージの仕様は一つのHaskellレコードである。具体的には、Distribution.InstalledPackageInfoモジュールにあるレコード<ulink url="&libraryCabalLocation;/Distribution-InstalledPackageInfo.html#%tInstalledPackageInfo">InstalledPackageInfo</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-InstalledPackageInfo.html#%tInstalledPackageInfo">web上の最新版</ulink>)<!-- 訳注: %tではなくt%3A -->である。これはCabalパッケージの一部であり、GHCに付属している。</para>
 
     <para><literal>InstalledPackageInfo</literal>には人間可読の構文がある。<literal>parseInstalledPackageInfo</literal>および<literal>showInstalledPackageInfo</literal>という二つの関数でこの構文をそれぞれ読んだり書いたりできる。次に示すのは<literal>unix</literal>パッケージの<literal>InstalledPackageInfo</literal>の例である。</para>
 
@@ -761,7 +761,7 @@ haddock-html: /usr/share/doc/ghc/html/libraries/unix
 	  <indexterm><primary><literal>auto</literal></primary><secondary>package specification</secondary></indexterm>
 	</term>
 	<listitem>
-          <para>(文字列)パッケージが配布されるにあたってのライセンス。このフィールドは型<ulink url="../libraries/Cabal/Distribution-License.html#t:License"><literal>License</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-License.html#t:License">web上の最新版</ulink>)の値である。</para>
+          <para>(文字列)パッケージが配布されるにあたってのライセンス。このフィールドは型<ulink url="&libraryCabalLocation;/Distribution-License.html#t:License"><literal>License</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Distribution-License.html#t:License">web上の最新版</ulink>)の値である。</para>
 	</listitem>
       </varlistentry>
 

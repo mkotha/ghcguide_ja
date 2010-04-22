@@ -5142,7 +5142,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
       </para>
       <para>対応している言語拡張の一覧は、<literal>ghc --supported-languages</literal>を実行することで得られる。(<xref linkend="modes"/>を見よ)</para>
 
-      <para><ulink url="../libraries/Cabal/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Language-Haskell-Extension.html">web上の最新版</ulink>)で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
+      <para><ulink url="&libraryCabalLocation;/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal/Language-Haskell-Extension.html">web上の最新版</ulink>)で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
     </sect2>
 
     <sect2 id="options-pragma">
