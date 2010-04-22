@@ -586,6 +586,12 @@
 	      <entry>静/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
+	    <row>
+	      <entry><option>-no-auto-link-packages</option></entry>
+	      <entry>haskell98パッケージを自動的にはリンクしない。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
