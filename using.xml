@@ -1472,7 +1472,7 @@ statements or clauses.
 
   <indexterm><primary>intermediate code generation</primary></indexterm>
 
-  <para>GHCは、コンパイルの副作用として、最適化済み中間コード(「コア」形式と呼ぶ)をファイルに出力することができる。GHC以外のバックエンドツールがコアファイルを読んで処理することができる。このファイルは接尾辞<filename>.hcr</filename>を持つ。コア形式は<ulink url="../ext-core/core.pdf"><citetitle>An External Representation for the GHC Core Language</citetitle></ulink>に記述されており、コアファイルを操作するツールのサンプル(Haskell製)はGHCのソース配布ディレクトリ<literal>utils/ext-core</literal>にある。<literal>.hcr</literal>ファイルの形式はデバッグのためにGHCが生成するコア出力(<xref linkend="options-debugging"/>)とは<emphasis>異なる</emphasis>ことに注意。(この二つの形式はやや似ているように見えるけれども)</para>
+  <para>GHCは、コンパイルの副作用として、最適化済み中間コード(「コア」形式と呼ぶ)をファイルに出力することができる。GHC以外のバックエンドツールがコアファイルを読んで処理することができる。このファイルは接尾辞<filename>.hcr</filename>を持つ。コア形式は<ulink url="../../core.pdf"><citetitle>An External Representation for the GHC Core Language</citetitle></ulink>に記述されており、コアファイルを操作するツールのサンプル(Haskell製)はGHCのソース配布ディレクトリ<literal>utils/ext-core</literal>にある。<literal>.hcr</literal>ファイルの形式はデバッグのためにGHCが生成するコア出力(<xref linkend="options-debugging"/>)とは<emphasis>異なる</emphasis>ことに注意。(この二つの形式はやや似ているように見えるけれども)</para>
 
   <para>コア形式は注釈(note)を最初からサポートしている。注釈を加えるには、ソースコード中で<literal>CORE</literal>プラグマ(<xref linkend="pragmas"/>を見よ)を使えば良い。</para>
 
