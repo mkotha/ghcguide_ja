@@ -12,7 +12,7 @@
 	<indexterm><primary><command>hasktags</command></primary></indexterm>
 	<indexterm><primary>CTAGS for Haskell</primary></indexterm>
 
-	<para><command>hasktags</command>は、非常に単純なHaskellプログラムであり、Haskellプログラムに対して、ctagsの「tags」ファイルや、egagsの「TAGS」ファイルを生成する。</para>
+	<para><command>hasktags</command>は非常に単純なHaskellプログラムであり、Haskellプログラムに対して、ctagsの「tags」ファイルやetagsの「TAGS」ファイルを生成する。</para>
 
         <para>これをNEditやVim、Emacsなどのエディタにロードすると、複数ファイルからなるプログラムで、関数、型、構築子の定義を探し、簡単に移動することができる。</para>
 
