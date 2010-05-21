@@ -14,7 +14,7 @@
 
 	<para><command>hasktags</command>は非常に単純なHaskellプログラムであり、Haskellプログラムに対して、ctagsの「tags」ファイルやetagsの「TAGS」ファイルを生成する。</para>
 
-        <para>これをNEditやVim、Emacsなどのエディタにロードすると、複数ファイルからなるプログラムで、関数、型、構築子の定義を探し、簡単に移動することができる。</para>
+        <para>これをNEditやVim、Emacsなどのエディタにロードすると、複数ファイルからなるプログラムにおいて、関数、型、構築子の定義を探し、簡単に移動することができる。</para>
 
 	<para>起動構文</para>
 
@@ -40,7 +40,7 @@ find -name \*.\*hs | xargs hasktags
 <sect2>
 <title>エディタからタグを使う</title>
 
-<para>NEditでは、「File/Load Tags File」でタグをロードし、「Ctrl-D」でタグを検索する。</para>
+<para>NEditでは、「File/Load Tags File」で「tags」ファイルをロードし、「Ctrl-D」でタグを検索する。</para>
 
 <para>XEmacsでは、「visit-tags-table」で「TAGS」ファイルをロードし、「M-.」でタグを検索する。</para>
 
