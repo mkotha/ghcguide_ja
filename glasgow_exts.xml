@@ -542,7 +542,7 @@ f ((view -> B, p3), p4) = e2
 
     <!-- ===================== Recursive do-notation ===================  -->
 
-<sect2 id="mdo-notation">
+<sect2 id="recursive-do-notation">
 <title>再帰的do記法
 </title>
 
@@ -639,7 +639,7 @@ class Monad m => MonadFix m where
 </para>
 </sect3>
 
-<sect3> <title>mdo記法 (廃止予定)</title>
+<sect3 id="mdo-notation"> <title>mdo記法 (廃止予定)</title>
 
 <para>
 GHCは、<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>に記述されている通りの<literal>mdo</literal>キーワードを有効にする<option>-XRecursiveDo</option>フラグをサポートしていたが、これは現在非推奨である。<literal>mdo { Q; e }</literal>の代わりに<literal>do { rec Q; e }</literal>と書いてほしい。
@@ -1125,7 +1125,7 @@ let f = ...
 in 
     ...
 </programlisting>
-そして、この結合性宣言は、この束縛がスコープにあるようなあらゆる場所で適用される。例えば、<literal>let</literal>式なら、他の<literal>let</literal>束縛の右辺と<literal>let</literal>式の本体で適用される。また、再帰的<literal>do</literal>式(<xref linkend="mdo-notation"/>)では、<literal>let</literal>文の局所結合性宣言は、束縛される名前と同様に、そのグループの全ての文に渡るスコープを持つ。
+そして、この結合性宣言は、この束縛がスコープにあるようなあらゆる場所で適用される。例えば、<literal>let</literal>式なら、他の<literal>let</literal>束縛の右辺と<literal>let</literal>式の本体で適用される。また、再帰的<literal>do</literal>式(<xref linkend="recursive-do-notation"/>)では、<literal>let</literal>文の局所結合性宣言は、束縛される名前と同様に、そのグループの全ての文に渡るスコープを持つ。
 </para>
 
 <para>
