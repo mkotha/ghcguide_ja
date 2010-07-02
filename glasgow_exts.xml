@@ -616,15 +616,13 @@ class Monad m => MonadFix m where
 <itemizedlist>
 <listitem><para>
 これは<literal>-XDoRec</literal>フラグで有効になる。このフラグは<literal>-fglasgow-exts</literal>で有効になる。
-再帰的do記法ではキーワードとして(<literal>do</literal>ではなく)<literal>mdo</literal>を使う。
 </para></listitem>
 
 <listitem><para>
 あるモナドに再帰的な束縛を使う必要があるなら、そのモナドは<literal>MonadFix</literal>クラスのインスタンスとして宣言されていなければならない。
 </para></listitem>
-
 <listitem><para>
-通常のdo記法と異なり、<literal>let</literal>や<literal>where</literal>の束縛と同じように、名前の隠蔽は許されない。つまり、一つの<literal>mdo</literal>において束縛される名前は全て異なっていなければならない。(論文の3.3節)
+
 次の<literal>MonadFix</literal>インスタンスは自動的に提供される。List, Maybe, IO。さらに、Control.Monad.STとControl.Monad.ST.Lazyモジュールは、Haskellの(それぞれ正格と遅延の)内部的な状態モナドについてのMonadFixインスタンスを提供する。
 </para></listitem>
 
