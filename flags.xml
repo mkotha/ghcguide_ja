@@ -880,8 +880,14 @@
 	      <entry><option>-XNoTypeOperators</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XDoRec</option></entry>
+	      <entry><link linkend="recursive-do-notation">再帰的do記法</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoDoRec</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XRecursiveDo</option></entry>
-	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。</entry>
+	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。これは非推奨である。代わりに<link linkend="recursive-do-notation">再帰的do記法</link>を使ってほしい。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
