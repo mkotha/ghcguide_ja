@@ -84,7 +84,7 @@ Ok, modules loaded: Main.
       
       <para>GHCは<replaceable>M</replaceable>というモジュールがどのファイルにあるかをどのようにして知るのだろうか。GHCiは、<literal><replaceable>M</replaceable>.hs</literal>または<literal><replaceable>M</replaceable>.lhs</literal>というファイルを探すのである。したがって、大部分のモジュールでは、モジュール名とファイル名は一致しなければならない。一致しなかった場合、GHCiはモジュールを見つけ出すことができない。</para>
 
-      <para>この規則には一つの例外がある。<literal>:load</literal>を使ってプログラムをロードするとき、あるいは<literal>ghci</literal>を起動するとき、モジュール名ではなくファイル名を指定することができる。そのファイルはもし存在するならロードされ、どんなモジュールを含んでいても構わない。これは、複数の<literal>Main</literal>モジュールが一つのディレクトリにあって、全てを<filename>Main.hs</filename>とは呼べないときに、特に便利である。</para>
+      <para>この規則には一つの例外がある。<literal>:load</literal>を使ってプログラムをロードするとき、あるいは<literal>ghci</literal>を起動するとき、モジュール名ではなくファイル名を指定することができる。そのファイルはもし存在するならロードされ、どんなモジュールを含んでいても構わない。これは、複数の<literal>Main</literal>モジュールが一つのディレクトリにある場合、全てを<filename>Main.hs</filename>と呼ぶことはできないので、特に便利である。</para>
 
       <para>ソースファイルを探すときの探索パスは、次に示すように、GHCiのコマンド行で<option>-i</option>を使って指定することができる。</para>
 
@@ -507,7 +507,7 @@ it &lt;- <replaceable>e</replaceable>
 <programlisting>
   ghci> reverse []
 </programlisting>
-      GHCiは何をするべきか。厳密に言うと、このプログラムは曖昧である。<literal>show (reverse [])</literal>(ここでGHCi計算するのはこれである)の型は<literal>Show a =&gt; a</literal>であり<!-- 訳注 これは誤り-->、これをどのように表示するかは<literal>a</literal>の型に依存する。例えば、
+      GHCiは何をするべきか。厳密に言うと、このプログラムは曖昧である。<literal>show (reverse [])</literal>(ここでGHCiが計算するのはこれである)の型は<literal>Show a =&gt; a</literal>であり<!-- 訳注 これは誤り-->、これをどのように表示するかは<literal>a</literal>の型に依存する。例えば、
 <programlisting>
   ghci> (reverse []) :: String
   ""

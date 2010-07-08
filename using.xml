@@ -92,7 +92,7 @@ module X where
     </variablelist>
     
     <para>フラグの早見表(<xref linkend="flag-reference"/>)にはそれぞれのフラグがどれに分類されるか記されている。</para>
-    <para>静的であるが、GHCiの<literal>:set</literal>コマンドで設定できるフラグも少しながらある。これは表中では&ldquo;静/<literal>:set</literal>&rdquo;と表記される。</para>
+    <para>静的でありながら、GHCiの<literal>:set</literal>コマンドで設定できるフラグも少しながらある。これは表中では&ldquo;静/<literal>:set</literal>&rdquo;と表記される。</para>
   </sect1>
 
   <sect1 id="file-suffixes">
