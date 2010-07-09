@@ -826,7 +826,7 @@ output = [ x
 
 <para><indexterm><primary>-XNoImplicitPrelude option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-XNoImplicitPrelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならないのだ)</para>
  
-            <para>自分で数値クラスの階層を定義するために、自作のプレリュードを実装しているとしよう。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、これは完全な無駄骨である。このため、<option>-XNoImplicitPrelude</option>フラグを使った場合に<emphasis>も</emphasis>、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
+            <para>自分で数値クラスの階層を定義するために、自作のプレリュードを実装しているとしよう。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、これは完全な無駄骨である。このため、<option>-XNoImplicitPrelude</option>フラグを使った場合には<emphasis>さらに</emphasis>、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
 	    <itemizedlist>
 	      <listitem>
 		<para>整数リテラル<literal>368</literal>の意味は「<literal>fromInteger (368::Integer)</literal>」であり、「<literal>Prelude.fromInteger (368::Integer)</literal>」ではない。</para> </listitem>	    
@@ -941,7 +941,7 @@ module Foo where
 スコープには二つの<literal>x</literal>があるが、<literal>ok1</literal>の定義中のパターンにおける<literal>x</literal>は、型<literal>S</literal>のフィールドを指す他にないということが明白である。関数<literal>ok2</literal>についても同様である。しかし、<literal>bad1</literal>におけるレコード更新と、<literal>bad2</literal>におけるレコード選択では、どちらの型が意図されているか明確でない。
 </para>
 <para>
-Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-XDisambiguateRecordFields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名が散らばるのを軽減できる。
+Haskell 98はこの四つすべてを曖昧であると見做すが、<option>-XDisambiguateRecordFields</option>が与えられると、GHCは前者二つを認める。この規則は、Haskell 98でのインスタンス宣言の規則(インスタンス宣言中のメソッド束縛の左辺のメソッド名は曖昧さなくそのクラスのメソッドを(スコープにあれば)参照し、スコープに同名の別の変数があっても構わないとする)と全く同じである。これによって、異なるモジュールから同じフィールド名を使う二つのレコードをインポートしたときに、修飾名がそこらに散らばるのを軽減できる。
 </para>
 <para>
 詳細をいくつか。
@@ -978,7 +978,7 @@ module Foo where
 </title>
 
 <para>
-レコード同名利用(record puns; punは「駄洒落」「語呂合わせ」の意)は、<literal>-XNamedFieldPuns</literal>フラグによって有効になる。
+レコード同名利用(訳注: record puns; punは「駄洒落」「語呂合わせ」の意)は、<literal>-XNamedFieldPuns</literal>フラグによって有効になる。
 </para>
 
 <para>

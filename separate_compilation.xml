@@ -23,7 +23,7 @@
 
       <indexterm><primary>unicode</primary></indexterm>
 
-      <para>GHCはソースファイルがASCII<indexterm><primary>ASCII</primary></indexterm>またはUTF-8<indexterm><primary>UTF-8</primary></indexterm>のみだと推定し、他のエンコード方式<indexterm><primary>encoding</primary></indexterm>は認識されない。しかし、UTF-8として不正な並びはコメント内部では無視されるので、Latin-1<indexterm><primary>Latin-1</primary></indexterm>のような他のエンコード方式を、コメント以外の部分がASCIIのみから成ることを条件に使うことができる。</para>
+      <para>GHCはソースファイルがASCII<indexterm><primary>ASCII</primary></indexterm>またはUTF-8<indexterm><primary>UTF-8</primary></indexterm>のみだと推定し、他のエンコード方式<indexterm><primary>encoding</primary></indexterm>は認識しない。しかし、UTF-8として不正な並びはコメント内部では無視されるので、Latin-1<indexterm><primary>Latin-1</primary></indexterm>のような他のエンコード方式を、コメント以外の部分がASCIIのみから成ることを条件に使うことができる。</para>
     </sect2>
 
     <sect2 id="output-files">
@@ -38,9 +38,9 @@
 
       <para>オブジェクトファイルは通常<literal>.o</literal>で終わり、そのモジュールのコンパイル済みコードを含む。</para>
 
-      <para>インタフェースファイルはふつう<literal>.hi</literal>で終わり、そのモジュールに依存するモジュールをコンパイルするときに必要な情報を含む。エクスポートされた関数の型や、データ型の定義といったものが含まれる。バイナリ形式なので、読もうとしないように。代わりに<option>&mdash;-show-iface</option>オプションを使うことができる。(<xref linkend="hi-options"/>を見よ)</para>
+      <para>インタフェースファイルはふつう<literal>.hi</literal>で終わり、そのモジュールに依存するモジュールをコンパイルするときに必要な情報を含む。エクスポートされた関数の型や、データ型の定義といったものがこれに含まれる。バイナリ形式なので、読もうとしないように。代わりに<option>&mdash;-show-iface</option>オプションを使うことができる。(<xref linkend="hi-options"/>を見よ)</para>
 
-      <para>オブジェクトファイルとインタフェースファイルは対になっていると考えるべきである。なぜなら、インタフェースファイルには、ある意味で、対応するオブジェクトファイルの説明が、コンパイラ可読の形で含まれているからである。なんらかの理由でインタフェースファイルとオブジェクトファイルの間に不整合ができると、コンパイラがオブジェクトファイルについて誤った仮定を置くことになるかもしれない。こうなると、まず間違いなく厄介なことになる。このため、オブジェクトファイルとインタフェースファイルは同じ場所に置くことを推奨する。(GHCはデフォルトでこれを行うが、すぐ下で説明するようにこれを変更することもできる)</para>
+      <para>オブジェクトファイルとインタフェースファイルは対になっていると考えるべきである。なぜなら、インタフェースファイルとは、ある意味で、対応するオブジェクトファイルの説明を、コンパイラ可読の形にしたものだからである。なんらかの理由でインタフェースファイルとオブジェクトファイルの間に不整合ができると、コンパイラがオブジェクトファイルについて誤った仮定を置くことになるかもしれない。こうなると、まず間違いなく厄介なことになる。このため、オブジェクトファイルとインタフェースファイルは同じ場所に置くことを推奨する。(GHCはデフォルトでこれを行うが、すぐ下で説明するようにこれを変更することもできる)</para>
 
       <para>全てのモジュールには、ソースコード中で定義(<literal>module A.B.C where ...</literal>)された<emphasis>モジュール名</emphasis>がある。</para>
 
