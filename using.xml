@@ -1408,7 +1408,7 @@ f "2"    = 2
           <indexterm><primary><option>-qm</option></primary><secondary>RTS
           option</secondary></indexterm>
 	  <listitem>
-            <para>負荷分散のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。移住はスレッドにしか適用されないことに注意。<literal>par</literal>によって作られた火花は、別途work-stealingによって負荷分散される。</para>
+            <para>負荷分散のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。移住はスレッドにしか適用されないことに注意。<literal>par</literal>によって作られたスパークは、別途work-stealingによって負荷分散される。</para>
             <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
           </listitem>
         </varlistentry>
@@ -1430,7 +1430,7 @@ f "2"    = 2
 
       <para>プログラムを実行するときに<literal>-s</literal>というRTSオプションを加えると、時間統計情報を見ることができる。これを使って、使うCPUの数を増やしたことでプログラムが速くなったかどうかを確認できる。ユーザ(user)時間が消費(elapsed)時間よりも大きいなら、プログラムは単一のCPUよりも多くを使ったことになる。比較のために<literal>-N</literal>オプションなしでも走らせてみると良いだろう。</para>
 
-      <para><literal>+RTS -s</literal>の出力によって、プログラムの実行中にいくつの「火花」(spark)が作られ、実行されたかが分かる(<xref linkend="rts-options-gc"/>を見よ)。これによって、あなたの<literal>par</literal>注釈がどの程度うまく働いているかについての感触が得られるだろう。</para>
+      <para><literal>+RTS -s</literal>の出力によって、プログラムの実行中にいくつの「スパーク」(spark)が作られ、実行されたかが分かる(<xref linkend="rts-options-gc"/>を見よ)。これによって、あなたの<literal>par</literal>注釈がどの程度うまく働いているかについての感触が得られるだろう。</para>
 
       <para>たくさんの実験とランタイムシステムのチューニングにより、GHCの並列性サポートは6.12.1で改善された。我々は、これがあなたにとってどの程度うまく働くかを聴きたいと引き続き思っている。また、我々のベンチマーク一式に加えるための並列プログラムも収集したいと思っている。</para>
     </sect2>
