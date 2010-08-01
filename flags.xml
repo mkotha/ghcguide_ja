@@ -2082,7 +2082,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-ddump-deriv</option></entry>
-	      <entry>導出(deriving)の出力を表示</entry>
+	      <entry>自動導出(deriving)の出力を表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>

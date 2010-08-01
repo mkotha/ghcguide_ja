@@ -50,7 +50,7 @@
       </varlistentry>
 
       <varlistentry>
-        <term>不必要に<function>Read</function>を導出したり使ったりしない</term>
+        <term>不必要に<function>Read</function>を自動導出したり使ったりしない</term>
 	<listitem>
 	  <para>これは醜く、しかも遅い。</para>
 	</listitem>

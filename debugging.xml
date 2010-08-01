@@ -79,7 +79,7 @@
                 <indexterm><primary><option>-ddump-deriv</option></primary></indexterm>
 	      </term>
 	      <listitem>
-                <para>導出インスタンス</para>
+                <para>自動導出インスタンス</para>
 	      </listitem>
 	    </varlistentry>
 
