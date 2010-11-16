@@ -1,0 +1,168 @@
+@charset "UTF-8";
+
+/* general setup */
+
+* {
+  padding: 0;
+  border: 0;
+  text-decoration: inherit;
+  color: inherit;
+  font-style: inherit;
+}
+
+html {
+  text-align: justify;
+}
+
+body {
+  text-indent: 0ex;
+  line-height: 1.4;
+  background-color: #fffdfa;
+  color: #000;
+  padding: 2ex 10% 10ex 10%;
+  background-repeat: repeat-y;
+}
+li, dt, dd{
+  margin: 0.7ex 0;
+}
+dd {
+  margin-left: 4ex;
+}
+code, var, kbd, samp, span, em, strong, dfn, input, select {
+  margin: 0 0.3ex;
+}
+pre code, pre kbd, pre samp, pre em, pre strong, pre span,
+code var, kbd var, samp var,
+code em, kbd em, samp em, 
+code strong, kbd strong, samp strong,
+code span, kbd span, samp span,
+em code {
+  margin: 0;
+}
+
+ul, ol {
+  margin-left: 5%;
+}
+ul {
+# ifdef NO_DATA_SCHEME
+  list-style-image: url("marker.png");
+# else
+  list-style-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAIAAABv85FHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wMVDTQBJ30LeAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAABkSURBVAjXfc4xCgAhDETRiSmsxCOI4P2vJVhFqzSarVwtlv3tY2Bgu9ZaKcWuHHZEJCK4OsbMc85vc86ttW6jlFLvHYCZjTFijMdExMwAqGrOudZ6hu8rVfXef//8+8LMIYTbHiWGUQoCQSdDAAAAAElFTkSuQmCC");
+# endif
+}
+ol {
+  list-style-image: none;
+}
+
+/* headlines */
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.1;
+}
+
+h1 {
+  text-align: right;
+  font-size: 250%;
+  padding: 2ex 3%;
+  border-width: thin;
+  border-color: #000;
+  border-style: solid solid solid none;
+  margin: 2ex -10%;
+}
+h2 {
+  text-align: center;
+  font-size: 135%;
+  padding: 0.5ex;
+  margin: 8ex 0% 5ex 0%;
+  color: #440;
+}
+h3 {
+  font-size: 125%;
+  border-bottom: solid thin #448;
+  padding-left: 5%;
+  margin-right: 50%;
+  margin-left: -7%;
+  margin-top: 2em;
+  margin-bottom: 1.5em;
+}
+h4 {
+  font-size: 110%;
+  margin-left: -1.5%;
+}
+h5 {
+  font-size: 95%:
+  margin-left: 7%;
+}
+h6 {
+  font-size: 75%;
+  margin-left: 8%;
+}
+
+/* inline elements */
+kbd, strong.command {
+  font-style: italic;
+  text-decoration: none;
+  font-weight: normal;
+}
+em {
+  font-weight: bold;
+}
+pre em {
+  font-weight: normal;
+  color: #c22;
+}
+strong {
+  text-decoration: underline;
+}
+code {
+  font-family: monospace;
+  font-size: 90%;
+}
+a {
+  text-decoration: underline;
+} 
+a:link {
+  color: #040;
+} 
+a:visited {
+  color: #484;
+}
+
+/* block elements */
+p {
+}
+
+/* default for pre */
+pre, div.psudocode {
+  line-height: 110%; 
+  border-left: solid thin #000;
+  padding: 0.5ex 1ex;
+  overflow: auto;
+  margin-left: 1ex;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+ins {
+  text-decoration: overline;
+}
+
+/* forms */
+
+input[type="text"], textarea {
+  border: inset thin;
+}
+
+input[type="submit"], input[type="button"] {
+  border: outset thin;
+}
+
+input[type="button"][disabled="disabled"] {
+  color: #456;
+}
+
+select {
+  background-color: #eef;
+}

@@ -1,0 +1,129 @@
+# include "default.css.in"
+
+body {
+  padding: 10ex 10% 20ex 10%;
+  position: relative;
+}
+em.replaceable {
+  color: #f00;
+  font-family: sans-serif;
+}
+div.navheader, div.navfooter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 0;
+}
+div.navheader {
+  top: 0;
+}
+div.navfooter {
+  bottom: 0;
+  top: auto;
+  margin-bottom: 1ex;
+}
+ul.navi {
+  padding: 0;
+  margin: 0;
+# ifndef OLD_INTERNET_EXPLORER
+  font-size: 0;
+# endif
+}
+ul.navi li {
+  position: absolute;
+  display: block;
+  width: 60px;
+  height: 20px;
+  margin: 0;
+}
+ul.navi li.prev {
+  top: 40px;
+  left: 10px;
+}
+ul.navi li.up {
+  position: static;
+  margin-left: auto;
+  margin-right: auto;
+  width: 20px;
+  height: 60px;
+}
+ul.navi li.next {
+  top: 40px;
+  right: 0px;
+}
+# ifndef OLD_INTERNET_EXPLORER
+ul.navi li a {
+  text-decoration: none;
+}
+ul.navi li.prev a span {
+  visibility: hidden;
+}
+ul.navi li.prev a:after {
+# ifdef NO_DATA_SCHEME
+  content: url("prev.png");
+# else
+  content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAPCAIAAAA+m5tcAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wMUBgUJWxIMfAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAFlSURBVEjH1ZaxroIwFIZb0q0DiRJNYGSFSVZGJ5+ACHHiEXgJJhcDb2F8AsLg7AuoXYxhMIaFMFDpHbjXNKKiN5erflv/c1L+Jqd/gYwxwJEkiSRJCCFeXCwWaZpOJhPQGhDCCyeXMI7dbocx9n2fFwkhnU4njmPWJhdOrjTwi+Fw6Hne6XQ6K3mea5o2m81adbnf758wGgTBYDCglPJl27Ydx2Ets16vVVV9yCghpNvtbrdbvhaGoa7rRVG8i1FKqWEY0+mUL6xWK0mSCCGsfR416vu+aZplWZ7Vw+Egy/J8Pmf/wiNGEYSw1+vFcZznOfwhiqLxeDwajSilZ7EKEfAivj+MMW6MjGoJa1QHuCUCAARBqLfxelmWx+Ox3+/f2tN13aaYvZu7dyKwLtaPXQ0bAIAQYlnWcrm81SyKIvrFE/LnA5BlGUJIUZQ7PQL4EN7F6Gaz+QCjGOPmkXv2Mr3q7+kLHntfcO3d7UgAAAAASUVORK5CYII=");
+# endif
+  visibility: visible;
+}
+ul.navi li.up a span {
+  visibility: hidden;
+}
+ul.navi li.up a:after {
+# ifdef NO_DATA_SCHEME
+  content: url("up.png");
+# else
+  content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAA4CAIAAACtyzUIAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wMUBgYnrOlScAAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAF6SURBVEjH7ZW/joJAEMZnN/gPChM1JsZCE2tt1NLSt7D1EXgJbWyMvAOFPoMlBaGj0rXAaIwtaoTdtSBBTla8a85czq9iZ367zHwMWcQ5h69CCAFAPA4AGEQql8vj8ZhS+pjgMSmKYtt2r9frdDqEkGhKQMuy7LouY2wymRSLxdlslkTncrnT6RQ8r9frdrvd7/cdxxHT2Wz2fD6HS9/3VVVVFGW32wnoTCZzuVyiEUrpaDTyPE9Ap9NpXdePx2M8JXCQc24YRqvVsizrtYOpVOp6vc7n81KppGnaCwclSfI8j3NOCGk2m4PBIGxaXEnw8ev1ummaCKFut7vZbMSVYIwppdHIdDotFAqLxQLFpyegg+NDLZdLQsh36aczGNb9mk5A/y2drI+Df8zBn1WCMf5M1W91yRh7k98SAOz3e9d1g/XhcGCMrVarKCTLcqVSAYD7SxuNBgD4vr/dbmu1WpS+b364GBzHqVar/Ik+f/F76Xw+PxwOn9E3QIofl+iMZroAAAAASUVORK5CYII=");
+# endif
+  visibility: visible;
+}
+ul.navi li.next a span {
+  visibility: hidden;
+}
+ul.navi li.next a:before {
+# ifdef NO_DATA_SCHEME
+  content: url("next.png");
+# else
+  content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAAPCAIAAAA+m5tcAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1wMUBgcDifGH4AAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAFjSURBVEjH1ZYxjoJAFIZnyHY0BIwxtLRaSUtpzQX0GJzBhMrGaGJlTeEZOAGlDZHGEDBYWCAGHjNbYNgRV9yGFb6K/POHfC/wCJhSil6DMa4v/Bvc20YQBN0QjeO4A6KKoqB2wKGO8HU+ny+XC2YodqgAAE6nE8/zRchxHHtaKb9KasK/g+fz+WazoQwIofI6DENRFAs/SikhhD0ty2xeKdSEzwP8Os99SWgtiqK4rkubgRBCCMnzHACyLEvT1DAMy7Jut1uSJNfrNY7j/X7f7/c/LFpht9vJshxFETuJpmmmaVJK2yLqeV6v13Mchw0Xi4WqqgDQFtEsy0aj0Xq9ZsPD4SBJkud597e8DaKz2Ww6nbIJAIzH49Vq9bOO9bdACPm+36jlcrkcDodJkpRJnueGYUwmkweTt6KNWtq2LYpi+XwLTNPkef54PD58yz7797TdbgVB0HWdDQEgiqLBYMCG3xoPzjr4+05LAAAAAElFTkSuQmCC");
+# endif
+  visibility: visible;
+}
+# endif
+dl.footnotes {
+  border-top: solid thin #000 ;
+  font-size: 90%;
+  margin: 10ex -5%;
+}
+dl.footnotes dt {
+  float: left;
+  clear: left;
+  margin: 0;
+  margin-top: 0.5ex;
+  width: 5%;
+}
+dl.footnotes dd {
+  float: left;
+  margin: 0;
+  padding: 0;
+  margin-top: 0.5ex;
+  width: 95%;
+}
+dl.footnotes p {
+  margin: 0;
+}
+table {
+  border-collapse: collapse;
+  border-style: hidden;
+}
+th {
+  padding: 0.2em 1em;
+  border-style: none;
+}
+td {
+  padding: 0.2em 1em;
+  border-style: none;
+}
+div.toc dt, div.toc dd {
+  margin-top: 0;
+  margin-bottom: 0;
+}
