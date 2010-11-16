@@ -9,73 +9,6 @@
   </para>
 
   <sect2>
-    <title>Highlights</title>
-    <itemizedlist>
-      <listitem>
-        <para>
-          Considerably improved support for parallel execution. GHC 6.10
-          would execute parallel Haskell programs, but performance was
-          often not very good. Simon Marlow has done lots of performance
-          tuning in 6.12, removing many of the accidental (and largely
-          invisible) gotchas that made parallel programs run slowly.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          As part of this parallel-performance tuning, Satnam Singh and
-          Simon Marlow have developed ThreadScope, a GUI that lets you
-          see what is going on inside your parallel program. It's a huge
-          step forward from "It takes 4 seconds with 1 processor, and 3
-          seconds with 8 processors; now what?". ThreadScope will be
-          released separately from GHC, but at more or less the same
-          time as GHC 6.12.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          Dynamic linking is now supported on Linux, and support for
-          other platforms will follow. Thanks for this most recently go
-          to the Industrial Haskell Group who pushed it into a
-          fully-working state; dynamic linking is the culmination of the
-          work of several people over recent years. One effect of
-          dynamic linking is that binaries shrink dramatically, because
-          the run-time system and libraries are shared. Perhaps more
-          importantly, it is possible to make dynamic plugins from
-          Haskell code that can be used from other applications.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          The I/O libraries are now Unicode-aware, so your Haskell
-          programs should now handle text files containing non-ascii
-          characters, without special effort.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          The package system has been made more robust, by associating
-          each installed package with a unique identifier based on its
-          exposed ABI. Now, cases where the user re-installs a package
-          without recompiling packages that depend on it will be
-          detected, and the packages with broken dependencies will be
-          disabled. Previously, this would lead to obscure compilation
-          errors, or worse, segfaulting programs.
-        </para>
-        <para>
-          This change involved a lot of internal restructuring, but it
-          paves the way for future improvements to the way packages are
-          handled. For instance, in the future we expect to track
-          profiled packages independently of non-profiled ones, and we
-          hope to make it possible to upgrade a package in an
-          ABI-compatible way, without recompiling the packages that
-          depend on it. This latter facility will be especially
-          important as we move towards using more shared libraries.
-        </para>
-      </listitem>
-    </itemizedlist>
-  </sect2>
-
-  <sect2>
     <title>Language changes</title>
     <itemizedlist>
       <listitem>
@@ -96,13 +29,6 @@
 
       <listitem>
         <para>
-          It is now possible to derive instances for GADT datatypes,
-          provided the standard instance code is valid for the datatype.
-        </para>
-      </listitem>
-
-      <listitem>
-        <para>
           The new <literal>DeriveFunctor</literal>,
           <literal>DeriveFoldable</literal> and
           <literal>DeriveTraversable</literal> language extensions
@@ -116,24 +42,6 @@
           The new <literal>NoNPlusKPatterns</literal> language extension
           disables <literal>n+k</literal> patterns.
           See <xref linkend="n-k-patterns" /> for more information.
-        </para>
-      </listitem>
-
-      <listitem>
-        <para>
-          The new <literal>ExplicitForAll</literal> language extension
-          enables explicit forall's in types.
-          See <xref linkend="explicit-foralls" /> for more information.
-        </para>
-      </listitem>
-
-      <listitem>
-        <para>
-          The new <literal>DoRec</literal> language extension
-          provides new syntax for recursive do-notation, and the old
-          <literal>RecursiveDo</literal> language extension has been
-          deprecated.
-          See <xref linkend="mdo-notation" /> for more information.
         </para>
       </listitem>
 
@@ -240,8 +148,7 @@ data instance T [a] where
       <listitem>
         <para>
           The <literal>ImpredicativeTypes</literal> extension is no
-          longer enabled by <literal>-fglasgow-exts</literal>, and
-          has been deprecated.
+          longer enabled by <literal>-fglasgow-exts</literal>.
         </para>
       </listitem>
 
@@ -571,7 +478,7 @@ SPARKS: 1430 (2 converted, 1427 pruned)
 <programlisting>
 Prelude> :set prompt "Loaded: %s\n> "
 Loaded: Prelude
->
+> 
 </programlisting>
       </listitem>
 
@@ -730,7 +637,7 @@ ghc --abi-hash M1 M2 ...
     </itemizedlist>
   </sect2>
 
-  <sect2>
+  <sect2> 
     <title>Libraries</title>
 
     <para>
@@ -921,7 +828,7 @@ ghc --abi-hash M1 M2 ...
       <itemizedlist>
         <listitem>
           <para>
-            Version number 1.8.0.2 (was 1.6.0.3)
+            Version number 1.8.0.0 (was 1.6.0.3)
           </para>
         </listitem>
 
