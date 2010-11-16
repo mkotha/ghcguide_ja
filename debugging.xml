@@ -109,7 +109,7 @@
                 <indexterm><primary><option>-ddump-rules</option></primary></indexterm>
 	      </term>
 	      <listitem>
-                <para>書き換え規則を全て出力する(特殊化過程で生成されたものも含む)</para>
+                <para>このモジュールで指定された書き換え規則を全て出力する。<xref linkend="controlling-rules"/>を見よ。</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -165,11 +165,11 @@
 
 	    <varlistentry>
 	      <term>
-	        <option>-ddump-workwrap</option>:
-                <indexterm><primary><option>-ddump-workwrap</option></primary></indexterm>
+	        <option>-ddump-worker-wraper</option>:
+                <indexterm><primary><option>-ddump-worker-wraper</option></primary></indexterm>
 	      </term>
 	      <listitem>
-                <para>ワーカ/ラッパ分割の出力</para>
+                <para>worker/wrapper分割の出力</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -272,7 +272,7 @@
           <indexterm><primary><option>-ddump-simpl-phases</option></primary></indexterm>
         </term>
 	<listitem>
-	  <para>単純化器の毎回の出力を見せる。<option>-dverbose-simpl</option>でも足りないときに使う。</para>
+	  <para>単純化器の毎回の出力を見せる。<option>-dverbose-core2core</option>でも足りないときに使う。</para>
 	</listitem>
       </varlistentry>
 
@@ -349,7 +349,7 @@
           <para>中間の「コアからコアへ」および「STGからSTGへ」過程の出力をそれぞれ表示する。(<emphasis>たくさん</emphasis>の出力になるよ！)。なので、本当に自暴自棄になったときには、次のように打つ。</para>
 
 	  <screen>
-% ghc -noC -O -ddump-simpl -dverbose-simpl -dcore-lint Foo.hs
+% ghc -noC -O -ddump-simpl -dverbose-core2core -dcore-lint Foo.hs
 </screen>
 
 	</listitem>
@@ -392,6 +392,26 @@
         </term>
 	<listitem>
 	  <para>デバッグ出力中での固有子の印字を抑制する。これによって、表示結果が曖昧になることがある(例えば、ある「x」の出現がどこで束縛されているのか不明瞭になる)が、コンパイラを二回実行したときに出力に無駄な違いが出ることを減らせるので、<command>diff</command>をまともに適用できるようになる。<command>diff</command>によってどこを見るべきか分かったら、<option>-dsuppress-uniques</option>なしでもう一回試せばよい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-coercions</option>
+          <indexterm><primary><option>-dsuppress-coercions</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>Core出力の中で型変換(coercion)を表示するのを抑制し、Core出力が短かくなるようにする。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-module-prefixes</option>
+          <indexterm><primary><option>-dsuppress-module-prefixes</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>Core出力の中でモジュール修飾接頭辞を表示するのを抑制し、読み易くする。</para>
 	</listitem>
       </varlistentry>
 
