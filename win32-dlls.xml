@@ -469,7 +469,6 @@ Private Declare Function adder Lib "adder.dll" Alias "adder@8"
 
 <!-- Emacs stuff:
      ;;; Local Variables: ***
-     ;;; mode: xml ***
      ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter") ***
      ;;; End: ***
  -->
