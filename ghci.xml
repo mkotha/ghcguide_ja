@@ -14,8 +14,11 @@
 
 <screen>
 $ ghci
-GHCi, version 6.8.1: http://www.haskell.org/ghc/  :? for help
+GHCi, version 6.12.1: http://www.haskell.org/ghc/  :? for help
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
 Loading package base ... linking ... done.
+Loading package ffi-1.0 ... linking ... done.
 Prelude> 
 </screen>
 
@@ -361,7 +364,7 @@ hello
 Prelude IO>
 </screen>
 
-      <para>(注意: <literal>:module +M</literal>の代わりに<literal>import M</literal>を使うこともできる。また、<literal>:module</literal>は<literal>:m</literal>に短縮できる)<literal>:module</literal>コマンドの完全な構文は次の通り。</para>
+      <para>(注意: 通常のHaskellの<literal>import</literal>構文を使うこともできるが、この場合<literal>*</literal>形式には対応しない)。また、<literal>:module</literal>は<literal>:m</literal>に短縮できる。<literal>:module</literal>コマンドの完全な構文は次の通り。</para>
 
 <screen>
 :module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable>
@@ -507,14 +510,14 @@ it &lt;- <replaceable>e</replaceable>
 <programlisting>
   ghci> reverse []
 </programlisting>
-      GHCiは何をするべきか。厳密に言うと、このプログラムは曖昧である。<literal>show (reverse [])</literal>(ここでGHCiが計算するのはこれである)の型は<literal>Show a =&gt; a</literal>であり<!-- 訳注 これは誤り-->、これをどのように表示するかは<literal>a</literal>の型に依存する。例えば、
+      GHCiは何をするべきか。厳密に言うと、このプログラムは曖昧である。<literal>show (reverse [])</literal>(ここでGHCiが計算するのはこれである)の型は<literal>Show a =&gt; String</literal>であり、これをどのように表示するかは<literal>a</literal>の型に依存する。例えば、
 <programlisting>
-  ghci> (reverse []) :: String
+  ghci> reverse ([] :: String)
   ""
-  ghci> (reverse []) :: [Int]
+  ghci> reverse ([] :: [Int])
   []
 </programlisting>
-    のようになる。しかし、利用者が型を指定しなければならないというのは面倒なので、GHCiはHaskellの型デフォルト化規則(Haskell 98 改訂レポートのセクション4.3.4)を以下のように拡張している。標準の規則では、個々の型変数<literal>a</literal>について制約の集まり<literal>(C1 a, C2 a, ..., Cn a)</literal>を考え、次の条件が満たされたとき、この型変数をデフォルト化する。
+    のようになる。しかし、利用者が型を指定しなければならないというのは面倒なので、GHCiはHaskellの型デフォルト化規則(Haskell 2010レポートの4.3.4節)を以下のように拡張している。標準の規則では、個々の型変数<literal>a</literal>について制約の集まり<literal>(C1 a, C2 a, ..., Cn a)</literal>を考え、次の条件が満たされたとき、この型変数をデフォルト化する。
     <orderedlist>
 	    <listitem><para>型変数<literal>a</literal>が他のどの制約にも現れない。</para></listitem>
             <listitem><para><literal>Ci</literal>が全て標準のクラスである。</para></listitem>
@@ -1210,7 +1213,6 @@ maybe :: b -> (a -> b) -> Maybe a -> b
 	</term>
 	<listitem>
           <para>Vi風のエディタ用(<literal>:ctags</literal>)またはEmacs風エディタ用(<literal>:etags</literal>)のタグファイルを生成する。ファイル名が指定されなかった場合は、それぞれデフォルトの<filename>tags</filename>または<filename>TAGS</filename>が使われる。ロードされているモジュール内の全ての関数、構築子、型のタグが作られる。これらのコマンドが働くには、全てのモジュールが解釈実行されていなければならない。</para>
-          <para><xref linkend="hasktags"/>も見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -1908,7 +1910,13 @@ Prelude> :set -fno-glasgow-exts
 	<term>デフォルトのバッファリングモードがGHCiとGHCで異なっている。</term>
         <listitem>
           <para>
-            GHCでは、デフォルトでstdoutハンドルは行バッファされている。しかし、GHCiでは、stdoutに関するバッファリングを無効にしてある。これが通常インタプリタに期待される振る舞いだからである。出力は生成されると同時に出現する。
+            GHCでは、デフォルトでstdoutハンドルは行バッファされている。しかし、GHCiでは、stdoutに関するバッファリングを無効にしてある。これが通常インタプリタに期待される振る舞いだからである。出力は生成されるとすぐに出現する。
+          </para>
+          <para> 
+            GHCと同様の行バッファの振る舞いが欲しい場合は、プログラムを次のように始めれば良い。
+            <programlisting>
+               main = do { hSetBuffering stdout LineBuffering; ... }
+            </programlisting>
           </para>
         </listitem>
       </varlistentry>
