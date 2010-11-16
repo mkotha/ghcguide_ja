@@ -196,6 +196,15 @@
 	      <entry>名前</entry>
 	    </row>
 	  </thead>
+
+<!--
+               to find the DocBook entities for these characters, find
+               the Unicode code point (e.g. 0x2237), and grep for it in
+               /usr/share/sgml/docbook/xml-dtd-*/ent/* (or equivalent on
+               your system.  Some of these Unicode code points don't have
+               equivalent DocBook entities.
+            -->
+
 	  <tbody>
 	    <row>
 	      <entry><literal>::</literal></entry>
@@ -238,12 +247,49 @@
           </tbody>
 	  <tbody>
 	    <row>
-	      <entry>..</entry>
-	      <entry>&hellip;</entry>
-	      <entry>0x22EF</entry>
-	      <entry>MIDLINE HORIZONTAL ELLIPSIS</entry>
+	      <entry>-&lt;</entry>
+	      <entry>&larrtl;</entry>
+	      <entry>0x2919</entry>
+	      <entry>LEFTWARDS ARROW-TAIL</entry>
 	    </row>
           </tbody>
+
+	  <tbody>
+	    <row>
+	      <entry>&gt;-</entry>
+	      <entry>&rarrtl;</entry>
+	      <entry>0x291A</entry>
+	      <entry>RIGHTWARDS ARROW-TAIL</entry>
+	    </row>
+          </tbody>
+
+	  <tbody>
+	    <row>
+	      <entry>-&lt;&lt;</entry>
+	      <entry></entry>
+	      <entry>0x291B</entry>
+	      <entry>LEFTWARDS DOUBLE ARROW-TAIL</entry>
+	    </row>
+          </tbody>
+
+	  <tbody>
+	    <row>
+	      <entry>&gt;&gt;-</entry>
+	      <entry></entry>
+	      <entry>0x291C</entry>
+	      <entry>RIGHTWARDS DOUBLE ARROW-TAIL</entry>
+	    </row>
+          </tbody>
+
+	  <tbody>
+	    <row>
+	      <entry>*</entry>
+	      <entry>&starf;</entry>
+	      <entry>0x2605</entry>
+	      <entry>BLACK STAR</entry>
+	    </row>
+          </tbody>
+
         </tgroup>
       </informaltable>
     </sect2>
@@ -491,7 +537,7 @@ let {(x -> y) = e1 ;
      (y -> x) = e2 } in x
 </programlisting>
 
-(将来、この制限を取り除くかもしれない。唯一のコストは、パターンの型検査がもう少し複雑になることである。)
+(この設計上の決定について、よりはっきりと述べたものが<ulink url="http://hackage.haskell.org/trac/ghc/ticket/4061">Trac #4061</ulink>にある。)
 
 </para>
 </listitem>
@@ -826,7 +872,7 @@ output = [ x
 
 <para><indexterm><primary>-XNoImplicitPrelude option</primary></indexterm>GHCは通常<filename>Prelude.hi</filename>を自動的にインポートする。これが嫌なら、<option>-XNoImplicitPrelude</option>を使うと良い。こうすれば、自分自身のPreludeをインポートすることができる。(ただし、それに<literal>Prelude</literal>という名前をつけてはいけない。Haskellではモジュールの名前空間は平坦なので、Preludeモジュールと衝突を起こしてはならないのだ)</para>
  
-            <para>自分で数値クラスの階層を定義するために、自作のプレリュードを実装しているとしよう。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、これは完全な無駄骨である。このため、<option>-XNoImplicitPrelude</option>フラグを使った場合には<emphasis>さらに</emphasis>、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
+            <para>自分で数値クラスの階層を定義するために、自作のプレリュードを実装しているとしよう。しかし、リテラルの「1」が、Haskellレポートの指定通りに<literal>Prelude.fromInteger 1</literal>を意味するとしたら、これは完全な無駄骨である。このため、<option>-XRebindableSyntax</option>フラグを使った場合には、以下に挙げる組込み構文は(Preludeのものではなく)<emphasis>スコープにあるものならなんでも</emphasis>使うようになる。
 	    <itemizedlist>
 	      <listitem>
 		<para>整数リテラル<literal>368</literal>の意味は「<literal>fromInteger (368::Integer)</literal>」であり、「<literal>Prelude.fromInteger (368::Integer)</literal>」ではない。</para> </listitem>	    
@@ -842,12 +888,18 @@ output = [ x
                 <para>符号反転(例えば「<literal>- (f x)</literal>」)は、数値パターンでも式中でも「<literal>negate (f x)</literal>」を意味する。</para></listitem>
 
 	      <listitem>
+		<para>条件分岐(例えば、 "<literal>if</literal> e1 <literal>then</literal> e2 <literal>else</literal> e3")は"<literal>ifThenElse</literal> e1 e2 e3"を意味する。ただし<literal>case</literal>式は影響を受けない。</para></listitem>
+
+	      <listitem>
 	  <para>do記法の変換時にはとにかくスコープにある<literal>(>>=)</literal>、<literal>(>>)</literal>、<literal>fail</literal>が使われる。リスト内包表記、mdo(<xref linkend="mdo-notation"/>)、並行配列内包表記は影響を受けない。</para></listitem>
 
 	      <listitem>
                 <para>アロー記法(<xref linkend="arrow-notation"/>を見よ)では、とにかくスコープにある<literal>arr</literal>、<literal>(>>>)</literal>、<literal>first</literal>、<literal>app</literal>、<literal>(|||)</literal>、<literal>loop</literal>の各関数が使われる。ただし、他の構文要素の場合と異なり、これらの関数の型はPreludeのものとかなり良く近似していなければならない。詳細は固まっていので、もしこれを使いたいなら、声を掛けてほしい。
 	      </para></listitem>
 	    </itemizedlist>
+<option>-XRebindableSyntax</option>は、<option>-XNoImplicitPrelude</option>を自動的に有効にする。
+</para>
+<para>
 どの場合でも(アロー記法は例外)、コードの静的意味は脱糖された形でのそれと等しくなるはずである。これは少々予想に反するかもしれない。例えば、<literal>368</literal>というリテラルの静的意味は<literal>fromInteger (368::Integer)</literal>のそれとまったく同じである。従って、<literal>fromInteger</literal>は下に挙げるどんな型をもっていても良い。
 <programlisting>
 fromInteger :: Integer -> Integer
@@ -1278,6 +1330,25 @@ import "network" Network.Socket
 <para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような類について多相的でも良いが、類が<literal>*</literal>でないなら、明示的な類注釈を使う必要がある。(<xref linkend="kinding"/>を見よ)</para>
 
 <para>このようなデータ型はボトムというただ一つの値しか持たないが、「幽霊型(phantom type)」を定義するときには便利なことがある。</para>
+</sect2>
+
+<sect2 id="datatype-contexts">
+<title>データ型文脈</title>
+
+<para>Haskellは、データ型に文脈を与えることを許している。例えば以下のように。</para>
+
+<programlisting>
+data Eq a => Set a = NilSet | ConsSet a (Set a)
+</programlisting>
+
+<para>これは、以下の型を持つ構築子を与える。</para>
+
+<programlisting>
+NilSet :: Set a
+ConsSet :: Eq a => a -> Set a -> Set a
+</programlisting>
+
+<para>GHCではこの機能は<literal>DatatypeContexts</literal>という名前の拡張であり、デフォルトで有効になっている。</para>
 </sect2>
 
 <sect2 id="infix-tycons">
@@ -2802,6 +2873,42 @@ Paterson条件: 文脈中の各表明に対して、次が求められる。
 (これをするには<link linkend="instance-rules"><option>-XFlexibleInstances</option></link>が必要である)
 </para>
 <para>
+警告: 重複インスタンスを使うときは気を付けないといけない。一貫性が失われる(つまり、プログラムの部分部分で異なるインスタンスが選ばれる)可能性があるからである。これは<option>-XIncoherentInstances</option>を使っていない場合ですらそうである。以下を考えよ。
+<programlisting>
+{-# LANGUAGE OverlappingInstances #-}
+module Help where
+
+    class MyShow a where
+      myshow :: a -> String
+
+    instance MyShow a => MyShow [a] where
+      myshow xs = concatMap myshow xs
+
+    showHelp :: MyShow a => [a] -> String
+    showHelp xs = myshow xs
+
+{-# LANGUAGE FlexibleInstances, OverlappingInstances #-}
+module Main where
+    import Help
+
+    data T = MkT
+
+    instance MyShow T where
+      myshow x = "Used generic instance"
+
+    instance MyShow [T] where
+      myshow xs = "Used more specific instance"
+
+    main = do { print (myshow [MkT]); print (showHelp [MkT]) }
+</programlisting>
+<literal>showHelp</literal>関数では、GHCから重複のあるインスタンスが見えないので、GHCは文句を言うことなく<literal>MyShow [a]</literal>インスタンスを使う。<literal>main</literal>中の<literal>myshow</literal>の呼び出しでは、GHCは、制約<literal>MyShow [T]</literal>を解決するに際して<literal>Main</literal>モジュールの重複インスタンス宣言を使う。結果として、このプログラムは次のように表示する。
+<programlisting>
+  "Used more specific instance"
+  "Used generic instance"
+</programlisting>
+(実装されていないが、他にあり得る振る舞いとして、後のインスタンス宣言が局所的なものと重複するかもしれないという理由で<literal>Help</literal>モジュールを拒絶するというものがある。)
+</para>
+<para>
 重複インスタンスや非整合(incoherent)インスタンスになるかどうかは、<emphasis>インスタンス宣言</emphasis>の性質であり、そのモジュールがコンパイルされるときに<option>-XOverlappingInstances</option>と<option>-XIncoherentInstances</option>が有効になっていたかどうかで決まる。インスタンス宣言をインポートし、利用するモジュールでは、フラグはどちらも必要ない。特に、インスタンス発見の過程では、以下が成り立つ。
 <itemizedlist>
 <listitem><para>
@@ -4290,21 +4397,22 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 		    <listitem><para>型。接合される式の型は<literal>Q Typ</literal>でなければならない。</para></listitem>
 		    <listitem><para>トップレベル宣言のリスト。接合される式の型は<literal>Q [Dec]</literal>でなければならない。</para></listitem>
 		    </itemizedlist>
-接合の中ではインポートしたモジュールで定義された関数しか呼ぶことができず、同じモジュールの別の場所で定義された関数は呼ぶことが出来ない。</para></listitem>
+パターン接合には対応していないことに注意。接合の中ではインポートしたモジュールで定義された関数しか呼ぶことができず、同じモジュールの別の場所で定義された関数は呼ぶことが出来ない。</para></listitem>
 
 
 	      <listitem><para>
                   式クォートは次のようにオックスフォード角括弧で囲んで書かれる。
 		  <itemizedlist>
-		    <listitem><para> <literal>[| ... |]</literal>、ただし「...」は式。このクォートの型は<literal>Q Exp</literal>である。</para></listitem>
+		    <listitem><para> <literal>[| ... |]</literal>または<literal>[e| ... |]</literal>、ただし「...」は式。このクォートの型は<literal>Q Exp</literal>である。</para></listitem>
 		    <listitem><para> <literal>[d| ... |]</literal>、ただし「...」は最上位の宣言の列。このクォートの型は<literal>Q [Dec]</literal>である。</para></listitem>
-		    <listitem><para> <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Q Typ</literal>である。</para></listitem>
+		    <listitem><para> <literal>[t| ... |]</literal>、ただし「...」は型。このクォートの型は<literal>Q Type</literal>である。</para></listitem>
+		    <listitem><para> <literal>[p| ... |]</literal>、ただし「...」はパターン。このクォートの型は<literal>Q Pat</literal>である。</para></listitem>
 		  </itemizedlist></para></listitem>
 
 	      <listitem><para>
 準クォートはパターン文脈または式文脈に出現可能で、これもオックスフォード括弧を使って書く。
 		  <itemizedlist>
-		    <listitem><para> <literal>[$<replaceable>varid</replaceable>| ... |]</literal>、
+		    <listitem><para> <literal>[<replaceable>varid</replaceable>| ... |]</literal>、
 ただし「...」は任意の文字列である。準クォート機能の完全な記述は<xref linkend="th-quasiquotation"/>にある。</para></listitem>
 		  </itemizedlist></para></listitem>
 
@@ -4455,35 +4563,76 @@ Hello
 <para>準クォートは、パターンおよび式をプログラマが定義した具象構文を使って書くことを可能にする。この拡張の背後にある動機といくつかの例が"<ulink url="http://www.eecs.harvard.edu/~mainland/ghc-quasiquoting/">Why It's Nice to be Quoted: Quasiquoting for Haskell</ulink>" (Proc Haskell Workshop 2007)に述べられている。以下の例では、単純な式言語のための準クォータをどうやって書くかを紹介する。</para>
 
 <para>
-この例において、準クォータ<literal>expr</literal>は<literal>Language.Haskell.TH.Quote.QuasiQuoter</literal>型の値に束縛されている。この型は二つの関数を含み、それぞれ式とパターンをクォートするのに用いられる。それぞれのクォータの最初の引数はオックスフォード括弧で囲まれた(任意の)文字列であり、準クォート文の文脈によって二つのパーサのどちらが呼ばれるかが決まる。準クォートが式文脈で現れたなら式パーサが呼ばれ、パターン文脈で現れたならパターンパーサが呼ばれる。</para>
+目立つ特徴を挙げる。
+<itemizedlist>
+<listitem><para>
+準クォートは<literal>[<replaceable>quoter</replaceable>| <replaceable>string</replaceable> |]</literal>の形をとる。
+<itemizedlist>
+<listitem><para>
+<replaceable>quoter</replaceable>は、インポートされたクォート子(quoter)の(修飾なしの)名前でなければならない。任意の式を置ける訳ではない。
+</para></listitem>
+<listitem><para>
+<replaceable>quoter</replaceable>は、"<literal>e</literal>"、"<literal>t</literal>"、"<literal>d</literal>"、 "<literal>p</literal>"であってはならない。これらはTemplate Haskellのクォートと重なるからである。
+</para></listitem>
+<listitem><para>
+トークン<literal>[<replaceable>quoter</replaceable>|</literal>の間にスペースがあってはいけない。
+</para></listitem>
+<listitem><para>
+クォートされる<replaceable>string</replaceable>は任意であり、改行を含んでもよい。
+</para></listitem>
+</itemizedlist>
+</para></listitem>
 
+<listitem><para>
+準クォートは以下のものが置ける場所に出現できる。
+<itemizedlist>
+<listitem><para>式</para></listitem>
+<listitem><para>パターン</para></listitem>
+<listitem><para>型</para></listitem>
+<listitem><para>最上位の宣言</para></listitem>
+</itemizedlist>
+(論文には最初の二つだけが記述されている)
+</para></listitem>
+
+<listitem><para>
+クォート子は<literal>Language.Haskell.TH.Quote.QuasiQuoter</literal>という型の値である。これは次のように定義されている。
+<programlisting>
+data QuasiQuoter = QuasiQuoter { quoteExp  :: String -> Q Exp,
+                                 quotePat  :: String -> Q Pat,
+                                 quoteType :: String -> Q Type,
+                                 quoteDec  :: String -> Q [Dec] }
+</programlisting>
+すなわち、クォート子は四つのパーサからなるタプルである。準クォートが出現できる文脈それぞれに対して一つずつである。
+</para></listitem>
+<listitem><para>
+準クォートを展開する際は、オックスフォード角括弧で囲まれた文字列に、適切なパーサを適用することで行なう。その準クォートの置かれた文脈(式、パターン、型、宣言)によって、どのパーサが呼ばれるかが決まる。
+</para></listitem>
+</itemizedlist>
+</para>
 <para>
-以下では、<literal>'int:n</literal>という構文を使って、変数<literal>n</literal>を逆クォートしたものを表していることに注意(逆クォートにこの構文を使うことはこのパーサの作者が決めたことであり、GHCによって決められたことでは<emphasis>ない</emphasis>)。パターン照合の際、これは<literal>n</literal>を構築子<literal>IntExpr</literal>の整数引数に束縛する。逆クォートに関する更なる詳細については参照した論文を見てほしい。この論文には<literal>String -> a</literal>という型の単一のパーサを活用して、<literal>Q Exp</literal>型の値を返す式パーサと、<literal>Q Pat</literal>型の値を返すパターンパーサの両方を生成するためのSYBを使ったテクニックの説明もある。
+下の例は、準クォートを実際に使っているところを示すものである。クォート子<literal>expr</literal>は、<literal>Expr</literal>モジュールで定義されており、<literal>QuasiQuoter</literal>型の値に束縛されている。この例では、<literal>'int:n</literal>という構文を使って、変数<literal>n</literal>を逆クォートしたものを表している(逆クォートにこの構文を使うことはこのパーサの作者が決めたことであり、GHCによって決められたことでは<emphasis>ない</emphasis>)。パターン照合の際、これは<literal>n</literal>を構築子<literal>IntExpr</literal>の整数引数に束縛する。逆クォートに関する更なる詳細については参照した論文を見てほしい。この論文には<literal>String -> a</literal>という型の単一のパーサを活用して、<literal>Q Exp</literal>型の値を返す式パーサと、<literal>Q Pat</literal>型の値を返すパターンパーサの両方を生成するためのSYBを使ったテクニックの説明もある。
 </para>
 
-<para>一般に、準クォートは<literal>[$<replaceable>quoter</replaceable>| <replaceable>string</replaceable> |]</literal>という形をしている。<replaceable>quoter</replaceable>はインポートされたクォータの名前でなければならない。ここでは任意の式が使える訳ではない。クォートされる<replaceable>string</replaceable>は任意のものであってよく、改行を含んでいてもよい。
-</para>
 <para>
 準クォータはTemplate Haskellと同じステージ制限に従わねばならない。たとえば、この例において<literal>expr</literal>は<literal>Main.hs</literal>で使われているので、そこで定義されることはできず、インポートされねばならない。
 </para>
 
 <programlisting>
-
-{- Main.hs -}
+{- ------------- Main.hsというファイル --------------- -}
 module Main where
 
 import Expr
 
 main :: IO ()
-main = do { print $ eval [$expr|1 + 2|]
+main = do { print $ eval [expr|1 + 2|]
           ; case IntExpr 1 of
-              { [$expr|'int:n|] -> print n
+              { [expr|'int:n|] -> print n
               ;  _              -> return ()
               }
           }
 
 
-{- Expr.hs -}
+{- ------------- Expr.hsというファイル --------------- -}
 module Expr where
 
 import qualified Language.Haskell.TH as TH
@@ -4510,12 +4659,12 @@ eval (BinopExpr op x y) = (opToFun op) (eval x) (eval y)
     opToFun MulOp = (*)
     opToFun DivOp = div
 
-expr = QuasiQuoter parseExprExp parseExprPat
+expr = QuasiQuoter { quoteExp = parseExprExp, quotePat =  parseExprPat }
 
 -- Exprをパースし、その表現をQ ExpまたはQ Patとして返す。
--- 二つのパーサを別々に書くことなく、一つのString -> Expr
--- という型のパーサを書くだけで済ますために、
--- SYBをどう使えばよいかについては、参照先の論文を見よ。
+-- SYBを使うことによって、二つのパーサを別々に書くことなく
+-- 一つのString -> Exprという型のパーサを書くだけで済ます
+-- 方法については、参照先の論文を見よ。
 
 parseExprExp :: String -> Q Exp
 parseExprExp ...
@@ -4525,20 +4674,20 @@ parseExprPat ...
 </programlisting>
 
 <para>ではコンパイラを走らせよう。
-</para>
 <programlisting>
 $ ghc --make -XQuasiQuotes Main.hs -o main
 </programlisting>
+</para>
 
 <para>
 "main"を走らせれば次のような出力になる。
-</para>
-
 <programlisting>
 $ ./main
 3
 1
 </programlisting>
+</para>
+
 
 </sect2>
 
@@ -5138,7 +5287,7 @@ GHCは、<option>-O</option><indexterm><primary><option>-O</option></primary></i
 
       <para>全ての言語拡張は、前に「<literal>-X</literal>」を付けることでコマンド行フラグになる。例えば<option>-XForeignFunctionInterface</option>のように。(同様に、全ての「<literal>-X</literal>」フラグは<literal>LANGUAGE</literal>プラグマとして書ける)
       </para>
-      <para>対応している言語拡張の一覧は、<literal>ghc --supported-languages</literal>を実行することで得られる。(<xref linkend="modes"/>を見よ)</para>
+      <para>対応している言語拡張の一覧は、<literal>ghc --supported-extensions</literal>を実行することで得られる。(<xref linkend="modes"/>を見よ)</para>
 
       <para><ulink url="&libraryCabalLocation;/Language-Haskell-Extension.html"><literal>Language.Haskell.Extension</literal></ulink>で定義されている型<literal>Extension</literal>の構築子ならどれを使っても良い。指定された拡張がGHCでサポートされていないなら、エラーが報告される。</para>
     </sect2>
@@ -5220,16 +5369,44 @@ key_function :: Int -> String -> (Bool, Double)
         <para><literal>INLINE</literal>プラグマの主要な効果は、ある関数の「コスト」がとても低いと宣言することである。これによって、通常の展開機構がインライン化に非常に積極的になる。一方、関数「<literal>f</literal>」に関する<literal>INLINE</literal>プラグマには、他の効果がいくつかある。
 <itemizedlist>
 <listitem><para>
-関数が<literal>f</literal>にインライン化されることがない。こうなっていなければ、GHCは<literal>f</literal>の右辺に大きな関数をインライン化して、<literal>f</literal>を大きくし、その後で盲目的に<literal>f</literal>をインライン化するかもしれない。
+GHCは関数のインライン化について熱心であるが、盲目的に行なう訳ではない。例えば、次のように書いたとする。
+<programlisting>
+map key_function xs
+</programlisting>
+これをインライン化して以下のようにしても、実際得られるものは何もない。
+<programlisting>
+map (\x -> <replaceable>body</replaceable>) xs
+</programlisting>
+一般的に言って、GHCが関数をインライン化するのは、そうすることが有益だと考えるなんらかの理由が(どんなに軽微なものでもいいが)ある場合だけである。
 </para></listitem>
 <listitem><para>
-<literal>f</literal>の本体において、float-in、float-out、共通部分式の変換が適用されない。
+さらに、GHCは関数が<emphasis>完全に適用されて</emphasis>いる場合にしかインライン化しない。ここで「完全に適用されて」いるというのは、その関数の定義の左辺に(構文的に)出現する引数の数と同じだけの引数に適用されているということである。例を挙げる。
+<programlisting>
+comp1 :: (b -> c) -> (a -> b) -> a -> c
+{-# INLINE comp1 #-}
+comp1 f g = \x -> f (g x)
+
+comp2 :: (b -> c) -> (a -> b) -> a -> c
+{-# INLINE comp2 #-}
+comp2 f g x = f (g x)
+</programlisting>
+<literal>comp1</literal>と<literal>comp2</literal>の二つの関数は同じ意味論を持つが、<literal>comp1</literal>が<emphasis>二個</emphasis>の引数に適用されたときにインライン化されるのに対して、<literal>comp2</literal>は三個を必要とする。これは次のような場合に重大な違いを生むことがある。
+<programlisting>
+map (not `comp1` not) xs
+</programlisting>
+これは、同様に「comp2」を使った場合よりも良く最適化されることになるだろう。
+</para></listitem>
+
+<listitem><para> 
+INLINE関数<literal>f</literal>の非インライン版が最終的に使われる場合を考慮して、通常の非インライン関数と同様に<literal>f</literal>の定義を最適化することが、GHCにとって有用である。しかし、<literal>f</literal>の<emphasis>最適化</emphasis>版をインライン化したくはない。INLINEプラグマを使うことの大きな理由の一つは、<literal>f</literal>の右辺にある関数が書き換え規則を持っている場合にそれを露出することだが、これらの関数が最適化によって消えてしまっては良くない。
+</para>
+<para>
+そのため、<emphasis>GHCは、書かれたコードをそのままの形でインライン化することを保証する</emphasis>。過不足なく。そのために、インライン用に関数定義のコピー("inline-RHS"と呼んでいる)を取っておき、それには手をつけずに、通常の右辺をいつものように最適化する。外部から可視である関数については、(最適化された右辺ではなく)この"inline-RHS"がインタフェースファイルに記録される。
 </para></listitem>
 <listitem><para>
 INLINE関数は正格性解析によってworker/wrapperされることがない。そうでなく、全部まとめてインライン化される。
 </para></listitem>
 </itemizedlist>
-これらの効果はすべて、期待したものだけがインライン化され、インライン化が多すぎたり少なすぎたりしないようにすることが目的である。
 </para>
 <para>
 GHCはインライン化が永遠に続くことがないことを保証する。相互再帰的な一団はすべて、一個以上の決してインライン化されない<emphasis>ループ破り</emphasis>によって切り離される。(<ulink url="http://research.microsoft.com/%7Esimonpj/Papers/inlining/index.htm"> Secrets of the GHC inliner, JFP 12(4) July 2002</ulink>を見よ)。GHCはループ破りとしてINLINEプラグマのついた関数を選ばないことを試みるが、選択肢がないときはINLINE関数でも選択され得、この場合INLINEプラグマは無視される。例えば、自己再帰的な関数では、ループ破りはその関数自体でしかありえないので、INLINEプラグマは常に無視される。</para>
@@ -5245,9 +5422,27 @@ GHCはインライン化が永遠に続くことがないことを保証する�
 #endif
 </programlisting>
 
-	<para><literal>NOINLINE</literal>プラグマ(<xref linkend="noinline-pragma"/>)も見よ。</para>
+	<para><literal>NOINLINE</literal>プラグマ(<xref linkend="noinline-pragma"/>)と<literal>INLINABLE</literal>プラグマ(<xref linkend="inlinable-pragma"/>)も見よ。</para>
 
 	<para>注意: HBCコンパイラは<literal>INLINE</literal>プラグマと相性が悪いので、コードをHBC互換にしたいなら<literal>#ifdef __GLASGOW_HASKELL__</literal>...<literal>#endif</literal>というCプリプロセッサ指令でプラグマを囲む必要があるだろう。</para>
+
+      </sect3>
+
+      <sect3 id="inlinable-pragma">
+	<title>INLINABLEプラグマ</title>
+
+<para>INLINABLEプラグマはINLINEプラグマと非常に似た動作をするが、以下の点が異なる。
+<itemizedlist>
+<listitem><para>
+INLINEは「これをインライン化してくれ」と言うものだが、INLINABLEは「インライン化は御自由に、あなたの裁量で」というものである。つまり、選択はGHCに委ねられ、プラグマのない関数と同じ規則が使われる。INLINEと異なり、その選択は<emphasis>呼び出し地点</emphasis>で行なわれ、したがってインライン化閾値や、最適化水準などの影響を受ける。</para></listitem>
+<listitem><para>
+INLINEと同様に、INLINABLEプラグマは元々の右辺のコピーを保持し、その右辺の大きさにかかわらずそれをインタフェースファイルに保存する。
+</para></listitem>
+<listitem><para>
+特殊関数<literal>inline</literal>(<xref linkend="special-ids"/>)を使って呼び出し地点でインライン化を強制すれば、元の右辺のコピーが得られる。実際、<literal>inline f</literal>を使うつもりがあるなら、<literal>f</literal>をINLINABLEと標示するのは良い考えである。そうすることで、GHCがそれの展開候補を(どれだけ大きくても)露出させることを保証するようにできるからである。
+</para></listitem>
+</itemizedlist>
+</para>
 
       </sect3>
 
@@ -5260,6 +5455,12 @@ GHCはインライン化が永遠に続くことがないことを保証する�
         <para><literal>NOINLINE</literal>プラグマはまさに想像される通りのことを行う。すなわち、指定された関数がコンパイラによってインライン化されるのを防ぐ。コードの大きさについて非常に用心深くある場合をのぞけば、これが必要になることはないはずである。</para>
 
         <para><literal>NOTINLINE</literal>は<literal>NOINLINE</literal>の同義名である。(<literal>NOINLINE</literal>は、Haskell 98によって、インライン化を無効にするための標準的な方法として定められているので、コードの可搬性を気にするならこちらを使うべきである)</para>
+      </sect3>
+
+      <sect3 id="conlike-pragma">
+	<title>CONLIKE修飾子</title>
+	<indexterm><primary>CONLIKE</primary></indexterm>
+        <para>INLINEプラグマとNOINLINEプラグマはCONLIKE修飾子を持つことができる。これは、RULEの照合に(のみ)影響する。<xref linkend="conlike"/>を見よ。</para>
       </sect3>
 
       <sect3 id="phase-control">
@@ -5520,8 +5721,6 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 
       この場合、二つの非ボックス化<literal>Int#</literal>が構築子<function>T</function>に直接置かれる。アンパックはnewtypeを透過して起こる。</para>
 
-      <para>フィールドがアンパックできないとき、警告は出力されないので、生成されたコードを<option>-ddump-simpl</option>で検査するのが良いかもしれない。</para>
-
       <para><option>-funbox-strict-fields</option>フラグも見よ。これは、簡単に言うと、あらゆる正格な構築子フィールドに<literal>{-#&nbsp;UNPACK&nbsp;#-}</literal>を加えるのと同じ効果がある。</para>
     </sect2>
 
@@ -5739,17 +5938,23 @@ GHCは、最適化過程において、常に規則を適用しようとする�
 
 </para>
 </listitem>
-<listitem>
+</itemizedlist>
+
+</para>
+
+</sect2>
+
+<sect2 id="conlike">
+<title>書き換え規則と、INLINE/NOINLINEおよびCONLIKEプラグマとの間の相互作用</title>
 
 <para>
 通常のインライン化は規則による書き換えと同時に起きる。これによって予期せぬ結果につながることがある。次の(人為的な)例を考えよ。
 <programlisting>
 f x = x
-{-# RULES "f" f True = False #-}
-
 g y = f y
-
 h z = g True
+
+{-# RULES "f" f True = False #-}
 </programlisting>
 <literal>f</literal>の右辺は小さいので、<literal>g</literal>へとインライン化され、次のような結果になる。
 <programlisting>
@@ -5759,14 +5964,24 @@ g y = y
 次に<literal>g</literal>が<literal>h</literal>へとインライン化されるが、<literal>f</literal>のRULEが発火する機会はない。GHCが逆にまず<literal>g</literal>を<literal>h</literal>へとインライン化していたら、<literal>f</literal>のRULEが発火する機会はより大きかっただろう。
 </para>
 <para>
-振る舞いを予測可能にするには、<literal>f</literal>にNOINLINEプラグマを使って、RULEに発火の機会があるうちにインライン化されることがないようにすれば良い。
+振る舞いを予測可能にするには、<literal>f</literal>にNOINLINEプラグマかINLINE[<replaceable>phase</replaceable>]プラグマを使って、RULEに発火の機会があるうちにインライン化されることがないようにすれば良い。
 </para>
-</listitem>
-
-</itemizedlist>
-
+<para>
+GHCは、仕事を複製することに関して非常に慎重である。例として次を考えよ。
+<programlisting>
+f k z xs = let xs = build g
+           in ...(foldr k z xs)...sum xs...
+{-# RULES "foldr/build" forall k z g. foldr k z (build g) = g k z #-}
+</programlisting>
+<literal>xs</literal>が二回使われているので、GHCはfold/build規則を発火しない。これは正しい動作である。なぜなら、<literal>xs</literal>を計算するのに大量の作業が必要かもしれず、規則が発火したらその作業が複製されるからである。</para>
+<para>
+しかし、場合によっては、この方針では慎重すぎることがある。例え簡約基を複製することになっても、規則に発火してもらいたい場合である。これが良案だということをGHCが見つけ出す方法はないので、そのことを宣言するためのCONLIKEプラグマを提供している。次のようにする。
+<programlisting>
+{-# INLINE[1] CONLIKE f #-}
+f x = <replaceable>blah</replaceable>
+</programlisting>
+CONLIKEは、INLINEまたはNOINLINEプラグマに対する修飾子である。fを一つの引数(一般には、'='記号の左側にある引数の数)に適用することが十分低コストで、複製によって規則が発火するならば複製できる、ということを示す。(「CONLIKE」という名前は"constructor-like"の短縮形である。構築子(constructor)は確実にこの性質を持つので) CONLIKEプラグマはINLINE/NOINLINEの修飾子であるが、これは次のような事情による。すなわち、規則が発火する前に<literal>f</literal>がインライン化されてしまわないことがはっきりしているのでない限り、<literal>f</literal>を規則の左辺と照合するのは実際上意味がないからである。
 </para>
-
 </sect2>
 
 <sect2>
@@ -6001,8 +6216,8 @@ i2d (I# i) = D# (int2Double# i) -- Glasgowのprim-opを直接使う
 
 </sect2>
 
-<sect2>
-<title>何が起こるか制御する</title>
+<sect2 id="controlling-rules">
+<title>書き換え規則の中で何が起こるか制御する</title>
 
 <para>
 
@@ -6010,16 +6225,21 @@ i2d (I# i) = D# (int2Double# i) -- Glasgowのprim-opを直接使う
 <listitem>
 
 <para>
-GHCがどの変換規則を使っているかを見るには<option>-ddump-rules</option>を使う。
+<emphasis>このモジュールで</emphasis>定義された規則を見るには、<option>-ddump-rules</option>を使う。これには特殊化過程で生成されたものも含むが、他モジュールからインポートされたものは除外される。
 </para>
 </listitem>
-<listitem>
 
+<listitem>
 <para>
 どの規則が発動したかを知るには<option>-ddump-simpl-stats</option>を使う。<option>-dppr-debug</option>も加えればより詳細な出力が得られる。</para>
 </listitem>
-<listitem>
 
+<listitem>
+<para><option>-ddump-rule-firings</option>を使うと、どの規則が発火したかを極めて詳細に見ることができる。<option>-dppr-debug</option>を加えるとさらに詳細な一覧が得られる。
+</para>
+</listitem>
+ 
+<listitem>
 <para>
 例えば、<filename>GHC/Base.lhs</filename>の<function>build</function>の定義は以下の様になっている。
 
@@ -6099,7 +6319,19 @@ g x = show x
 
 <sect1 id="special-ids">
 <title>特殊な組込み関数</title>
-<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>モジュールに解説がある。</para>
+<para>GHCには特殊な振る舞いをする組込み関数が少々ある。これらはライブラリ説明書の<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html"><literal>GHC.Prim</literal></ulink>モジュールに解説がある。特に、
+<itemizedlist>
+<listitem><para>
+<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html#v%3Ainline"><literal>inline</literal></ulink>は、個々の呼び出し地点ごとにインライン化を制御できる。
+</para></listitem>
+<listitem><para>
+<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html#v%3Alazy"><literal>lazy</literal></ulink>は正格性解析器を抑制する。
+</para></listitem>
+<listitem><para>
+<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html#v%3AunsafeCoerce%23"><literal>unsafeCoearce</literal></ulink>は、型検査器を欺くことを可能にする。
+</para></listitem>
+</itemizedlist>
+</para>
 </sect1>
 
 
