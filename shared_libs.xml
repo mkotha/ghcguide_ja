@@ -84,13 +84,6 @@ ghc -dynamic -shared Foo.o -o libfoo.so
 	    </para>
 	  </listitem>
 	</varlistentry>
-	<varlistentry>
-	  <term>wrapped</term>
-	  <listitem>
-	    <para>この方式はラッパプログラムを生成し、このラッパプログラムがプログラム本体(同じディレクトリに.dynという拡張子付きで存在する)を呼ぶ。このとき、プログラム本体が必要な共有ライブラリを見つけられるような方法で呼ぶ。現在のことろこの方式はやや実験的である。
-	    </para>
-	  </listitem>
-	</varlistentry>
       </variablelist>
       LinuxおよびSolarisにおいて、依存しているライブラリのパスとして相対パスを使うには、<literal>deploy</literal>方式を使って、適切な-rpathフラグをリンカに渡せばよい。
 <programlisting>
@@ -98,6 +91,7 @@ ghc -dynamic Main.hs -o main -lfoo -L. -optl-Wl,-rpath,'$ORIGIN'
 </programlisting>
       これは、<literal>libfoo.so</literal>というライブラリがカレントディレクトリにあり、このプログラムが(訳注: 別の場所、あるいは別マシンに)配置されたときには実行ファイル<literal>main</literal>と同じディレクトリで見付かることを仮定している。同様に、実行ファイルから相対的に見てサブディレクトリを使うことも可能である。例えば、<literal>-optl-Wl,-rpath,'$ORIGIN/lib'</literal>。
     </para>
+    <para>Darwin/MacOS Xでは、動的ライブラリにはビルド時に「install name」が付加されることが通常期待される。これはそのライブラリの最終的なインストールパスである。後にこのライブラリをリンクするライブラリや実行ファイルは、このライブラリを実行時に探索する場所としてこのパスを選ぶ(このライブラリがまだインストールされていない場合であっても)。ghcを直接使ってコンパイルする場合、デフォルトではライブラリがビルドされた場所がinstall nameとして設定される。<option>-dylib-install-name</option>オプションを使うと、指定したパスでそれを上書きすることができる(Appleのリンカに<literal>-install_name</literal>を渡すものである)。Cabalはこれを代行する。Cabalは、動的ライブラリのinstall nameとして、最終的なインストール場所の絶対パスを自動的に設定する。</para>
   </sect2>
 
 </sect1>
