@@ -6,6 +6,39 @@
   <indexterm><primary>using GHC</primary></indexterm>
 
   <sect1>
+    <title>始めてみよう: プログラムをコンパイルする</title>
+
+    <para>この章には、GHCのコマンド行構文の完全なリファレンスが、400以上のフラグも含めて書かれている。これは大きくて複雑なシステムであり大量の詳細があるので、どこから始めれば良いのか、かなり分かりにくいかもしれない。これを踏まえて、以降の節で完全な構文に飛び込む前に、ここに入門的な節がある。この節はHaskellプログラムをコンパイルするためのGHCの基本的な使い方について、簡単な導入を提供する。</para>
+
+    <para>Hallo Worldプログラムを作ってコンパイルし、実行してみよう。まず、以下のHaskellコードを含む<filename>hello.hs</filename>というファイルを作る。
+    </para>
+
+<programlisting>
+main = putStrLn "Hello, World!"
+</programlisting>
+
+    <para>このプログラムをコンパイルするには、次のようにGHCを使う。</para>
+
+<screen>
+$ ghc hello.hs</screen>
+
+     <para>(ここで<literal>$</literal>はプロンプトを表す。これを入力しないように)。GHCは<filename>hello.hs</filename>というソースファイルをコンパイルし、<filename>hello.o</filename>という<firstterm>オブジェクトファイル</firstterm>と<firstterm>hello.hi</firstterm>という<firstterm>インタフェースファイル</firstterm>を生成する。次にこのオブジェクトファイルをGHC付属のライブラリとリンクし、Unix/Linux/Macなら<filename>hello</filename>、Windowsなら<filename>hello.exe</filename>という実行ファイルを作成する。</para>
+
+    <para>デフォルトでは、GHCは自身の動作に関して寡黙であり、表示するのはエラーメッセージだけである。裏で何が行われているかを見たいなら、コマンド行に<option>-v</option>を追加すれば良い。
+    </para>
+
+    <para>その後、次のようにしてプログラムを実行できる。
+    </para>
+
+<screen>
+$ ./hello
+Hello World!</screen>
+
+    <para>プログラムが複数のモジュールに分かれている場合、GHCには<filename>Main</filename>モジュールが置かれているソースファイル名を教えてやれば十分である。そうすると、GHCは<literal>import</literal>宣言を分析して、プログラムを構成する他のモジュールを見付け、そのソースファイルを見付ける。これは、<literal>Main</literal>を除いて、全てのソースファイルは、その中身のモジュール名に従って名付けられなけばいけない(ドットはディレクトリ区切りに変換して)ということである。例えば、<literal>Data.Person</literal>というモジュールは、Unix/Linux/Macでは<filename>Data/Person.hs</filename>というファイルに、Windowsでは<filename>Data\Person.hs</filename>に、それぞれ置かれることになる。
+    </para>
+  </sect1>
+
+  <sect1>
     <title>オプション概観</title>
     
     <para>GHCの振る舞いは<firstterm>オプション</firstterm>で制御される。歴史的な理由から、これはコマンド行フラグとか引数とも呼ばれる。オプションを指定する方法は次の三つである。</para>
@@ -74,7 +107,7 @@ module X where
       <varlistentry>
         <term>モード指定フラグ</term>
 	<listitem>
-          <para>例えば<option>--make</option>や<option>-E</option>がこれである。モード指定フラグはコマンド行から一つだけ指定しても良い。利用可能なモードの一覧は<xref linkend="modes"/>にある。</para>
+          <para>例えば<option>&ndash;&ndash;make</option>や<option>-E</option>がこれである。モード指定フラグはコマンド行から一つだけ指定しても良い。利用可能なモードの一覧は<xref linkend="modes"/>にある。</para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -144,6 +177,20 @@ module X where
       </varlistentry>
       
       <varlistentry>
+	<term><filename>.ll</filename></term>
+	<listitem>
+          <para>llvm中間言語のソースファイル。ふつうはコンパイラによって生成される。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><filename>.bc</filename></term>
+	<listitem>
+          <para>llvm中間言語のビットコードファイル。ふつうはコンパイラによって生成される。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><filename>.s</filename></term>
 	<listitem>
           <para>アセンブリ言語のソースファイル。ふつうはコンパイラによって生成される。</para>
@@ -165,7 +212,11 @@ module X where
   <sect1 id="modes">
     <title>実行モード</title>
 
-    <para>GHCの振る舞いはまずモード指定フラグによって制御される。これらのフラグのうちただ一つだけを使うことができるが、コマンド行において最初のオプションである必要はない。以下のモードが利用できる。</para>
+    <para>GHCの振る舞いはまずモード指定フラグによって制御される。これらのフラグのうちただ一つだけを使うことができるが、コマンド行において最初のオプションである必要はない。</para>
+
+    <para>モードフラグがない場合、コマンド行にソースファイルがあるならGHCはmakeモード(<xref linkend="make-mode"/>)に入り、そうでないならコマンド行中で指定されたオブジェクトをリンクして実行ファイルを作る。</para>
+
+    <para>以下のモードフラグが利用できる。</para>
 
     <variablelist>
       <varlistentry>
@@ -184,13 +235,15 @@ module X where
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
-	    <arg choice='plain'>--make</arg>
+	    <arg choice='plain'>&ndash;&ndash;make</arg>
 	  </cmdsynopsis>
           <indexterm><primary>make mode</primary></indexterm>
           <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
 	</term>
 	<listitem>
           <para>このモードでは、GHCは複数のモジュールから成るHaskellのプログラムを、依存性を解析しながら自動的にビルドする。単純なHaskellプログラムなら、これは<command>make</command>を使うのに比べてずっと簡単で、しかも速い。makeモードは<xref linkend="make-mode"/>で説明されている。</para>
+
+          <para>コマンド行中に一つでもHaskellソースファイルがあるなら、このモードがデフォルトであり、この場合<option>&ndash;&ndash;make</option>オプションは省略できる。</para>
 	</listitem>
       </varlistentry>
 
@@ -275,9 +328,10 @@ module X where
       <varlistentry>
 	<term>
           <cmdsynopsis>
+            <command>ghc --supported-extensions</command>
             <command>ghc --supported-languages</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;supported-languages</option></primary></indexterm>
+          <indexterm><primary><option>&ndash;&ndash;supported-extensions</option></primary><primary><option>&ndash;&ndash;supported-languages</option></primary></indexterm>
         </term>
 	<listitem>
 	  <para>対応している言語拡張を表示する。</para>
@@ -341,13 +395,19 @@ module X where
       <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
       <indexterm><primary>separate compilation</primary></indexterm>
       
-      <para><option>&ndash;&ndash;make</option>オプションが指定されると、GHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる一つ以上のモジュール(ふつうは<literal>Main</literal>だけ)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
+      <para>このモードではGHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる一つ以上のモジュール(ふつうは<literal>Main</literal>だけ)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
 
 <screen>
 ghc &ndash;&ndash;make Main.hs
 </screen>
 
-      <para>コマンド行はソースファイル名やモジュール名をいくつ含んでいても良い。それらを初期モジュールとしてインポートを追いかけることで、GHCはプログラムの全てのモジュールを見つけ出す。次に、古くなったモジュールの再コンパイルが試みられ、最後に、もし<literal>Main</literal>モジュールがあるなら、プログラムはリンクされて実行可能形式になる。</para>
+      <para>実際には、コマンド行中にHaskellソースファイルが一つでもあり、他のモードが指定されてもいないなら、GHCは自動的にmakeモードに入るので、この例では次のように入力するだけでも良い。</para>
+
+<screen>
+ghc Main.hs
+</screen>
+
+      <para>ソースファイル名やモジュール名はいくつ指定しても良い。それらを初期モジュールとしてインポートを追いかけることで、GHCはプログラムの全てのモジュールを見つけ出す。次に、古くなったモジュールの再コンパイルが試みられ、最後に、もし<literal>Main</literal>モジュールがあるなら、プログラムはリンクされて実行可能形式になる。</para>
 
       <para>伝統的な<literal>Makefile</literal>に比べて、<literal>ghc &ndash;&ndash;make</literal>を使うことの利点は、以下のようなことである。</para>
 
@@ -654,7 +714,7 @@ ghc -c Foo.hs</screen>
 	<term><option>-Wall</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-Wall</option></primary></indexterm>
-          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-simple-patterns</option>、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unused-do-bind</option>、<option>-fwarn-implicit-prelude</option>である。</para>
+          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unused-do-bind</option>、<option>-fwarn-implicit-prelude</option>である。</para>
 	</listitem>
       </varlistentry>
 
@@ -767,7 +827,7 @@ foreign import "&amp;f" f :: FunPtr t
 	<listitem>
 	  <indexterm><primary><option>-fwarn-lazy-unlifted-bindings</option></primary>
 	  </indexterm>
-	  <para>持ち上げられていない型(訳注: unlifed type; ボトムを持たない型)が、まるで遅延するかのように束縛されている場合に警告を発する。例えば<literal>where (I# x) = ...</literal>のような場合である。代わりに<literal>where !(I# x) = ...</literal>を使うこと。GHC 6.14では、これは警告でなくエラーになる予定である。
+	  <para>持ち上げられていない型(訳注: unlifed type; ボトムを持たない型)が、まるで遅延するかのように束縛されている場合に警告を発する。例えば<literal>where (I# x) = ...</literal>のような場合である。代わりに<literal>where !(I# x) = ...</literal>を使うこと。GHC 7.2では、これは警告でなくエラーになる予定である。
       </para>
 	</listitem>
       </varlistentry>
@@ -939,21 +999,6 @@ f "2"    = 2
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fwarn-simple-patterns</option>:</term>
-	<listitem>
-	  <indexterm><primary><option>-fwarn-simple-patterns</option></primary>
-	  </indexterm>
-          <para>失敗する可能性のあるラムダ束縛されたパターンについて警告する。例えば、<literal>\(x:xs)->...</literal>のような場合である。通常、これらは<option>-fwarn-incomplete-patterns</option>でいう不完全なパターンとはみなされない。</para>
-          <para>「ラムダ束縛されたパターン」には単一のパターンがある全ての場所、例えばリストの内包表記やdo記法が含まれる。これらの場合ではパターン照合の失敗は合法であり、フィルタリング(リスト内包表記)またはモナドの<literal>fail</literal>操作(モナド)を引き起こす。例えば、
-	    <programlisting>
-	      f :: [Maybe a] -> [a]
-	      f xs = [y | Just y &lt;- xs]
-	      </programlisting>
-            <option>-fwarn-simple-patterns</option>を有効にすると、このような、おそらく無実の場合についても警告を出す。これがこのフラグがデフォルトで無効にされている理由である。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
 	<term><option>-fwarn-tabs</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-tabs</option></primary></indexterm>
@@ -969,7 +1014,7 @@ f "2"    = 2
 	<listitem>
 	  <indexterm><primary><option>-fwarn-type-defaults</option></primary></indexterm>
 	  <indexterm><primary>defaulting mechanism, warning</primary></indexterm>
-          <para>数値型に対するデフォルト化機構が発動したときに警告・通知する。これは、あるデフォルトを前提としたコードを別のデフォルトの下のコードに変換するときに便利である。例えば、<constant>1</constant>という値に特に制約がないとき、Haskell 1.4の「デフォルトのデフォルト」は型<literal>Int</literal>を与えるが、Haskell 98ではこれは<literal>Integer</literal>である。これは実行時性能と挙動に影響を与える可能性があるので、通知されると便利である。</para>
+          <para>数値型に対するデフォルト化機構が発動したときに警告・通知する。これは、あるデフォルトを前提としたコードを別のデフォルトの下のコードに変換するときに便利である。例えば、<constant>1</constant>という値に特に制約がないとき、Haskell 1.4の「デフォルトのデフォルト」は型<literal>Int</literal>を与えるが、Haskell 98以降ではこれは<literal>Integer</literal>である。これは実行時性能と挙動に影響を与える可能性があるので、通知されると便利である。</para>
 
 	  <para>この警告はデフォルトで無効である。</para>
 	</listitem>
@@ -1217,6 +1262,26 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
+            <option>-fno-float-in</option>
+            <indexterm><primary><option>-fno-float-in</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>float-in変換を無効にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fno-specialise</option>
+            <indexterm><primary><option>-fno-specialise</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>多重定義関数の自動特殊化を無効にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
             <option>-fspec-constr</option>
             <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
           </term>
@@ -1448,9 +1513,18 @@ f "2"    = 2
     <variablelist>
 
       <varlistentry>
+	<term><option>-msse2</option>:</term>
+	<listitem>
+          <para>(x86のみ、GHC 7.0.1より追加) ネイティブコード生成器を使っているとき、浮動小数点演算の実装にSSE2のレジスタと命令セットを用いる。これは浮動小数点性能の相当な向上をもたらすが、出来たコードはSSE2対応のプロセッサ(Intel Pentium 4以降またはAMD Athlon 64以降)でしか走らない。
+          </para>
+          <para>x86-64プラットフォームでは、無条件にSSE2が使われる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-monly-[32]-regs</option>:</term>
 	<listitem>
-          <para>(iX86の機械)<indexterm><primary>-monly-N-regs option (iX86 only)</primary></indexterm>GHCはパフォーマンスのために四つのレジスタをGCCから「盗もうと」する。これは大抵うまく行く。しかし、ある種のモジュールでは、四つのレジスタを盗まれた状態でGCCがコンパイルしていると、おそらく次のように言ってクラッシュする。
+          <para>(x86のみ)<indexterm><primary>-monly-N-regs option (iX86 only)</primary></indexterm>GHCはパフォーマンスのために四つのレジスタをGCCから「盗もうと」する。これは大抵うまく行く。しかし、ある種のモジュールでは、四つのレジスタを盗まれた状態でGCCがコンパイルしていると、おそらく次のように言ってクラッシュする。
 
 <screen>
 Foo.hc:533: fixed or forbidden register was spilled.
