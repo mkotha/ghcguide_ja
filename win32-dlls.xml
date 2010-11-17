@@ -283,185 +283,120 @@ DLL: HScool.dll  ==&#62; import lib: libHScool.dll.a
 <sect2 id="win32-dlls-foreign">
 <title>他の言語から呼ぶためのDLLを作る</title>
 
-<para>
-Haskellコードをまとめて、他の言語、例えばVisual BasicやC++から呼べるようにしたいなら、いくつか知っておくと良いことがある。これは<xref linkend="ffi-library" />の特別な場合である。以下ではDLL特有の問題について扱う。例を挙げる。</para>
-
-<itemizedlist>
-
-<listitem>
-<para>
-<literal>foreign export</literal>宣言を使って、外部から呼びたいHaskellの関数をエクスポートする。例を挙げる。
+<para>この節では、Haskellコードをまとめて、他の言語、例えばVisual BasicやC++から呼べるDLLを作る方法を記述する。これは<xref linkend="ffi-library" />の特別な場合である。以下ではDLL特有の問題について扱う。例を挙げる。</para>
+<para><literal>foreign export</literal>宣言を使って、外部から呼びたいHaskellの関数をエクスポートする。例を挙げる。</para>
 
 <programlisting>
+-- Adder.hs
+{-# LANGUAGE ForeignFunctionInterface #-}
 module Adder where
 
-adder :: Int -> Int -> IO Int  &ndash;&ndash; 余計なIO
+adder :: Int -> Int -> IO Int -- 余計なIO
 adder x y = return (x+y)
 
 foreign export stdcall adder :: Int -> Int -> IO Int
 </programlisting>
+<para>HaskellのRTSの開始/終了を行う補助コードを加える。
 </para>
-</listitem>
-
-<listitem>
-<para>
-これをコンパイルする。
-
-<screen>
-ghc -c adder.hs -fglasgow-exts
-</screen>
-  
-これで、adder.oとadder_stub.oの二つのファイルができる。
-</para>
-</listitem>
-
-<listitem>
-<para>
-HaskellのRTSを起動する<function>DllMain()</function>をコンパイルする。実装の一例を示す。
-
 <programlisting>
-#include &lt;windows.h&gt;
+// StartEnd.c
 #include &lt;Rts.h&gt;
 
 extern void __stginit_Adder(void);
 
-static char* args[] = { "ghcDll", NULL };
-                       /* 注意: argvはNULLで終わっていなければならない */
-BOOL
-STDCALL
-DllMain
-   ( HANDLE hModule
-   , DWORD reason
-   , void* reserved
-   )
+void HsStart()
 {
-  if (reason == DLL_PROCESS_ATTACH) {
-      /* この時点でRTSのDLLはロードされているはずだが、起動する必要がある。*/
-      startupHaskell(1, args, __stginit_Adder);
-      return TRUE;
-  }
-  return TRUE;
+   int argc = 1;
+   char* argv[] = {"ghcDll", NULL}; // argvはNULLで終わっていなければならない
+
+   // Haskellのランタイムを初期化する
+   char** args = argv;
+   hs_init(&amp;argc, &amp;args);
+
+   // Haskellに全ての根モジュールを通知する
+   hs_add_root(__stginit_Adder);
+}
+
+void HsEnd()
+{
+   hs_exit();
 }
 </programlisting>
-
-ここで、<literal>Adder</literal>はモジュールの木の根をなすモジュールの名前である。(上述のように、根となるモジュールはただ一つなければならない。したがって、DLLには一つのモジュール木がなければならない)。これをコンパイルする。
-
-<screen>
-ghc -c dllMain.c
-</screen>
+<para>ここで、<literal>Adder</literal>はモジュール木における根となるモジュールの名前である(上述のように、DLLにはただ一つの根モジュールがなければならず、従ってただ一つのモジュール木がなければならない)。全てをコンパイルする。
 </para>
-</listitem>
-
-<listitem>
-<para>
-DLLを構築する。
-
 <screen>
-ghc &ndash;shared -o adder.dll adder.o adder_stub.o dllMain.o
+ghc -c Adder.hs
+ghc -c StartEnd.c
+ghc -shared -o Adder.dll Adder.o Adder_stub.o StartEnd.o
 </screen>
-
+<para>これで、<filename>Adder.dll</filename>ファイルが他の言語から使えるようになった。Adderの関数を呼ぶ前に<literal>HsStart</literal>を呼ぶことが必要であり、一番最後には<literal>HsEnd</literal>を呼ぶ必要がある。
 </para>
-</listitem>
-
-<listitem>
 <para>
-これでVBAから<function>adder</function>を使える。これは私なら次のように<constant>Declare</constant>する。
+  <emphasis>警告:</emphasis> <literal>hs_init</literal>/<literal>hs_exit</literal>を呼ぶのに<literal>DllMain</literal>を使うことが魅力的に思えるかもしれないが、これは動作しない(特に<literal>-threaded</literal>付きでコンパイルしているなら)。<literal>DllMain</literal>の間に実行してよい動作には厳しい制約があり、<literal>hs_init</literal>はこれらの制約を破るので、セットアップ中にdllがフリーズするのにつながることがある。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/3605">bug #3605</ulink>を見よ)</para>
 
+<sect3 id="win32-dlls-vba">
+<title>VBAから使う</title>
+
+<para><filename>Adder.dll</filename>をVBAから使う例。
+</para>
 <programlisting>
-Private Declare Function adder Lib "adder.dll" Alias "adder@8"
+Private Declare Function Adder Lib "Adder.dll" Alias "adder@8" _
       (ByVal x As Long, ByVal y As Long) As Long
+
+Private Declare Sub HsStart Lib "Adder.dll" ()
+Private Declare Sub HsEnd Lib "Adder.dll" ()
+
+Private Sub Document_Close()
+HsEnd
+End Sub
+
+Private Sub Document_Open()
+HsStart
+End Sub
+
+Public Sub Test()
+MsgBox "12 + 5 = " &amp; Adder(12, 5)
+End Sub
 </programlisting>
+<para>この例はMicrosoft Wordの<literal>Document_Open</literal>/<literal>Close</literal>関数を使っているが、<literal>HsStart</literal>が関数が最初に呼ばれるよりも先に呼ばれ、<literal>HsEnd</literal>が最後のものより後に呼ばれる限り、問題なく動作するはずである。</para>
+</sect3>
 
-このHaskell DLLはGHCに付属するいくつかのDLLに依存しているので、それらが可視であるように注意。
+<sect3 id="win32-dlls-c++">
+<title>C++から使う</title>
+
+<para><filename>Adder.dll</filename>をC++から使う例。
 </para>
-
-<para>
-静的にリンクされたDLLをビルドするのは前節の通りである。HaskellソースをコンパイルしてDLLをビルドするときに<option>-static</option>を加えるだけで良い。
-</para>
-
-</listitem>
-
-</itemizedlist>
-
-</sect2>
-
-<sect2>
-<title>DllMain()に注意！</title>
-
-<para>関数<literal>DllMain()</literal>の本体は極めて危険な場所である。これは、プロセスの終了時、DLLがアンロードされる順番が規定されていないことによる。つまり、あなたのDLLの<literal>DllMain()</literal>が呼ばれた時点で既に、あなたのDLLが脱初期化に際して呼ぶ関数の含まれているDLLがアンロードされた後かもしれないのである。言い換えると、終了処理のコードを<literal>DllMain()</literal>に置くことはできない。但し、終了処理のコードが、利用できることが保証されているある種の関数(詳しくはPlatform SDKを見よ)しか呼ばないなら別である。</para>
-
-
-<para>解決策は、常にDLLから関数<literal>Begin()</literal>と<literal>End()</literal>をエクスポートし、このDLLを使うアプリケーションからそれらを呼んで、End()関数にある終了処理コードが必要とする全てのDLLが、呼ばれた時点で利用可能状態であることを保証することである。</para>
-
-<para>以下の例は、テストしていないが、この考え方を例証するものである。(この例に何か問題を見付けたり、もっと良い例があるなら、知らせてほしい)。<literal>Bar</literal>と<literal>Zap</literal>という二つのHaskellモジュールを使うLewisというDLLがあるとしよう。ただし、<literal>Bar</literal>は<literal>Zap</literal>をインポートしており、従って<xref linkend="using-own-main"/>の意味でルートモジュールであるとする。すると、このDLLの主要なC++単位はこのような感じになる。</para>
 
 <programlisting>
- // Lewis.cpp -- GCCでコンパイルする
- #include &lt;Windows.h&gt;
- #include "HsFFI.h"
+// Tester.cpp
+#include "HsFFI.h"
+#include "Adder_stub.h"
+#include &lt;stdio.h&gt;
 
- #define __LEWIS_DLL_EXPORT
- #include "Lewis.h"
+extern "C" {
+    void HsStart();
+    void HsEnd();
+}
 
- #include "Bar_stub.h"  // GHCが生成したもの
- #include "Zap_stub.h"
-
- BOOL APIENTRY DllMain( HANDLE hModule, 
-                        DWORD  ul_reason_for_call, 
-                        LPVOID lpReserved
-                       ){
-   return TRUE;
- }
-
- extern "C"{
-
- LEWIS_API HsBool lewis_Begin(){
-   int argc = ...
-   char *argv[] = ...
-
-   // Haskellランタイムを初期化する
-   hs_init(&amp;argc, &amp;argv);
-
-   // Haskellに、全てのルートモジュールについて通知する
-   hs_add_root(__stginit_Bar);
-
-   // ここで残り全部の初期化を行い
-   // 問題があれば偽を返す
-   return HS_BOOL_TRUE;
- }
-
- LEWIS_API void lewis_End(){
-   hs_exit();
- }
-
- LEWIS_API HsInt lewis_Test(HsInt x){
-   // BarやZapからエクスポートされた
-   // Haskell関数を使う
-
-   return ...
- }
-
- } // extern "C"
-
-そして、このDLLの関数を使ったアプリケーションのmain()は以下のようになるだろう。
-
- // MyApp.cpp
- #include "stdafx.h"
- #include "Lewis.h"
-
- int main(int argc, char *argv[]){
-   if (lewis_Begin()){
-      // 以降、Lewis DLLからエクスポートされた
-      // 他の関数を安全に呼べる
-
-   }
-   lewis_End();
-   return 0;
- }
+int main()
+{
+    HsStart();
+    // これで、DLLの関数を安全に呼べる
+    printf("12 + 5 = %i\n", adder(12,5))    ;
+    HsEnd();
+    return 0;
+}
 </programlisting>
-
-<para><literal>Lewis.h</literal>は、DLLの外部ユーザ(GHCをインストールしているとは限らないし、従って<literal>HsFFI.h</literal>などを持っているとは限らない)に対してもHaskell FFIの型が定義されているように、必要な<literal>#ifndef</literal>を持つことになるだろう。
+<para>これは次のようにコンパイルし、実行できる。
 </para>
+<screen>
+$ ghc -o tester Tester.cpp Adder.dll.a
+$ tester
+12 + 5 = 17
+</screen>
+
+</sect3>
+
 </sect2>
 
 </sect1>
