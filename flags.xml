@@ -57,8 +57,8 @@
 	      <entry>-</entry>
 	    </row>
             <row>
-              <entry><option>&ndash;&ndash;supported-languages</option></entry>
-              <entry>対応している言語拡張を表示</entry>
+              <entry><option>&ndash;&ndash;supported-extensions</option>または<option>&ndash;&ndash;supported-languages</option></entry>
+              <entry>対応している言語および言語拡張を表示</entry>
               <entry>モード</entry>
               <entry>-</entry>
             </row>
@@ -299,6 +299,12 @@
 	    <row>
 	      <entry><option>-keep-hc-file</option>または<option>-keep-hc-files</option></entry>
               <entry>中間の<literal>.hc</literal>ファイルを保持する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-keep-llvm-file</option>または<option>-keep-llvm-files</option></entry>
+	      <entry>中間の<literal>.ll</literal>LLVMファイルを保持する</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -684,6 +690,12 @@
 	      <entry>暗黙に<literal>import Prelude</literal>しない</entry>
 	      <entry>動</entry>
 	      <entry><option>-XImplicitPrelude</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XRebindableSyntax</option></entry>
+	      <entry><link linkend="rebindable-syntax">再束縛可能な構文</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoRebindableSyntax</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XNoMonomorphismRestriction</option></entry>
@@ -1095,6 +1107,13 @@
 	  </row>
 
 	  <row>
+	    <entry><option>-fwarn-missing-import-lists</option></entry>
+	    <entry>明示的なimportがインポートリストを欠いているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fnowarn-missing-import-lists</option></entry>
+	  </row>
+
+	  <row>
 	    <entry><option>-fwarn-missing-methods</option></entry>
 	    <entry>クラスメソッドが定義されていないときに警告する</entry>
 	    <entry>動</entry>
@@ -1127,13 +1146,6 @@
 	    <entry>重複パターンがあれば警告する</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-overlapping-patterns</option></entry>
-	  </row>
-
-	  <row>
-	    <entry><option>-fwarn-simple-patterns</option></entry>
-	    <entry>失敗し得るラムダパターンがあれば警告する</entry>
-	    <entry>動</entry>
-	    <entry><option>-fno-warn-simple-patterns</option></entry>
 	  </row>
 
 	  <row>
@@ -1345,6 +1357,13 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-fspecialise</option></entry>
+	      <entry>多重定義された関数の特殊化を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-specialise</entry>
+	    </row>
+
+	    <row>
 	      <entry><option>-ffull-laziness</option></entry>
               <entry>完全遅延(束縛を外側に向かって浮遊させる)を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
@@ -1352,10 +1371,17 @@
 	    </row>
 
             <row>
-	      <entry><option>-frewrite-rules</option></entry>
+	      <entry><option>-ffloat-in</option></entry>
+	      <entry>"float-in"最適化を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-float-in</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fenable-rewrite-rules</option></entry>
 	      <entry>全ての書き換え規則(多重定義関数の自動特殊化で生成されたものも含む)を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-rewrite-rules</option></entry>
+	      <entry><option>-fno-enable-rewrite-rules</option></entry>
  	    </row>
 
 	    <row>
@@ -1364,6 +1390,13 @@
 	      <entry>動</entry>
 	      <entry>-fno-strictness</entry>
 	    </row>
+
+            <row>
+              <entry><option>-fstrictness=before</option>=<replaceable>n</replaceable></entry>
+              <entry>単純化器の段階<replaceable>n</replaceable>の前に、追加で正格性解析を行なう。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
 
 	    <row>
 	      <entry><option>-fspec-constr</option></entry>
@@ -1478,13 +1511,13 @@
 	  <tbody>
 	    <row>
 	      <entry><option>-auto</option></entry>
-	      <entry>全てのエクスポートされている関数に自動的に<literal>_scc_</literal>を付加する</entry>
+	      <entry>エクスポートされていてINLINE指定されていない全ての関数に自動的に<literal>_scc_</literal>を付加する</entry>
 	      <entry>動</entry>
 	      <entry><option>-no-auto</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-auto-all</option></entry>
-	      <entry>全ての最上位の関数に自動的に<literal>_scc_</literal>を付加する</entry>
+	      <entry>INLINE指定されていない全ての最上位の関数に自動的に<literal>_scc_</literal>を付加する</entry>
 	      <entry>動</entry>
 	      <entry><option>-no-auto-all</option></entry>
 	    </row>
@@ -1645,6 +1678,12 @@
 	      <entry>-fasm</entry>
 	    </row>
 	    <row>
+	      <entry><option>-fllvm</option></entry>
+	      <entry>LLVMを介してコンパイルする</entry>
+	      <entry>動</entry>
+	      <entry>-fasm</entry>
+	    </row>
+	    <row>
 	      <entry><option>-fno-code</option></entry>
 	      <entry>コード生成を省略する</entry>
 	      <entry>動</entry>
@@ -1750,6 +1789,18 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-rtsopts</option>, <option>-rtsopts={none,some,all}</option></entry>
+	      <entry>RTSの振る舞いを、コマンド行フラグと環境変数<literal>GHCRTS</literal>で調整できるようにするかどうかを制御する。<literal>none</literal>を使うと、一切のRTSフラグを与えられないということになる。<literal>some</literal>なら、最小限の、安全なオプションのみを与えられる(デフォルト)。<literal>all</literal>なら(あるいは、引数がないなら)全てのRTSフラグが許可されるという意味である。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-with-rtsopts=<replaceable>opts</replaceable></option></entry>
+	      <entry>デフォルトのRTSオプションを<replaceable>opts</replaceable>に設定する。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-no-link</option></entry>
 	      <entry>リンクを省略する</entry>
 	      <entry>動</entry>
@@ -1803,6 +1854,12 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
+	    <row>
+	      <entry><option>-dylib-install-name</option> <replaceable>path</replaceable></entry>
+	      <entry>ライブラリファイルのインストール先のフルパスを示すinstall nameを設定する(これはAppleのリンカに<literal>-install_name</literal>を渡すことで行なう)。後にこのライブラリをリンクするライブラリや実行ファイルは、このライブラリを実行時に探索する場所としてこのパスを選ぶ。(Darwin/MacOS Xのみ)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1843,6 +1900,18 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-pgmlo</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をLLVM最適化器として使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-pgmlc</option> <replaceable>cmd</replaceable></entry>
+	      <entry><replaceable>cmd</replaceable>をLLVMコンパイラとして使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-pgmm</option> <replaceable>cmd</replaceable></entry>
 	      <entry><replaceable>cmd</replaceable>をmanglerとして使う</entry>
 	      <entry>動</entry>
@@ -1868,7 +1937,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-pgmdll</option> <replaceable>cmd</replaceable></entry>
-	      <entry>Use <replaceable>cmd</replaceable>をDLL生成器として使う</entry>
+	      <entry><replaceable>cmd</replaceable>をDLL生成器として使う</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1890,6 +1959,8 @@
       <indexterm><primary><option>-pgmL</option></primary></indexterm>
       <indexterm><primary><option>-pgmP</option></primary></indexterm>
       <indexterm><primary><option>-pgmc</option></primary></indexterm>
+      <indexterm><primary><option>-pgmlo</option></primary></indexterm>
+      <indexterm><primary><option>-pgmlc</option></primary></indexterm>
       <indexterm><primary><option>-pgma</option></primary></indexterm>
       <indexterm><primary><option>-pgml</option></primary></indexterm>
       <indexterm><primary><option>-pgmdll</option></primary></indexterm>
@@ -1934,6 +2005,18 @@
 	    <row>
 	      <entry><option>-optc</option> <replaceable>option</replaceable></entry>
 	      <entry><replaceable>option</replaceable>をCコンパイラに渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optlo</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をLLVM最適化器に渡す</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-optlc</option> <replaceable>option</replaceable></entry>
+	      <entry><replaceable>option</replaceable>をLLVMコンパイラに渡す</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -1987,6 +2070,14 @@
 	      <entry>逆</entry>
 	    </row>
 	  </thead>
+          <tbody>
+            <row>
+	      <entry><option>-msse2</option></entry>
+	      <entry>(x86のみ)浮動小数点にSSE2を使う</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+            </row>
+          </tbody>
 	  <tbody>
 	    <row>
 	      <entry><option>-monly-[432]-regs</option></entry>
@@ -2117,6 +2208,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-ddump-llvm</option></entry>
+	      <entry>LLVM中間コードを出力する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-ddump-occur-anal</option></entry>
 	      <entry>出現解析の出力を表示</entry>
 	      <entry>動</entry>
@@ -2208,7 +2305,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-ddump-worker-wrapper</option></entry>
-	      <entry>ワーカ・ラッパ出力を表示</entry>
+	      <entry>worker/wrapper出力を表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -2257,6 +2354,18 @@
 	    <row>
 	      <entry><option>-dsuppress-uniques</option></entry>
 	      <entry>デバッグ出力中で固有子を表示することを抑制する(<command>diff</command>が使いやすくなる。</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dsuppress-coercions</option></entry>
+              <entry>Core出力の中で型変換(coercion)を表示するのを抑制し、Core出力が短かくなるようにする。</entry>
+	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-dsuppress-module-prefixes</option></entry>
+              <entry>Core出力の中でモジュール修飾接頭辞を表示するのを抑制し、読み易くする。</entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
@@ -2366,6 +2475,12 @@
 	    <row>
 	      <entry><option>-fno-asm-mangling</option></entry>
 	      <entry>アセンブリのmanglingを無効にする(代わりに<option>-unreg</option>を使うこと)</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-ghci-sandbox</option></entry>
+	      <entry>GHCiのサンドボックスを無効にする。これは、フォークされたスレッドではなく主スレッドで計算が走るということである。</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
