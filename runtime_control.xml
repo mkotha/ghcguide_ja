@@ -8,7 +8,7 @@
 
   <para>実行可能なプログラムを作るとき、GHCシステムはコードをコンパイルし、それを自明でないランタイムシステム(RTS)とリンクする。これは、記憶領域の管理や、プロファイルの取得などを行う。</para>
 
-  <para>特別なコマンド行引数をプログラムに渡すことで、RTSの振る舞いをいくらか制御することができる。</para>
+  <para>リンク時に<literal>-rtsopts</literal>フラグを使っているなら、特別なコマンド行引数をプログラムに渡すことで、RTSの振る舞いをいくらか制御することができる。</para>
 
   <para>Haskellプログラムの実行が開始されるとき、RTSはコマンド行引数から<option>+RTS</option><indexterm><primary><option>+RTS</option></primary></indexterm>と<option>-RTS</option><indexterm><primary><option>-RTS</option></primary></indexterm>で囲まれた部分を自分用に抽出する。以下のような例を考える。</para>
 
@@ -32,14 +32,14 @@
 
   <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
 
-  <sect2 id="rts-optinos-environment">
+  <sect2 id="rts-options-environment">
     <title>大域的なRTSオプションを設定する</title>
 
     <indexterm><primary>RTS options</primary><secondary>from the environment</secondary></indexterm>
     <indexterm><primary>environment variable</primary><secondary>for
     setting RTS options</secondary></indexterm>
 
-    <para>RTSオプションは環境変数<envar>GHCRTS</envar><indexterm><primary><envar>GHCRTS</envar></primary></indexterm>からも採られる。例えば、GHCでコンパイルされた全てのプログラムについて最大ヒープサイズを128Mにするなら、次のようにすれば良い。(<literal>sh</literal>系のシェルを使っていると仮定する)</para>
+    <para>リンク時に<literal>-rtsopts</literal>フラグが使われているなら、RTSオプションは環境変数<envar>GHCRTS</envar><indexterm><primary><envar>GHCRTS</envar></primary></indexterm>からも採られる。例えば、GHCでコンパイルされた全てのプログラムについて最大ヒープサイズを128Mにするなら、次のようにすれば良い。(<literal>sh</literal>系のシェルを使っていると仮定する)</para>
 
 <screen>
    GHCRTS='-M128m'
@@ -73,6 +73,8 @@
        option</secondary></indexterm></term>
        <listitem>
          <para>yes(デフォルト)なら、RTSはctrl-Cの類を捕捉するためのシグナルハンドラを設置する。このオプションは、HaskellコードをDLLとして使っていて、自分でシグナルハンドラを設定したいときに特に有用である。</para>
+
+         <para><option>--install-signal-handlers=no</option>の場合でも、RTSの時間間隔タイマは変わらずに有効だということに注意。タイマシグナルはSIGVTALRMかSIGALRMで、RTSの設定とOSの能力によって異なる。このタイマシグナルを無効化するにはRTSオプション<literal>-V0</literal>を使う。(上記参照)</para>
        </listitem>
      </varlistentry>
 
@@ -634,6 +636,16 @@
 	</listitem>
       </varlistentry>
     </variablelist>
+
+  </sect2>
+
+  <sect2>
+    <title>RTSの振る舞いを変更するリンカフラグ</title>
+
+    <indexterm><primary>RTS behaviour, changing</primary></indexterm>
+
+    <para>GHCでは、リンカフラグ<literal>-with-rtsopts</literal>を使うことで、任意のプログラムのRTS設定を初歩的な形で制御できるようになっている。例えば、<literal>-H128m -K1m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K1m"</literal>付きでリンクすれば良い。
+    </para>
 
   </sect2>
 
