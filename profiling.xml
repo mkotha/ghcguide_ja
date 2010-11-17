@@ -180,7 +180,7 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
 
     <sect2><title>コスト集約点を手動で挿入する</title>
 
-      <para>コスト集約点はプログラム上の注釈に過ぎない。コンパイラに<option>-auto-all</option>を指示すると、全ての最上位の関数の周りに自動的にコスト集約点が挿入される。しかし、自分でコスト集約点を挿入するのも完全に自由である。</para>
+      <para>コスト集約点は、単なるプログラム上の注釈である。コンパイラに<option>-auto-all</option>を指示すると、INLINE指定されていない全ての最上位の関数の周りに自動的にコスト集約点が挿入される。しかし、自分でコスト集約点を挿入するのも完全に自由である。</para>
 
       <para>コスト集約点の注釈の構文は以下である。</para>
 
@@ -281,7 +281,7 @@ x = nfib 25
           <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
         </term>
 	<listitem>
-          <para>GHCが全ての最上位のエクスポートされた関数に<function>_scc_</function><!--訳注: SCCとすべき。以下同様-->を自動的に加える。</para>
+          <para>INLINE指定されていない全ての最上位のエクスポートされた関数に、GHCが<function>_scc_</function><!--訳注: SCCとすべき。以下同様-->を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は、手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
       
@@ -291,7 +291,7 @@ x = nfib 25
           <indexterm><primary><option>-auto-all</option></primary></indexterm>
         </term>
 	<listitem>
-          <para><emphasis>全て</emphasis>の最上位の関数が、エクスポートされているかにかかわらず、自動的に<function>_scc_</function>化される。</para>
+          <para>INLINE指定されていない<emphasis>全て</emphasis>の最上位の関数が、エクスポートされているかにかかわらず、自動的に<function>_scc_</function>化される。INLINE指定された関数には手動でコスト集約点を与えなければならない。</para>
 	</listitem>
       </varlistentry>
 
@@ -327,17 +327,29 @@ x = nfib 25
     <variablelist>
       <varlistentry>
 	<term>
-          <option>-p</option> or <option>-P</option>:
+          <option>-p</option>または<option>-P</option>または<option>-pa</option>:
           <indexterm><primary><option>-p</option></primary></indexterm>
           <indexterm><primary><option>-P</option></primary></indexterm>
+          <indexterm><primary><option>-pa</option></primary></indexterm>
           <indexterm><primary>time profile</primary></indexterm>
         </term>
 	<listitem>
           <para><option>-p</option>オプションは標準的な<emphasis>時間プロファイル</emphasis>の報告を生成する。結果は<filename><replaceable>program</replaceable>.prof</filename>というファイルに出力される。</para>
 
           <para><option>-P</option>はより詳細なプロファイル(実際の時間と確保量のデータを含む)を生成する。(あまり使われない)</para>
+
+          <para><option>-pa</option>オプションは最も詳細な報告を生成する。実際の時間と確保量データに加えて、全てのコスト集約点を含んだものである。</para>
 	</listitem>
       </varlistentry>
+
+     <varlistentry>
+       <term><option>-V<replaceable>secs</replaceable></option>
+       <indexterm><primary><option>-V</option></primary><secondary>RTS
+       option</secondary></indexterm></term>
+       <listitem>
+         <para>RTSの時計が進行する時間間隔を設定する。これは時間・確保量プロファイルの標本間隔でもある。デフォルトは0.02秒</para>
+       </listitem>
+     </varlistentry>
 
       <varlistentry>
 	<term>
@@ -535,7 +547,7 @@ x = nfib 25
             <indexterm><primary><option>-i</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para>プロファイル間隔(標本取得間隔)を<replaceable>secs</replaceable>秒(デフォルトは0.1秒)に設定する。小数も使える。例えば<option>-i0.2</option>とすれば毎秒五回標本を取得する。これが影響するのはヒーププロファイルだけである。時間プロファイルでは常に1/50秒の周期で標本が取得される。</para>
+            <para>プロファイル間隔(標本取得間隔)を<replaceable>secs</replaceable>秒(デフォルトは0.1秒)に設定する。小数も使える。例えば<option>-i0.2</option>とすれば毎秒五回標本を取得する。これが影響するのはヒーププロファイルだけである。時間プロファイルでは常にRTS時計に合わせた周期で標本が取得される。これを変えることについては<xref linkend="prof-time-options"/>を見よ。</para>
 	  </listitem>
 	</varlistentry>
 
