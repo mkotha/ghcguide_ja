@@ -5,7 +5,7 @@
 
   <para>この節では、配布物に含まれるその他のプログラムについて述べる。これらは、大いなるHaskellでのプログラミング作業に役立つものである。</para>
 
-<!-- comment: hasktags documentation loosely based on that for hstags -->
+<!-- comment: hasktags was dropped in GHC 6.12
 
 <sect1  id ="hasktags">
 	<title>Haskell用Ctags/Etags: <command>hasktags</command></title>
@@ -49,6 +49,7 @@ find -name \*.\*hs | xargs hasktags
 
 </sect1>
 
+-->
 <!-- comment: hstags doesn't work anymore
 
   <sect1 id="hstags">
@@ -171,7 +172,7 @@ tags:
 	<varlistentry>
 	  <term><literal>-c PROG</literal>または<literal>&ndash;&ndash;cc=PROG</literal></term>
 	  <listitem>
-	    <para>利用するCコンパイラ(デフォルト: <command>ghc</command>)。</para>
+	    <para>利用するCコンパイラ(デフォルト: <command>gcc</command>)。</para>
 	  </listitem>
 	</varlistentry>
 
