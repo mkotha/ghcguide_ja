@@ -163,11 +163,45 @@
                 </a>
               </li>
             </xsl:if>
+            <li class="comment">
+              <a>
+                <xsl:attribute name="href">
+                  <xsl:text>http://www.kotha.net/bbs/?prefix=%3E</xsl:text>
+                  <xsl:value-of select="$custom.prefix"/>
+                  <xsl:call-template name="href.target.uri">
+                    <xsl:with-param name="object" select="."/>
+                  </xsl:call-template>
+                  <xsl:text>%0A</xsl:text>
+                </xsl:attribute>
+                <xsl:text>このページにコメントする</xsl:text>
+              </a>
+            </li>
           </ul>
         </xsl:if>
       </div>
     </xsl:if>
   </xsl:template>
+
+  <!--
+  <xsl:template name="user.footer.navigation">
+    <ul>
+      <li>
+        <a>
+          <xsl:attribute name="href">
+            <xsl:text>http://www.kotha.net/bbs/bbs.cgi?prefix=%3E</xsl:text>
+            <xsl:value-of select="$custom.prefix"/>
+            <xsl:call-template name="href.target.uri">
+              <xsl:with-param name="object" select="."/>
+            </xsl:call-template>
+            <xsl:text>%0A</xsl:text>
+          </xsl:attribute>
+          <xsl:text>このページにコメントする</xsl:text>
+        </a>
+      </li>
+    </ul>
+  </xsl:template>
+  -->
+
 
   <xsl:template name="section.heading">
     <xsl:param name="section" select="."/>

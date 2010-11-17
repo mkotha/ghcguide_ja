@@ -89,6 +89,15 @@ ul.navi li.next a:before {
   visibility: visible;
 }
 # endif
+ul.navi li.comment {
+  position: absolute;
+  bottom: 0;
+  margin-left: 65%;
+  margin-right: auto;
+  font-size: medium;
+  width: auto;
+  text-decoration: underline;
+}
 dl.footnotes {
   border-top: solid thin #000 ;
   font-size: 90%;
