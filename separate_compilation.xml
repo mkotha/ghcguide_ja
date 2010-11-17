@@ -241,6 +241,8 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
       </indexterm>
       <indexterm><primary><literal>.hc</literal> files, saving</primary>
       </indexterm>
+      <indexterm><primary><literal>.ll</literal> files, saving</primary>
+      </indexterm>
       <indexterm><primary><literal>.s</literal> files, saving</primary>
       </indexterm>
 
@@ -256,6 +258,18 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
           </term>
 	  <listitem>
             <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをCを介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.hc</literal>ファイルは生成されない。生成されるようにするのに<option>-fvia-C</option>を使う必要があるかもしれない)</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-keep-llvm-file</option>,
+            <option>-keep-llvm-files</option>
+            <indexterm><primary><option>-keep-llvm-file</option></primary></indexterm>
+            <indexterm><primary><option>-keep-llvm-files</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをLLVMを介して行うに際して、中間の<literal>.ll</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.ll</literal>ファイルは生成されない。生成されるようにするのに<option>-fllvm</option>を使う必要があるかもしれない)</para>
 	  </listitem>
 	</varlistentry>
 
