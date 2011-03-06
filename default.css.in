@@ -19,7 +19,7 @@ body {
   line-height: 1.4;
   background-color: #fffdfa;
   color: #000;
-  padding: 2ex 10% 10ex 10%;
+  padding: 2ex 2% 10ex 7%;
   background-repeat: repeat-y;
 }
 li, dt, dd{
@@ -67,13 +67,13 @@ h1 {
   border-width: thin;
   border-color: #000;
   border-style: solid solid solid none;
-  margin: 2ex -10%;
+  margin: 2ex 0% 2ex -5%;
 }
 h2 {
   text-align: center;
   font-size: 135%;
   padding: 0.5ex;
-  margin: 8ex 0% 5ex 0%;
+  margin: 8ex 5% 5ex 0%;
   color: #440;
 }
 h3 {
