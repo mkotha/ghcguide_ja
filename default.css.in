@@ -171,3 +171,17 @@ input[type="button"][disabled="disabled"] {
 select {
   background-color: #eef;
 }
+
+/* Haskell syntax */
+
+span.hs-comment {
+  color: #a0c;
+}
+
+span.hs-keyword {
+  color: #05c;
+}
+
+span.hs-keyglyph, span.hs-layout {
+  color: #484;
+}
