@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-7-0-2">
+  <title>Release notes for version 7.0.2</title>
+
+  <para>
+    The significant changes to the various parts of the compiler
+    since 7.0.1 are listed in the following sections.
+  </para>
+
+  <sect2>
+    <title>Compiler</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          The old <literal>[$foo| ... |]</literal> syntax works again,
+          but is deprecated.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+          There have been significant improvments to the new type checker.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>GHCi</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Loading <literal>.a</literal> libraries is now possible on
+          all platforms. A <literal>.o</literal> library will still be
+          used by preference if both exist. GHCi will no longer warn
+          about missing <literal>.o</literal> libraries.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+          We now close <literal>.ghci</literal> files after reading
+          them, which on Windows machines allows them to be altered
+          while GHCi is running.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+          It is now possible to <literal>:unset</literal> the ghci
+          variables (<literal>args</literal>, <literal>prog</literal>,
+          <literal>prompt</literal>, <literal>editor</literal> and
+          <literal>stop</literal>).
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Runtime system</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          DTrace is now supported on Solaris, in addition to OS X.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Build system</title>
+
+    <itemizedlist>
+      <listitem>
+        <para>
+          OS X builds on 10.6 now work on both 10.5 and 10.6.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+          Windows installations now include the
+          <literal>libstdc++</literal> DLL.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Haddock</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          GHC now comes with haddock 2.9.0.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+          GHC now includes hoogle databases for the libraries.
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Libraries</title>
+
+    <sect3>
+        <title>array</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 0.3.0.2)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>base</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 4.3.1.0 (was 4.3.0.0)
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    The Unicode support has been improved; in
+                    particular, decoding errors are now detected,
+                    and an exception raised, immediately, rather than
+                    when a buffer gets flushed.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    Some bugs, including memory leaks and a deadlock,
+                    in the new IO manager on non-Windows have
+                    been fixed.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>bin-package-db</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    This is an internal package, and should not be used.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>bytestring</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 0.9.1.10 (was 0.9.1.8)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>Cabal</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 1.10.1.0 (was 1.10.0.0)
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    The error messages given when a program cannot be
+                    found have been improved.
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    The <literal>commandParseArgs</literal> function, and
+                    the <literal>CommandParse</literal> type, are now
+                    exported from
+                    <literal>Distribution.Simple.Command</literal>.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>containers</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 0.4.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>directory</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.1.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>extensible-exceptions</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 0.1.1.2)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>filepath</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.2.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>ghc-binary</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    This is an internal package, and should not be used.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>ghc-prim</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    This is an internal package, and should not be used.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>haskell98</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 1.1.0.1 (was 1.1.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>haskell2010</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.0.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>hpc</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 0.5.0.6)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>integer-gmp</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 0.2.0.3 (was 0.2.0.2)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>old-locale</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.0.0.2)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>old-time</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.0.0.6)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>pretty</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.0.1.2)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>process</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 1.0.1.5 (was 1.0.1.4)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>random</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.0.0.3)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>template-haskell</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 2.5.0.0)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>time</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 1.2.0.3)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>unix</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 2.4.2.0 (was 2.4.1.0)
+                </para>
+            </listitem>
+
+            <listitem>
+                <para>
+                    <literal>System.Posix.Signals</literal> now exports
+                    <literal>reservedSignals</literal>, the set of
+                    signals reserved for use by the implementation.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>Win32</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    No change (version 2.2.0.1)
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect3>
+  </sect2>
+</sect1>
+
