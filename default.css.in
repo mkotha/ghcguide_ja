@@ -54,6 +54,11 @@ ol {
   list-style-image: none;
 }
 
+ul.graph {
+  list-style-type: none;
+  list-style-image: none;
+}
+
 /* headlines */
 
 h1, h2, h3, h4, h5, h6 {
