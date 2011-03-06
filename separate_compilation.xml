@@ -501,7 +501,7 @@ hs-bootファイルにはブートストラップのための最小限の情報�
 </programlisting>
 </para></listitem>
 <listitem><para>結合性宣言はHaskellと同じである。</para></listitem>
-<listitem><para>型同義名の宣言はHaskellと同じである。</para></listitem>
+<listitem><para>型シノニムの宣言はHaskellと同じである。</para></listitem>
 <listitem><para>データ型の宣言はHaskellと同じように完全な形で与えても良いし、「=」記号以下を省略して抽象的に与えても良い。例えば、
 <programlisting>
   data T a b
