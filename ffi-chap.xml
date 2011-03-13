@@ -296,6 +296,28 @@ int main(int argc, char *argv[])
         <para>GHCのランタイムは、プログラムが終了する場合を特別扱いして、スタンドアローンの実行ファイルが終了するときにブロックしているスレッドを待つ必要がないようにしている。コードがメモリから取り除かれるのと同時にプログラムとそのすべてのスレッドが終了するのだから、スレッドが先に終了するように保証する必要がない。(非公式だが、この、早くていい加減な<literal>hs_exit()</literal>が欲しいなら、代わりに<literal>shutdownHaskellAndExit()</literal>を呼ぶと良い)</para>
       </sect3>
     </sect2>
+
+    <sect2 id="ffi-floating-point">
+      <title>浮動小数点とFFI</title>
+
+      <para>C99標準の<literal>fenv.h</literal>ヘッダは、浮動小数点ユニットの状態を確認したり変更したりするための操作を提供している。特に、浮動小数点演算で使われる丸めモードを変更したり、例外フラグを検査したりすることができる。</para>
+
+      <para>Haskellでは浮動小数点演算は純粋な型を持ち、その評価順は規定されない。<literal>fenv.h</literal>の関数を使うと浮動小数点演算の結果を変えたりその作用を観測することができるので、厳密には<literal>fenv.h</literal>の使用はプログラム全体の浮動小数点演算の振る舞いを未定義にする。</para>
+
+      <para>とはいえ、GHCが浮動小数点状態に関して何を行なうかを厳密に記述することが我々には<emphasis>できる</emphasis>。これは、どうしても<literal>fenv.h</literal>を使わざるを得ないときに、落とし穴についての完全な知識を持っていられるようにするためである。
+        <itemizedlist>
+          <listitem>
+            <para>GHCは浮動小数点環境を完全に無視する。ランタイムはそれを変更しないし、読みもしない。</para>
+          </listitem>
+          <listitem>
+            <para>浮動小数点環境はスレッドの通常のコンテキストスイッチに際して保存されない。なので、あるスレッドで浮動小数点状態を変更すると、その変更が他のスレッドから見えるかもしれない。さらに、例外状態を検査してもその結果は信頼できない。コンテキストスイッチによって変更を受けるかもしれないからである。浮動小数点状態を変更したり検査したりする必要があり、複数スレッドを使う必要もあるなら、bound thread (<literal>Control.Concurrent.forkOS</literal>)を使わねばならない。bound threadは一つのOSスレッドを占有し、OSスレッドが浮動小数点状態の保存と復帰を行なうからである。</para>
+          </listitem>
+          <listitem>
+            <para>他言語呼び出しは決してGHCにプリエンプトされないので、他言語呼び出しの間に一時的に浮動小数点状態を変更することは安全である。</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </sect2>
   </sect1>
 </chapter>
 
