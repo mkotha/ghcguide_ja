@@ -1,56 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sect1 id="runtime-control">
+<section id="runtime-control">
   <title>コンパイル済みプログラムを実行する</title>
 
   <indexterm><primary>runtime control of Haskell programs</primary></indexterm>
   <indexterm><primary>running, compiled program</primary></indexterm>
   <indexterm><primary>RTS options</primary></indexterm>
 
-  <para>実行可能なプログラムを作るとき、GHCシステムはコードをコンパイルし、それを自明でないランタイムシステム(RTS)とリンクする。これは、記憶領域の管理や、プロファイルの取得などを行う。</para>
+  <para>実行可能なプログラムを作るとき、GHCシステムはコードをコンパイルし、それを自明でないランタイムシステム(RTS)とリンクする。これは、記憶領域の管理、スレッドのスケジュール、プロファイルの取得などを行う。</para>
 
-  <para>リンク時に<literal>-rtsopts</literal>フラグを使っているなら、特別なコマンド行引数をプログラムに渡すことで、RTSの振る舞いをいくらか制御することができる。</para>
+  <para>RTSは、振る舞いを制御するための沢山のオプションを持っている。例えば、コンテキストスイッチの間隔やヒープのデフォルトの大きさを変えたり、ヒーププロファイルを有効にしたりである。こうしたオプションは色々な方法でランタイムシステムに渡すことができる。次の節(<xref linkend="setting-rts-options"/>)ではこれらの方法を記述し、それ以降の節ではRTSオプション自体について記述する。</para>
 
-  <para>Haskellプログラムの実行が開始されるとき、RTSはコマンド行引数から<option>+RTS</option><indexterm><primary><option>+RTS</option></primary></indexterm>と<option>-RTS</option><indexterm><primary><option>-RTS</option></primary></indexterm>で囲まれた部分を自分用に抽出する。以下のような例を考える。</para>
+  <section id="setting-rts-options">
+    <title>RTSオプションを設定する</title>
+    <indexterm><primary>RTS options, setting</primary></indexterm>
 
-<screen>
-% ./a.out -f +RTS -p -S -RTS -h foo bar
-</screen>
+    <para>RTSオプションを設定するのには四つの方法がある。
 
-  <para>RTSは<option>-p</option> <option>-S</option>を横取りし、プログラムが<function>System.getArgs</function>を読んだときには残りの引数である<literal>-f -h foo bar</literal>が渡される。</para>
+      <itemizedlist>
+        <listitem>
+          <para>プログラムを実行する際、コマンド行の<literal>+RTS ... -RTS</literal>の間で。(<xref linkend="rts-opts-cmdline" />)</para>
+        </listitem>
+        <listitem>
+          <para>コンパイル時に、<option>--with-rtsopts</option>を使って。(<xref linkend="rts-opts-compile-time" />)</para>
+        </listitem>
+        <listitem>
+          <para>環境変数<envar>GHCRTS</envar>で。(<xref linkend="rts-options-environment" />)</para>
+        </listitem>
+        <listitem>
+          <para>ランタイムシステムの&ldquo;フック&rdquo;を上書きすることによって。(<xref linkend="rts-hooks" />)</para>
+        </listitem>
+      </itemizedlist>
+    </para>
 
-  <para>次の例のように、ランタイムシステムへのオプションがコマンド行の最後まで続くときは、<option>-RTS</option>オプションは必要ない。</para>
+    <section id="rts-opts-cmdline">
+      <title>コマンド行でRTSオプションを設定する</title>
 
-<screen>
+      <para>リンク時に<literal>-rtsopts</literal>フラグを適切に設定していたなら、プログラムを実行するときにRTSオプションをコマンド行で与えることができる。</para>
+
+    <para>Haskellプログラムの実行が開始されるとき、RTSはコマンド行引数から<option>+RTS</option><indexterm><primary><option>+RTS</option></primary></indexterm>と<option>-RTS</option><indexterm><primary><option>-RTS</option></primary></indexterm>で囲まれた部分を自分用に抽出する。以下のような例を考える。</para>
+
+    <screen>
+$ ghc prog.hs -rtsopts
+[1 of 1] Compiling Main             ( prog.hs, prog.o )
+Linking prog ...
+$ ./prog -f +RTS -H32m -S -RTS -h foo bar
+    </screen>
+
+      <para>RTSは<option>-H32m</option> <option>-S</option>を横取りし、プログラムが<function>System.Environment.getArgs</function>を読んだときには残りの引数である<literal>-f -h foo bar</literal>が渡される。</para>
+
+      <para>次の例のように、ランタイムシステムへのオプションがコマンド行の最後まで続くときは、<option>-RTS</option>オプションは必要ない。</para>
+
+    <screen>
 % hls -ltr /usr/etc +RTS -A5m
-</screen>
+    </screen>
 
-  <para>残りのオプションを問答無用で(RTSでなく)プログラムに渡したいなら、<option>&ndash;&ndash;RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>を使うことができる。</para>
+      <para>残りのオプションを問答無用で(RTSでなく)プログラムに渡したいなら、<option>&ndash;&ndash;RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>を使うことができる。</para>
 
-  <para>いつもと同様、<replaceable>size</replaceable>を取るRTSオプションについては、以下が適用される。<replaceable>size</replaceable>の最後の文字がKまたはkなら、数値は1000倍される。Mまたはmなら、1,000,000倍される。GまたはG<!-- 訳注: たぶん誤り -->なら、1,000,000,000倍される。(カウンタのオーバーフローは<emphasis>あなたの</emphasis>責任である)</para>
+      <para>いつもと同様、<replaceable>size</replaceable>を取るRTSオプションについては、以下が適用される。<replaceable>size</replaceable>の最後の文字がKまたはkなら、数値は1000倍される。Mまたはmなら、1,000,000倍される。GまたはG<!-- 訳注: たぶん誤り -->なら、1,000,000,000倍される。(カウンタのオーバーフローは<emphasis>あなたの</emphasis>責任である)</para>
 
-  <para><literal>+RTS -f</literal><indexterm><primary><option>-f</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
+      <para><literal>+RTS -?</literal><indexterm><primary><option>-?</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
 
-  <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
+      <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
+    </section>
 
-  <sect2 id="rts-options-environment">
-    <title>大域的なRTSオプションを設定する</title>
+    <section id="rts-opts-compile-time">
+      <title>コンパイル時にRTSオプションを設定する</title>
 
-    <indexterm><primary>RTS options</primary><secondary>from the environment</secondary></indexterm>
-    <indexterm><primary>environment variable</primary><secondary>for
-    setting RTS options</secondary></indexterm>
+      <para><literal>-with-rtsopts</literal>フラグ(<xref linkend="options-linker"/>)を使うことで、プログラムのRTSオプションをコンパイル時に設定することができる。例として、<literal>-H128m -K64m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K64m"</literal>付きでリンクすればよい。</para>
+    </section>
 
-    <para>リンク時に<literal>-rtsopts</literal>フラグが使われているなら、RTSオプションは環境変数<envar>GHCRTS</envar><indexterm><primary><envar>GHCRTS</envar></primary></indexterm>からも採られる。例えば、GHCでコンパイルされた全てのプログラムについて最大ヒープサイズを128Mにするなら、次のようにすれば良い。(<literal>sh</literal>系のシェルを使っていると仮定する)</para>
+    <section id="rts-options-environment">
+      <title><envar>RTSOPTS</envar>でRTSオプションを設定する</title>
 
-<screen>
-   GHCRTS='-M128m'
-   export GHCRTS
-</screen>
+      <indexterm><primary>RTS options</primary><secondary>from the environment</secondary></indexterm>
+      <indexterm><primary>environment variable</primary><secondary>for
+      setting RTS options</secondary></indexterm>
 
-    <para><envar>GHCRTS</envar>環境変数から採られたRTSオプションはコマンド行からオプションを与えることで上書きできる。</para>
+      <para>リンク時に<literal>-rtsopts</literal>フラグが<literal>none</literal>以外に設定されているなら、RTSオプションは環境変数<envar>GHCRTS</envar><indexterm><primary><envar>GHCRTS</envar></primary></indexterm>からも採られる。例えば、GHCでコンパイルされた全てのプログラムについて最大ヒープサイズを2Gにするなら、次のようにすれば良い。(<literal>sh</literal>系のシェルを使っていると仮定する)</para>
 
-  </sect2>
+  <screen>
+     GHCRTS='-M2G'
+     export GHCRTS
+  </screen>
 
-  <sect2 id="rts-options-misc">
+      <para><envar>GHCRTS</envar>環境変数から採られたRTSオプションはコマンド行からオプションを与えることで上書きできる。</para>
+
+        <para>ヒント: あなたの環境に<literal>GHCRTS=-M2G</literal>のようなものを設定しておくと、Haskellプログラムがあなたのマシンの実メモリを超えて成長することを簡単に防ぐことができる。誤ってこういうことをするのは良くあることであり、OSがそのプロセスを殺すことを決めるまでマシンがゆっくりと地を這うことになる。(そして、ちゃんと正しいのを殺してくれるといいね)</para>
+      </section>
+
+    <section id="rts-hooks">
+      <title>RTSの振る舞いを変更するためのフック</title>
+
+      <indexterm><primary>hooks</primary><secondary>RTS</secondary></indexterm>
+      <indexterm><primary>RTS hooks</primary></indexterm>
+      <indexterm><primary>RTS behaviour, changing</primary></indexterm>
+
+      <para>GHCでは、ランタイムシステムから呼ばれるフックをコンパイル時に含めることで、任意のプログラムのRTS設定をある程度制御することができる。RTSにはこれら全てのフックのスタブ定義が含まれているが、自分の版を書いてGHCのコマンド行からリンクすることで、デフォルトと異なるものを使える。</para>
+
+      <para>DLLリンクの気まぐれのせいで、これらのフックはWindowsでプログラムが動的リンクでビルドされるときには働かない。</para>
+
+      <para><literal>ghc_rts_opts</literal><indexterm><primary><literal>ghc_rts_opts</literal></primary></indexterm>というフックを使うと、特定のプログラムのRTSオプションを恒久的に設定することができる。これは新しい<option>-with-rtsopts</option>というリンカオプションと同じである。よくある使いかたは、プログラムのヒープやスタックをデフォルトより大きくすることである。例えば、<literal>-H128m -K1m</literal>を設定するには、まず以下の定義をCソースファイルに置く。</para>
+
+  <programlisting>
+  char *ghc_rts_opts = "-H128m -K1m";
+  </programlisting>
+
+      <para>このCファイルをコンパイルし、できたオブジェクトファイルを、Haskellプログラムをリンクするときのコマンド行に加えれば良い。</para>
+
+      <para>これらのフラグは、<literal>GHCRTS</literal>環境変数やコマンド行のフラグよりも先に解釈される。</para>
+
+      <para>ランタイムシステムがどうしようもなくなったとき(例えばスタックオーバーフロー)に表示される文言を変更することもできる。このためのフックは以下である。</para>
+
+      <variablelist>
+
+        <varlistentry>
+          <term>
+            <function>void OutOfHeapHook (unsigned long, unsigned long)</function>
+            <indexterm><primary><function>OutOfHeapHook</function></primary></indexterm>
+          </term>
+          <listitem>
+            <para>ヒープオーバーフローのメッセージ。</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <function>void StackOverflowHook (long int)</function>
+            <indexterm><primary><function>StackOverflowHook</function></primary></indexterm>
+          </term>
+          <listitem>
+            <para>スタックオーバーフローのメッセージ。</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <function>void MallocFailHook (long int)</function>
+            <indexterm><primary><function>MallocFailHook</function></primary></indexterm>
+          </term>
+          <listitem>
+            <para><function>malloc</function>が失敗したときに表示されるメッセージ。</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
+    </section>
+  </section>
+
+  <section id="rts-options-misc">
     <title>いろいろなRTSオプション</title>
 
     <variablelist>
@@ -93,9 +191,9 @@
        </listitem>
      </varlistentry>
     </variablelist>
-  </sect2>
+  </section>
 
-  <sect2 id="rts-options-gc">
+  <section id="rts-options-gc">
     <title>ガベッジコレクタを制御するためのRTSオプション</title>
 
     <indexterm><primary>garbage collector</primary><secondary>options</secondary></indexterm>
@@ -475,15 +573,15 @@
       </varlistentry>
     </variablelist>
 
-  </sect2>
+  </section>
 
-  <sect2>
+  <section>
     <title>並行性と並列性に関するRTSオプション</title>
 
     <para>並行実行に関わるRTSオプションは<xref linkend="using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
-  </sect2>
+  </section>
 
-  <sect2 id="rts-profiling">
+  <section id="rts-profiling">
     <title>プロファイルに関するRTSオプション</title>
 
     <para>プロファイルについてのランタイムオプションの大部分は、プログラムをプロファイル用にコンパイルした場合にのみ利用可能である。(<xref linkend="prof-compiler-options" />を見よ、またランタイムオプションについては<xref linkend="rts-options-heap-prof" />を見よ)。ただし、通常の非プロファイル版実行ファイルでも利用できるプロファイルオプションがただ一つ存在する。</para>
@@ -500,9 +598,9 @@
         </listitem>
       </varlistentry>
     </variablelist>
-  </sect2>
+  </section>
 
-  <sect2 id="rts-eventlog">
+  <section id="rts-eventlog">
     <title>追跡情報を得る</title>
 
     <indexterm><primary>tracing</primary></indexterm>
@@ -553,9 +651,9 @@
 
     <para>この追跡フレームワークで記録されるイベントを、デバッグオプション<option>-D<replaceable>x</replaceable></option>も生成する。デフォルトではこれらのイベントはテキストとして標準出力にダンプされる(<option>-D<replaceable>x</replaceable></option>によって<option>-v</option>が有効になる)が、<option>-l</option>を使うことでバイナリのイベント記録ファイルに保存することもできる。
     </para>
-  </sect2>
+  </section>
 
-  <sect2 id="rts-options-debugging">
+  <section id="rts-options-debugging">
     <title>ハックする者、デバッグする者、及び好奇心過剰な魂のためのRTSオプション</title>
 
     <indexterm><primary>RTS options, hacking/debugging</primary></indexterm>
@@ -635,78 +733,9 @@
       </varlistentry>
     </variablelist>
 
-  </sect2>
+  </section>
 
-  <sect2>
-    <title>RTSの振る舞いを変更するリンカフラグ</title>
-
-    <indexterm><primary>RTS behaviour, changing</primary></indexterm>
-
-    <para>GHCでは、リンカフラグ<literal>-with-rtsopts</literal>を使うことで、任意のプログラムのRTS設定を初歩的な形で制御できるようになっている。例えば、<literal>-H128m -K1m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K1m"</literal>付きでリンクすれば良い。
-    </para>
-
-  </sect2>
-
-  <sect2 id="rts-hooks">
-    <title>RTSの振る舞いを変更するためのフック</title>
-
-    <indexterm><primary>hooks</primary><secondary>RTS</secondary></indexterm>
-    <indexterm><primary>RTS hooks</primary></indexterm>
-    <indexterm><primary>RTS behaviour, changing</primary></indexterm>
-
-    <para>GHCでは、ランタイムシステムから呼ばれるフックをコンパイル時に含めることで、任意のプログラムのRTS設定をある程度制御することができる。RTSにはこれら全てのフックのスタブ定義が含まれているが、自分の版を書いてGHCのコマンド行からリンクすることで、デフォルトと異なるものを使える。</para>
-
-    <para>DLLリンクの気まぐれのせいで、これらのフックはWindowsでプログラムが動的リンクでビルドされるときには働かない。</para>
-
-    <para><literal>ghc_rts_opts</literal><indexterm><primary><literal>ghc_rts_opts</literal></primary></indexterm>というフックを使うと、特定のプログラムのRTSオプションを恒久的に設定することができる。よくある使いかたは、プログラムのヒープやスタックをデフォルトより大きくすることである。例えば、<literal>-H128m -K1m</literal>を設定するには、まず以下の定義をCソースファイルに置く。</para>
-
-<programlisting>
-char *ghc_rts_opts = "-H128m -K1m";
-</programlisting>
-
-    <para>このCファイルをコンパイルし、できたオブジェクトファイルを、Haskellプログラムをリンクするときのコマンド行に加えれば良い。</para>
-
-    <para>これらのフラグは、<literal>GHCRTS</literal>環境変数やコマンド行のフラグよりも先に解釈される。</para>
-
-    <para>ランタイムシステムがどうしようもなくなったとき(例えばスタックオーバーフロー)に表示される文言を変更することもできる。このためのフックは以下である。</para>
-
-    <variablelist>
-
-      <varlistentry>
-	<term>
-          <function>void OutOfHeapHook (unsigned long, unsigned long)</function>
-          <indexterm><primary><function>OutOfHeapHook</function></primary></indexterm>
-        </term>
-	<listitem>
-          <para>ヒープオーバーフローのメッセージ。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <function>void StackOverflowHook (long int)</function>
-          <indexterm><primary><function>StackOverflowHook</function></primary></indexterm>
-        </term>
-	<listitem>
-          <para>スタックオーバーフローのメッセージ。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <function>void MallocFailHook (long int)</function>
-          <indexterm><primary><function>MallocFailHook</function></primary></indexterm>
-        </term>
-	<listitem>
-          <para><function>malloc</function>が失敗したときに表示されるメッセージ。</para>
-	</listitem>
-      </varlistentry>
-    </variablelist>
-
-    <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
-  </sect2>
-
-  <sect2>
+  <section>
     <title>RTSに関する情報を取得する</title>
 
     <indexterm><primary>RTS</primary></indexterm>
@@ -818,8 +847,8 @@ $ ./a.out +RTS --info
 
     </variablelist>
 
-  </sect2>
-</sect1>
+  </section>
+</section>
 
 <!-- Emacs stuff:
      ;;; Local Variables: ***
