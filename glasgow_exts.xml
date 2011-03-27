@@ -5106,12 +5106,16 @@ f4 (x,y)  = [x,y]
 ここでは、<literal>f3</literal>と<literal>f4</literal>は等しい。もともと評価を強制するパターンの前にびっくりマークを置いても何も変わらない。
 </para>
 <para>
-この、「びっくりマークは変数かワイルドカードの前に置かれたときのみ違いがある」という一般的な法則には、(見掛け上の)例外が一つある。<literal>let</literal>または<literal>where</literal>束縛の最上位におけるびっくりマークは、パターンに関係なく、その束縛を正格にする。例を示す。
+この、「びっくりマークは変数かワイルドカードの前に置かれたときのみ違いがある」という一般的な法則には、(見掛け上の)例外が一つある。<literal>let</literal>または<literal>where</literal>束縛の最上位におけるびっくりマークは、パターンに関係なく、その束縛を正格にする。(「見掛け上の」例外と言ったのは、束縛の最上位にあるびっくりマークは<emphasis>パターン</emphasis>の一部ではないと考えるのが正しいからである。そうではなく、これは<emphasis>束縛</emphasis>の構文の一部であり、「びっくりパターン束縛」を作る。)
+例を示す。
 <programlisting>
 let ![x,y] = e in b
 </programlisting>
-これは正格な束縛である。操作的に言うと、まず<literal>e</literal>が評価され、パターン<literal>[x,y]</literal>に対して照合され、そして<literal>b</literal>が評価される。(「見掛け上の」例外と言ったのは、束縛の最上位にあるびっくりマークは<emphasis>パターン</emphasis>の一部ではないと考えるのが正しいからである。そうではなく、これは<emphasis>束縛</emphasis>の構文の一部である。)
-パターン束縛中に入れ子になったびっくりパターンは、他のあらゆる形式のパターンと同様に振る舞う。例を挙げる。
+これはびっくりパターン束縛である。操作的には、これは次のcase式とまったく同様に振る舞う。
+<programlisting>
+case e of [x,y] -> b
+</programlisting>
+case式と同様に、びっくりパターン束縛は非再帰的かつ単相的でなければならない。一方、パターン束縛中に入れ子になったびっくりパターンは、他のあらゆる形式のパターンと同様に振る舞う。例を挙げる。
 <programlisting>
 let (!x,[y]) = e in b
 </programlisting>
@@ -5431,15 +5435,21 @@ GHCはインライン化が永遠に続くことがないことを保証する�
       <sect3 id="inlinable-pragma">
 	<title>INLINABLEプラグマ</title>
 
-<para>INLINABLEプラグマはINLINEプラグマと非常に似た動作をするが、以下の点が異なる。
+<para>関数<literal>f</literal>に対する<literal>{-# INLINABLE f #-}</literal>プラグマは、以下のように振る舞う。
 <itemizedlist>
 <listitem><para>
-INLINEは「これをインライン化してくれ」と言うものだが、INLINABLEは「インライン化は御自由に、あなたの裁量で」というものである。つまり、選択はGHCに委ねられ、プラグマのない関数と同じ規則が使われる。INLINEと異なり、その選択は<emphasis>呼び出し地点</emphasis>で行なわれ、したがってインライン化閾値や、最適化水準などの影響を受ける。</para></listitem>
+<literal>INLINE</literal>は「これをインライン化してくれ」と言うものだが、<literal>INLINABLE</literal>は「インライン化は御自由に、あなたの裁量で」というものである。つまり、選択はGHCに委ねられ、プラグマのない関数と同じ規則が使われる。INLINEと異なり、その選択は<emphasis>呼び出し地点</emphasis>で行なわれ、したがってインライン化閾値や、最適化水準などの影響を受ける。</para></listitem>
 <listitem><para>
-INLINEと同様に、INLINABLEプラグマは元々の右辺のコピーを保持し、その右辺の大きさにかかわらずそれをインタフェースファイルに保存する。
+<literal>INLINE</literal>と同様に、<literal>INLINABLE</literal>プラグマは元々の右辺のコピーを保持し、その右辺の大きさにかかわらずそれをインタフェースファイルに保存する。
 </para></listitem>
 <listitem><para>
-特殊関数<literal>inline</literal>(<xref linkend="special-ids"/>)を使って呼び出し地点でインライン化を強制すれば、元の右辺のコピーが得られる。実際、<literal>inline f</literal>を使うつもりがあるなら、<literal>f</literal>をINLINABLEと標示するのは良い考えである。そうすることで、GHCがそれの展開候補を(どれだけ大きくても)露出させることを保証するようにできるからである。
+<literal>INLINABLE</literal>プラグマの使い道の一つは、特殊関数<literal>inline</literal>(<xref linkend="special-ids"/>)と組み合わせることである。<literal>inline f</literal>という呼び出しは、極めて積極的に<literal>f</literal>をインライン化しようとする。<literal>f</literal>がインライン化できることを確実にするために<literal>f</literal>を<literal>INLINABLE</literal>と標示するのは良い考えである。そうすることで、GHCがそれの展開候補を(どれだけ大きくても)露出させることを保証するようにできるからである。さらに、<literal>f</literal>が<literal>INLINABLE</literal>であるという注釈をすることで、GHCの最適化器が作り出した何らかの<literal>f</literal>の最適化版ではなく、<literal>f</literal>の元々の右辺がインライン化されることが確かになる。
+</para></listitem>
+<listitem><para>
+<literal>INLINABLE</literal>プラグマは<literal>SPECIALISE</literal>プラグマとも共同する。すなわち、関数<literal>f</literal>を<literal>INLINABLE</literal>と標示した場合、後で別モジュールで<literal>SPECIALISE</literal>することができる(<xref linkend="specialize-pragma"/>を見よ)。</para></listitem>
+
+<listitem><para>
+<literal>INLINE</literal>プラグマと異なり、<literal>INLINABLE</literal>プラグマを再帰関数に使うのは問題ない。これをするのは主に後で<literal>SPECIALISE</literal>を使えるようにするためである。
 </para></listitem>
 </itemizedlist>
 </para>
@@ -5634,6 +5644,9 @@ data Foo = ...
 最後の例では、生成されたRULSの左辺がかなり複雑なものになる(試してみよ)ので、あまりうまく発動しないかもしれない。この手の特殊化を使うことがあったら、どの程度うまくいったか知らせてほしい。
 </para>
 
+    <sect3 id="specialize-inline">
+      <title>SPECIALIZE INLINE</title>
+
 <para><literal>SPECIALIZE</literal>の後には<literal>INLINE</literal>か<literal>NOINLINE</literal>プラグマを続けることができる。さらに、<xref linkend="inline-noinline-pragma"/>にあるように段階を指定することもできる。このような<literal>INLINE</literal>プラグマはその関数の特殊化版(のみ)に影響し、その関数が再帰的であっても適用される。動機となる例はこれである。
 <programlisting>
 -- type-indexedな表現を持つ配列のGADT
@@ -5649,6 +5662,45 @@ data Arr e where
 </programlisting>
 ここでは、<literal>(!:)</literal>は<literal>Arr e</literal>型の配列の添字演算を行う再帰関数である。<literal>(Int,Int)</literal>での<literal>(!:)</literal>の呼び出しを考えてみよう。二番目の特殊化が発動し、その特殊化された関数がインライン化される。それには<literal>(!:)</literal>の呼び出しが二つあり、どちらも<literal>Int</literal>型についてのものである。これらの呼び出しは両方とも最初の特殊化を発動させ、その本体も再びインライン化される。結果として、添字演算関数についての型によるアンロールができたことになる。</para>
 <para>警告: <literal>SPECIALISE INLINE</literal>を非多相再帰な関数に対して使うと、GHCは発散する。</para>
+</sect3>
+
+<sect3><title>インポートした関数のSPECIALIZE</title>
+
+<para>
+一般に、<literal>SPECIALIZE</literal>プラグマは同じモジュールで定義された関数にのみ与え得る。しかし関数<literal>f</literal>がその定義場所で<literal>INLINABLE</literal>プラグマを与えられているなら、インポート先のモジュールで後から特殊化することができる(<xref linkend="inlinable-pragma"/>を見よ)。例を挙げる。
+<programlisting>
+module Map( lookup, blah blah ) where
+  lookup :: Ord key => [(key,a)] -> key -> Maybe a
+  lookup = ...
+  {-# INLINABLE lookup #-}
+
+module Client where
+  import Map( lookup )
+
+  data T = T1 | T2 deriving( Eq, Ord )
+  {-# SPECIALISE lookup :: [(T,a)] -> T -> Maybe a
+</programlisting>
+ここで、<literal>lookup</literal>が<literal>INLINABLE</literal>と宣言されているが、この定義位置では<literal>T</literal>が存在しないので、これを<literal>T</literal>に関して特殊化することができない。代わりに、利用者のモジュールが<literal>T</literal>を定義して、<literal>lookup</literal>をその型に関して特殊化することができる。
+</para>
+<para>
+さらに、<literal>Client</literal>をインポートする(あるいは推移的に、<literal>Client</literal>をインポートするモジュールをインポートする)全てのモジュールからは、この<literal>lookup</literal>の特殊化版が「見え」て、利用されることになる。各モジュールに<literal>SPECIALIZE</literal>プラグマを置く必要はない。
+</para>
+<para>
+さらに、そもそも<literal>SPECIALIZE</literal>プラグマすら必要ないこともある。モジュールMをコンパイルする際、GHCの最適化器(-Oで)は、Mで定義された全ての最上位の多重定義関数について、Mで呼ばれている型に関して特殊化するかどうか検討する。<emphasis>加えて</emphasis>最適化器はMに<emphasis>インポートされた</emphasis><literal>INLINABLE</literal>の多重定義関数について、Mで呼ばれている型に関して特殊化するかどうか検討する。よってこの例では、以下のように、<literal>lookup</literal>を<literal>T</literal>型で呼ぶだけで十分だろう。
+<programlisting>
+module Client where
+  import Map( lookup )
+
+  data T = T1 | T2 deriving( Eq, Ord )
+
+  findT1 :: [(T,a)] -> Maybe a
+  findT1 m = lookup m T1   -- T型でのlookupの呼び出し
+</programlisting>
+しかし、このような呼び出しがないこともあるので、そういう場合にこのプラグマは便利になり得る。
+</para>
+</sect3>
+
+<sect3><title>旧式のSPECIALIZE構文</title>
 
       <para>参考: 古いGHCでは、特定の型についての特殊化を自分で指定することができた。
 
@@ -5657,6 +5709,7 @@ data Arr e where
 </programlisting>
 
       より一般的な<literal>RULES</literal>プラグマ(<xref linkend="rule-spec"/>を見よ)ができたので、この機能は削除された。</para>
+</sect3>
 
     </sect2>
 
@@ -6343,7 +6396,7 @@ g x = show x
 </para>
 
 <programlisting>
-  import Generics
+  import Data.Generics
 
   class Bin a where
     toBin   :: a -> [Int]
@@ -6361,7 +6414,7 @@ g x = show x
 							  (y,bs'') = fromBin bs'
 </programlisting>
 <para>
-このクラス宣言は、<literal>toBin</literal>と<literal>fromBin</literal>が任意のデータ型についてどのように動作するかを説明している。これを達成するために、単位、積、和のそれぞれの場合についての処理を与えている。これらは<literal>Generics</literal>というライブラリモジュールで定義されている。
+このクラス宣言は、<literal>toBin</literal>と<literal>fromBin</literal>が任意のデータ型についてどのように動作するかを説明している。これを達成するために、単位、積、和のそれぞれの場合についての処理を与えている。これらは<literal>Data.Generics</literal>というライブラリモジュールで定義されている。
 </para>
 <programlisting>
   data Unit    = Unit
@@ -6382,10 +6435,10 @@ g x = show x
       <para>総称性を使うには以下のものが必要である。</para>
       <itemizedlist>
 	<listitem>
-	  <para>フラグとして、<option>-fglasgow-exts</option>(拡張文法を有効にする)と<option>-XGenerics</option>(データ型毎の追加コードを生成する)と<option>-package lang</option>(<literal>Generics</literal>ライブラリを利用可能にする)を使う。</para>
+	  <para>フラグとして、<option>-XGenerics</option>(拡張構文を有効にし、データ型毎の追加コードを生成する)と<option>-package syb</option>(<literal>Data.Generics</literal>ライブラリを利用可能にする)を使う。</para>
 	</listitem>
 	<listitem>
-          <para><literal>lang</literal>パッケージの<literal>Generics</literal>モジュールをインポートする。これによって、<literal>Unit</literal>、<literal>:*:</literal>、<literal>:+:</literal>の各データ型がスコープに導入される。(これらの型に明示的に言及しないならインポートは必要ない。インスタンス宣言を行うだけの場合など)</para>
+          <para><literal>syb</literal>パッケージの<literal>Data.Generics</literal>モジュールをインポートする。これによって、<literal>Unit</literal>、<literal>:*:</literal>、<literal>:+:</literal>の各データ型がスコープに導入される。(これらの型に明示的に言及しないならインポートは必要ない。インスタンス宣言を行うだけの場合など)</para>
 	</listitem>
       </itemizedlist>
     </sect2>
