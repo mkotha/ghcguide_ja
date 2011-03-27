@@ -699,6 +699,53 @@ $ cat foo.hspp</screen>
 
       <varlistentry>
         <term>
+          <option>-rtsopts</option>
+          <indexterm><primary><option>-rtsopts</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>このオプションは、コマンド行や<envar>GHCRTS</envar>で与えられるRTS制御オプションの処理に影響する。可能なのは以下の三つ。
+          </para>
+          <variablelist>
+            <varlistentry>
+              <term><option>-rtsopts=none</option></term>
+              <listitem>
+                <para>すべてのRTSオプションの処理を無効にする。<option>+RTS</option>がコマンド行内のいずれかの位置に現れた場合、プログラムはエラーメッセージを出力して異常終了する。<envar>GHCRTS</envar>環境変数が設定されている場合、プログラムは警告メッセージを出力し、<envar>GHCRTS</envar>を無視し、通常通りに実行される。</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><option>-rtsopts=some</option></term>
+              <listitem>
+                <para>&lsqb;これがデフォルトの設定である&rsqb;「安全」なRTSオプション(現在<option>-?</option>と<option>--info</option>のみ)だけを有効にする。これら以外のRTSオプションがコマンド行や<envar>GHCRTS</envar>で使われていた場合、プログラムはエラーメッセージを出力して異常終了する。
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><option>-rtsopts=all</option>, or
+ just <option>-rtsopts</option></term>
+              <listitem>
+                <para>コマンド行と<envar>GHCRTS</envar>の両方で、<emphasis>全て</emphasis>のRTSオプションの処理を有効にする。
+                </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+          <para>GHC 6.12.3以前では、全てのRTSオプションを処理するのがデフォルトだった。しかし、RTSオプションは任意のファイルに対するログデータの書き込みを、実行プログラムのコンテキストで許すので、セキュリティ上の問題が発生する余地がある。このため、GHC 7.0.1以降のデフォルトは<option>-rtsopts=some</option>である。
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-with-rtsopts</option>
+          <indexterm><primary><option>-with-rtsopts</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>このオプションは、RTSオプションのデフォルトをリンク時に設定できるようにする。例えば、<option>-with-rtsopts="-H128m"</option>はヒープのデフォルトの大きさを128MBにする。このプログラムのデフォルトのヒープサイズは、ユーザによって上書きされない限り、常にこれになる。(<option>-rtsopts</option>オプションの設定によっては、ユーザが実行時にRTSオプションを設定することができないかもしれない。その場合には<option>-with-rtsopts</option>がそれを設定する<emphasis>唯一</emphasis>の方法である。)
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
           <option>-fno-gen-manifest</option>
           <indexterm><primary><option>-fno-gen-manifest</option></primary>
           </indexterm>
