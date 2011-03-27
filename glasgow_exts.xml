@@ -4090,8 +4090,6 @@ GHCは、可能な最も内側の量化点を探したり<emphasis>しない</em
 <sect2 id="impredicative-polymorphism">
 <title>非叙述的多相
 </title>
-<para><emphasis>注意: GHC 6.12においてこの非叙述的多相の機能は非推奨であり、GHC 6.14では削除されるか、他のものに置き換えられるだろう。</emphasis></para>
-
 <para>GHCは<emphasis>非叙述的多相</emphasis>(impredicative polymorphism)を扱え、<option>-XImpredicativeTypes</option>で有効になる。これは、多相的関数を多相型で呼ぶことができ、データ構造に多相的な型をパラメタとして与えることができるということである。例を挙げる。
 <programlisting>
   f :: Maybe (forall a. [a] -> [a]) -> Maybe ([Int], [Char])
