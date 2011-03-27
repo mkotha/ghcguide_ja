@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<section id="runtime-control">
+<sect1 id="runtime-control">
   <title>コンパイル済みプログラムを実行する</title>
 
   <indexterm><primary>runtime control of Haskell programs</primary></indexterm>
@@ -10,7 +10,7 @@
 
   <para>RTSは、振る舞いを制御するための沢山のオプションを持っている。例えば、コンテキストスイッチの間隔やヒープのデフォルトの大きさを変えたり、ヒーププロファイルを有効にしたりである。こうしたオプションは色々な方法でランタイムシステムに渡すことができる。次の節(<xref linkend="setting-rts-options"/>)ではこれらの方法を記述し、それ以降の節ではRTSオプション自体について記述する。</para>
 
-  <section id="setting-rts-options">
+  <sect2 id="setting-rts-options">
     <title>RTSオプションを設定する</title>
     <indexterm><primary>RTS options, setting</primary></indexterm>
 
@@ -32,7 +32,7 @@
       </itemizedlist>
     </para>
 
-    <section id="rts-opts-cmdline">
+    <sect3 id="rts-opts-cmdline">
       <title>コマンド行でRTSオプションを設定する</title>
 
       <para>リンク時に<literal>-rtsopts</literal>フラグを適切に設定していたなら、プログラムを実行するときにRTSオプションをコマンド行で与えることができる。</para>
@@ -61,15 +61,15 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       <para><literal>+RTS -?</literal><indexterm><primary><option>-?</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
 
       <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
-    </section>
+    </sect3>
 
-    <section id="rts-opts-compile-time">
+    <sect3 id="rts-opts-compile-time">
       <title>コンパイル時にRTSオプションを設定する</title>
 
       <para><literal>-with-rtsopts</literal>フラグ(<xref linkend="options-linker"/>)を使うことで、プログラムのRTSオプションをコンパイル時に設定することができる。例として、<literal>-H128m -K64m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K64m"</literal>付きでリンクすればよい。</para>
-    </section>
+    </sect3>
 
-    <section id="rts-options-environment">
+    <sect3 id="rts-options-environment">
       <title><envar>RTSOPTS</envar>でRTSオプションを設定する</title>
 
       <indexterm><primary>RTS options</primary><secondary>from the environment</secondary></indexterm>
@@ -86,9 +86,9 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       <para><envar>GHCRTS</envar>環境変数から採られたRTSオプションはコマンド行からオプションを与えることで上書きできる。</para>
 
         <para>ヒント: あなたの環境に<literal>GHCRTS=-M2G</literal>のようなものを設定しておくと、Haskellプログラムがあなたのマシンの実メモリを超えて成長することを簡単に防ぐことができる。誤ってこういうことをするのは良くあることであり、OSがそのプロセスを殺すことを決めるまでマシンがゆっくりと地を這うことになる。(そして、ちゃんと正しいのを殺してくれるといいね)</para>
-      </section>
+      </sect3>
 
-    <section id="rts-hooks">
+    <sect3 id="rts-hooks">
       <title>RTSの振る舞いを変更するためのフック</title>
 
       <indexterm><primary>hooks</primary><secondary>RTS</secondary></indexterm>
@@ -145,10 +145,10 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       </variablelist>
 
       <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
-    </section>
-  </section>
+    </sect3>
+  </sect2>
 
-  <section id="rts-options-misc">
+  <sect2 id="rts-options-misc">
     <title>いろいろなRTSオプション</title>
 
     <variablelist>
@@ -191,9 +191,9 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
        </listitem>
      </varlistentry>
     </variablelist>
-  </section>
+  </sect2>
 
-  <section id="rts-options-gc">
+  <sect2 id="rts-options-gc">
     <title>ガベッジコレクタを制御するためのRTSオプション</title>
 
     <indexterm><primary>garbage collector</primary><secondary>options</secondary></indexterm>
@@ -573,15 +573,15 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       </varlistentry>
     </variablelist>
 
-  </section>
+  </sect2>
 
-  <section>
+  <sect2>
     <title>並行性と並列性に関するRTSオプション</title>
 
     <para>並行実行に関わるRTSオプションは<xref linkend="using-concurrent"/>で、並列計算に関わる物は<xref linkend="parallel-options"/>で、それぞれ説明されている。</para>
-  </section>
+  </sect2>
 
-  <section id="rts-profiling">
+  <sect2 id="rts-profiling">
     <title>プロファイルに関するRTSオプション</title>
 
     <para>プロファイルについてのランタイムオプションの大部分は、プログラムをプロファイル用にコンパイルした場合にのみ利用可能である。(<xref linkend="prof-compiler-options" />を見よ、またランタイムオプションについては<xref linkend="rts-options-heap-prof" />を見よ)。ただし、通常の非プロファイル版実行ファイルでも利用できるプロファイルオプションがただ一つ存在する。</para>
@@ -598,9 +598,9 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
         </listitem>
       </varlistentry>
     </variablelist>
-  </section>
+  </sect2>
 
-  <section id="rts-eventlog">
+  <sect2 id="rts-eventlog">
     <title>追跡情報を得る</title>
 
     <indexterm><primary>tracing</primary></indexterm>
@@ -651,9 +651,9 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
     <para>この追跡フレームワークで記録されるイベントを、デバッグオプション<option>-D<replaceable>x</replaceable></option>も生成する。デフォルトではこれらのイベントはテキストとして標準出力にダンプされる(<option>-D<replaceable>x</replaceable></option>によって<option>-v</option>が有効になる)が、<option>-l</option>を使うことでバイナリのイベント記録ファイルに保存することもできる。
     </para>
-  </section>
+  </sect2>
 
-  <section id="rts-options-debugging">
+  <sect2 id="rts-options-debugging">
     <title>ハックする者、デバッグする者、及び好奇心過剰な魂のためのRTSオプション</title>
 
     <indexterm><primary>RTS options, hacking/debugging</primary></indexterm>
@@ -733,9 +733,9 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       </varlistentry>
     </variablelist>
 
-  </section>
+  </sect2>
 
-  <section>
+  <sect2>
     <title>RTSに関する情報を取得する</title>
 
     <indexterm><primary>RTS</primary></indexterm>
@@ -847,8 +847,8 @@ $ ./a.out +RTS --info
 
     </variablelist>
 
-  </section>
-</section>
+  </sect2>
+</sect1>
 
 <!-- Emacs stuff:
      ;;; Local Variables: ***
