@@ -163,6 +163,7 @@
                 </a>
               </li>
             </xsl:if>
+            <!--
             <li class="comment">
               <a>
                 <xsl:attribute name="href">
@@ -176,6 +177,7 @@
                 <xsl:text>このページにコメントする</xsl:text>
               </a>
             </li>
+            -->
           </ul>
         </xsl:if>
       </div>
