@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-7-0-4">
+  <title>Release notes for version 7.0.4</title>
+
+  <para>
+    The significant changes to the various parts of the compiler
+    since 7.0.3 are listed below.
+  </para>
+
+  <itemizedlist>
+    <listitem>
+      <para>
+        A floating point regression in 7.0.3 affecting x86 has been
+        fixed (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5149">#5149</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        The GHCi linker now handles partially stripped object files (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5004">#5004</ulink>).
+        This fixes loading the ghc package in ghci when it's been
+        stripped, which is often the case in Linux distribution packages.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A bug which caused bad results from <literal>getCPUTime</literal>,
+        <literal>getClockTime</literal> and
+        <literal>getCurrentTime</literal> has been fixed
+        (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/4247">#4247</ulink>, <ulink url="http://hackage.haskell.org/trac/ghc/ticket/4970">#4970</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A runtime system bug with large heaps has been fixed (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5086">#5086</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A runtime system bug when heap profiling has been fixed (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5127">#5127</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A runtime system bug when heap profiling has been fixed (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5127">#5127</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A runtime system bug, which caused incorrect results and
+        segfaults when using FFI callbacks, has been fixed.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        A runtime system bug, which occasionally caused parallel programs
+        to &lt;&lt;loop&gt;&gt; when using
+        <literal>-feager-blackholing</literal>, has been fixed
+        (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5226">#5226</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Incorrect directory permissions when installing have been fixed (<ulink url="http://hackage.haskell.org/trac/ghc/ticket/4982">#4982</ulink>).
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Some improvements have been made to the new Cabal testsuite support.
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Cabal is now 1.10.2.0 (was 1.10.1.0).
+      </para>
+    </listitem>
+  </itemizedlist>
+
+</sect1>
+
