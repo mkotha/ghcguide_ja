@@ -28,5 +28,5 @@
 <!-- library locations are modified to point to the web,
      to make them suitable for www.kotha.net -->
 <!ENTITY libraryBaseLocation    "http://www.haskell.org/ghc/docs/latest/html/libraries/base-4.3.1.0">
-<!ENTITY libraryCabalLocation   "http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal-1.10.1.0">
+<!ENTITY libraryCabalLocation   "http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal-1.10.2.0">
 <!ENTITY libraryGhcPrimLocation "http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim-0.2.0.0">
