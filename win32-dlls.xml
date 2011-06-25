@@ -116,17 +116,28 @@ GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使
 </title>
 
 <para>
-<emphasis>HaskellライブラリをDLLにする機能はWindowsでは現在動作しない。我々は将来この機能を復活できるように望んでいる(<xref linkend="using-shared-libs"/>を見よ)。Haskellアプリケーション全体を単一のDLLとしてビルドするのには対応していることに注意。動作しないのは複数のDLLからなるHaskellプログラムである。GHCのWindows用配布物には静的ライブラリしか入っていない。</emphasis></para>
-
-<!--
-<para>
 <indexterm><primary>Dynamic link libraries, Win32</primary></indexterm>
 <indexterm><primary>DLLs, Win32</primary></indexterm>
-On Win32 platforms, the compiler is capable of both producing and using
-dynamic link libraries (DLLs) containing ghc-compiled code. This
-section shows you how to make use of this facility.
+Win32プラットフォームのGHCは、GHCでコンパイルされたコードを含むダイナミックリンクライブラリ(DLL)を作ったり使ったりすることができる。この節ではこの機能の使い方を示す。
 </para>
 
+<para>
+DLLを使ってできることは以下の二つがある。
+<itemizedlist>
+  <listitem>
+    <para>それぞれのHaskellパッケージをDLLにして、複数のHaskell実行ファイルが同じパッケージを使う場合にそれらがDLLファイルを共有できるようにする。(これに対して、ライブラリを静的リンクした場合、実質的にRTSと全てのライブラリの新しいコピーが各実行ファイルごとに作られることになる)
+    </para>
+    <para>これは、他のプラットフォームにおける動的リンクと同じであり、<xref linkend="using-shared-libs"/>で記述されている。
+    </para>
+  </listitem>
+  <listitem>
+    <para>完全なHaskellプログラムを一つのDLLとしてまとめ、外部の(普通Haskell製でない)プログラムから呼べるようにする。通常、これはプラグインなどを実装するのに使われる。以下はこれについて述べる。
+    </para>
+  </listitem>
+</itemizedlist>
+</para>
+
+<!--
 <para>
 Until recently, <command>strip</command> didn't work reliably on DLLs, so you
 should test your version with care, or make sure you have the latest
