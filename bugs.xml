@@ -5,7 +5,7 @@
   <sect1 id="vs-Haskell-defn">
     <title>Haskell&nbsp;98とGlasgow&nbsp;Haskell、言語上の不準拠点
 </title>
-    
+
     <indexterm><primary>GHC vs the Haskell 98 language</primary></indexterm>
     <indexterm><primary>Haskell 98 language vs GHC</primary></indexterm>
 
@@ -15,18 +15,18 @@
 
   <sect2 id="haskell98-divergence">
     <title>Haskell&nbsp;98からの逸脱</title>
-    
-      
+
+
     <sect3 id="infelicities-lexical">
       <title>字句的構文</title>
-      
+
       <itemizedlist>
 	<listitem>
           <para>GHCでは、修飾された識別子に関して、ある種の字句規則がHaskellレポートのものとわずかに異なっている。<replaceable>module</replaceable><literal>.</literal><replaceable>reservedop</replaceable>という形のもの、例えば<literal>M.\</literal>があったとき、<literal>M</literal>と<literal>.\</literal>という二つの字句要素ではなく、一つの修飾された演算子と解釈される。</para>
 	</listitem>
       </itemizedlist>
     </sect3>
-      
+
       <sect3 id="infelicities-syntax">
 	<title>文脈自由文法</title>
 	
@@ -73,7 +73,7 @@ main = do args &lt;- getArgs
 
       <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-XNoMonoPatBinds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
     </sect3>
-      
+
       <sect3 id="infelicities-Modules">
 	<title>モジュールシステムとインタフェースファイル</title>
 	
@@ -98,7 +98,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
 	  </listitem>
 	</varlistentry>
       </variablelist>
-      
+
     </sect3>
 
       <sect3 id="infelicities-Prelude">
@@ -186,12 +186,12 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
 	</listitem>
       </varlistentry>
     </variablelist>
-      
+
     </sect2>
 
   <sect2 id="ffi-divergence">
     <title>FFI仕様からの逸脱</title>
-    
+
     <variablelist>
       <varlistentry>
         <term><literal>hs_exit()</literal>の後に<literal>hs_init()</literal>を呼ぶことが許されない</term>
@@ -201,7 +201,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
       </varlistentry>
     </variablelist>
   </sect2>
-    
+
   </sect1>
 
 
@@ -234,10 +234,10 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
 	<para>再帰をデータ型にエンコードする標準的な方法を使うと、GHCのインライン化器を停止しないようにすることができる。</para>
 <programlisting>
   data U = MkU (U -> Bool)
-       
+
   russel :: U -> Bool
   russel u@(MkU p) = not $ p u
-  
+
   x :: Bool
   x = russel (MkU russel)
 </programlisting>
@@ -248,7 +248,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
       <listitem>
 	<para>インスタンス宣言が他のパッケージから取り込まれた場合、どれが「スコープにあるか」についてGHCは細かく管理しない。GHCがそのパッケージで見かけたインスタンス宣言は、そのパッケージ由来のモジュールがコマンド行の式で使われているかどうかに依らず、あらゆる場所でスコープに入る。このバグが影響するのは<option>--make</option>モードとGHCiだけである。</para>
       </listitem>
-      
+
       <listitem>
         <para>「存在型を持つレコード」の拡張(<xref linkend="existential-records"/>を参照)を使う場合、モジュールの分割コンパイルが壊れている。回避方法としては、毎回cleanして<option>--make</option>付きでビルドするか、6.7開発スナップショットを使うという方法しかない。詳細は<ulink url="http://hackage.haskell.org/trac/ghc/ticket/933">trac bug #933</ulink>を見よ。</para>
       </listitem>
@@ -265,7 +265,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
         <para>GHCiがそれぞれのモジュールのデフォルト設定を覚えておいて、「現在の」モジュール(どういう意味かは別にして)のものを使うようにした方が良いだろう。</para>
       </listitem>
 
-      <listitem> 
+      <listitem>
       <para>Windowsでは、GNU ld/BFDにバグがあり、0xffff個よりも多くの再配置のある、正しくないPEオブジェクトファイルを出力することがある。このバグに影響されたパッケージをGHCiがロードしようとすると、次のような形式のメッセージが得られる。
 <screen>
 Loading package javavm ... linking ... WARNING: Overflown relocation field (# relocs found: 30765)
