@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="extending-ghc">
+  <title>GHCを拡張する・ライブラリとして使う(GHC as a Library)</title>
+
+  <para>GHCは、ghcパッケージを通じてその内部APIを露出している。これを使うと、GHCのコンパイルドライバ全体を活用して、Haskellコードを分析したりコンパイルしたりするプログラムを書くことができる。またGHCは、コンパイル中にコンパイラプラグイン(GHCの内部中間表現Coreを見たり変更したりすることを許されたモジュール)をロードする能力を利用者に与える。プラグインは実験的な最適化や解析などに適しており、多くのよくある場合に関して、コンパイラの開発に参入する障壁を低くする。</para>
+
+  <para>加えて、GHCは軽量な注釈機構を用意しており、ソースコードにメタデータで注釈を付けて、後でコンパイラAPIまたはコンパイラプラグインを使って読み出すことができる。</para>
+
+  <sect1 id="annotation-pragmas">
+    <title>ソース注釈</title>
+
+    <para>注釈(annotation)とは、ソースコード中の識別子にデータを添付するための小さなプラグマである。添付したデータはコンパイル中残り続け、GHCをライブラリとして使ったり、コンパイラプラグインを書いたりする際に読んで利用することができる。</para>
+
+      <sect2 id="ann-pragma">
+        <title>値に注釈を付ける</title>
+        
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para>最上位の値の束縛には、<literal>ANN</literal>プラグマを使って、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスであるような任意の式を添付することができる。したがって、特に、通常の値(例えば<literal>take</literal>)だけでなくデータ構築子(例えば<literal>Just</literal>)にも<literal>ANN</literal>を使って注釈を付けられる。例として、<literal>foo</literal>という関数に<literal>Just "Hello"</literal>を注釈として付けるには、次のようにする。</para>
+        
+<programlisting>
+{-# ANN foo (Just "Hello") #-}
+foo = ...
+</programlisting>
+        
+        <para>
+        注釈の利用には、いくつか制限が課せられる。
+          <itemizedlist>
+            <listitem><para>注釈を付ける束縛は最上位のものでなければならない(つまり、ネストしていてはならない)</para></listitem>
+            <listitem><para>注釈を付ける束縛は現在のモジュールで宣言されていなければならない</para></listitem>
+            <listitem><para>注釈とする式は、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスのある型でなければならない。</para></listitem>
+            <listitem><para>注釈とする式には<ulink linkend="using-template-haskell">Template Haskellの段階制約</ulink>が課せられるので、例えばコンパイル中のモジュールの関数を走らせることはできない。</para>
+            
+            <para>正確には、注釈<literal>{-# ANN x e #-}</literal>が段階として正しい(well staged)のは、<literal>$(e)</literal>が段階として正しい場合であり、その場合に限る。(ただし、接合構文にかかる通常の型の制限は無視し、接合の中に接合を書くことについての通常の制限も無視する。<literal>$([|1|])</literal>は注釈として問題ない(冗長ではあるが)。)</para></listitem>
+          </itemizedlist>
+          
+          これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。
+        </para>
+        
+        <para>一方で、これらの制限を別にすれば、多くのことが許されており、完全に評価されていない式でさえも使うことができる。注釈式は、Template Haskellの接合がコンパイラによって評価されるのとちょうど同じように評価される。よって、この注釈は問題ない。</para>
+        
+<programlisting>
+{-# ANN f SillyAnnotation { foo = (id 10) + $([| 20 |]), bar = 'f } #-}
+f = ...
+</programlisting>
+      </sect2>
+      
+      <sect2 id="typeann-pragma">
+        <title>型に注釈を付ける</title>
+        
+        <indexterm><primary>ANN type</primary></indexterm>
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para><literal>ANN</literal>プラグマで型に注釈を付けるには、<literal>type</literal>キーワードを使う。例を示す。</para>
+        
+<programlisting>
+{-# ANN type Foo (Just "A `Maybe String' annotation") #-}
+data Foo = ...
+</programlisting>
+      </sect2>
+      
+      <sect2 id="modann-pragma">
+        <title>モジュールに注釈を付ける</title>
+        
+        <indexterm><primary>ANN module</primary></indexterm>
+        <indexterm><primary>ANN</primary></indexterm>
+        
+        <para><literal>ANN</literal>プラグマでモジュールに注釈を付けるには、<literal>module</literal>キーワードを使う。例を示す。</para>
+        
+<programlisting>
+{-# ANN module (Just "A `Maybe String' annotation") #-}
+</programlisting>
+      </sect2>
+  </sect1>
+
+  <sect1 id="ghc-as-a-library">
+    <title>GHCをライブラリとして使う</title>
+
+    <para><literal>ghc</literal>パッケージはGHCのフロントエンドの大部分をユーザに露出し、それを活用するプログラムを書けるようにする。実際、このライブラリはGHC内部のフロントエンドコンパイルドライバが使っているものと同じであるので、ソースコードをプログラム的にコンパイルしたり中身を読んだりするツールを書くことを可能にする。このような機能はIDEやリファクタリングツールの類を書くのに便利である。単純な例として、ここに示すのは、GHCがデフォルトで行うのとちょうど同じようにモジュールをコンパイルするプログラムである。</para>
+
+<programlisting>
+import GHC
+import GHC.Paths ( libdir )
+import DynFlags ( defaultDynFlags )
+ 
+main = 
+    defaultErrorHandler defaultDynFlags $ do
+      runGhc (Just libdir) $ do
+        dflags &lt;- getSessionDynFlags
+        setSessionDynFlags dflags
+        target &lt;- guessTarget "test_main.hs" Nothing
+        setTargets [target]
+        load LoadAllTargets
+</programlisting>
+
+    <para><literal>runGhc</literal>の引数はやや注意を要する。GHCは自分のライブラリ群を見付ける必要があるので、この引数は<literal>ghc --print-libdir</literal>で出力されるディレクトリでなければならない。ただし、このプログラムをコンパイルするのに使っているのと同じバージョンのGHCを使う必要がある。したがって上では、これを供給する<literal>ghc-paths</literal>パッケージを使っている。</para>
+
+    <para>これをコンパイルすると次のようになる。</para>
+
+<programlisting>
+$ cat test_main.hs
+main = putStrLn "hi"
+$ ghc -package ghc simple_ghc_api.hs
+[1 of 1] Compiling Main             ( simple_ghc_api.hs, simple_ghc_api.o )
+Linking simple_ghc_api ...
+$ ./simple_ghc_api
+$ ./test_main 
+hi
+$ 
+</programlisting>
+
+    <para>このAPIを使うことについてのさらなる情報および、サンプルとリファレンスについては、<ulink url="http://haskell.org/haskellwiki/GHC/As_a_library">Haskell.org wikiのこのページ</ulink>を見てほしい。</para>
+  </sect1>
+
+  <sect1 id="compiler-plugins">
+    <title>コンパイラプラグイン</title>
+
+    <para>GHCは、コンパイル時にコンパイラプラグインをロードする能力を持っている。この機能は<ulink url="http://gcc.gnu.org/wiki/plugins">GCC</ulink>が提供するものに似ており、利用者がプラグインを書いてコンパイルのパイプラインを確認/変更したり、GHCの中間言語であるCoreを変換したりできる。プラグインは実験的な分析や最適化に適しており、利用に際してGHCのソースコードを必要としない。</para>
+
+    <para>プラグインはC--を読んだり最適化したりできず、GCCと違ってパーサ/フロントエンドへの変更を実装することができない。これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。</para>
+
+    <sect2 id="using-compiler-plugins">
+      <title>コンパイラプラグインを使う</title>
+
+      <para>プラグインは、コマンド行中で<literal>-fplugin=<replaceable>module</replaceable></literal>を使うことて指定できる。ここで<replaceable>module</replaceable>は、プラグインをエクスポートする登録モジュールである。プラグインへの引数は、<literal>-fplugin-opt=<replaceable>module</replaceable>:<replaceable>args</replaceable></literal>というコマンド行オプションで指定できる。ここで<replaceable>args</replaceable>は<replaceable>module</replaceable>で提供されるプラグインに解釈される引数列である。</para>
+
+      <para>例として、<literal>foo-ghc-plugin</literal>パッケージの<literal>Foo.Plugin</literal>モジュールからエクスポートされているプラグインをロードして、それに引数"baz"を与えるには、このようにGHCを起動する。</para>
+
+<programlisting>
+$ ghc -fplugin Foo.Plugin -fplugin-opt Foo.Plugin:baz Test.hs
+[1 of 1] Compiling Main             ( Test.hs, Test.o )
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
+Loading package base ... linking ... done.
+Loading package ffi-1.0 ... linking ... done.
+Loading package foo-ghc-plugin-0.1 ... linking ... done.
+...
+Linking Test ...
+$ 
+</programlisting>
+
+      <para>プラグインは登録済みパッケージからエクスポートされるものなので、例えばcabalファイルに依存関係としてプラグインを書き、<literal>ghc-options</literal>フィールドでプラグインの引数を指定する、ということをしても問題ない。</para>
+    </sect2>
+
+    <sect2 id="writing-compiler-plugins">
+      <title>コンパイラプラグインを書く</title>
+
+      <para>プラグインとは、<literal>plugin</literal>という名前の<literal>GhcPlugins.Plugin</literal>型の識別子をエクスポートしているモジュールのことである。全てのプラグインは<literal>import GhcPlugins</literal>すべきである。コンパイルパイプラインとのインタフェースがそこで定義されているからである。</para>
+
+      <para><literal>Plugin</literal>は、実質的に、コンパイルパイプラインの中にコンパイル過程を設置する関数を保持している。デフォルトで、<literal>GhcPlugins.defaultPlugin</literal>という何もしない空プラグインが存在する。自分の設置関数を指定するには、レコード構文を使ってこの空プラグイン(訳注: のフィールド)を再定義するべきである。<literal>Plugin</literal>型が正確にどんなフィールドを持つかは変更の可能性があるので、プラグインが将来にわたってインタフェースへの影響を最小限にしつつ動作しつづけるようにするために、これが最良の方法である。</para>
+
+      <para><literal>Plugin</literal>は<literal>installCoreToDos</literal>というフィールドをエクスポートする。これは<literal>[CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]</literal>という型の関数である。<literal>CommandLineOption</literal>は実質的にただの<literal>String</literal>であり、<literal>CoreToDo</literal>は要するに<literal>Core -> Core</literal>型の関数である。<literal>CoreToDo</literal>は、あなたのパスに名前を与え、GHCを起動したときに全てのモジュールに対してそれを走らせる。</para>
+
+      <para>例として、何もせずに元のコンパイルパイプラインを返し、そして'Hello'と言うプラグインを掲げる。</para>
+
+<programlisting>
+module DoNothing.Plugin (plugin) where
+import GhcPlugins
+
+plugin :: Plugin
+plugin = defaultPlugin {
+  installCoreToDos = install
+  }
+
+install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
+install _ todo = do
+  reinitializeGlobals
+  putMsgS "Hello!"
+  return todo
+</programlisting>
+
+      <para>このプラグインをコンパイルしてパッケージとして登録(例えばcabalで)したなら、コマンド行で<literal>-fplugin=DoNothing.Plugin</literal>と指定するだけでこれを使うことができ、コンパイル中にGHCが'Hello'と言うのを確認できるはずである。</para>
+
+      <para>設置関数の先頭で<literal>reinitializeGlobals</literal>を呼んでいるのに十分注意すること。windowsのリンカが<literal>libghc</literal>を扱う際のバグにより、コンパイラプラグインが呼び出しの時点でGHCと同じ大域状態を持つことを正しく保証するのに、この呼び出しが必要である。<literal>reinitializeGlobals</literal>を使わないと、コンパイラプラグインが未初期化の状態を要求し、実行時にクラッシュすることがある。</para>
+
+      <para>将来的に、このリンクのバグが修正されれば、<literal>reinitializeGlobals</literal>は非推奨として警告対象になり、何もしないように変更されるだろう。</para>
+      <sect3 id="coretodo-in-more-detail">
+        <title><literal>CoreToDo</literal>についてより詳しく</title>
+
+        <para><literal>CoreToDo</literal>は実質的に、GHCがCoreに対して行うあらゆる種類の最適化過程を記述するデータ型である。過程には単純化、CSE、ベクトル化などがある。プラグインのためには専用の構築子、<literal>CoreDoPluginPass :: String -> PluginPass -> CoreToDo</literal>があり、自分で用意した過程をパイプラインに挿入する場合には常にこれを使うべきである。最初のパラメタはプラグインの名前であり、二番目は挿入したい過程である。</para>
+
+        <para><literal>CoreM</literal>はモナドであり、全てのCore最適化はその中に生息し、その中で動作する。</para>
+
+        <para>プラグインの設置関数(上の例では<literal>install</literal>)は、<literal>CoreToDo</literal>のリストを取り、<literal>CoreToDo</literal>のリストを返す。GHCは、モジュールのコンパイルを開始する前に、ロードするように指示された全てのプラグインを列挙し、全ての設置関数を走らせる。最初のリストはGHCが自分で指定したものである。全てのプラグインについてこれを行なった後、最終的なリストが最適化器に与えられ、単にリストを順番に辿ることで実行される。</para>
+
+        <para>設置関数を書く際には注意深くなければならない。なぜなら、執筆時点では、あなたが返したリストは疑われたり再確認されたりしないからである。以下のような設置関数を考える。</para>
+
+<programlisting>
+install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
+install _ _ = return []
+</programlisting>
+
+        <para>これが正しいのは間違いないが、やりたいことと違うのもまた間違いない。</para>
+      </sect3>
+
+      <sect3 id="manipulating-bindings">
+        <title>束縛を操作する</title>
+
+        <para>前の節では、<literal>CoreDoPluginPass</literal>が名前の他に<literal>PluginPass</literal>型の過程を取ることを見た。<literal>PluginPass</literal>は<literal>(ModGuts -> CoreM ModGuts)</literal>の別名である。<literal>ModGuts</literal>は、GHCが特定の時点でコンパイルしようとしている一つのモジュールを表現する型である。</para>
+
+        <para><literal>ModGuts</literal>は、モジュールの最上位の束縛のうち見て確かめられるものを全て保持する。これらの束縛の型は<literal>CoreBind</literal>であり、実質的に、名前が本体のコードに束縛されるのを表す。最上位の束縛は<literal>ModGuts</literal>の<literal>mg_binds</literal>フィールドにある。最上位の束縛を操作する過程は、このフィールドに沿って繰り返しを行い、更新した<literal>mg_binds</literal>フィールドを含む新しい<literal>ModGuts</literal>を返すだけで実装できる。これは非常によくあるケースなので、<literal>([CoreBind] -> CoreM [CoreBind])</literal>型の関数を<literal>(ModGuts -> CoreM ModGuts)</literal>型に持ち上げる<literal>bindsOnlyPass</literal>という関数が用意されている。</para>
+
+        <para>前節の例を続けて、コンパイル中モジュールの全ての非再帰的束縛の名前を表示するだけの単純なプラグインを書くことができる。</para>
+
+<programlisting>
+module SayNames.Plugin (plugin) where
+import GhcPlugins
+
+plugin :: Plugin
+plugin = defaultPlugin {
+  installCoreToDos = install
+  }
+
+install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
+install _ todo = do
+  reinitializeGlobals
+  return (CoreDoPluginPass "Say name" pass : todo)
+
+pass :: ModGuts -> CoreM ModGuts
+pass = bindsOnlyPass (mapM printBind)
+  where printBind :: CoreBind -> CoreM CoreBind
+        printBind bndr@(NonRec b _) = do
+          putMsgS $ "Non-recursive binding named " ++ showSDoc (ppr b)
+          return bndr 
+        printBind bndr = return bndr
+</programlisting>
+      </sect3>
+
+      <sect3 id="getting-annotations">
+        <title>注釈を使う</title>
+        
+        <para>先に注釈プラグマ(<xref linkend="annotation-pragmas"/>)について議論した際、コンパイラプラグインに追加の手掛かりや情報を与えるのにこれを使えることに言及した。モジュールの注釈はプラグインから取得できるが、そのためにはモジュールの<literal>ModGuts</literal>を通らなければならない。注釈は<literal>Data</literal>と<literal>Typeable</literal>の任意のインスタンスであり得るので、インタフェースから取得するデータの正しい型を指定する型注釈を与える必要がある。また、あなたのユーザが使う注釈型と、あなたのプラグインが使うものが同じであることを保証しなければならない。このため、可能ならば、コンパイラプラグインを提供するパッケージの一部として注釈も配布することを勧める。</para>
+
+        <para>あるbinderの注釈を取得するには、`getAnnotations`を使い、適切な型を指定すればよい。<literal>SomeAnn</literal>注釈の付いた全ての最上位・非再帰的な束縛の名前を表示する例を示す。</para>
+
+<programlisting>
+{-# LANGUAGE DeriveDataTypeable #-}
+module SayAnnNames.Plugin (plugin, SomeAnn) where
+import GhcPlugins
+import Control.Monad (when)
+import Data.Data
+import Data.Typeable
+
+data SomeAnn = SomeAnn deriving (Data, Typeable)
+
+plugin :: Plugin
+plugin = defaultPlugin {
+  installCoreToDos = install
+  }
+
+install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
+install _ todo = do
+  reinitializeGlobals
+  return (CoreDoPluginPass "Say name" pass : todo)
+
+pass :: ModGuts -> CoreM ModGuts
+pass g = mapM_ (printAnn g) (mg_binds g) >> return g
+  where printAnn :: ModGuts -> CoreBind -> CoreM CoreBind
+        printAnn guts bndr@(NonRec b _) = do
+          anns &lt;- annotationsOn guts b :: CoreM [SomeAnn]
+          when (not $ null anns) $ putMsgS $ "Annotated binding found: " ++  showSDoc (ppr b)
+          return bndr
+        printAnn _ bndr = return bndr
+
+annotationsOn :: Data a => ModGuts -> CoreBndr -> CoreM [a]
+annotationsOn guts bndr = do
+  anns &lt;- getAnnotations deserializeWithData guts
+  return $ lookupWithDefaultUFM anns [] (varUnique bndr)
+</programlisting>
+
+        <para>これらの内部APIなどの使いかたについて、より詳しくはGHC API説明書を参照のこと。</para>
+      </sect3>
+    </sect2>
+
+  </sect1>
+
+</chapter>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->
