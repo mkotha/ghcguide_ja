@@ -8,10 +8,10 @@
 
   <sect2 id="dumping-output">
     <title>コンパイラの中間構造を出力する</title>
-    
+
     <indexterm><primary>dumping GHC intermediates</primary></indexterm>
     <indexterm><primary>intermediate passes, output</primary></indexterm>
-    
+
     <variablelist>
       <varlistentry>
 	<term>
@@ -19,7 +19,7 @@
           <indexterm><primary><option>-ddump</option> options</primary></indexterm>
         </term>
 	<listitem>
-          <para>過程<literal>&lt;pass&gt;</literal>(頻繁に使われるものについては短縮形がある)の後にデバッグ情報を出力する。<option>-v5</option>を使うことでこれら全てを一遍に得られる。(<emphasis>大量の</emphasis>出力になる)。あるいは、<option>-v4</option>を使うことで大部分を得られる。特に重要なのは下記の通りである。</para>
+          <para>過程<literal>&lt;pass&gt;</literal>(頻繁に使われるものについては短縮形がある)の後にデバッグ情報を出力する。<option>-v5</option>を使うことでこれら全てを一遍に得られる。(<emphasis>大量の</emphasis>出力になる)。あるいは、<option>-v4</option>を使うことで大部分を得られる。<option>-ddump-to-file</option>を渡すと、標準出力の邪魔をするのを防ぐことができる。特に重要なのは下記の通りである。</para>
 
 	  <variablelist>
 	    <varlistentry>
@@ -110,6 +110,37 @@
 	      </term>
 	      <listitem>
                 <para>このモジュールで指定された書き換え規則を全て出力する。<xref linkend="controlling-rules"/>を見よ。</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-rule-firings</option>:
+                <indexterm><primary><option>-ddump-rule-firings</option></primary></indexterm>
+	      </term>
+	      <listitem>
+		<para>このモジュールで発火した規則の名前を全て出力する</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-rule-rewrites</option>:
+                <indexterm><primary><option>-ddump-rule-rewrites</option></primary></indexterm>
+	      </term>
+	      <listitem>
+		<para>このモジュールで発火した全ての規則に関して詳細な情報を出力する</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-vect</option>:
+                <indexterm><primary><option>-ddump-vect</option></primary></indexterm>
+	      </term>
+	      <listitem>
+		<para>ベクトル化器の出力を表示する。
+                </para>
 	      </listitem>
 	    </varlistentry>
 
@@ -265,7 +296,7 @@
 	  </variablelist>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>
           <option>-ddump-simpl-phases</option>:
@@ -317,6 +348,16 @@
       </varlistentry>
 
       <varlistentry>
+  <term>
+          <option>-ddump-vt-trace</option>
+          <indexterm><primary><option>-ddump-tv-trace</option></primary></indexterm>
+        </term>
+  <listitem>
+          <para>ベクトル化器が自分のやっていることを*事細かに*報告するようにする。</para>
+  </listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term>
           <option>-ddump-rn-trace</option>
           <indexterm><primary><option>-ddump-rn-trace</option></primary></indexterm>
@@ -354,7 +395,7 @@
 
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>
           <option>-dshow-passes</option>
@@ -362,6 +403,16 @@
         </term>
 	<listitem>
           <para>それぞれの過程を、発生するごとに表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-ddump-core-stats</option>
+          <indexterm><primary><option>-ddump-core-stats</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>最適化パイプラインの最後に、コア言語のプログラムの大きさの要約を一行で表示する。</para>
 	</listitem>
       </varlistentry>
 
@@ -384,44 +435,42 @@
           <para>デバッグ出力にはいくつかの「様式」がある。例えば型を表示する場合、「利用者」様式(デフォルト)では、コンパイラが内部的に持っている型についての情報をできる限りHaskellソースファイルの構文に従って表す。「デバッグ」様式で型が表示されるときには、明示的なforallが付き、変数には固有IDが添付される。(このため、一見同じだが実は異なるものを見分けることができる)。このフラグは、デバッグ出力を、より多弁なデバッグ様式で行うようにする。</para>
 	</listitem>
       </varlistentry>
+    </variablelist>
+  </sect2>
 
-      <varlistentry>
-	<term>
-          <option>-dsuppress-uniques</option>
-          <indexterm><primary><option>-dsuppress-uniques</option></primary></indexterm>
-        </term>
-	<listitem>
-	  <para>デバッグ出力中での固有子の印字を抑制する。これによって、表示結果が曖昧になることがある(例えば、ある「x」の出現がどこで束縛されているのか不明瞭になる)が、コンパイラを二回実行したときに出力に無駄な違いが出ることを減らせるので、<command>diff</command>をまともに適用できるようになる。<command>diff</command>によってどこを見るべきか分かったら、<option>-dsuppress-uniques</option>なしでもう一回試せばよい。</para>
-	</listitem>
-      </varlistentry>
+  <sect2 id="formatting dumps">
+    <title>出力の整形</title>
 
-      <varlistentry>
-	<term>
-          <option>-dsuppress-coercions</option>
-          <indexterm><primary><option>-dsuppress-coercions</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>Core出力の中で型変換(coercion)を表示するのを抑制し、Core出力が短かくなるようにする。</para>
-	</listitem>
-      </varlistentry>
+    <indexterm><primary>formatting dumps</primary></indexterm>
 
-      <varlistentry>
-	<term>
-          <option>-dsuppress-module-prefixes</option>
-          <indexterm><primary><option>-dsuppress-module-prefixes</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>Core出力の中でモジュール修飾接頭辞を表示するのを抑制し、読み易くする。</para>
-	</listitem>
-      </varlistentry>
-
+     <variablelist>
       <varlistentry>
 	<term>
           <option>-dppr-user-length</option>
           <indexterm><primary><option>-dppr-user-length</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>エラーメッセージ中では、式はある「深さ」までしか印字されず、それよりも深い部分式は省略符号で表される。このフラグはその深さを決定する。デフォルト値は5。</para>
+	  <para>エラーメッセージにおいて、式は決まった「深さ」までしか表示されず、それを超えた部分式は省略記号になる。このフラグはその深さを決めるものである。デフォルト値は5。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dppr-colsNNN</option>
+          <indexterm><primary><option>-dppr-colsNNN</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>デバッグ出力の幅を設定する。コードが過度に折り返されるときにはこれを使うと良い。例えば、<option>-dppr-cols200</option>。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dppr-case-as-let</option>
+          <indexterm><primary><option>-dppr-case-as-let</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>選択肢が一つであるcase式を、正格なlet式であるかのように表示する。これは、大量のボックス外しを伴うコードを扱うときに助けになる。</para>
 	</listitem>
       </varlistentry>
 
@@ -431,8 +480,88 @@
           <indexterm><primary><option>-dno-debug-output</option></primary></indexterm>
         </term>
         <listitem>
-          <para>要求されていないデバッグ出力を全て抑制する。GHCは、<literal>DEBUG</literal>オプション付きでビルドされている場合、ときどき開発者向きのデバッグ出力を吐き出す。この追加の出力は、テストフレームワークを混乱させて誤ったテスト失敗を引き起すことがあるので、それを無効にするためにこのフラグが用意されている。</para>
+          <para>求められた以外のデバッグ出力を全て抑制する。GHCが<literal>DEBUG</literal>オプション付きでビルドされているとき、開発者にとって興味のあるデバッグ情報を出力することがある。この余分な出力がテストフレームワークを混乱させ、嘘のテスト失敗を引き起すことがあるので、これを無効にするためにこのフラグがある。</para>
         </listitem>
+      </varlistentry>
+     </variablelist>
+
+  </sect2>
+
+  <sect2 id="supression">
+    <title>不要な情報を抑制する</title>
+
+    <indexterm><primary>suppression</primary></indexterm>
+
+    コア出力は大量の情報を含んでいる。用途によっては不要なものも含まれる。興味のない部分を抑制するには以下のフラグを使えば良い。
+    <variablelist>
+      <varlistentry>
+	<term>
+          <option>-dsuppress-all</option>
+          <indexterm><primary><option>-dsuppress-all</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>抑制可能なものを全て抑制する。ただし、出力を曖昧にすることが多いので、固有識別子だけは抑制しない。コードの全体的な構造を知りたいだけなら、ここから始めると良い。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-uniques</option>
+          <indexterm><primary><option>-dsuppress-uniques</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>固有子の印字を抑制する。これによって、表示結果が曖昧になることがある(例えば、ある「x」の出現がどこで束縛されているのか不明瞭になる)が、コンパイラを二回実行したときに出力に無駄な違いが出ることを減らせるので、<command>diff</command>をまともに適用できるようになる。<command>diff</command>によってどこを見るべきか分かったら、<option>-dsuppress-uniques</option>なしでもう一回試せばよい。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-idinfo</option>
+          <indexterm><primary><option>-dsuppress-idinfo</option></primary></indexterm>
+        </term>
+	<listitem>
+	  <para>識別子の束縛地点に表示される、その識別子の拡張情報を抑制する。これには正格性情報とインライン化器のテンプレートが含まれる。インライン化器のテンプレートを省くことで、このフラグを使うとコア出力の大きさを半減させることができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-module-prefixes</option>
+          <indexterm><primary><option>-dsuppress-module-prefixes</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>Core出力の中でモジュール修飾接頭辞を表示するのを抑制する。<constant>Data.List.length</constant>なら<constant>Data.List</constant>の部分である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-type-signatures</option>
+          <indexterm><primary><option>-dsuppress-type-signatures</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>型シグネチャの印字を抑制する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-type-applications</option>
+          <indexterm><primary><option>-dsuppress-type-applications</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>型適用の印字を抑制する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-dsuppress-coercions</option>
+          <indexterm><primary><option>-dsuppress-coercions</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>型適用の印字を抑制する。</para>
+	</listitem>
       </varlistentry>
     </variablelist>
   </sect2>
