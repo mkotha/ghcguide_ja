@@ -4,9 +4,9 @@
 <chapter id="ffi">
  <title>他言語関数インタフェース(FFI)</title>
 
-  <para>GHCは、Haskell 98の追補である他言語関数インタフェース1.0に(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>から得られる。</para>
+  <para>GHCは、Haskellの他言語関数インタフェースに(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>にあるHaskellレポートの一部である。</para>
 
-  <para>GHCでFFI対応を有効にするには、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>フラグを与えれば良い。</para>
+  <para>FFI対応はデフォルトで有効であるが、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>で明示的に有効にしたり無効にしたりできる。</para>
 
   <para>GHCには、FFI追補に対する固有の拡張がいくつか実装されている。これらの拡張は<xref linkend="ffi-ghcexts"/>に記述されている。これらの拡張を使ったプログラムは可搬でないということにどうか気を付けてほしい。従って、これらの機能は可能な限り避けるべきである。</para>
 
@@ -47,6 +47,38 @@
    foreign import prim "foo" foo :: ByteArray# -> (# Int#, Int# #)
 </programlisting>
 これは、GHCの内部的な呼び出し規約に従う、Cmmコードで書かれた関数群をインポートするのに使う。この機能は、専らGHC付属の中核ライブラリでのみ使うことを意図している。さらなる詳細はGHC開発者wikiを見よ。</para>
+      </sect2>
+
+      <sect2 id="ffi-interruptible">
+        <title>割り込み可能な他言語呼び出し</title>
+        <para>これは、他言語呼び出しと<literal>Control.Concurrent.throwTo</literal>の相互作用についてである。通常、<literal>throwTo</literal>の対象が他言語呼び出しの実行中であった場合、その呼び出しが完了するまで例外が発生せず、その間呼び出し元はブロックされる。これによってプログラムが無反応になることがあり、特にユーザによる割り込み(Control-Cなど)の場合に問題になる。Control-Cシグナルを受け取ったとき(Unixなら<literal>SIGINT</literal>)のデフォルトの振る舞いは、主スレッドに<literal>UserInterrupt</literal>例外を発生させることである。その時点で主スレッドが他言語関数呼び出しでブロックしていた場合、プログラムはユーザによる割り込みに反応しない。</para>
+
+        <para>問題は、一般に他言語呼び出しに安全に割り込むことが不可能であることだ。しかしなお、ブロックするシステムコールに割り込む方法をGHCは提供しており、UnixとWindowsの両方で、大部分のシステムコールに対して動作する。<literal>InterruptibleFFI</literal>拡張が有効である場合、他言語呼び出しに<literal>safe</literal>や<literal>unsafe</literal>の代わりに<literal>interruptible</literal>という注釈を付けることができる。
+
+<programlisting>
+foreign import ccall interruptible
+   "sleep" :: CUint -> IO CUint
+</programlisting>
+
+          <literal>interruptible</literal>は<literal>safe</literal>と同様に振る舞うが、違いは、interruptibleな他言語呼び出しを実行中のスレッドが<literal>throwTo</literal>の対象になった時、OS依存の機構を使って他言語呼び出しが返るように仕向けようとする点である。
+
+          <variablelist>
+            <varlistentry>
+              <term>Unixシステム</term>
+              <listitem>
+                <para>他言語呼び出しを行っているスレッドに対して<literal>SIGPIPE</literal>シグナルが送られる。通常、これだけでブロック中のシステムコールが<literal>EINTR</literal>で返ることになる(GHCはデフォルトで空のシグナルハンドラを<literal>SIGPIPE</literal>に設定し、デフォルトの挙動(プロセスの終了)を上書きしている)。</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>Windowsシステム</term>
+              <listitem>
+                <para>
+                  [Vista以降のみ] RTSが<literal>CancelSynchronousIO</literal>というWin32関数を呼び、これが、ブロックしているI/O操作をエラー<literal>ERROR_OPERATION_ABORTED</literal>で終了させる。</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+
+          システムコールが成功裏に割り込まれると、それはHaskellに返り、そこで例外が発生する。<literal>interruptible</literal>を使う場合には、この他言語関数<!-- 訳注: システムコールの間違いか-->の呼び出し元が、呼び出しが割り込まれた結果を正しく扱えるようになっているかどうか特に注意すること。Unixでは<literal>EINTR</literal>を常に検査するのは良い習慣であるが、Windowsでは通常は<literal>ERROR_OPERATION_ABORTED</literal>に対処することが必要でない。</para>
       </sect2>
   </sect1>
 
@@ -105,18 +137,11 @@ extern HsInt foo(HsInt a0);</programlisting>
 #include "foo_stub.h"
 #endif
 
-#ifdef __GLASGOW_HASKELL__
-extern void __stginit_Foo ( void );
-#endif
-
 int main(int argc, char *argv[])
 {
   int i;
 
   hs_init(&amp;argc, &amp;argv);
-#ifdef __GLASGOW_HASKELL__
-  hs_add_root(__stginit_Foo);
-#endif
 
   for (i = 0; i &lt; 5; i++) {
     printf("%d\n", foo(2500));
@@ -132,8 +157,7 @@ int main(int argc, char *argv[])
 
         <para><literal>hs_init()</literal>に<literal>argc</literal>と<literal>argv</literal>への参照を渡している。これは、RTSへの引数(つまり、<literal>+RTS...-RTS</literal>の間の引数)を抽出できるようにするためである。</para>
 
-	<para>次に、<function>hs_add_root</function><indexterm><primary><function>hs_add_root</function></primary></indexterm>を呼ぶ。これは、プログラム中のHaskellモジュールを初期化するのに必要なGHC固有のインタフェースである。<function>hs_add_root</function>の引数としては、プログラムの「ルート」モジュールの初期化関数の名前を与えるべきである。ルートモジュールとは、プログラム中の全てのモジュールを直接・間接にインポートするモジュールのことである。スタンドアローンのHaskellプログラムではこれは通常<literal>Main</literal>であるが、ライブラリからHaskellコードを使っているならそうとは限らない。(訳注: ライブラリ由来のHaskellコードを使っているならそうとは限らない、と訳すべき？原文は、..., but when you are using Haskell code from a library it may not be.)。プログラムに複数のルートモジュールがあるときは、それぞれについて一回ずつ<function>hs_add_root</function>を呼べば良い。モジュール<replaceable>M</replaceable>の初期化関数の名前は<literal>__stginit_<replaceable>M</replaceable></literal>であり、上記のコードのように外部関数シンボルとして宣言することができる。シンボル名は以下に示すZ符号化に従って変換せねばならないことに注意。</para>
-
+        <!-- 訳注: この表は削除されるべき -->
 	<informaltable>
 	 <tgroup cols="2" align="left" colsep="1" rowsep="1">
 	   <thead>
@@ -189,9 +213,6 @@ int main(int argc, char *argv[])
    // Haskellのラインタイムを初期化する
    hs_init(&amp;argc, &amp;argv);
 
-   // 全てのルートモジュールをHaskellに通知する
-   hs_add_root(__stginit_Foo);
-
    // その他の初期化があればここで行ない、
    // 問題があればfalseを返す
    return HS_BOOL_TRUE;
@@ -202,10 +223,10 @@ int main(int argc, char *argv[])
  }
 </programlisting>
 
-        <para>この初期化ルーチン<literal>mylib_init</literal>は、通常どおり<literal>hs_init()</literal>と<literal>hs_add_root()</literal>を呼んでHaskellランタイムを初期化する。これに対応する脱初期化関数<literal>mylib_end()</literal>は<literal>hs_exit()</literal>を呼んでランタイムを終了させる。</para>
+        <para>この初期化ルーチン<literal>mylib_init</literal>は、通常どおり<literal>hs_init()</literal>を呼んでHaskellランタイムを初期化する。これに対応する脱初期化関数<literal>mylib_end()</literal>は<literal>hs_exit()</literal>を呼んでランタイムを終了させる。</para>
       </sect3>
     </sect2>
-    
+
     <sect2 id="glasgow-foreign-headers">
       <title>ヘッダファイルを使う</title>
 
@@ -214,7 +235,7 @@ int main(int argc, char *argv[])
       <para>Cの関数は、通常、Cのヘッダファイルでプロトタイプを使って宣言される。前の版のGHC(6.8.3以前)は、Haskellコードから生成されるCソースファイルにヘッダを<literal>&num;include</literal>していたので、FFIを介して呼ばれるCの関数が正しい型で呼ばれているかどうかを、Cコンパイラが検査することができた。</para>
 
       <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、ネイティブコードのバックエンド(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、他言語呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された他言語呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に他言語呼び出しをインライン化できるようになるからである。</para>
-        
+
       <para><literal>-&num;include</literal>オプションはもはや非推奨であり、Cabalのパッケージ仕様の中の<literal>include-files</literal>フィールドは無視される。</para>
 
     </sect2>
@@ -258,34 +279,36 @@ int main(int argc, char *argv[])
 	</varlistentry>
       </variablelist>
     </sect2>
-    
+
     <sect2 id="ffi-threads">
       <title>マルチスレッドとFFI</title>
       <para>マルチスレッド環境でFFIを使うには、<option>-threaded</option>オプションを使う必要がある。(<xref linkend="options-linker" />を見よ)</para>
-        
+
       <sect3>
         <title>foreign importとマルチスレッド</title>
-        
+
         <para><literal>safe</literal>注釈(デフォルトである)付きで<literal>foreign import</literal>された関数を呼ぶ場合、プログラムが<option>-threaded</option>を使ってリンクされているなら、その呼び出しは他のHaskellスレッドと並行に走る。プログラムが<option>-threaded</option>なしでリンクされている時は、その呼び出しが返るまで他のHaskellスレッドはブロックされる。</para>
-        
+
         <para>つまり、長い時間が掛かったり、いつまでブロックするか分からない関数を他言語呼び出しする必要があるなら、それを<literal>safe</literal>にして、<option>-threaded</option>を使うべきである。ライブラリ関数の中には、内部的にこの種の呼び出しを行うものもある。その場合は説明文書にその旨記載があるべきである。</para>
         <para>複数のHaskellスレッドから他言語呼び出しを行い、しかも<option>-threaded</option>を使っている場合、呼んでいる外部コードがスレッドセーフでなければならないことに注意すること。特に、ある種のGUIライブラリはスレッドセーフでなく、GUIメソッドを一つのスレッドからのみ呼ぶことを要求する。この場合、GUI操作は一つのHaskellスレッドからのみ行い、さらに結合スレッド(<xref linkend="haskell-threads-and-os-threads"/>を見よ)を使う必要があるかもしれない。</para>
 
         <para>複数のHaskellスレッドでなされた他言語呼び出しは<emphasis>並列</emphasis>に実行され得るのに注意。これは<literal>+RTS -N</literal>フラグ(<xref linkend="parallel-options"/>)を使っていない場合でもそうである。<literal>+RTS -N</literal>フラグはHaskellスレッドの並列実行を制御するが、ある時点での他言語の呼び出しは、<literal>+RTS -N</literal>の値に関係なく、いくらでも多くなり得る。</para>
+
+        <para>呼び出しが<literal>interruptible</literal>とされており、プログラムがマルチスレッドの場合、そのHaskellスレッドが例外を受けた場合に呼び出しが中断され得る。この中断が発生する機構はプラットフォームによって異なるが、ブロックしているシステムコールが「割り込み発生」のエラーコードで即座に返ることが意図されている。使われているOSスレッドを破壊するものではない。さらなる詳細は<xref linkend="ffi-interruptible"/>を見よ。</para>
       </sect3>
 
       <sect3 id="haskell-threads-and-os-threads">
         <title>HaskellスレッドとOSスレッドの関係</title>
-        
+
         <para>通常、HaskellスレッドとOSスレッドの間に固定された関係はない。つまり、他言語呼び出しを行った時、それがどのOSスレッドで起こるのかは規定されない。さらに、一つのHaskellスレッドが複数回の呼び出しを行ったとしても、それが同じOSスレッド上で実行される保証はない。</para>
 
         <para>このことは普通問題にならないし、このおかげでGHCのランタイムシステムがOSのスレッド資源を効率的に利用することが可能になっている。しかし、例えばスレッドローカルな状態を使う外部コードを呼ぶ場合など、どのOSスレッドを使うかをもっと制御できた方が便利なことがある。このような場合のために、<emphasis>結合スレッド</emphasis>(bound thread)を用意している。これは、特定のOSスレッドに結び付けられたHaskellスレッドである。結合スレッドについての情報は、<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>モジュールの説明を見よ。</para>
       </sect3>
-      
+
       <sect3>
         <title>foreign exportとマルチスレッド</title>
-        
-        <para>プログラムが<option>-threaded</option>付きでリンクされているなら、<literal>foreign export</literal>された関数を複数のOSスレッドから並行に呼び出してよい。通常通り、ランタイムシステムは<literal>hs_init()</literal>と<literal>hs_add_root</literal>を呼んで初期化せねばならない。また、これらの呼び出しは<literal>foreign export</literal>されたいかなる関数をも呼び出す前に完了していなければならない。</para>
+
+        <para>プログラムが<option>-threaded</option>付きでリンクされているなら、<literal>foreign export</literal>された関数を複数のOSスレッドから並行に呼び出してよい。通常通り、ランタイムシステムは<literal>hs_init()</literal>を呼んで初期化せねばならない。また、これらの呼び出しは<literal>foreign export</literal>されたいかなる関数をも呼び出す前に完了していなければならない。</para>
       </sect3>
 
       <sect3 id="hs-exit">
