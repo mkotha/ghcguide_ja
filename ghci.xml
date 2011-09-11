@@ -4,7 +4,7 @@
   <indexterm><primary>GHCi</primary></indexterm>
   <indexterm><primary>interpreter</primary><see>GHCi</see></indexterm>
   <indexterm><primary>interactive</primary><see>GHCi</see></indexterm>
-  
+
   <para>GHCi<footnote><para>「i」はinteractiveのiである</para></footnote>はGHCの対話環境であり、Haskellの式を対話的に評価したりプログラムを解釈実行したりできる。もしあなたが<ulink url="http://www.haskell.org/hugs/">Hugs</ulink><indexterm><primary>Hugs</primary></indexterm>に慣れ親しんでいるなら、GHCiの扱いにもすぐに慣れるだろう。しかしながら、GHCiはコンパイル済みコードをロードすることができ、また、GHCが提供する言語拡張の全て<footnote><para>ただし、現在のところ、<literal>foreign export</literal>を除く</para></footnote>をサポートする。<indexterm><primary>FFI</primary><secondary>GHCi support</secondary></indexterm><indexterm><primary>Foreign Function Interface</primary><secondary>GHCi support</secondary></indexterm>また、GHCiには対話的デバッガが含まれている。(<xref linkend="ghci-debugger"/>を見よ)</para>
 
   <sect1 id="ghci-introduction">
@@ -19,7 +19,7 @@ Loading package ghc-prim ... linking ... done.
 Loading package integer-gmp ... linking ... done.
 Loading package base ... linking ... done.
 Loading package ffi-1.0 ... linking ... done.
-Prelude> 
+Prelude>
 </screen>
 
     <para>GHCiがプレリュードと標準ライブラリをロードするのに少し時間が掛かるかもしれない。その後、プロンプトが表示される。バナーにある通り、<literal>:?</literal>と打ち込めば利用可能なコマンド一覧と、それぞれの短い説明が得られる。</para>
@@ -35,10 +35,45 @@ Prelude> 1+2
 3
 Prelude> let x = 42 in x / 9
 4.666666666666667
-Prelude> 
+Prelude>
 </screen>
 
     <para>GHCiは行全体を一つの式だと解釈し、それを評価する。式は複数の行に渡っていてはいけない。エンターキーが押されると、GHCiは即座にそれを評価しようとする。</para>
+
+    <para>GHCiには複数行モード<indexterm><primary><literal>:set +m</literal></primary></indexterm>もあり、これは空行で終了する。次のように。</para>
+
+<screen>
+Prelude> :set +m
+Prelude> let x = 42 in x / 9
+Prelude|
+4.666666666666667
+Prelude>
+</screen>
+
+    <para>Haskellでは、<literal>let</literal>式には<literal>in</literal>が続く。しかし、GHCiでは、式は<literal>IO</literal>モナドの中でも解釈され得るので、付属する<literal>in</literal>文のない<literal>let</literal>束縛は、上の例のように空行を使うことで示すことができる。</para>
+
+    <para>複数行モードは、モナドな<literal>do</literal>文を複数入力するのに便利である。</para>
+
+<screen>
+Control.Monad.State> flip evalStateT 0 $ do
+Control.Monad.State| i &lt;- get
+Control.Monad.State| lift $ do
+Control.Monad.State|   putStrLn "Hello World!"
+Control.Monad.State|   print i
+Control.Monad.State|
+"Hello World!"
+0
+Control.Monad.State>
+</screen>
+
+   <para>ユーザは、複数行の対話の途中で中断してトップレベルプロンプトに戻ることができる。</para>
+
+<screen>
+Prelude> do
+Prelude| putStrLn "Hello, World!"
+Prelude| ^C
+Prelude>
+</screen>
   </sect1>
 
   <sect1 id="loading-source-files">
@@ -84,7 +119,7 @@ Ok, modules loaded: Main.
       <title>モジュールとファイル名</title>
       <indexterm><primary>modules</primary><secondary>and filenames</secondary></indexterm>
       <indexterm><primary>filenames</primary><secondary>of modules</secondary></indexterm>
-      
+
       <para>GHCは<replaceable>M</replaceable>というモジュールがどのファイルにあるかをどのようにして知るのだろうか。GHCiは、<literal><replaceable>M</replaceable>.hs</literal>または<literal><replaceable>M</replaceable>.lhs</literal>というファイルを探すのである。したがって、大部分のモジュールでは、モジュール名とファイル名は一致しなければならない。一致しなかった場合、GHCiはモジュールを見つけ出すことができない。</para>
 
       <para>この規則には一つの例外がある。<literal>:load</literal>を使ってプログラムをロードするとき、あるいは<literal>ghci</literal>を起動するとき、モジュール名ではなくファイル名を指定することができる。そのファイルはもし存在するならロードされ、どんなモジュールを含んでいても構わない。これは、複数の<literal>Main</literal>モジュールが一つのディレクトリにある場合、全てを<filename>Main.hs</filename>と呼ぶことはできないので、特に便利である。</para>
@@ -152,7 +187,7 @@ A                ( A.hs, interpreted )
 *Main> :reload
 Compiling D                ( D.hs, interpreted )
 Ok, modules loaded: A, B, C, D.
-*Main> 
+*Main>
 </screen>
 
     <para>Dがコンパイルされたが、この例ではDのソースは実際には変更されていないので、インタフェースは同じままであり、そのため再コンパイル検査器がA、B、Cを再コンパイルする必要がないと判断したことに注意。</para>
@@ -241,7 +276,7 @@ hello
       <title>プロンプトで<literal>do</literal>記法を使う</title>
       <indexterm><primary>do-notation</primary><secondary>in GHCi</secondary></indexterm>
       <indexterm><primary>statements</primary><secondary>in GHCi</secondary></indexterm>
-      
+
       <para>GHCiは実際には単なる式ではなく<firstterm>文</firstterm>を受け付ける。そのため、値や関数を名前に束縛して、後で式や文の中で使うことができる。</para>
 
       <para>GHCiプロンプトが受け付ける文の構文は、Haskellの<literal>do</literal>式における文の構文と全く同じである。ただし、こちらにはモナドの多重定義はない。プロンプトに入力される文は<literal>IO</literal>モナドの中になければならない。
@@ -352,7 +387,7 @@ Compiling Main             ( Main.hs, interpreted )
       <para><literal>*<replaceable>module</replaceable></literal>という構文は、プロンプトから入力される式に対して、<replaceable>module</replaceable>の完全なトップレベルスコープが使われるということを示している。<literal>*</literal>がない場合、そのモジュールがエクスポートしているものだけが可視である。</para>
 
       <para>扱えるのは単一のモジュールだけではない。GHCiは複数のモジュールのスコープを組み合わせることができ、このとき<literal>*</literal>が付く形式と<literal>*</literal>なしの形式を混合して用いることができる。GHCiはこれらのモジュールのスコープを全て組み合わせ、プロンプトのスコープとする。</para>
-      
+
       <para>注意: 技術的な理由から、GHCiは解釈実行されるモジュールについてしか<literal>*</literal>形式をサポートしない。そのため、コンパイル済みモジュールとパッケージのモジュールは、それがエクスポートしたものでしかプロンプトのスコープに寄与できない。GHCiがモジュールの解釈実行版を使っていることを確実にするには、モジュールをロードする時に<literal>*</literal>を加えれば良い。例えば<literal>:load *M</literal>のように。</para>
 
       <para>スコープは<literal>:module</literal>コマンドで操作できる。例えば、現在のスコープが<literal>Prelude</literal>なら、次のようにして、<literal>IO</literal>モジュールでエクスポートされたものをスコープに導入することができる。</para>
@@ -447,13 +482,13 @@ bar
 
       </sect3>
     </sect2>
-  
+
 
     <sect2>
       <title><literal>it</literal>という変数</title>
       <indexterm><primary><literal>it</literal></primary>
       </indexterm>
-      
+
       <para>式(正確には束縛文でない文)がプロンプトに入力されると、GHCiはその値を暗黙のうちに変数<literal>it</literal>に束縛する。例えば、次のようにである。</para>
 <screen>
 Prelude> 1+2
@@ -568,16 +603,16 @@ def = toEnum 0
         </listitem>
       </itemizedlist>
     </para>
-      
+
     <para>現在のところ、&ldquo;スタックトレース&rdquo;を得る手段は提供されていないが、追跡と履歴の機能が有用な次善策になっていて、これらで十分エラー発生時の状況を知ることができることがしばしばある。例えば、例外が投げられたときに自動的にブレークするようにすることが可能で、これは例外がコンパイル済みコードで投げられた場合にも有効である。(<xref linkend="ghci-debugger-exceptions"/>を見よ)</para>
-      
+
     <sect2 id="breakpoints">
       <title>ブレークポイントと変数内容の表示</title>
-      
+
       <para>全体を通した例としてクイックソートを使おう。コードは以下の通り。</para>
 
 <programlisting>
-qsort [] = [] 
+qsort [] = []
 qsort (a:as) = qsort left ++ [a] ++ qsort right
   where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
 
@@ -591,7 +626,7 @@ Prelude> :l qsort.hs
 [1 of 1] Compiling Main             ( qsort.hs, interpreted )
 Ok, modules loaded: Main.
 *Main>
-      </screen>       
+      </screen>
 
       <para>ここで、qsortの二番目の等式の右辺にブレークポイントを設定する。</para>
 
@@ -600,7 +635,7 @@ Ok, modules loaded: Main.
 Breakpoint 0 activated at qsort.hs:2:15-46
 *Main>
 </programlisting>
-      
+
       <para><literal>:break 2</literal>というコマンドは、直近にロードされたモジュール(この場合<literal>qsort.hs</literal>)の2行目にブレークポイントを設定するものである。詳しく言うと、その行にある完全な部分式のうちもっとも左側にあるものが選ばれる。この場合<literal>(qsort left ++ [a] ++ qsort right)</literal>である。</para>
 
       <para>さて、プログラムを実行してみる。</para>
@@ -618,8 +653,8 @@ right :: [a]
       <para>ブレークポイントのところで実行が中断した。プロンプトが変わって、現在ブレークポイントで停止していることと、その場所が<literal>[qsort.hs:2:15-46]</literal>であることを示している。場所をさらに明確にするには、<literal>:list</literal>コマンドが使える。</para>
 
 <programlisting>
-[qsort.hs:2:15-46] *Main> :list 
-1  qsort [] = [] 
+[qsort.hs:2:15-46] *Main> :list
+1  qsort [] = []
 2  qsort (a:as) = qsort left ++ [a] ++ qsort right
 3    where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
 </programlisting>
@@ -676,7 +711,7 @@ _t1 :: [Integer]
 [qsort.hs:2:15-46] *Main> a
 8
 </screen>
-      
+
       <para>式全体の評価を<literal>:force</literal>で強制するのでなく、個々のサンクを評価したい場合、Haskellの<literal>seq</literal>が便利かもしれない。例えば以下のように使う。</para>
 
 <screen>
@@ -699,7 +734,7 @@ _result :: [a]
 a :: a
 left :: [a]
 right :: [a]
-[qsort.hs:2:15-46] *Main> 
+[qsort.hs:2:15-46] *Main>
 </screen>
 
       <para>実行は、前に停止した点から再開し、同じブレークポイントで再び停止した。</para>
@@ -722,7 +757,7 @@ right :: [a]
    :break <replaceable>line</replaceable>
    :break <replaceable>line</replaceable> <replaceable>column</replaceable>
    :break <replaceable>module</replaceable> <replaceable>line</replaceable>
-   :break <replaceable>module</replaceable> <replaceable>line</replaceable> <replaceable>column</replaceable> 
+   :break <replaceable>module</replaceable> <replaceable>line</replaceable> <replaceable>column</replaceable>
 </screen>
 
       <para>ブレークポイントを特定の行に設定する場合、GHCiは、その行で始まりその行で終わる部分式の中でもっとも左側にあるものを選ぶ。二つの完全な部分式が同じカラムから始まっているなら長い方が選ばれる。その行に完全な部分式が無い場合、その行で始まっている部分式の中でもっとも左側にあるものが選ばれる。それも失敗したら、その行を一部か全部覆う式の中でもっとも右側にあるものが選ばれる。</para>
@@ -749,7 +784,7 @@ right :: [a]
 *Main> :delete 0
 *Main> :show breaks
 [1] Main qsort.hs:2:15-46
-</screen>        
+</screen>
 
         <para>全てのブレークポイントを一度に削除するには、<literal>:delete *</literal>とすれば良い。</para>
 
@@ -773,9 +808,9 @@ _result :: IO ()
 
 <screen>
 [qsort.hs:5:7-47] *Main> :list
-4  
+4
 5  main = print (qsort [8, 4, 0, 3, 1, 23, 11, 18])
-6  
+6
 [qsort.hs:5:7-47] *Main>
 </screen>
 
@@ -786,9 +821,9 @@ _result :: IO ()
 [qsort.hs:5:7-47] *Main> :step
 Stopped at qsort.hs:5:14-46
 _result :: [Integer]
-4  
+4
 5  main = print (qsort [8, 4, 0, 3, 1, 23, 11, 18])
-6  
+6
 [qsort.hs:5:14-46] *Main>
 </screen>
     </sect2>
@@ -837,13 +872,13 @@ _result :: [a]
       <para>追跡機能を使うには、式を<literal>:trace</literal>コマンドで評価する。例えば、<literal>qsort</literal>のベースケースにブレークポイントを設定する。</para>
 <screen>
 *Main&gt; :list qsort
-1  qsort [] = [] 
+1  qsort [] = []
 2  qsort (a:as) = qsort left ++ [a] ++ qsort right
 3    where (left,right) = (filter (&lt;=a) as, filter (&gt;a) as)
-4  
+4
 *Main&gt; :b 1
 Breakpoint 1 activated at qsort.hs:1:11-12
-*Main&gt; 
+*Main&gt;
 </screen>
 
       <para>そして、小さな<literal>qsort</literal>を追跡付きで実行する。</para>
@@ -886,7 +921,7 @@ Logged breakpoint at qsort.hs:3:24-38
 _result :: [a]
 as :: [a]
 a :: a
-[-1: qsort.hs:3:24-38] *Main> 
+[-1: qsort.hs:3:24-38] *Main>
 </screen>
 
       <para>履歴中の各ステップで局所変数が保存されており、通常同様に調べることができる。また、プロンプトが変わって、<literal>-1</literal>と、履歴中の最初のステップを調べていることを示している。<literal>:forward</literal>コマンドを使うと履歴中を前方に移動することができる。</para>
@@ -1050,7 +1085,7 @@ $ ghci -package readline
 GHCi, version 6.8.1: http://www.haskell.org/ghc/  :? for help
 Loading package base ... linking ... done.
 Loading package readline-1.0 ... linking ... done.
-Prelude> 
+Prelude>
 </screen>
 
       <para>起動中のGHCiから新しいパッケージをロードするには、次のコマンドが使える。</para>
@@ -1065,7 +1100,7 @@ Prelude> :set -package <replaceable>name</replaceable>
     <sect2>
       <title>追加のライブラリ</title>
       <indexterm><primary>libraries</primary><secondary>with GHCi</secondary></indexterm>
-      
+
       <para>追加のライブラリは、コマンド行から、通常の<literal>-l<replaceable>lib</replaceable></literal>オプションを使って指定することができる。(ここでいう<emphasis>ライブラリ</emphasis>とは、他言語のオブジェクトコードのライブラリのことである。Haskellソースのライブラリを使うことについては、<xref linkend="ghci-modules-filenames"/>を見よ)例えば、「m」ライブラリをロードするには、次のようにすれば良い。</para>
 
 <screen>
@@ -1195,7 +1230,7 @@ maybe :: b -> (a -> b) -> Maybe a -> b
 
       <varlistentry>
 	<term>
-          <literal>:continue</literal> 
+          <literal>:continue</literal>
           <indexterm><primary><literal>:continue</literal></primary></indexterm>
         </term>
 	<listitem><para>ブレークポイントで停止しているとき、実行中の評価を再開する。</para>
@@ -1262,7 +1297,7 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
-          <literal>:delete * | <replaceable>num</replaceable> ...</literal> 
+          <literal>:delete * | <replaceable>num</replaceable> ...</literal>
           <indexterm><primary><literal>:delete</literal></primary></indexterm>
         </term>
 	<listitem>
@@ -1282,7 +1317,7 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
-          <literal>:etags</literal> 
+          <literal>:etags</literal>
         </term>
 	<listitem>
 	  <para><literal>:ctags</literal>を見よ。</para>
@@ -1494,6 +1529,17 @@ bar
 
       <varlistentry>
 	<term>
+          <literal>:script</literal> <optional><replaceable>n</replaceable></optional>
+	  <literal>filename</literal>
+          <indexterm><primary><literal>:script</literal></primary></indexterm>
+        </term>
+	<listitem>
+    <para>ファイルの各行をGHCiコマンドとして実行する。このコマンドは、<literal>:set +m</literal>で設定される複数行モードと同時に使うことができる。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:set</literal> <optional><replaceable>option</replaceable>...</optional>
           <indexterm><primary><literal>:set</literal></primary></indexterm>
         </term>
@@ -1639,7 +1685,7 @@ bar
        </varlistentry>
       <varlistentry>
 	<term>
-          <literal>:step [<replaceable>expr</replaceable>]</literal> 
+          <literal>:step [<replaceable>expr</replaceable>]</literal>
           <indexterm><primary><literal>:step</literal></primary></indexterm>
         </term>
 	<listitem>
@@ -1722,6 +1768,16 @@ bar
       <variablelist>
 	<varlistentry>
 	  <term>
+            <literal>+m</literal>
+            <indexterm><primary><literal>+m</literal></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>複数行コマンドのパースを有効にする。複数行コマンドは、現在の行が閉じていないレイアウト文脈を含んでいる場合に受け付けられる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
             <literal>+r</literal>
             <indexterm><primary><literal>+r</literal></primary></indexterm>
             <indexterm><primary>CAFs</primary><secondary>in GHCi</secondary></indexterm>
@@ -1729,7 +1785,7 @@ bar
           </term>
 	  <listitem>
             <para>通常、ロードされたモジュールにあるトップレベルの式(CAF(Constant Applicative Form)、あるいは定作用形とも呼ばれる)を評価した結果は、複数回のプロンプトでの評価をまたがって保持される。<literal>+r</literal>を有効にすると、トップレベルの式の評価結果はすべて、一回の評価が終わるごとに捨てられるようになる(それでも一回の評価の<emphasis>間は</emphasis>保持される)。</para>
-	  
+	
             <para>このオプションは、評価済みのトップレベル式が大量のメモリを消費するときや、再現性のある実行性能の計測をしたいときに有用かもしれない。</para>
 	  </listitem>
 	</varlistentry>
@@ -1764,7 +1820,7 @@ bar
 <screen>
 Prelude> :set -fglasgow-exts
 </screen>
-      
+
       <para>GHCのコマンド行オプションのうち、<firstterm>動的な</firstterm>オプション(<xref linkend="flag-reference"/>の表を見よ)として設計されているものは全て、<literal>:set</literal>を使って有効にすることができる。オプションを無効にするには、逆の効果を持つオプションを有効にすれば良い。</para><indexterm><primary>dynamic</primary><secondary>options</secondary></indexterm>
 
 <screen>
@@ -1841,6 +1897,8 @@ Prelude> :set -fno-glasgow-exts
       </varlistentry>
     </variablelist>
 
+    <para><option>-ghci-script</option>オプションを使うと、別に<filename>.ghci</filename>を追加することができる。これらは通常の<filename>.ghci</filename>の後にロードされる。</para>
+
   </sect1>
 
   <sect1 id="ghci-obj">
@@ -1855,7 +1913,7 @@ Prelude> :set -fno-glasgow-exts
 
   <sect1 id="ghci-faq">
     <title>FAQと注意事項</title>
-    
+
     <variablelist>
       <varlistentry>
         <term>インタプリタがforeign export宣言のあるモジュールをロードできません！</term>
@@ -1912,7 +1970,7 @@ Prelude> :set -fno-glasgow-exts
           <para>
             GHCでは、デフォルトでstdoutハンドルは行バッファされている。しかし、GHCiでは、stdoutに関するバッファリングを無効にしてある。これが通常インタプリタに期待される振る舞いだからである。出力は生成されるとすぐに出現する。
           </para>
-          <para> 
+          <para>
             GHCと同様の行バッファの振る舞いが欲しい場合は、プログラムを次のように始めれば良い。
             <programlisting>
                main = do { hSetBuffering stdout LineBuffering; ... }
