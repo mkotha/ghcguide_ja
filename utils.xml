@@ -226,6 +226,30 @@ tags:
 	</varlistentry>
 
 	<varlistentry>
+	  <term><literal>-k</literal> or
+	  <literal>&ndash;&ndash;keep-files</literal></term>
+	  <listitem>
+	    <para>通常通りに進行するが、中間ファイルを全く削除しない。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>-x</literal> or
+	  <literal>&ndash;&ndash;cross-compile</literal></term>
+	  <listitem>
+	    <para>クロスコンパイルモードを起動する(<xref linkend="hsc2hs_cross"/>を見よ)。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><literal>&ndash;&ndash;cross-safe</literal></term>
+	  <listitem>
+            <para>.hscディレクティブを、<literal>--cross-compile</literal>モード(<xref linkend="hsc2hs_cross"/>を見よ)が対応しているものに限定する。これは、安全にクロスコンパイルされねばならない<literal>.hsc</literal>ファイルがあって、クロスコンパイル不能な要素が忍び込むことがないようにしたい場合に便利なはずである。</para>
+	  </listitem>
+	</varlistentry>
+
+
+	<varlistentry>
 	  <term><literal>-?</literal>または<literal>&ndash;&ndash;help</literal></term>
 	  <listitem>
 	    <para>利用可能なフラグの要約を表示し、成功裡に終了する。</para>
@@ -396,6 +420,22 @@ tags:
 
       <para>このようなマクロはソース中で直接定義することもできる。これは、<literal>#let</literal>マクロを使ったものに展開される<literal>#let</literal>風マクロを作るのに便利である。通常の<literal>#let</literal>では、マクロ名に<literal>hsc_</literal>を前置し、定義を<literal>printf</literal>の呼び出しで包む。</para>
 
+    </sect2>
+
+    <sect2 id="hsc2hs_cross">
+      <title>クロスコンパイル</title>
+
+      <para><command>hsc2hs</command>は通常、Cプログラムを作成し、コンパイルし、実行することで動作する。しかし、この方策はクロスコンパイルでは機能しない。この場合、Cコンパイラはホスト機械ではなくターゲット機械で走るコードを生成するからである。この状況のために、<command>hsc2hs --cross-compile</command>という特殊なモードがある。これは、コンパイルのみ(細かく言うと、コンパイルの成否)によって情報を抽出して.hsを生成することができる。
+      </para>
+
+      <para><literal>--cross-compile</literal>は、<literal>.hsc</literal>構文の一部にしか対応していない。以下のものは未対応である。
+      <itemizedlist>
+	<listitem><literal>#{const_str}</literal></listitem>
+	<listitem><literal>#{let}</literal></listitem>
+	<listitem><literal>#{def}</literal></listitem>
+	<listitem>自分で定義した構文要素</listitem>
+      </itemizedlist>
+      </para>
     </sect2>
 
   </sect1>
