@@ -60,7 +60,7 @@
 	    </varlistentry>
 
 	    <varlistentry>
-	      <term>加入:</term> 
+	      <term>加入:</term>
 	      <listitem>
 		<para><ulink
 	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-users"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-users</literal></ulink>.</para>
@@ -99,7 +99,7 @@
 	    </varlistentry>
 
 	    <varlistentry>
-	      <term>加入:</term> 
+	      <term>加入:</term>
 	      <listitem>
 		<para><ulink
 	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs</literal></ulink>.</para>
@@ -123,12 +123,12 @@
 	  </variablelist>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>cvs-ghc:</term>
 	<listitem>
 	  <para>ここには筋金入りのGHC開発者たちがたむろしている。GHCのdarcsリポジトリのコミットメッセージもこのリストに送られてくる。他のdarcsリポジトリについては他のメーリングリストがある(もっとも注目に値するのは<literal>cvs-liberaries</literal>だ)。</para>
-	  
+	
 	  <variablelist>
 	    <varlistentry>
 	      <term>リストのメールアドレス:</term>
@@ -138,7 +138,7 @@
 	    </varlistentry>
 
 	    <varlistentry>
-	      <term>加入:</term> 
+	      <term>加入:</term>
 	      <listitem>
 		<para><ulink
 	      url="http://www.haskell.org/mailman/listinfo/cvs-ghc"><literal>http://www.haskell.org/mailman/listinfo/cvs-ghc</literal></ulink>.</para>
@@ -200,7 +200,7 @@
 	  </indexterm>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
         <term>安定版スナップショット</term>
         <listitem>
@@ -227,13 +227,10 @@
 	</listitem>
       </varlistentry>
     </variablelist>
-    
+
     <para>あなたの手元のGHCのバージョン番号は、<literal>ghc</literal>を<literal>--version</literal>フラグ(<xref linkend="options-help"/>を見よ)つきで起動することで知ることができる。</para>
   </sect1>
 
-&relnotes4;
-&relnotes3;
-&relnotes2;
 &relnotes1;
 
 </chapter>
