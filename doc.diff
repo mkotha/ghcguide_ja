@@ -1,0 +1,3690 @@
+@@ -4823,18 +5092,14 @@
+       essentially giving a name to the functional dependency.  In class
+       instances, we define the type instances of FD families in accordance
+       with the class head.  Method signatures are not affected by that
+-      process. 
+-    </para>
+-    <para>
+-      NB: Equalities in superclass contexts are not fully implemented in
+-      GHC 6.10. 
++      process.
+     </para>
+   </sect3>
+ 
+-  <sect3 id-="ty-fams-in-instances">
++  <sect3 id="ty-fams-in-instances">
+     <title>Type families and instance declarations</title>
+-    <para>Type families require us to extend the rules for 
+-      the form of instance heads, which are given 
++    <para>Type families require us to extend the rules for
++      the form of instance heads, which are given
+       in <xref linkend="flexible-instance-head"/>.
+       Specifically:
+ <itemizedlist>
+@@ -4889,9 +5154,9 @@
+ <sect2 id="flexible-contexts"><title>The context of a type signature</title>
+ <para>
+ The <option>-XFlexibleContexts</option> flag lifts the Haskell 98 restriction
+-that the type-class constraints in a type signature must have the 
++that the type-class constraints in a type signature must have the
+ form <emphasis>(class type-variable)</emphasis> or
+-<emphasis>(class (type-variable type-variable ...))</emphasis>. 
++<emphasis>(class (type-variable type-variable ...))</emphasis>.
+ With <option>-XFlexibleContexts</option>
+ these type signatures are perfectly OK
+ <programlisting>
+@@ -4929,8 +5194,8 @@
+ 
+ A type variable <literal>a</literal> is "reachable" if it appears
+ in the same constraint as either a type variable free in
+-<literal>type</literal>, or another reachable type variable.  
+-A value with a type that does not obey 
++<literal>type</literal>, or another reachable type variable.
++A value with a type that does not obey
+ this reachability restriction cannot be used without introducing
+ ambiguity; that is why the type is rejected.
+ Here, for example, is an illegal type:
+@@ -5009,8 +5274,8 @@
+ <sect2 id="implicit-parameters">
+ <title>Implicit parameters</title>
+ 
+-<para> Implicit parameters are implemented as described in 
+-"Implicit parameters: dynamic scoping with static types", 
++<para> Implicit parameters are implemented as described in
++"Implicit parameters: dynamic scoping with static types",
+ J Lewis, MB Shields, E Meijer, J Launchbury,
+ 27th ACM Symposium on Principles of Programming Languages (POPL'00),
+ Boston, Jan 2000.
+@@ -5037,7 +5302,7 @@
+ can support dynamic binding. Basically, we express the use of a
+ dynamically bound variable as a constraint on the type. These
+ constraints lead to types of the form <literal>(?x::t') => t</literal>, which says "this
+-function uses a dynamically-bound variable <literal>?x</literal> 
++function uses a dynamically-bound variable <literal>?x</literal>
+ of type <literal>t'</literal>". For
+ example, the following expresses the type of a sort function,
+ implicitly parameterized by a comparison function named <literal>cmp</literal>.
+@@ -5047,11 +5312,11 @@
+ The dynamic binding constraints are just a new form of predicate in the type class system.
+ </para>
+ <para>
+-An implicit parameter occurs in an expression using the special form <literal>?x</literal>, 
++An implicit parameter occurs in an expression using the special form <literal>?x</literal>,
+ where <literal>x</literal> is
+-any valid identifier (e.g. <literal>ord ?x</literal> is a valid expression). 
++any valid identifier (e.g. <literal>ord ?x</literal> is a valid expression).
+ Use of this construct also introduces a new
+-dynamic-binding constraint in the type of the expression. 
++dynamic-binding constraint in the type of the expression.
+ For example, the following definition
+ shows how we can define an implicitly parameterized sort function in
+ terms of an explicitly parameterized <literal>sortBy</literal> function:
+@@ -5084,8 +5349,8 @@
+ <para>
+ An implicit-parameter type constraint differs from other type class constraints in the
+ following way: All uses of a particular implicit parameter must have
+-the same type. This means that the type of <literal>(?x, ?x)</literal> 
+-is <literal>(?x::a) => (a,a)</literal>, and not 
++the same type. This means that the type of <literal>(?x, ?x)</literal>
++is <literal>(?x::a) => (a,a)</literal>, and not
+ <literal>(?x::a, ?x::b) => (a, b)</literal>, as would be the case for type
+ class constraints.
+ </para>
+@@ -5110,7 +5375,7 @@
+    g s = show (read s)
+ </programlisting>
+ Here, <literal>g</literal> has an ambiguous type, and is rejected, but <literal>f</literal>
+-is fine.  The binding for <literal>?x</literal> at <literal>f</literal>'s call site is 
++is fine.  The binding for <literal>?x</literal> at <literal>f</literal>'s call site is
+ quite unambiguous, and fixes the type <literal>a</literal>.
+ </para>
+ </sect3>
+@@ -5130,8 +5395,8 @@
+ </para>
+ <para>
+ A group of implicit-parameter bindings may occur anywhere a normal group of Haskell
+-bindings can occur, except at top level.  That is, they can occur in a <literal>let</literal> 
+-(including in a list comprehension, or do-notation, or pattern guards), 
++bindings can occur, except at top level.  That is, they can occur in a <literal>let</literal>
++(including in a list comprehension, or do-notation, or pattern guards),
+ or a <literal>where</literal> clause.
+ Note the following points:
+ <itemizedlist>
+@@ -5139,10 +5404,10 @@
+ An implicit-parameter binding group must be a
+ collection of simple bindings to implicit-style variables (no
+ function-style bindings, and no type signatures); these bindings are
+-neither polymorphic or recursive.  
++neither polymorphic or recursive.
+ </para></listitem>
+ <listitem><para>
+-You may not mix implicit-parameter bindings with ordinary bindings in a 
++You may not mix implicit-parameter bindings with ordinary bindings in a
+ single <literal>let</literal>
+ expression; use two nested <literal>let</literal>s instead.
+ (In the case of <literal>where</literal> you are stuck, since you can't nest <literal>where</literal> clauses.)
+@@ -5255,7 +5520,7 @@
+ Linear implicit parameters are just like ordinary implicit parameters,
+ except that they are "linear"; that is, they cannot be copied, and
+ must be explicitly "split" instead.  Linear implicit parameters are
+-written '<literal>%x</literal>' instead of '<literal>?x</literal>'.  
++written '<literal>%x</literal>' instead of '<literal>?x</literal>'.
+ (The '/' in the '%' suggests the split!)
+ </para>
+ <para>
+@@ -5264,7 +5529,7 @@
+     import GHC.Exts( Splittable )
+ 
+     data NameSupply = ...
+-    
++
+     splitNS :: NameSupply -> (NameSupply, NameSupply)
+     newName :: NameSupply -> Name
+ 
+@@ -5279,7 +5544,7 @@
+ 		      env' = extend env x x'
+     ...more equations for f...
+ </programlisting>
+-Notice that the implicit parameter %ns is consumed 
++Notice that the implicit parameter %ns is consumed
+ <itemizedlist>
+ <listitem> <para> once by the call to <literal>newName</literal> </para> </listitem>
+ <listitem> <para> once by the recursive call to <literal>f</literal> </para></listitem>
+@@ -5313,14 +5578,14 @@
+ <programlisting>
+ 	g :: (Splittable a, %ns :: a) => b -> (b,a,a)
+ </programlisting>
+-The <literal>Splittable</literal> class is built into GHC.  It's exported by module 
++The <literal>Splittable</literal> class is built into GHC.  It's exported by module
+ <literal>GHC.Exts</literal>.
+ </para>
+ <para>
+ Other points:
+ <itemizedlist>
+-<listitem> <para> '<literal>?x</literal>' and '<literal>%x</literal>' 
+-are entirely distinct implicit parameters: you 
++<listitem> <para> '<literal>?x</literal>' and '<literal>%x</literal>'
++are entirely distinct implicit parameters: you
+   can use them together and they won't interfere with each other. </para>
+ </listitem>
+ 
+@@ -5353,7 +5618,7 @@
+ </programlisting>
+ But now the name supply is consumed in <emphasis>three</emphasis> places
+ (the two calls to newName,and the recursive call to f), so
+-the result is utterly different.  Urk!  We don't even have 
++the result is utterly different.  Urk!  We don't even have
+ the beta rule.
+ </para>
+ <para>
+@@ -5402,7 +5667,7 @@
+ Yikes!
+ </para><para>
+ You may say that this is a good reason to dislike linear implicit parameters
+-and you'd be right.  That is why they are an experimental feature. 
++and you'd be right.  That is why they are an experimental feature.
+ </para>
+ </sect3>
+ 
+@@ -5415,7 +5680,7 @@
+ 
+ <para>
+ Haskell infers the kind of each type variable.  Sometimes it is nice to be able
+-to give the kind explicitly as (machine-checked) documentation, 
++to give the kind explicitly as (machine-checked) documentation,
+ just as it is nice to give a type signature for a function.  On some occasions,
+ it is essential to do so.  For example, in his paper "Restricted Data Types in Haskell" (Haskell Workshop 1999)
+ John Hughes had to define the data type:
+@@ -5480,9 +5745,9 @@
+ </title>
+ 
+ <para>
+-GHC's type system supports <emphasis>arbitrary-rank</emphasis> 
++GHC's type system supports <emphasis>arbitrary-rank</emphasis>
+ explicit universal quantification in
+-types. 
++types.
+ For example, all the following types are legal:
+ <programlisting>
+     f1 :: forall a b. a -> b -> a
+@@ -5616,11 +5881,11 @@
+ <programlisting>
+     a1 :: T Int
+     a1 = T1 (\xy->x) 3
+-    
++
+     a2, a3 :: Swizzle
+     a2 = MkSwizzle sort
+     a3 = MkSwizzle reverse
+-    
++
+     a4 :: MonadT Maybe
+     a4 = let r x = Just x
+ 	     b m k = case m of
+@@ -5687,7 +5952,7 @@
+ that x's type has no foralls in it</emphasis>.
+ </para>
+ <para>
+-What does it mean to "provide" an explicit type for x?  You can do that by 
++What does it mean to "provide" an explicit type for x?  You can do that by
+ giving a type signature for x directly, using a pattern type signature
+ (<xref linkend="scoped-type-variables"/>), thus:
+ <programlisting>
+@@ -5723,10 +5988,10 @@
+ <title>Implicit quantification</title>
+ 
+ <para>
+-GHC performs implicit quantification as follows.  <emphasis>At the top level (only) of 
++GHC performs implicit quantification as follows.  <emphasis>At the top level (only) of
+ user-written types, if and only if there is no explicit <literal>forall</literal>,
+ GHC finds all the type variables mentioned in the type that are not already
+-in scope, and universally quantifies them.</emphasis>  For example, the following pairs are 
++in scope, and universally quantifies them.</emphasis>  For example, the following pairs are
+ equivalent:
+ <programlisting>
+   f :: a -> a
+@@ -5771,8 +6036,8 @@
+ <sect2 id="impredicative-polymorphism">
+ <title>Impredicative polymorphism
+ </title>
+-<para>GHC supports <emphasis>impredicative polymorphism</emphasis>, 
+-enabled with <option>-XImpredicativeTypes</option>.  
++<para>GHC supports <emphasis>impredicative polymorphism</emphasis>,
++enabled with <option>-XImpredicativeTypes</option>.
+ This means
+ that you can call a polymorphic function at a polymorphic type, and
+ parameterise data structures over polymorphic types.  For example:
+@@ -5788,7 +6053,7 @@
+ <para>The technical details of this extension are described in the paper
+ <ulink url="http://research.microsoft.com/%7Esimonpj/papers/boxy/">Boxy types:
+ type inference for higher-rank types and impredicativity</ulink>,
+-which appeared at ICFP 2006.  
++which appeared at ICFP 2006.
+ </para>
+ </sect2>
+ 
+@@ -5810,9 +6075,9 @@
+ because of the explicit <literal>forall</literal> (<xref linkend="decl-type-sigs"/>).
+ The type variables bound by a <literal>forall</literal> scope over
+ the entire definition of the accompanying value declaration.
+-In this example, the type variable <literal>a</literal> scopes over the whole 
++In this example, the type variable <literal>a</literal> scopes over the whole
+ definition of <literal>f</literal>, including over
+-the type signature for <varname>ys</varname>. 
++the type signature for <varname>ys</varname>.
+ In Haskell 98 it is not possible to declare
+ a type for <varname>ys</varname>; a major benefit of scoped type variables is that
+ it becomes possible to do so.
+@@ -5854,7 +6119,7 @@
+ In Haskell, a programmer-written type signature is implicitly quantified over
+ its free type variables (<ulink
+ url="http://www.haskell.org/onlinereport/decls.html#sect4.1.2">Section
+-4.1.2</ulink> 
++4.1.2</ulink>
+ of the Haskell Report).
+ Lexically scoped type variables affect this implicit quantification rules
+ as follows: any type variable that is in scope is <emphasis>not</emphasis> universally
+@@ -5893,11 +6158,11 @@
+   g (x:xs) = xs ++ [ x :: a ]
+ </programlisting>
+ This program will be rejected, because "<literal>a</literal>" does not scope
+-over the definition of "<literal>f</literal>", so "<literal>x::a</literal>"
++over the definition of "<literal>g</literal>", so "<literal>x::a</literal>"
+ means "<literal>x::forall a. a</literal>" by Haskell's usual implicit
+ quantification rules.
+ </para></listitem>
+-<listitem><para> The signature gives a type for a function binding or a bare variable binding, 
++<listitem><para> The signature gives a type for a function binding or a bare variable binding,
+ not a pattern binding.
+ For example:
+ <programlisting>
+@@ -5907,7 +6172,7 @@
+   f2 :: forall a. [a] -> [a]
+   f2 = \(x:xs) -> xs ++ [ x :: a ]   -- OK
+ 
+-  f3 :: forall a. [a] -> [a] 
++  f3 :: forall a. [a] -> [a]
+   Just f3 = Just (\(x:xs) -> xs ++ [ x :: a ])   -- Not OK!
+ </programlisting>
+ The binding for <literal>f3</literal> is a pattern binding, and so its type signature
+@@ -5929,8 +6194,8 @@
+ <programlisting>
+   f = runST ( (op >>= \(x :: STRef s Int) -> g x) :: forall s. ST s Bool )
+ </programlisting>
+-Here, the type signature <literal>forall a. ST s Bool</literal> brings the 
+-type variable <literal>s</literal> into scope, in the annotated expression 
++Here, the type signature <literal>forall s. ST s Bool</literal> brings the
++type variable <literal>s</literal> into scope, in the annotated expression
+ <literal>(op >>= \(x :: STRef s Int) -> g x)</literal>.
+ </para>
+ 
+@@ -5940,7 +6205,7 @@
+ <title>Pattern type signatures</title>
+ <para>
+ A type signature may occur in any pattern; this is a <emphasis>pattern type
+-signature</emphasis>. 
++signature</emphasis>.
+ For example:
+ <programlisting>
+   -- f and g assume that 'a' is already in scope
+@@ -5967,7 +6232,7 @@
+ </programlisting>
+ Here, the pattern signatures for <literal>ys</literal> and <literal>zs</literal>
+ are fine, but the one for <literal>v</literal> is not because <literal>b</literal> is
+-not in scope. 
++not in scope.
+ </para>
+ <para>
+ However, in all patterns <emphasis>other</emphasis> than pattern bindings, a pattern
+@@ -5990,7 +6255,7 @@
+ existentially-bound type variable.
+ </para>
+ <para>
+-When a pattern type signature binds a type variable in this way, GHC insists that the 
++When a pattern type signature binds a type variable in this way, GHC insists that the
+ type variable is bound to a <emphasis>rigid</emphasis>, or fully-known, type variable.
+ This means that any user-written type signature always stands for a completely known type.
+ </para>
+@@ -6000,7 +6265,7 @@
+ could not name existentially-bound type variables in subsequent type signatures.
+ </para>
+ <para>
+-This is (now) the <emphasis>only</emphasis> situation in which a pattern type 
++This is (now) the <emphasis>only</emphasis> situation in which a pattern type
+ signature is allowed to mention a lexical variable that is not already in
+ scope.
+ For example, both <literal>f</literal> and <literal>g</literal> would be
+@@ -6010,7 +6275,7 @@
+ 
+ </sect3>
+ 
+-<!-- ==================== Commented out part about result type signatures 
++<!-- ==================== Commented out part about result type signatures
+ 
+ <sect3 id="result-type-sigs">
+ <title>Result type signatures</title>
+@@ -6028,7 +6293,7 @@
+   h xs = case xs of
+ 	    (y:ys) :: a -> y
+ </programlisting>
+-The final <literal>:: [a]</literal> after the patterns of <literal>f</literal> gives the type of 
++The final <literal>:: [a]</literal> after the patterns of <literal>f</literal> gives the type of
+ the result of the function.  Similarly, the body of the lambda in the RHS of
+ <literal>g</literal> is <literal>[Int]</literal>, and the RHS of the case
+ alternative in <literal>h</literal> is <literal>a</literal>.
+@@ -6094,12 +6359,12 @@
+ <literal>let</literal> or <literal>where</literal>) should be sorted into
+ strongly-connected components, and then type-checked in dependency order
+ (<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.1">Haskell
+-Report, Section 4.5.1</ulink>).  
++Report, Section 4.5.1</ulink>).
+ As each group is type-checked, any binders of the group that
+ have
+ an explicit type signature are put in the type environment with the specified
+ polymorphic type,
+-and all others are monomorphic until the group is generalised 
++and all others are monomorphic until the group is generalised
+ (<ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.2">Haskell Report, Section 4.5.2</ulink>).
+ </para>
+ 
+@@ -6115,7 +6380,7 @@
+ <programlisting>
+   f :: Eq a =&gt; a -> Bool
+   f x = (x == x) || g True || g "Yes"
+-  
++
+   g y = (y &lt;= y) || f True
+ </programlisting>
+ This is rejected by Haskell 98, but under Jones's scheme the definition for
+@@ -6132,7 +6397,7 @@
+ </para>
+ 
+ <para>
+-The same refined dependency analysis also allows the type signatures of 
++The same refined dependency analysis also allows the type signatures of
+ mutually-recursive functions to have different contexts, something that is illegal in
+ Haskell 98 (Section 4.5.2, last sentence).  With
+ <option>-XRelaxedPolyRec</option>
+@@ -6142,7 +6407,7 @@
+ <programlisting>
+   f :: Eq a =&gt; a -> Bool
+   f x = (x == x) || g True
+-  
++
+   g :: Ord a =&gt; a -> Bool
+   g y = (y &lt;= y) || f True
+ </programlisting>
+@@ -6153,7 +6418,7 @@
+ <title>Monomorphic local bindings</title>
+ <para>
+ We are actively thinking of simplifying GHC's type system, by <emphasis>not generalising local bindings</emphasis>.
+-The rationale is described in the paper 
++The rationale is described in the paper
+ <ulink url="http://research.microsoft.com/~simonpj/papers/constraints/index.htm">Let should not be generalised</ulink>.
+ </para>
+ <para>
+@@ -6166,14 +6431,14 @@
+ 
+ </sect1>
+ <!-- ==================== End of type system extensions =================  -->
+-  
++
+ <!-- ====================== TEMPLATE HASKELL =======================  -->
+ 
+ <sect1 id="template-haskell">
+ <title>Template Haskell</title>
+ 
+ <para>Template Haskell allows you to do compile-time meta-programming in
+-Haskell.  
++Haskell.
+ The background to
+ the main technical innovations is discussed in "<ulink
+ url="http://research.microsoft.com/~simonpj/papers/meta-haskell/">
+@@ -6184,23 +6449,23 @@
+ Template Haskell at <ulink url="http://www.haskell.org/haskellwiki/Template_Haskell">
+ http://www.haskell.org/haskellwiki/Template_Haskell</ulink>, and that is the best place to look for
+ further details.
+-You may also 
++You may also
+ consult the <ulink
+ url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">online
+-Haskell library reference material</ulink> 
++Haskell library reference material</ulink>
+ (look for module <literal>Language.Haskell.TH</literal>).
+-Many changes to the original design are described in 
++Many changes to the original design are described in
+       <ulink url="http://research.microsoft.com/~simonpj/papers/meta-haskell/notes2.ps">
+ Notes on Template Haskell version 2</ulink>.
+ Not all of these changes are in GHC, however.
+ </para>
+ 
+-<para> The first example from that paper is set out below (<xref linkend="th-example"/>) 
+-as a worked example to help get you started. 
++<para> The first example from that paper is set out below (<xref linkend="th-example"/>)
++as a worked example to help get you started.
+ </para>
+ 
+ <para>
+-The documentation here describes the realisation of Template Haskell in GHC.  It is not detailed enough to 
++The documentation here describes the realisation of Template Haskell in GHC.  It is not detailed enough to
+ understand Template Haskell; see the <ulink url="http://haskell.org/haskellwiki/Template_Haskell">
+ Wiki page</ulink>.
+ </para>
+@@ -6224,24 +6489,24 @@
+ 		  of "$" overrides its meaning as an infix operator, just as "M.x" overrides the meaning
+ 		  of "." as an infix operator.  If you want the infix operator, put spaces around it.
+ 		  </para>
+-	      <para> A splice can occur in place of 
++	      <para> A splice can occur in place of
+ 		  <itemizedlist>
+ 		    <listitem><para> an expression; the spliced expression must
+ 		    have type <literal>Q Exp</literal></para></listitem>
+ 		    <listitem><para> an type; the spliced expression must
+ 		    have type <literal>Q Typ</literal></para></listitem>
+-		    <listitem><para> a list of top-level declarations; the spliced expression 
++		    <listitem><para> a list of top-level declarations; the spliced expression
+                     must have type <literal>Q [Dec]</literal></para></listitem>
+ 		    </itemizedlist>
+             Note that pattern splices are not supported.
+-	    Inside a splice you can can only call functions defined in imported modules,
++            Inside a splice you can only call functions defined in imported modules,
+ 	    not functions defined elsewhere in the same module.</para></listitem>
+ 
+ 	      <listitem><para>
+ 		  A expression quotation is written in Oxford brackets, thus:
+ 		  <itemizedlist>
+-		    <listitem><para> <literal>[| ... |]</literal>, or <literal>[e| ... |]</literal>, 
+-                             where the "..." is an expression; 
++		    <listitem><para> <literal>[| ... |]</literal>, or <literal>[e| ... |]</literal>,
++                             where the "..." is an expression;
+                              the quotation has type <literal>Q Exp</literal>.</para></listitem>
+ 		    <listitem><para> <literal>[d| ... |]</literal>, where the "..." is a list of top-level declarations;
+                              the quotation has type <literal>Q [Dec]</literal>.</para></listitem>
+@@ -6266,17 +6531,17 @@
+ 		    <listitem><para> <literal>'f</literal> has type <literal>Name</literal>, and names the function <literal>f</literal>.
+ 		  Similarly <literal>'C</literal> has type <literal>Name</literal> and names the data constructor <literal>C</literal>.
+ 		  In general <literal>'</literal><replaceable>thing</replaceable> interprets <replaceable>thing</replaceable> in an expression context.
+-		     </para></listitem> 
++		     </para></listitem>
+ 		    <listitem><para> <literal>''T</literal> has type <literal>Name</literal>, and names the type constructor  <literal>T</literal>.
+ 		  That is, <literal>''</literal><replaceable>thing</replaceable> interprets <replaceable>thing</replaceable> in a type context.
+-		     </para></listitem> 
++		     </para></listitem>
+ 		  </itemizedlist>
+ 	          These <literal>Names</literal> can be used to construct Template Haskell expressions, patterns, declarations etc.  They
+ 	          may also be given as an argument to the <literal>reify</literal> function.
+ 	         </para>
+ 		</listitem>
+ 
+-	      <listitem><para> You may omit the <literal>$(...)</literal> in a top-level declaration splice. 
++	      <listitem><para> You may omit the <literal>$(...)</literal> in a top-level declaration splice.
+               Simply writing an expression (rather than a declaration) implies a splice.  For example, you can write
+ <programlisting>
+ module Foo where
+@@ -6295,7 +6560,7 @@
+             This abbreviation makes top-level declaration slices quieter and less intimidating.
+ 	    </para></listitem>
+ 
+-		  
++
+ 	</itemizedlist>
+ (Compared to the original paper, there are many differences of detail.
+ The syntax for a declaration splice uses "<literal>$</literal>" not "<literal>splice</literal>".
+@@ -6321,7 +6586,7 @@
+    <listitem><para>
+    You can only run a function at compile time if it is imported
+    from another module <emphasis>that is not part of a mutually-recursive group of modules
+-   that includes the module currently being compiled</emphasis>.  Furthermore, all of the modules of 
++   that includes the module currently being compiled</emphasis>.  Furthermore, all of the modules of
+    the mutually-recursive group must be reachable by non-SOURCE imports from the module where the
+    splice is to be run.</para>
+    <para>
+@@ -6343,11 +6608,11 @@
+ </itemizedlist>
+ </para>
+ <para> Template Haskell works in any mode (<literal>--make</literal>, <literal>--interactive</literal>,
+-	or file-at-a-time).  There used to be a restriction to the former two, but that restriction 
++	or file-at-a-time).  There used to be a restriction to the former two, but that restriction
+ 	has been lifted.
+ </para>
+ </sect2>
+- 
++
+ <sect2 id="th-example">  <title> A Template Haskell Worked Example </title>
+ <para>To help you get over the confidence barrier, try out this skeletal worked example.
+   First cut and paste the two modules below into "Main.hs" and "Printf.hs":</para>
+@@ -6417,7 +6682,7 @@
+ <sect2>
+ <title>Using Template Haskell with Profiling</title>
+ <indexterm><primary>profiling</primary><secondary>with Template Haskell</secondary></indexterm>
+- 
++
+ <para>Template Haskell relies on GHC's built-in bytecode compiler and
+ interpreter to run the splice expressions.  The bytecode interpreter
+ runs the compiled expression on top of the same runtime on which GHC
+@@ -6469,11 +6734,11 @@
+ <literal>[<replaceable>quoter</replaceable>| <replaceable>string</replaceable> |]</literal>.
+ <itemizedlist>
+ <listitem><para>
+-The <replaceable>quoter</replaceable> must be the (unqualified) name of an imported 
+-quoter; it cannot be an arbitrary expression.  
++The <replaceable>quoter</replaceable> must be the (unqualified) name of an imported
++quoter; it cannot be an arbitrary expression.
+ </para></listitem>
+ <listitem><para>
+-The <replaceable>quoter</replaceable> cannot be "<literal>e</literal>", 
++The <replaceable>quoter</replaceable> cannot be "<literal>e</literal>",
+ "<literal>t</literal>", "<literal>d</literal>", or "<literal>p</literal>", since
+ those overlap with Template Haskell quotations.
+ </para></listitem>
+@@ -6482,7 +6747,7 @@
+ <literal>[<replaceable>quoter</replaceable>|</literal>.
+ </para></listitem>
+ <listitem><para>
+-The quoted <replaceable>string</replaceable> 
++The quoted <replaceable>string</replaceable>
+ can be arbitrary, and may contain newlines.
+ </para></listitem>
+ </itemizedlist>
+@@ -6500,7 +6765,7 @@
+ </para></listitem>
+ 
+ <listitem><para>
+-A quoter is a value of type <literal>Language.Haskell.TH.Quote.QuasiQuoter</literal>, 
++A quoter is a value of type <literal>Language.Haskell.TH.Quote.QuasiQuoter</literal>,
+ which is defined thus:
+ <programlisting>
+ data QuasiQuoter = QuasiQuoter { quoteExp  :: String -> Q Exp,
+@@ -6693,7 +6958,7 @@
+        |  proc <replaceable>apat</replaceable> -> <replaceable>cmd</replaceable>
+ </screen>
+ where <literal>proc</literal> is a new keyword.
+-The variables of the pattern are bound in the body of the 
++The variables of the pattern are bound in the body of the
+ <literal>proc</literal>-expression,
+ which is a new sort of thing called a <firstterm>command</firstterm>.
+ The syntax of commands is as follows:
+@@ -7096,7 +7361,7 @@
+ <para>
+ Although only GHC implements arrow notation directly,
+ there is also a preprocessor
+-(available from the 
++(available from the
+ <ulink url="http://www.haskell.org/arrows/">arrows web page</ulink>)
+ that translates arrow notation into Haskell 98
+ for use with other Haskell systems.
+@@ -7141,7 +7406,7 @@
+ <indexterm><primary>Bang patterns</primary></indexterm>
+ </title>
+ <para>GHC supports an extension of pattern matching called <emphasis>bang
+-patterns</emphasis>, written <literal>!<replaceable>pat</replaceable></literal>.   
++patterns</emphasis>, written <literal>!<replaceable>pat</replaceable></literal>.
+ Bang patterns are under consideration for Haskell Prime.
+ The <ulink
+ url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell
+@@ -7149,9 +7414,9 @@
+ than the material below.
+ </para>
+ <para>
+-The key change is the addition of a new rule to the 
++The key change is the addition of a new rule to the
+ <ulink url="http://haskell.org/onlinereport/exps.html#sect3.17.2">semantics of pattern matching in the Haskell 98 report</ulink>.
+-Add new bullet 10, saying: Matching the pattern <literal>!</literal><replaceable>pat</replaceable> 
++Add new bullet 10, saying: Matching the pattern <literal>!</literal><replaceable>pat</replaceable>
+ against a value <replaceable>v</replaceable> behaves as follows:
+ <itemizedlist>
+ <listitem><para>if <replaceable>v</replaceable> is bottom, the match diverges</para></listitem>
+@@ -7183,13 +7448,13 @@
+ f2 (!x, y) = [x,y]
+ </programlisting>
+ Here, <literal>f2</literal> is strict in <literal>x</literal> but not in
+-<literal>y</literal>.  
++<literal>y</literal>.
+ A bang only really has an effect if it precedes a variable or wild-card pattern:
+ <programlisting>
+ f3 !(x,y) = [x,y]
+ f4 (x,y)  = [x,y]
+ </programlisting>
+-Here, <literal>f3</literal> and <literal>f4</literal> are identical; 
++Here, <literal>f3</literal> and <literal>f4</literal> are identical;
+ putting a bang before a pattern that
+ forces evaluation anyway does nothing.
+ </para>
+@@ -7236,7 +7501,7 @@
+ g6 x = case f x of { y -&gt; body }
+ g7 x = case f x of { !y -&gt; body }
+ </programlisting>
+-The functions <literal>g5</literal> and <literal>g6</literal> mean exactly the same thing.  
++The functions <literal>g5</literal> and <literal>g6</literal> mean exactly the same thing.
+ But <literal>g7</literal> evaluates <literal>(f x)</literal>, binds <literal>y</literal> to the
+ result, and then evaluates <literal>body</literal>.
+ </para>
+@@ -7266,7 +7531,7 @@
+ </programlisting>
+ The semantics of Haskell pattern matching is described in <ulink
+ url="http://www.haskell.org/onlinereport/exps.html#sect3.17.2">
+-Section 3.17.2</ulink> of the Haskell Report.  To this description add 
++Section 3.17.2</ulink> of the Haskell Report.  To this description add
+ one extra item 10, saying:
+ <itemizedlist><listitem><para>Matching
+ the pattern <literal>!pat</literal> against a value <literal>v</literal> behaves as follows:
+@@ -7282,13 +7547,13 @@
+    = v `seq` case v of { pat -> e; _ -> e' }
+ </programlisting>
+ </para><para>
+-That leaves let expressions, whose translation is given in 
++That leaves let expressions, whose translation is given in
+ <ulink url="http://www.haskell.org/onlinereport/exps.html#sect3.12">Section
+ 3.12</ulink>
+ of the Haskell Report.
+-In the translation box, first apply 
+-the following transformation:  for each pattern <literal>pi</literal> that is of 
+-form <literal>!qi = ei</literal>, transform it to <literal>(xi,!qi) = ((),ei)</literal>, and and replace <literal>e0</literal> 
++In the translation box, first apply
++the following transformation:  for each pattern <literal>pi</literal> that is of
++form <literal>!qi = ei</literal>, transform it to <literal>(xi,!qi) = ((),ei)</literal>, and replace <literal>e0</literal>
+ by <literal>(xi `seq` e0)</literal>.  Then, when none of the left-hand-side patterns
+ have a bang at the top, apply the rules in the existing box.
+ </para>
+@@ -7416,7 +7681,7 @@
+ 
+     <para>Pragmas all take the form
+ 
+-<literal>{-# <replaceable>word</replaceable> ... #-}</literal>  
++<literal>{-# <replaceable>word</replaceable> ... #-}</literal>
+ 
+     where <replaceable>word</replaceable> indicates the type of
+     pragma, and is followed optionally by information specific to that
+@@ -7426,7 +7691,7 @@
+     in the following sections; any pragma encountered with an
+     unrecognised <replaceable>word</replaceable> is
+     ignored. The layout rule applies in pragmas, so the closing <literal>#-}</literal>
+-    should start in a column to the right of the opening <literal>{-#</literal>. </para> 
++    should start in a column to the right of the opening <literal>{-#</literal>. </para>
+ 
+     <para>Certain pragmas are <emphasis>file-header pragmas</emphasis>:
+       <itemizedlist>
+@@ -7436,7 +7701,7 @@
+ 	  </para></listitem>
+       <listitem><para>
+       There can be as many file-header pragmas as you please, and they can be
+-      preceded or followed by comments.  
++      preceded or followed by comments.
+ 	  </para></listitem>
+       <listitem><para>
+       File-header pragmas are read once only, before
+@@ -7456,7 +7721,7 @@
+       <indexterm><primary>LANGUAGE</primary><secondary>pragma</secondary></indexterm>
+       <indexterm><primary>pragma</primary><secondary>LANGUAGE</secondary></indexterm>
+ 
+-      <para>The <literal>LANGUAGE</literal> pragma allows language extensions to be enabled 
++      <para>The <literal>LANGUAGE</literal> pragma allows language extensions to be enabled
+ 	in a portable way.
+ 	It is the intention that all Haskell compilers support the
+ 	<literal>LANGUAGE</literal> pragma with the same syntax, although not
+@@ -7565,7 +7830,7 @@
+       (a) uses within the defining module, and
+       (b) uses in an export list.
+       The latter reduces spurious complaints within a library
+-      in which one module gathers together and re-exports 
++      in which one module gathers together and re-exports
+       the exports of several others.
+       </para>
+       <para>You can suppress the warnings with the flag
+@@ -7602,7 +7867,7 @@
+         <para>The major effect of an <literal>INLINE</literal> pragma
+         is to declare a function's &ldquo;cost&rdquo; to be very low.
+         The normal unfolding machinery will then be very keen to
+-        inline it.  However, an <literal>INLINE</literal> pragma for a 
++        inline it.  However, an <literal>INLINE</literal> pragma for a
+ 	function "<literal>f</literal>" has a number of other effects:
+ <itemizedlist>
+ <listitem><para>
+@@ -7616,13 +7881,13 @@
+ map (\x -> <replaceable>body</replaceable>) xs
+ </programlisting>
+ In general, GHC only inlines the function if there is some reason (no matter
+-how slight) to supose that it is useful to do so.
++how slight) to suppose that it is useful to do so.
+ </para></listitem>
+ 
+ <listitem><para>
+-Moreover, GHC will only inline the function if it is <emphasis>fully applied</emphasis>, 
++Moreover, GHC will only inline the function if it is <emphasis>fully applied</emphasis>,
+ where "fully applied"
+-means applied to as many arguments as appear (syntactically) 
++means applied to as many arguments as appear (syntactically)
+ on the LHS of the function
+ definition.  For example:
+ <programlisting>
+@@ -7634,7 +7899,7 @@
+ {-# INLINE comp2 #-}
+ comp2 f g x = f (g x)
+ </programlisting>
+-The two functions <literal>comp1</literal> and <literal>comp2</literal> have the 
++The two functions <literal>comp1</literal> and <literal>comp2</literal> have the
+ same semantics, but <literal>comp1</literal> will be inlined when applied
+ to <emphasis>two</emphasis> arguments, while <literal>comp2</literal> requires
+ <emphasis>three</emphasis>.  This might make a big difference if you say
+@@ -7644,14 +7909,14 @@
+ which will optimise better than the corresponding use of `comp2`.
+ </para></listitem>
+ 
+-<listitem><para> 
++<listitem><para>
+ It is useful for GHC to optimise the definition of an
+-INLINE function <literal>f</literal> just like any other non-INLINE function, 
++INLINE function <literal>f</literal> just like any other non-INLINE function,
+ in case the non-inlined version of <literal>f</literal> is
+-ultimately called.  But we don't want to inline 
++ultimately called.  But we don't want to inline
+ the <emphasis>optimised</emphasis> version
+ of <literal>f</literal>;
+-a major reason for INLINE pragmas is to expose functions 
++a major reason for INLINE pragmas is to expose functions
+ in <literal>f</literal>'s RHS that have
+ rewrite rules, and it's no good if those functions have been optimised
+ away.
+@@ -7660,7 +7925,7 @@
+ So <emphasis>GHC guarantees to inline precisely the code that you wrote</emphasis>, no more
+ and no less.  It does this by capturing a copy of the definition of the function to use
+ for inlining (we call this the "inline-RHS"), which it leaves untouched,
+-while optimising the ordinarly RHS as usual.  For externally-visible functions
++while optimising the ordinarily RHS as usual.  For externally-visible functions
+ the inline-RHS (not the optimised RHS) is recorded in the interface file.
+ </para></listitem>
+ <listitem><para>
+@@ -7695,13 +7960,13 @@
+ {-# INLINE returnUs #-}
+ </programlisting>
+ 
+-	<para>See also the <literal>NOINLINE</literal> (<xref linkend="inlinable-pragma"/>) 
+-        and <literal>INLINABLE</literal> (<xref linkend="noinline-pragma"/>) 
++	<para>See also the <literal>NOINLINE</literal> (<xref linkend="noinline-pragma"/>)
++        and <literal>INLINABLE</literal> (<xref linkend="inlinable-pragma"/>)
+         pragmas.</para>
+ 
+ 	<para>Note: the HBC compiler doesn't like <literal>INLINE</literal> pragmas,
+ 	  so if you want your code to be HBC-compatible you'll have to surround
+-	  the pragma with C pre-processor directives 
++	  the pragma with C pre-processor directives
+ 	  <literal>#ifdef __GLASGOW_HASKELL__</literal>...<literal>#endif</literal>.</para>
+ 
+       </sect3>
+@@ -7759,7 +8024,7 @@
+ 
+       <sect3 id="noinline-pragma">
+ 	<title>NOINLINE pragma</title>
+-	
++
+ 	<indexterm><primary>NOINLINE</primary></indexterm>
+ 	<indexterm><primary>NOTINLINE</primary></indexterm>
+ 
+@@ -7778,7 +8043,7 @@
+       <sect3 id="conlike-pragma">
+ 	<title>CONLIKE modifier</title>
+ 	<indexterm><primary>CONLIKE</primary></indexterm>
+-        <para>An INLINE or NOINLINE pragma may have a CONLIKE modifier, 
++        <para>An INLINE or NOINLINE pragma may have a CONLIKE modifier,
+         which affects matching in RULEs (only).  See <xref linkend="conlike"/>.
+         </para>
+       </sect3>
+@@ -7850,82 +8115,6 @@
+       </sect3>
+     </sect2>
+ 
+-    <sect2 id="annotation-pragmas">
+-      <title>ANN pragmas</title>
+-      
+-      <para>GHC offers the ability to annotate various code constructs with additional
+-      data by using three pragmas.  This data can then be inspected at a later date by
+-      using GHC-as-a-library.</para>
+-            
+-      <sect3 id="ann-pragma">
+-        <title>Annotating values</title>
+-        
+-        <indexterm><primary>ANN</primary></indexterm>
+-        
+-        <para>Any expression that has both <literal>Typeable</literal> and <literal>Data</literal> instances may be attached to a top-level value
+-        binding using an <literal>ANN</literal> pragma. In particular, this means you can use <literal>ANN</literal>
+-        to annotate data constructors (e.g. <literal>Just</literal>) as well as normal values (e.g. <literal>take</literal>).
+-        By way of example, to annotate the function <literal>foo</literal> with the annotation <literal>Just "Hello"</literal>
+-        you would do this:</para>
+-        
+-<programlisting>
+-{-# ANN foo (Just "Hello") #-}
+-foo = ...
+-</programlisting>
+-        
+-        <para>
+-          A number of restrictions apply to use of annotations:
+-          <itemizedlist>
+-            <listitem><para>The binder being annotated must be at the top level (i.e. no nested binders)</para></listitem>
+-            <listitem><para>The binder being annotated must be declared in the current module</para></listitem>
+-            <listitem><para>The expression you are annotating with must have a type with <literal>Typeable</literal> and <literal>Data</literal> instances</para></listitem>
+-            <listitem><para>The <ulink linkend="using-template-haskell">Template Haskell staging restrictions</ulink> apply to the
+-            expression being annotated with, so for example you cannot run a function from the module being compiled.</para>
+-            
+-            <para>To be precise, the annotation <literal>{-# ANN x e #-}</literal> is well staged if and only if <literal>$(e)</literal> would be 
+-            (disregarding the usual type restrictions of the splice syntax, and the usual restriction on splicing inside a splice - <literal>$([|1|])</literal> is fine as an annotation, albeit redundant).</para></listitem>
+-          </itemizedlist>
+-          
+-          If you feel strongly that any of these restrictions are too onerous, <ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">
+-          please give the GHC team a shout</ulink>.
+-        </para>
+-        
+-        <para>However, apart from these restrictions, many things are allowed, including expressions which are not fully evaluated!
+-        Annotation expressions will be evaluated by the compiler just like Template Haskell splices are. So, this annotation is fine:</para>
+-        
+-<programlisting>
+-{-# ANN f SillyAnnotation { foo = (id 10) + $([| 20 |]), bar = 'f } #-}
+-f = ...
+-</programlisting>
+-      </sect3>
+-      
+-      <sect3 id="typeann-pragma">
+-        <title>Annotating types</title>
+-        
+-        <indexterm><primary>ANN type</primary></indexterm>
+-        <indexterm><primary>ANN</primary></indexterm>
+-        
+-        <para>You can annotate types with the <literal>ANN</literal> pragma by using the <literal>type</literal> keyword. For example:</para>
+-        
+-<programlisting>
+-{-# ANN type Foo (Just "A `Maybe String' annotation") #-}
+-data Foo = ...
+-</programlisting>
+-      </sect3>
+-      
+-      <sect3 id="modann-pragma">
+-        <title>Annotating modules</title>
+-        
+-        <indexterm><primary>ANN module</primary></indexterm>
+-        <indexterm><primary>ANN</primary></indexterm>
+-        
+-        <para>You can annotate modules with the <literal>ANN</literal> pragma by using the <literal>module</literal> keyword. For example:</para>
+-        
+-<programlisting>
+-{-# ANN module (Just "A `Maybe String' annotation") #-}
+-</programlisting>
+-      </sect3>
+-    </sect2>
+ 
+     <sect2 id="line-pragma">
+       <title>LINE pragma</title>
+@@ -8008,7 +8197,7 @@
+   h :: Eq a => a -> a -> a
+   {-# SPECIALISE h :: (Eq a) => [a] -> [a] -> [a] #-}
+ </programlisting>
+-The last of these examples will generate a 
++The last of these examples will generate a
+ RULE with a somewhat-complex left-hand side (try it yourself), so it might not fire very
+ well.  If you use this kind of specialisation, let us know how well it works.
+ </para>
+@@ -8017,7 +8206,7 @@
+       <title>SPECIALIZE INLINE</title>
+ 
+ <para>A <literal>SPECIALIZE</literal> pragma can optionally be followed with a
+-<literal>INLINE</literal> or <literal>NOINLINE</literal> pragma, optionally 
++<literal>INLINE</literal> or <literal>NOINLINE</literal> pragma, optionally
+ followed by a phase, as described in <xref linkend="inline-noinline-pragma"/>.
+ The <literal>INLINE</literal> pragma affects the specialised version of the
+ function (only), and applies even if the function is recursive.  The motivating
+@@ -8052,7 +8241,7 @@
+ Generally, you can only give a <literal>SPECIALIZE</literal> pragma
+ for a function defined in the same module.
+ However if a function <literal>f</literal> is given an <literal>INLINABLE</literal>
+-pragma at its definition site, then it can subequently be specialised by
++pragma at its definition site, then it can subsequently be specialised by
+ importing modules (see <xref linkend="inlinable-pragma"/>).
+ For example
+ <programlisting>
+@@ -8103,7 +8292,7 @@
+ </para>
+ </sect3>
+ 
+-<sect3><title>Obselete SPECIALIZE syntax</title>
++<sect3><title>Obsolete SPECIALIZE syntax</title>
+ 
+       <para>Note: In earlier versions of GHC, it was possible to provide your own
+       specialised function for a given type:
+@@ -8128,7 +8317,7 @@
+ Same idea, except for instance declarations.  For example:
+ 
+ <programlisting>
+-instance (Eq a) => Eq (Foo a) where { 
++instance (Eq a) => Eq (Foo a) where {
+    {-# SPECIALIZE instance Eq (Foo [(Int, Bar)]) #-}
+    ... usual stuff ...
+  }
+@@ -8147,7 +8336,7 @@
+       <title>UNPACK pragma</title>
+ 
+       <indexterm><primary>UNPACK</primary></indexterm>
+-      
++
+       <para>The <literal>UNPACK</literal> indicates to the compiler
+       that it should unpack the contents of a constructor field into
+       the constructor itself, removing a level of indirection.  For
+@@ -8166,7 +8355,11 @@
+       compiler).</para>
+ 
+       <para>Unpacking constructor fields should only be used in
+-      conjunction with <option>-O</option>, in order to expose
++      conjunction with <option>-O</option><footnote>in fact, UNPACK
++          has no effect without <option>-O</option>, for technical
++          reasons
++      (see <ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick
++            5252</ulink>)</footnote>, in order to expose
+       unfoldings to the compiler so the reboxing can be removed as
+       often as possible.  For example:</para>
+ 
+@@ -8227,7 +8420,7 @@
+ 
+ <para>
+ The programmer can specify rewrite rules as part of the source program
+-(in a pragma).  
++(in a pragma).
+ Here is an example:
+ 
+ <programlisting>
+@@ -8239,7 +8432,7 @@
+ <para>
+ Use the debug flag <option>-ddump-simpl-stats</option> to see what rules fired.
+ If you need more information, then <option>-ddump-rule-firings</option> shows you
+-each individual rule firing in detail.
++each individual rule firing and <option>-ddump-rule-rewrites</option> also shows what the code looks like before and after the rewrite.
+ </para>
+ 
+ <sect2>
+@@ -8360,7 +8553,7 @@
+ <para>
+ Inside a RULE "<literal>forall</literal>" is treated as a keyword, regardless of
+ any other flag settings.  Furthermore, inside a RULE, the language extension
+-<option>-XScopedTypeVariables</option> is automatically enabled; see 
++<option>-XScopedTypeVariables</option> is automatically enabled; see
+ <xref linkend="scoped-type-variables"/>.
+ </para>
+ </listitem>
+@@ -8368,9 +8561,9 @@
+ 
+ <para>
+ Like other pragmas, RULE pragmas are always checked for scope errors, and
+-are typechecked. Typechecking means that the LHS and RHS of a rule are typechecked, 
++are typechecked. Typechecking means that the LHS and RHS of a rule are typechecked,
+ and must have the same type.  However, rules are only <emphasis>enabled</emphasis>
+-if the <option>-fenable-rewrite-rules</option> flag is 
++if the <option>-fenable-rewrite-rules</option> flag is
+ on (see <xref linkend="rule-semantics"/>).
+ </para>
+ </listitem>
+@@ -8393,8 +8586,8 @@
+ by the <option>-fenable-rewrite-rules</option> flag.
+ This flag is implied by <option>-O</option>, and may be switched
+ off (as usual) by <option>-fno-enable-rewrite-rules</option>.
+-(NB: enabling <option>-fenable-rewrite-rules</option> without <option>-O</option> 
+-may not do what you expect, though, because without <option>-O</option> GHC 
++(NB: enabling <option>-fenable-rewrite-rules</option> without <option>-O</option>
++may not do what you expect, though, because without <option>-O</option> GHC
+ ignores all optimisation information in interface files;
+ see <option>-fignore-interface-pragmas</option>, <xref linkend="options-f"/>.)
+ Note that <option>-fenable-rewrite-rules</option> is an <emphasis>optimisation</emphasis> flag, and
+@@ -8503,12 +8696,12 @@
+ g y = y
+ </programlisting>
+ Now <literal>g</literal> is inlined into <literal>h</literal>, but <literal>f</literal>'s RULE has
+-no chance to fire.  
++no chance to fire.
+ If instead GHC had first inlined <literal>g</literal> into <literal>h</literal> then there
+-would have been a better chance that <literal>f</literal>'s RULE might fire.  
++would have been a better chance that <literal>f</literal>'s RULE might fire.
+ </para>
+ <para>
+-The way to get predictable behaviour is to use a NOINLINE 
++The way to get predictable behaviour is to use a NOINLINE
+ pragma, or an INLINE[<replaceable>phase</replaceable>] pragma, on <literal>f</literal>, to ensure
+ that it is not inlined until its RULEs have had a chance to fire.
+ </para>
+@@ -8531,12 +8724,12 @@
+ {-# INLINE[1] CONLIKE f #-}
+ f x = <replaceable>blah</replaceable>
+ </programlisting>
+-CONLIKE is a modifier to an INLINE or NOINLINE pragam.  It specifies that an application
++CONLIKE is a modifier to an INLINE or NOINLINE pragma.  It specifies that an application
+ of f to one argument (in general, the number of arguments to the left of the '=' sign)
+ should be considered cheap enough to duplicate, if such a duplication would make rule
+ fire.  (The name "CONLIKE" is short for "constructor-like", because constructors certainly
+ have such a property.)
+-The CONLIKE pragam is a modifier to INLINE/NOINLINE because it really only makes sense to match 
++The CONLIKE pragma is a modifier to INLINE/NOINLINE because it really only makes sense to match
+ <literal>f</literal> on the LHS of a rule if you are sure that <literal>f</literal> is
+ not going to be inlined before the rule has a chance to fire.
+ </para>
+@@ -8811,7 +9004,7 @@
+ Use <option>-ddump-rules</option> to see the rules that are defined
+ <emphasis>in this module</emphasis>.
+ This includes rules generated by the specialisation pass, but excludes
+-rules imported from other modules. 
++rules imported from other modules.
+ </para>
+ </listitem>
+ 
+@@ -8824,7 +9017,8 @@
+ 
+ <listitem>
+ <para>
+- Use <option>-ddump-rule-firings</option> to see in great detail what rules are being fired.
++ Use <option>-ddump-rule-firings</option> or <option>-ddump-rule-rewrites</option>
++to see in great detail what rules are being fired.
+ If you add <option>-dppr-debug</option> you get a still more detailed listing.
+ </para>
+ </listitem>
+@@ -8943,7 +9137,7 @@
+ restrains the strictness analyser.
+ </para></listitem>
+ <listitem><para>
+-<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html#v%3AunsafeCoerce%23"><literal>lazy</literal></ulink> 
++<ulink url="&libraryGhcPrimLocation;/GHC-Prim.html#v%3AunsafeCoerce%23"><literal>unsafeCoerce#</literal></ulink>
+ allows you to fool the type checker.
+ </para></listitem>
+ </itemizedlist>
+@@ -8955,257 +9149,223 @@
+ <title>Generic classes</title>
+ 
+ <para>
+-The ideas behind this extension are described in detail in "Derivable type classes",
+-Ralf Hinze and Simon Peyton Jones, Haskell Workshop, Montreal Sept 2000, pp94-105.
+-An example will give the idea:
++GHC used to have an implementation of generic classes as defined in the paper
++"Derivable type classes", Ralf Hinze and Simon Peyton Jones, Haskell Workshop,
++Montreal Sept 2000, pp94-105. These have been removed and replaced by the more
++general <link linkend="generic-programming">support for generic programming</link>.
+ </para>
+ 
+-<programlisting>
+-  import Data.Generics
++</sect1>
+ 
+-  class Bin a where
+-    toBin   :: a -> [Int]
+-    fromBin :: [Int] -> (a, [Int])
+-  
+-    toBin {| Unit |}    Unit	  = []
+-    toBin {| a :+: b |} (Inl x)   = 0 : toBin x
+-    toBin {| a :+: b |} (Inr y)   = 1 : toBin y
+-    toBin {| a :*: b |} (x :*: y) = toBin x ++ toBin y
+-  
+-    fromBin {| Unit |}    bs      = (Unit, bs)
+-    fromBin {| a :+: b |} (0:bs)  = (Inl x, bs')    where (x,bs') = fromBin bs
+-    fromBin {| a :+: b |} (1:bs)  = (Inr y, bs')    where (y,bs') = fromBin bs
+-    fromBin {| a :*: b |} bs	  = (x :*: y, bs'') where (x,bs' ) = fromBin bs
+-							  (y,bs'') = fromBin bs'
+-</programlisting>
+-<para>
+-This class declaration explains how <literal>toBin</literal> and <literal>fromBin</literal>
+-work for arbitrary data types.  They do so by giving cases for unit, product, and sum,
+-which are defined thus in the library module <literal>Data.Generics</literal>:
+-</para>
+-<programlisting>
+-  data Unit    = Unit
+-  data a :+: b = Inl a | Inr b
+-  data a :*: b = a :*: b
+-</programlisting>
+-<para>
+-Now you can make a data type into an instance of Bin like this:
+-<programlisting>
+-  instance (Bin a, Bin b) => Bin (a,b)
+-  instance Bin a => Bin [a]
+-</programlisting>
+-That is, just leave off the "where" clause.  Of course, you can put in the
+-where clause and over-ride whichever methods you please.
+-</para>
+ 
+-    <sect2>
+-      <title> Using generics </title>
+-      <para>To use generics you need to</para>
+-      <itemizedlist>
+-	<listitem>
+-	  <para>
+-            Use the flags <option>-XGenerics</option> (to enable the
+-            extra syntax and generate extra per-data-type code),
+-            and <option>-package syb</option> (to make the
+-            <literal>Data.Generics</literal> module available.
+-          </para>
+-	</listitem>
+-	<listitem>
+-	  <para>Import the module <literal>Data.Generics</literal> from the
+-          <literal>syb</literal> package.  This import brings into
+-          scope the data types <literal>Unit</literal>,
+-          <literal>:*:</literal>, and <literal>:+:</literal>.  (You
+-          don't need this import if you don't mention these types
+-          explicitly; for example, if you are simply giving instance
+-          declarations.)</para>
+-	</listitem>
+-      </itemizedlist>
+-    </sect2>
++<sect1 id="generic-programming">
++<title>Generic programming</title>
+ 
+-<sect2> <title> Changes wrt the paper </title>
+ <para>
+-Note that the type constructors <literal>:+:</literal> and <literal>:*:</literal> 
+-can be written infix (indeed, you can now use
+-any operator starting in a colon as an infix type constructor).  Also note that
+-the type constructors are not exactly as in the paper (Unit instead of 1, etc).
+-Finally, note that the syntax of the type patterns in the class declaration
+-uses "<literal>{|</literal>" and "<literal>|}</literal>" brackets; curly braces
+-alone would ambiguous when they appear on right hand sides (an extension we 
+-anticipate wanting).
++Using a combination of <option>-XDeriveGeneric</option>
++(<xref linkend="deriving-typeable"/>) and
++<option>-XDefaultSignatures</option> (<xref linkend="class-default-signatures"/>),
++you can easily do datatype-generic
++programming using the <literal>GHC.Generics</literal> framework. This section
++gives a very brief overview of how to do it.
+ </para>
+-</sect2>
+ 
+-<sect2> <title>Terminology and restrictions</title>
+ <para>
+-Terminology.  A "generic default method" in a class declaration
+-is one that is defined using type patterns as above.
+-A "polymorphic default method" is a default method defined as in Haskell 98.
+-A "generic class declaration" is a class declaration with at least one
+-generic default method.
++Generic programming support in GHC allows defining classes with methods that
++do not need a user specification when instantiating: the method body is
++automatically derived by GHC. This is similar to what happens for standard
++classes such as <literal>Read</literal> and <literal>Show</literal>, for
++instance, but now for user-defined classes.
+ </para>
+ 
++<sect2>
++<title>Deriving representations</title>
++
+ <para>
+-Restrictions:
+-<itemizedlist>
+-<listitem>
+-<para>
+-Alas, we do not yet implement the stuff about constructor names and 
+-field labels.
++The first thing we need is generic representations. The
++<literal>GHC.Generics</literal> module defines a couple of primitive types
++that are used to represent Haskell datatypes:
++
++<programlisting>
++-- | Unit: used for constructors without arguments
++data U1 p = U1
++
++-- | Constants, additional parameters and recursion of kind *
++newtype K1 i c p = K1 { unK1 :: c }
++
++-- | Meta-information (constructor names, etc.)
++newtype M1 i c f p = M1 { unM1 :: f p }
++
++-- | Sums: encode choice between constructors
++infixr 5 :+:
++data (:+:) f g p = L1 (f p) | R1 (g p)
++
++-- | Products: encode multiple arguments to constructors
++infixr 6 :*:
++data (:*:) f g p = f p :*: g p
++</programlisting>
+ </para>
+-</listitem>
+ 
+-<listitem>
+ <para>
+-A generic class can have only one parameter; you can't have a generic
+-multi-parameter class.
++The <literal>Generic</literal> class mediates between user-defined datatypes
++and their internal representation as a sum-of-products:
++
++<programlisting>
++class Generic a where
++  -- Encode the representation of a user datatype
++  type Rep a :: * -> *
++  -- Convert from the datatype to its representation
++  from  :: a -> (Rep a) x
++  -- Convert from the representation to the datatype
++  to    :: (Rep a) x -> a
++</programlisting>
++
++Instances of this class can be derived by GHC with the
++<option>-XDeriveGeneric</option> (<xref linkend="deriving-typeable"/>), and are
++necessary to be able to define generic instances automatically.
+ </para>
+-</listitem>
+ 
+-<listitem>
+ <para>
+-A default method must be defined entirely using type patterns, or entirely
+-without.  So this is illegal:
++For example, a user-defined datatype of trees <literal>data UserTree a = Node a
++(UserTree a) (UserTree a) | Leaf</literal> gets the following representation:
++
+ <programlisting>
+-  class Foo a where
+-    op :: a -> (a, Bool)
+-    op {| Unit |} Unit = (Unit, True)
+-    op x               = (x,    False)
++instance Generic (UserTree a) where
++  -- Representation type
++  type Rep (UserTree a) =
++    M1 D D1UserTree (
++          M1 C C1_0UserTree (
++                M1 S NoSelector (K1 P a)
++            :*: M1 S NoSelector (K1 R (UserTree a))
++            :*: M1 S NoSelector (K1 R (UserTree a)))
++      :+: M1 C C1_1UserTree U1)
++
++  -- Conversion functions
++  from (Node x l r) = M1 (L1 (M1 (M1 (K1 x) :*: M1 (K1 l) :*: M1 (K1 r))))
++  from Leaf         = M1 (R1 (M1 U1))
++  to (M1 (L1 (M1 (M1 (K1 x) :*: M1 (K1 l) :*: M1 (K1 r))))) = Node x l r
++  to (M1 (R1 (M1 U1)))                                      = Leaf
++
++-- Meta-information
++data D1UserTree
++data C1_0UserTree
++data C1_1UserTree
++
++instance Datatype D1UserTree where
++  datatypeName _ = "UserTree"
++  moduleName _   = "Main"
++
++instance Constructor C1_0UserTree where
++  conName _ = "Node"
++
++instance Constructor C1_1UserTree where
++  conName _ = "Leaf"
+ </programlisting>
+-However it is perfectly OK for some methods of a generic class to have 
+-generic default methods and others to have polymorphic default methods.
++
++This representation is generated automatically if a
++<literal>deriving Generic</literal> clause is attached to the datatype.
++<link linkend="stand-alone-deriving">Standalone deriving</link> can also be
++used.
+ </para>
+-</listitem>
+ 
+-<listitem>
++</sect2>
++
++<sect2>
++<title>Writing generic functions</title>
++
+ <para>
+-The type variable(s) in the type pattern for a generic method declaration
+-scope over the right hand side.  So this is legal (note the use of the type variable ``p'' in a type signature on the right hand side:
++A generic function is defined by creating a class and giving instances for
++each of the representation types of <literal>GHC.Generics</literal>. As an
++example we show generic serialization:
+ <programlisting>
+-  class Foo a where
+-    op :: a -> Bool
+-    op {| p :*: q |} (x :*: y) = op (x :: p)
+-    ...
++data Bin = O | I
++
++class GSerialize f where
++  gput :: f a -> [Bin]
++
++instance GSerialize U1 where
++  gput U1 = []
++
++instance (GSerialize a, GSerialize b) => GSerialize (a :*: b) where
++  gput (x :*: y) = gput x ++ gput y
++
++instance (GSerialize a, GSerialize b) => GSerialize (a :+: b) where
++  gput (L1 x) = O : gput x
++  gput (R1 x) = I : gput x
++
++instance (GSerialize a) => GSerialize (M1 i c a) where
++  gput (M1 x) = gput x
++
++instance (Serialize a) => GSerialize (K1 i a) where
++  gput (K1 x) = put x
+ </programlisting>
++
++Typically this class will not be exported, as it only makes sense to have
++instances for the representation types.
+ </para>
+-</listitem>
++</sect2>
++
++<sect2>
++<title>Generic defaults</title>
+ 
+-<listitem>
+ <para>
+-The type patterns in a generic default method must take one of the forms:
++The only thing left to do now is to define a "front-end" class, which is
++exposed to the user:
+ <programlisting>
+-       a :+: b
+-       a :*: b
+-       Unit
++class Serialize a where
++  put :: a -> [Bin]
++
++  default put :: (Generic a, GSerialize (Rep a)) => a -> [Bit]
++  put = gput . from
+ </programlisting>
+-where "a" and "b" are type variables.  Furthermore, all the type patterns for
+-a single type constructor (<literal>:*:</literal>, say) must be identical; they
+-must use the same type variables.  So this is illegal:
++Here we use a <link linkend="class-default-signatures">default signature</link>
++to specify that the user does not have to provide an implementation for
++<literal>put</literal>, as long as there is a <literal>Generic</literal>
++instance for the type to instantiate. For the <literal>UserTree</literal> type,
++for instance, the user can just write:
++
+ <programlisting>
+-  class Foo a where
+-    op :: a -> Bool
+-    op {| a :+: b |} (Inl x) = True
+-    op {| p :+: q |} (Inr y) = False
++instance (Serialize a) => Serialize (UserTree a)
+ </programlisting>
+-The type patterns must be identical, even in equations for different methods of the class.
+-So this too is illegal:
+-<programlisting>
+-  class Foo a where
+-    op1 :: a -> Bool
+-    op1 {| a :*: b |} (x :*: y) = True
+ 
+-    op2 :: a -> Bool
+-    op2 {| p :*: q |} (x :*: y) = False
+-</programlisting>
+-(The reason for this restriction is that we gather all the equations for a particular type constructor
+-into a single generic instance declaration.)
++The default method for <literal>put</literal> is then used, corresponding to the
++generic implementation of serialization.
+ </para>
+-</listitem>
++</sect2>
+ 
+-<listitem>
+-<para>
+-A generic method declaration must give a case for each of the three type constructors.
+-</para>
+-</listitem>
+ 
+-<listitem>
++<sect2>
++<title>More information</title>
++
+ <para>
+-The type for a generic method can be built only from:
+-  <itemizedlist>
+-  <listitem> <para> Function arrows </para> </listitem>
+-  <listitem> <para> Type variables </para> </listitem>
+-  <listitem> <para> Tuples </para> </listitem>
+-  <listitem> <para> Arbitrary types not involving type variables </para> </listitem>
+-  </itemizedlist>
+-Here are some example type signatures for generic methods:
+-<programlisting>
+-    op1 :: a -> Bool
+-    op2 :: Bool -> (a,Bool)
+-    op3 :: [Int] -> a -> a
+-    op4 :: [a] -> Bool
+-</programlisting>
+-Here, op1, op2, op3 are OK, but op4 is rejected, because it has a type variable
+-inside a list.  
++For more detail please refer to the
++<ulink url="http://www.haskell.org/haskellwiki/Generics">HaskellWiki page</ulink>
++or the original paper:
+ </para>
+-<para>
+-This restriction is an implementation restriction: we just haven't got around to
+-implementing the necessary bidirectional maps over arbitrary type constructors.
+-It would be relatively easy to add specific type constructors, such as Maybe and list,
+-to the ones that are allowed.</para>
+-</listitem>
+ 
++<itemizedlist>
+ <listitem>
+ <para>
+-In an instance declaration for a generic class, the idea is that the compiler
+-will fill in the methods for you, based on the generic templates.  However it can only
+-do so if
+-  <itemizedlist>
+-  <listitem>
+-  <para>
+-  The instance type is simple (a type constructor applied to type variables, as in Haskell 98).
+-  </para>
+-  </listitem>
+-  <listitem>
+-  <para>
+-  No constructor of the instance type has unboxed fields.
+-  </para>
+-  </listitem>
+-  </itemizedlist>
+-(Of course, these things can only arise if you are already using GHC extensions.)
+-However, you can still give an instance declarations for types which break these rules,
+-provided you give explicit code to override any generic default methods.
++Jose Pedro Magalhaes, Atze Dijkstra, Johan Jeuring, and Andres Loeh.
++<ulink url="http://dreixel.net/research/pdf/gdmh.pdf">
++  A generic deriving mechanism for Haskell</ulink>.
++<citetitle>Proceedings of the third ACM Haskell symposium on Haskell</citetitle>
++(Haskell'2010), pp. 37-48, ACM, 2010.
+ </para>
+ </listitem>
+-
+ </itemizedlist>
+-</para>
+-
+-<para>
+-The option <option>-ddump-deriv</option> dumps incomprehensible stuff giving details of 
+-what the compiler does with generic declarations.
+-</para>
+ 
++<emphasis>Note</emphasis>: the current support for generic programming in GHC
++is preliminary. In particular, we only allow deriving instances for the
++<literal>Generic</literal> class. Support for deriving
++<literal>Generic1</literal> (and thus enabling generic functions of kind
++<literal>* -> *</literal> such as <literal>fmap</literal>) will come at a
++later stage.
+ </sect2>
+ 
+-<sect2> <title> Another example </title>
+-<para>
+-Just to finish with, here's another example I rather like:
+-<programlisting>
+-  class Tag a where
+-    nCons :: a -> Int
+-    nCons {| Unit |}    _ = 1
+-    nCons {| a :*: b |} _ = 1
+-    nCons {| a :+: b |} _ = nCons (bot::a) + nCons (bot::b)
+-  
+-    tag :: a -> Int
+-    tag {| Unit |}    _       = 1
+-    tag {| a :*: b |} _       = 1   
+-    tag {| a :+: b |} (Inl x) = tag x
+-    tag {| a :+: b |} (Inr y) = nCons (bot::a) + tag y
+-</programlisting>
+-</para>
+-</sect2>
+ </sect1>
+ 
++
+ <sect1 id="monomorphism">
+ <title>Control over monomorphism</title>
+ 
+@@ -9217,7 +9377,7 @@
+ <title>Switching off the dreaded Monomorphism Restriction</title>
+           <indexterm><primary><option>-XNoMonomorphismRestriction</option></primary></indexterm>
+ 
+-<para>Haskell's monomorphism restriction (see 
++<para>Haskell's monomorphism restriction (see
+ <ulink url="http://www.haskell.org/onlinereport/decls.html#sect4.5.5">Section
+ 4.5.5</ulink>
+ of the Haskell Report)
+@@ -9232,7 +9392,7 @@
+           <indexterm><primary><option>-XMonoPatBinds</option></primary></indexterm>
+ 
+ 	  <para> As an experimental change, we are exploring the possibility of
+-	  making pattern bindings monomorphic; that is, not generalised at all.  
++	  making pattern bindings monomorphic; that is, not generalised at all.
+ 	    A pattern binding is a binding whose LHS has no function arguments,
+ 	    and is not a simple variable.  For example:
+ <programlisting>
+@@ -9252,7 +9412,6 @@
+ </sect1>
+ 
+ 
+-
+ <!-- Emacs stuff:
+      ;;; Local Variables: ***
+      ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+diff -dur 7.0.4-original//license.xml original/license.xml
+--- 7.0.4-original//license.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/license.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -23,7 +23,7 @@
+ </listitem>
+ 
+ <listitem>
+-<para> 
++<para>
+ Redistributions in binary form must reproduce the above copyright notice,
+ this list of conditions and the following disclaimer in the documentation
+ and/or other materials provided with the distribution.
+@@ -31,7 +31,7 @@
+ </listitem>
+ 
+ <listitem>
+-<para> 
++<para>
+ Neither name of the University nor the names of its contributors may be
+ used to endorse or promote products derived from this software without
+ specific prior written permission.
+diff -dur 7.0.4-original//packages.xml original/packages.xml
+--- 7.0.4-original//packages.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/packages.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -101,6 +101,13 @@
+       directly.
+     </para>
+ 
++    <para>Similar to a package's hidden status is a package's trusted
++      status. A package can be either trusted or not trusted (distrusted).
++      By default packages are distrusted. This property of a package only
++      plays a role when compiling code using GHC's Safe Haskell feature
++      (see <xref linkend="safe-haskell"/>).
++    </para>
++
+     <para>To see which modules are provided by a package use the
+       <literal>ghc-pkg</literal> command (see <xref linkend="package-management"/>):</para>
+ 
+@@ -265,6 +272,53 @@
+             <literal>-package mypkg-1.2</literal>.</para>
+         </listitem>
+       </varlistentry>
++
++      <varlistentry>
++        <term><option>-trust</option> <replaceable>P</replaceable>
++        <indexterm><primary><option>-trust</option></primary>
++          </indexterm></term>
++        <listitem>
++          <para>This option causes the install package <replaceable>P
++            </replaceable> to be both exposed and trusted by GHC. This
++            command functions in the in a very similar way to the <option>
++            -package</option> command but in addition sets the selected
++            packaged to be trusted by GHC, regardless of the contents of
++            the package database. (see <xref linkend="safe-haskell"/>).
++          </para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term><option>-distrust</option> <replaceable>P</replaceable>
++        <indexterm><primary><option>-distrust</option></primary>
++          </indexterm></term>
++        <listitem>
++          <para>This option causes the install package <replaceable>P
++            </replaceable> to be both exposed and distrusted by GHC. This
++            command functions in the in a very similar way to the <option>
++            -package</option> command but in addition sets the selected
++            packaged to be distrusted by GHC, regardless of the contents of
++            the package database. (see <xref linkend="safe-haskell"/>).
++          </para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term><option>-distrust-all</option>
++        <indexterm><primary><option>-distrust-all</option></primary>
++          </indexterm></term>
++        <listitem>
++          <para>Ignore the trusted flag on installed packages, and distrust
++            them by default. If you use this flag and Safe Haskell then any
++            packages you require to be trusted (including <literal>base
++            </literal>) need to be explicitly trusted using <option>-trust
++            </option> options. This option does not change the exposed/hidden
++            status of a package, so it isn't equivalent to applying <option>
++            -distrust</option> to all packages on the system. (see
++            <xref linkend="safe-haskell"/>).
++          </para>
++        </listitem>
++      </varlistentry>
+     </variablelist>
+   </sect2>
+ 
+@@ -279,7 +333,6 @@
+ <programlisting>
+ /usr/bin/ld: Undefined symbols:
+ _ZCMain_main_closure
+-___stginit_ZCMain
+ </programlisting>
+ </para>
+ 
+@@ -463,7 +516,7 @@
+       The purpose of the package ID is to detect problems caused by
+       re-installing a package without also recompiling the packages
+       that depend on it.  Recompiling dependencies is necessary,
+-      because the newly compiled package may have a differnt ABI
++      because the newly compiled package may have a different ABI
+       (Application Binary Interface) than the previous version, even
+       if both packages were built from the same source code using the
+       same compiler.  With package IDs, a recompiled
+@@ -625,6 +678,15 @@
+       </varlistentry>
+ 
+       <varlistentry>
++        <term><literal>ghc-pkg check</literal></term>
++        <listitem>
++          <para>Check consistency of dependencies in the package
++          database, and report packages that have missing
++          dependencies.</para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
+         <term><literal>ghc-pkg expose <replaceable>P</replaceable></literal></term>
+         <listitem>
+           <para>Sets the <literal>exposed</literal> flag for package
+@@ -633,18 +695,25 @@
+       </varlistentry>
+ 
+       <varlistentry>
+-        <term><literal>ghc-pkg check</literal></term>
++        <term><literal>ghc-pkg hide <replaceable>P</replaceable></literal></term>
+         <listitem>
+-          <para>Check consistency of dependencies in the package
+-          database, and report packages that have missing
+-          dependencies.</para>
++          <para>Sets the <literal>exposed</literal> flag for package
++            <replaceable>P</replaceable> to <literal>False</literal>.</para>
+         </listitem>
+       </varlistentry>
+ 
+       <varlistentry>
+-        <term><literal>ghc-pkg hide <replaceable>P</replaceable></literal></term>
++        <term><literal>ghc-pkg trust <replaceable>P</replaceable></literal></term>
+         <listitem>
+-          <para>Sets the <literal>exposed</literal> flag for package
++          <para>Sets the <literal>trusted</literal> flag for package
++            <replaceable>P</replaceable> to <literal>True</literal>.</para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term><literal>ghc-pkg distrust <replaceable>P</replaceable></literal></term>
++        <listitem>
++          <para>Sets the <literal>trusted</literal> flag for package
+             <replaceable>P</replaceable> to <literal>False</literal>.</para>
+         </listitem>
+       </varlistentry>
+@@ -986,7 +1055,7 @@
+       </listitem>
+       <listitem>
+         <para>Versions of the Haskell libraries for use with GHCi may also
+-          abe included: GHCi cannot load <literal>.a</literal> files
++          be included: GHCi cannot load <literal>.a</literal> files
+           directly, instead it will look for an object file
+           called <filename>HSfoo.o</filename> and load that.  On some
+           systems, the <literal>ghc-pkg</literal> tool can automatically
+@@ -1094,6 +1163,7 @@
+                  System.Posix.Signals.Exts System.Posix.Semaphore
+                  System.Posix.SharedMem
+ hidden-modules:
++trusted: False
+ import-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
+ library-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
+ hs-libraries: HSunix-2.3.1.0
+@@ -1222,7 +1292,7 @@
+             <indexterm><primary><literal>maintainer</literal></primary><secondary>package specification</secondary></indexterm>
+           </term>
+           <listitem>
+-            <para>(optinoal freeform) The email address of the package's maintainer.</para>
++            <para>(optional freeform) The email address of the package's maintainer.</para>
+           </listitem>
+         </varlistentry>
+ 
+@@ -1274,7 +1344,7 @@
+             <indexterm><primary><literal>category</literal></primary><secondary>package specification</secondary></indexterm>
+           </term>
+           <listitem>
+-            <para>(optinoal freeform) Which category the package belongs to.  This field
++            <para>(optional freeform) Which category the package belongs to.  This field
+             is for use in conjunction with a future centralised package
+             distribution framework, tentatively titled Hackage.</para>
+           </listitem>
+@@ -1325,6 +1395,16 @@
+         </varlistentry>
+ 
+         <varlistentry>
++          <term>
++            <literal>trusted</literal>
++            <indexterm><primary><literal>trusted</literal></primary><secondary>package specification</secondary></indexterm>
++          </term>
++          <listitem>
++            <para>(bool) Whether the package is trusted or not.</para>
++          </listitem>
++        </varlistentry>
++
++        <varlistentry>
+           <term>
+             <literal>import-dirs</literal>
+             <indexterm><primary><literal>import-dirs</literal></primary><secondary>package specification</secondary></indexterm>
+diff -dur 7.0.4-original//parallel.xml original/parallel.xml
+--- 7.0.4-original//parallel.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/parallel.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -4,7 +4,7 @@
+   <indexterm><primary>parallelism</primary>
+   </indexterm>
+ 
+-  <para>GHC implements some major extensions to Haskell to support 
++  <para>GHC implements some major extensions to Haskell to support
+   concurrent and parallel programming.  Let us first establish terminology:
+   <itemizedlist>
+ 	<listitem><para><emphasis>Parallelism</emphasis> means running
+@@ -12,16 +12,16 @@
+ 	  performance.  Ideally, this should be done invisibly, and with no
+ 	  semantic changes.
+ 	    </para></listitem>
+-	<listitem><para><emphasis>Concurrency</emphasis> means implementing 
++	<listitem><para><emphasis>Concurrency</emphasis> means implementing
+ 	  a program by using multiple I/O-performing threads.  While a
+-	  concurrent Haskell program <emphasis>can</emphasis> run on a 
++	  concurrent Haskell program <emphasis>can</emphasis> run on a
+ 	  parallel machine, the primary goal of using concurrency is not to gain
+ 	  performance, but rather because that is the simplest and most
+ 	  direct way to write the program.  Since the threads perform I/O,
+ 	  the semantics of the program is necessarily non-deterministic.
+ 	    </para></listitem>
+   </itemizedlist>
+-  GHC supports both concurrency and parallelism. 
++  GHC supports both concurrency and parallelism.
+   </para>
+ 
+   <sect2 id="concurrent-haskell">
+@@ -55,7 +55,7 @@
+    <sect2><title>Software Transactional Memory</title>
+ 
+     <para>GHC now supports a new way to coordinate the activities of Concurrent
+-    Haskell threads, called Software Transactional Memory (STM).  The 
++    Haskell threads, called Software Transactional Memory (STM).  The
+     <ulink
+     url="http://research.microsoft.com/%7Esimonpj/papers/stm/index.htm">STM
+     papers</ulink> are an excellent introduction to what STM is, and how to use
+@@ -78,7 +78,7 @@
+ <sect2><title>Parallel Haskell</title>
+ 
+   <para>GHC includes support for running Haskell programs in parallel
+-  on symmetric, shared-memory multi-processor 
++  on symmetric, shared-memory multi-processor
+       (SMP)<indexterm><primary>SMP</primary></indexterm>.
+   By default GHC runs your program on one processor; if you
+      want it to run in parallel you must link your program
+@@ -185,7 +185,7 @@
+       parallel <literal>map</literal>.</para>
+   </sect2>
+ 
+-<sect2><title>Data Parallel Haskell</title>
++<sect2 id="dph"><title>Data Parallel Haskell</title>
+   <para>GHC includes experimental support for Data Parallel Haskell (DPH). This code
+         is highly unstable and is only provided as a technology preview. More
+         information can be found on the corresponding <ulink
+diff -dur 7.0.4-original//phases.xml original/phases.xml
+--- 7.0.4-original//phases.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/phases.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -5,7 +5,7 @@
+   <sect2 id="replacing-phases">
+     <title>Replacing the program for one or more phases</title>
+     <indexterm><primary>phases, changing</primary></indexterm>
+-    
++
+     <para>You may specify that a different program be used for one
+     of the phases of the compilation system, in place of whatever
+     the <command>ghc</command> has wired into it.  For example, you
+@@ -71,17 +71,6 @@
+ 
+       <varlistentry>
+         <term>
+-          <option>-pgmm</option> <replaceable>cmd</replaceable>
+-          <indexterm><primary><option>-pgmm</option></primary></indexterm>
+-        </term>
+-        <listitem>
+-          <para>Use <replaceable>cmd</replaceable> as the
+-          mangler.</para>
+-        </listitem>
+-      </varlistentry>
+-
+-      <varlistentry>
+-        <term>
+           <option>-pgms</option> <replaceable>cmd</replaceable>
+           <indexterm><primary><option>-pgms</option></primary></indexterm>
+         </term>
+@@ -420,7 +409,7 @@
+           for Windows, <literal>solaris</literal>, etc.).</para>
+         </listitem>
+       </varlistentry>
+-        
++
+       <varlistentry>
+         <term>
+           <constant><replaceable>arch</replaceable>_HOST_ARCH=1</constant>
+@@ -448,7 +437,7 @@
+ <programlisting>strmod = "\
+ \ p \
+ \ "</programlisting>
+-      
++
+       <para>don't work with <option>-cpp</option>;
+       <filename>/usr/bin/cpp</filename> elides the backslash-newline
+       pairs.</para>
+@@ -463,7 +452,7 @@
+ 
+   <sect2 id="pre-processor">
+     <title>Options affecting a Haskell pre-processor</title>
+-    
++
+     <indexterm><primary>pre-processing: custom</primary></indexterm>
+     <indexterm><primary>Pre-processor options</primary></indexterm>
+ 
+@@ -543,21 +532,8 @@
+         </term>
+         <listitem>
+           <para>Use GHC's native code generator rather than
+-          compiling via C.  This will compile faster (up to twice as
+-          fast), but may produce code that is slightly slower than
+-          compiling via C.  <option>-fasm</option> is the default.</para>
+-        </listitem>
+-      </varlistentry>
+-
+-      <varlistentry>
+-        <term>
+-          <option>-fvia-C</option>
+-          <indexterm><primary><option>-fvia-C</option></primary></indexterm>
+-        </term>
+-        <listitem>
+-          <para>Compile via C instead of using the native code
+-          generator.  This is the default on architectures for which GHC
+-          doesn't have a native code generator.</para>
++          compiling via LLVM.
++          <option>-fasm</option> is the default.</para>
+         </listitem>
+       </varlistentry>
+ 
+@@ -569,8 +545,8 @@
+         <listitem>
+           <para>Compile via LLVM instead of using the native code
+           generator. This will generally take slightly longer than the
+-          native code generator to compile but quicker than compiling
+-          via C. Produced code is generally the same speed or faster
++          native code generator to compile.
++          Produced code is generally the same speed or faster
+           than the other two code generators. Compiling via LLVM
+           requires LLVM version 2.7 or later to be on the path.</para>
+         </listitem>
+@@ -879,11 +855,11 @@
+             However, if all the modules are otherwise up to date, you may need to force
+             recompilation both of the module where the new "main" is, and of the
+             module where the "main" function used to be;
+-            <literal>ghc</literal> is not clever 
++            <literal>ghc</literal> is not clever
+             enough to figure out that they both need recompiling.  You can
+             force recompilation by removing the object file, or by using the
+             <option>-fforce-recomp</option> flag.
+-            </para> 
++            </para>
+         </listitem>
+       </varlistentry>
+ 
+@@ -952,7 +928,7 @@
+           <para>The threaded runtime system provides the following
+           benefits:</para>
+ 
+-          <itemizedlist> 
++          <itemizedlist>
+             <listitem>
+               <para>Parallelism<indexterm><primary>parallelism</primary></indexterm> on a multiprocessor<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm> or multicore<indexterm><primary>multicore</primary></indexterm>
+               machine.  See <xref linkend="using-smp" />.</para>
+@@ -1062,7 +1038,7 @@
+             <option>-with-rtsopts="-H128m"</option> sets the default heap size to 128MB.
+             This will always be the default heap size for this program, unless the user overrides it.
+             (Depending on the setting of the <option>-rtsopts</option> option, the user might
+-            not have the ability to change RTS options at run-time, in which case 
++            not have the ability to change RTS options at run-time, in which case
+             <option>-with-rtsopts</option> would be the <emphasis>only</emphasis> way to set
+             them.)
+           </para>
+@@ -1078,7 +1054,7 @@
+         <listitem>
+           <para>On Windows, GHC normally generates a
+             <firstterm>manifest</firstterm><indexterm><primary>manifest</primary>
+-            </indexterm>file when linking a binary.  The
++            </indexterm> file when linking a binary.  The
+             manifest is placed in the file
+             <literal><replaceable>prog</replaceable>.exe.manifest</literal>
+             where <replaceable>prog.exe</replaceable> is the name of the
+@@ -1098,7 +1074,7 @@
+             system using the security control panel, but GHC by default
+             generates binaries that don't depend on the user having disabled
+             installer detection.</para>
+-          
++
+           <para>The <option>-fno-gen-manifest</option> disables generation of
+             the manifest file.  One reason to do this would be if you had
+             a manifest file of your own, for example.</para>
+@@ -1110,7 +1086,7 @@
+             <option>-fno-embed-manifest</option>, see below.</para>
+         </listitem>
+       </varlistentry>
+-          
++
+       <varlistentry>
+         <term>
+           <option>-fno-embed-manifest</option>
+@@ -1126,15 +1102,15 @@
+             </indexterm>; to see exactly what GHC does to embed the manifest,
+             use the <option>-v</option> flag.  A GHC installation comes with
+             its own copy of <literal>windres</literal> for this reason.</para>
+-          
++
+           <para>See also <option>-pgmwindres</option> (<xref
+-              linkend="replacing-phases" />) and 
++              linkend="replacing-phases" />) and
+             <option>-optwindres</option> (<xref
+                                             linkend="forcing-options-through"
+               />).</para>
+         </listitem>
+       </varlistentry>
+-          
++
+       <varlistentry>
+         <term>
+           <option>-fno-shared-implib</option>
+@@ -1149,7 +1125,7 @@
+             disk-space cost of creating this import library, which can be substantial - it
+             might require as much space as the code itself, as Haskell DLLs tend to export
+             lots of symbols.</para>
+-            
++
+           <para>As long as you are happy to only be able to link to the DLL using
+             <literal>GetProcAddress</literal> and friends, you can supply the
+             <option>-fno-shared-implib</option> flag to disable the creation of the import
+diff -dur 7.0.4-original//profiling.xml original/profiling.xml
+--- 7.0.4-original//profiling.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/profiling.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -8,7 +8,7 @@
+   <para> Glasgow Haskell comes with a time and space profiling
+   system. Its purpose is to help you improve your understanding of
+   your program's execution behaviour, so you can improve it.</para>
+-  
++
+   <para> Any comments, suggestions and/or improvements you have are
+   welcome.  Recommended &ldquo;profiling tricks&rdquo; would be
+   especially cool! </para>
+@@ -39,18 +39,18 @@
+       <indexterm><primary><option>-p</option></primary><secondary>RTS
+       option</secondary></indexterm>
+     </listitem>
+-      
++
+     <listitem>
+       <para> Examine the generated profiling information, using one of
+       GHC's profiling tools.  The tool to use will depend on the kind
+       of profiling information generated.</para>
+     </listitem>
+-    
++
+   </orderedlist>
+-  
++
+   <sect1 id="cost-centres">
+     <title>Cost centres and cost-centre stacks</title>
+-    
++
+     <para>GHC's profiling system assigns <firstterm>costs</firstterm>
+     to <firstterm>cost centres</firstterm>.  A cost is simply the time
+     or space required to evaluate an expression.  Cost centres are
+@@ -385,7 +385,7 @@
+ 	</listitem>
+       </varlistentry>
+     </variablelist>
+-      
++
+     <para>There are a few other profiling-related compilation options.
+     Use them <emphasis>in addition to</emphasis>
+     <option>-prof</option>.  These do not have to be used consistently
+@@ -406,7 +406,7 @@
+           it manually.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term>
+           <option>-auto-all</option>:
+@@ -509,7 +509,7 @@
+       </varlistentry>
+ 
+     </variablelist>
+-    
++
+   </sect1>
+ 
+   <sect1 id="prof-heap">
+@@ -541,7 +541,7 @@
+ 	file,
+ 	<filename><replaceable>prog</replaceable>.ps</filename>.  The
+ 	<command>hp2ps</command> utility is described in detail in
+-	<xref linkend="hp2ps"/>.</para> 
++	<xref linkend="hp2ps"/>.</para>
+       </listitem>
+       <listitem>
+ 	<para>Display the heap profile using a postscript viewer such
+@@ -612,7 +612,7 @@
+ 	    represent an approximation to the actual type.</para>
+ 	  </listitem>
+ 	</varlistentry>
+-	
++
+ 	<varlistentry>
+ 	  <term>
+             <option>-hr</option>
+@@ -644,7 +644,7 @@
+       to display a profile by type but only for data produced by a
+       certain module, or a profile by retainer for a certain type of
+       data.  Restrictions are specified as follows:</para>
+-      
++
+       <variablelist>
+ 	<varlistentry>
+ 	  <term>
+@@ -702,7 +702,7 @@
+ 	    types.</para>
+ 	  </listitem>
+ 	</varlistentry>
+-	
++
+ 	<varlistentry>
+ 	  <term>
+             <option>-hr</option><replaceable>cc</replaceable>,...
+@@ -776,7 +776,7 @@
+ 	    state in addition to the space allocated for its stack
+ 	    (stacks normally start small and then grow as
+ 	    necessary).</para>
+-	    
++
+ 	    <para>This includes the main thread, so using
+ 	    <option>-xt</option> is a good way to see how much stack
+ 	    space the program is using.</para>
+@@ -802,7 +802,7 @@
+       </variablelist>
+ 
+     </sect2>
+-    
++
+     <sect2 id="retainer-prof">
+       <title>Retainer Profiling</title>
+ 
+@@ -843,7 +843,7 @@
+       set <literal>MANY</literal>.  The maximum set size defaults to 8
+       and can be altered with the <option>-R</option> RTS
+       option:</para>
+-      
++
+       <variablelist>
+ 	<varlistentry>
+ 	  <term><option>-R</option><replaceable>size</replaceable></term>
+@@ -883,7 +883,7 @@
+ <screen>
+ <replaceable>prog</replaceable> +RTS -hr -hcB
+ </screen>
+-	
++
+ 	<para>This trick isn't foolproof, because there might be other
+         B closures in the heap which aren't the retainers we are
+         interested in, but we've found this to be a useful technique
+@@ -1004,9 +1004,9 @@
+     <indexterm><primary>heap profiles</primary></indexterm>
+     <indexterm><primary>postscript, from heap profiles</primary></indexterm>
+     <indexterm><primary><option>-h&lt;break-down&gt;</option></primary></indexterm>
+-    
++
+     <para>Usage:</para>
+-    
++
+ <screen>
+ hp2ps [flags] [&lt;file&gt;[.hp]]
+ </screen>
+@@ -1030,7 +1030,7 @@
+     <para>The flags are:</para>
+ 
+     <variablelist>
+-      
++
+       <varlistentry>
+ 	<term><option>-d</option></term>
+ 	<listitem>
+@@ -1136,7 +1136,7 @@
+ 	  <para>Use a small box for the title.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term><option>-t&lt;float&gt;</option></term>
+ 	<listitem>
+@@ -1157,14 +1157,14 @@
+ 	  <para>Generate colour output.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term><option>-y</option></term>
+ 	<listitem>
+ 	  <para>Ignore marks.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term><option>-?</option></term>
+ 	<listitem>
+@@ -1177,7 +1177,7 @@
+     <sect2 id="manipulating-hp">
+       <title>Manipulating the hp file</title>
+ 
+-<para>(Notes kindly offered by Jan-Willhem Maessen.)</para>
++<para>(Notes kindly offered by Jan-Willem Maessen.)</para>
+ 
+ <para>
+ The <filename>FOO.hp</filename> file produced when you ask for the
+@@ -1256,7 +1256,7 @@
+ heap profile as described in the previous section.  Run <command>gv</command> on your
+ profile:
+ <screen>
+-  gv -watch -seascape FOO.ps 
++  gv -watch -seascape FOO.ps
+ </screen>
+ If you forget the <literal>-watch</literal> flag you can still select
+ "Watch file" from the "State" menu.  Now each time you generate a new
+@@ -1292,7 +1292,7 @@
+     head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
+       | hp2ps > FOO.ps
+     kill -HUP $gvpsnum
+-  done    
++  done
+ </screen>
+ </para>
+ </sect2>
+@@ -1335,7 +1335,7 @@
+       a yellow background indicates a part of the program that was
+       never evaluated; a green background indicates an always-True
+       expression and a red background indicates an always-False one.
+-    </para> 
++    </para>
+ 
+    <sect2><title>A small example: Reciprocation</title>
+ 
+@@ -1381,10 +1381,10 @@
+     </para>
+ 
+ <screen>
+-$ ghc -fhpc Recip.hs --make 
++$ ghc -fhpc Recip.hs --make
+ </screen>
+-    <para>HPC index (.mix) files are placed placed in .hpc subdirectory. These can be considered like
+-    the .hi files for HPC. 
++    <para>HPC index (.mix) files are placed in .hpc subdirectory. These can be considered like
++    the .hi files for HPC.
+    </para>
+ <screen>
+ $ ./Recip
+@@ -1396,8 +1396,8 @@
+ $ hpc report Recip
+  80% expressions used (81/101)
+  12% boolean coverage (1/8)
+-      14% guards (1/7), 3 always True, 
+-                        1 always False, 
++      14% guards (1/7), 3 always True,
++                        1 always False,
+                         2 unevaluated
+        0% 'if' conditions (0/1), 1 always False
+      100% qualifiers (0/0)
+@@ -1415,11 +1415,11 @@
+ 		hpc_index.html, hpc_index_alt.html, hpc_index_exp.html,
+ 		hpc_index_fun.html.
+ 	</para>
+-     </sect2> 
++     </sect2>
+ 
+      <sect2><title>Options for instrumenting code for coverage</title>
+ 	<para>
+-		Turning on code coverage is easy, use the -fhpc flag. 
++		Turning on code coverage is easy, use the -fhpc flag.
+ 		Instrumented and non-instrumented can be freely mixed.
+ 		When compiling the Main module GHC automatically detects when there
+ 		is an hpc compiled file, and adds the correct initialization code.
+@@ -1431,9 +1431,9 @@
+ 
+       <para>
+       The hpc toolkit uses a cvs/svn/darcs-like interface, where a
+-      single binary contains many function units.</para> 
++      single binary contains many function units.</para>
+ <screen>
+-$ hpc 
++$ hpc
+ Usage: hpc COMMAND ...
+ 
+ Commands:
+@@ -1456,9 +1456,9 @@
+      <para>In general, these options act on .tix file after an
+      instrumented binary has generated it, which hpc acting as a
+      conduit between the raw .tix file, and the more detailed reports
+-     produced. 
++     produced.
+ 	</para>
+-	  
++
+ 	<para>
+ 		The hpc tool assumes you are in the top-level directory of
+ 		the location where you built your application, and the .tix
+@@ -1467,7 +1467,7 @@
+ 		--srcdir multiple times to analyse programs compiled from
+ 		difference locations, as is typical for packages.
+ 	</para>
+-	  
++
+ 	<para>
+ 	We now explain in more details the major modes of hpc.
+      </para>
+@@ -1477,8 +1477,8 @@
+ 			all modules and packages are considered in generating report,
+ 			unless include or exclude are used. The report is a summary
+ 			unless the --per-module flag is used. The --xml-output option
+-			allows for tools to use hpc to glean coverage. 
+-		</para>	
++			allows for tools to use hpc to glean coverage.
++		</para>
+ <screen>
+ $ hpc help report
+ Usage: hpc report [OPTION] .. &lt;TIX_FILE&gt; [&lt;MODULE&gt; [&lt;MODULE&gt; ..]]
+@@ -1518,8 +1518,8 @@
+ 
+        </sect3>
+        <sect3><title>hpc sum</title>
+-		<para>hpc sum adds together any number of .tix files into a single 
+-		.tix file. hpc sum does not change the original .tix file; it generates a new .tix file. 
++		<para>hpc sum adds together any number of .tix files into a single
++		.tix file. hpc sum does not change the original .tix file; it generates a new .tix file.
+ 		</para>
+ <screen>
+ $ hpc help sum
+@@ -1535,10 +1535,10 @@
+ </screen>
+        </sect3>
+        <sect3><title>hpc combine</title>
+-		<para>hpc combine is the swiss army knife of hpc. It can be 
++		<para>hpc combine is the swiss army knife of hpc. It can be
+ 		 used to take the difference between .tix files, to subtract one
+ 		.tix file from another, or to add two .tix files. hpc combine does not
+-		change the original .tix file; it generates a new .tix file. 
++		change the original .tix file; it generates a new .tix file.
+ 		</para>
+ <screen>
+ $ hpc help combine
+@@ -1557,11 +1557,11 @@
+        </sect3>
+        <sect3><title>hpc map</title>
+ 		<para>hpc map inverts or zeros a .tix file. hpc map does not
+-		change the original .tix file; it generates a new .tix file. 
++		change the original .tix file; it generates a new .tix file.
+ 		</para>
+ <screen>
+ $ hpc help map
+-Usage: hpc map [OPTION] .. &lt;TIX_FILE&gt; 
++Usage: hpc map [OPTION] .. &lt;TIX_FILE&gt;
+ Map a function over a single .tix file
+ 
+ Options:
+@@ -1591,7 +1591,7 @@
+     --hpcdir=DIR   sub-directory that contains .mix files
+                    default .hpc [rarely used]
+     --output=FILE  output FILE
+-% hpc help draft  
++% hpc help draft
+ Usage: hpc draft [OPTION] .. &lt;TIX_FILE&gt;
+ 
+ Options:
+@@ -1660,7 +1660,7 @@
+             for <option>-debug</option> at link-time).  This links in
+             the debug version of the RTS, which includes the code for
+             aggregating and reporting the results of ticky-ticky
+-            profilng.
++            profiling.
+           </para>
+         </listitem>
+         <listitem>
+@@ -1678,7 +1678,7 @@
+       the invocation
+       <command>foo +RTS -rfoo.ticky</command>.
+       </para>
+-    
++
+ <screen>
+  foo +RTS -rfoo.ticky
+ 
+diff -dur 7.0.4-original//runtime_control.xml original/runtime_control.xml
+--- 7.0.4-original//runtime_control.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/runtime_control.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -329,7 +329,7 @@
+            with a message like &ldquo;<literal>failed to mmap() memory below 2Gb</literal>&rdquo;.  If you need to use this option to get GHCi working
+            on your machine, please file a bug.
+          </para>
+-         
++
+          <para>
+            On 64-bit machines, the RTS needs to allocate memory in the
+            low 2Gb of the address space.  Support for this across
+@@ -495,7 +495,7 @@
+             generation <replaceable>gen</replaceable> and higher.
+             Omitting <replaceable>gen</replaceable> turns off the
+             parallel GC completely, reverting to sequential GC.</para>
+-          
++
+           <para>The default parallel GC settings are usually suitable
+             for parallel programs (i.e. those
+             using <literal>par</literal>, Strategies, or with multiple
+@@ -509,7 +509,7 @@
+             restrict parallel GC to the old generation
+             with <literal>-qg1</literal>.</para>
+         </listitem>
+-      </varlistentry>        
++      </varlistentry>
+ 
+       <varlistentry>
+         <term>
+@@ -524,7 +524,7 @@
+             generation <replaceable>gen</replaceable> and higher.
+             Omitting <replaceable>gen</replaceable> disables
+             load-balancing entirely.</para>
+-          
++
+           <para>
+             Load-balancing shares out the work of GC between the
+             available cores.  This is a good idea when the heap is
+@@ -600,22 +600,88 @@
+ 
+       <varlistentry>
+ 	<term>
+-         <option>-k</option><replaceable>size</replaceable>
++         <option>-ki</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-k</option></primary><secondary>RTS option</secondary></indexterm>
+-         <indexterm><primary>stack, minimum size</primary></indexterm>
++         <indexterm><primary>stack, initial size</primary></indexterm>
+         </term>
+ 	<listitem>
+-	  <para>&lsqb;Default: 1k&rsqb; Set the initial stack size for
+-          new threads.  Thread stacks (including the main thread's
+-          stack) live on the heap, and grow as required.  The default
+-          value is good for concurrent applications with lots of small
+-          threads; if your program doesn't fit this model then
+-          increasing this option may help performance.</para>
++          <para>
++            &lsqb;Default: 1k&rsqb; Set the initial stack size for new
++            threads.  (Note: this flag used to be
++            simply <option>-k</option>, but was renamed
++            to <option>-ki</option> in GHC 7.2.1.  The old name is
++            still accepted for backwards compatibility, but that may
++            be removed in a future version).
++          </para>
+ 
+-	  <para>The main thread is normally started with a slightly
+-          larger heap to cut down on unnecessary stack growth while
+-          the program is starting up.</para>
+-	</listitem>
++          <para>
++            Thread stacks (including the main thread's stack) live on
++            the heap.  As the stack grows, new stack chunks are added
++            as required; if the stack shrinks again, these extra stack
++            chunks are reclaimed by the garbage collector.  The
++            default initial stack size is deliberately small, in order
++            to keep the time and space overhead for thread creation to
++            a minimum, and to make it practical to spawn threads for
++            even tiny pieces of work.
++          </para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term>
++          <option>-kc</option><replaceable>size</replaceable>
++          <indexterm><primary><option>-kc</option></primary><secondary>RTS
++          option</secondary></indexterm>
++          <indexterm><primary>stack</primary><secondary>chunk size</secondary></indexterm>
++        </term>
++        <listitem>
++          <para>
++            &lsqb;Default: 32k&rsqb; Set the size of &ldquo;stack
++            chunks&rdquo;.  When a thread's current stack overflows, a
++            new stack chunk is created and added to the thread's
++            stack, until the limit set by <option>-K</option> is
++            reached.
++          </para>
++
++          <para>
++            The advantage of smaller stack chunks is that the garbage
++            collector can avoid traversing stack chunks if they are
++            known to be unmodified since the last collection, so
++            reducing the chunk size means that the garbage collector
++            can identify more stack as unmodified, and the GC overhead
++            might be reduced.  On the other hand, making stack chunks
++            too small adds some overhead as there will be more
++            overflow/underflow between chunks.  The default setting of
++            32k appears to be a reasonable compromise in most cases.
++          </para>
++        </listitem>
++      </varlistentry>
++
++      <varlistentry>
++        <term>
++          <option>-kb</option><replaceable>size</replaceable>
++          <indexterm><primary><option>-kc</option></primary><secondary>RTS
++          option</secondary></indexterm>
++          <indexterm><primary>stack</primary><secondary>chunk buffer size</secondary></indexterm>
++        </term>
++        <listitem>
++          <para>
++            &lsqb;Default: 1k&rsqb; Sets the stack chunk buffer size.
++            When a stack chunk overflows and a new stack chunk is
++            created, some of the data from the previous stack chunk is
++            moved into the new chunk, to avoid an immediate underflow
++            and repeated overflow/underflow at the boundary.  The
++            amount of stack moved is set by the <option>-kb</option>
++            option.
++          </para>
++          <para>
++            Note that to avoid wasting space, this value should
++            typically be less than 10&percnt; of the size of a stack
++            chunk (<option>-kc</option>), because in a chain of stack
++            chunks, each chunk will have a gap of unused space of this
++            size.
++          </para>
++        </listitem>
+       </varlistentry>
+ 
+       <varlistentry>
+@@ -627,9 +693,14 @@
+ 	<listitem>
+ 	  <para>&lsqb;Default: 8M&rsqb; Set the maximum stack size for
+           an individual thread to <replaceable>size</replaceable>
+-          bytes.  This option is there purely to stop the program
+-          eating up all the available memory in the machine if it gets
+-          into an infinite loop.</para>
++          bytes.  If the thread attempts to exceed this limit, it will
++            be send the <literal>StackOverflow</literal> exception.
++          </para>
++          <para>
++            This option is there mainly to stop the program eating up
++            all the available memory in the machine if it gets into an
++            infinite loop.
++          </para>
+ 	</listitem>
+       </varlistentry>
+ 
+@@ -746,7 +817,7 @@
+       </listitem>
+       <listitem>
+         <para>
+-          The peak memory the RTS has allocated from the OS. 
++          The peak memory the RTS has allocated from the OS.
+         </para>
+       </listitem>
+       <listitem>
+@@ -941,12 +1012,12 @@
+       </listitem>
+       <listitem>
+         <para>
+-          How many page faults occured this garbage collection.
++          How many page faults occurred this garbage collection.
+         </para>
+       </listitem>
+       <listitem>
+         <para>
+-          How many page faults occured since the end of the last garbage
++          How many page faults occurred since the end of the last garbage
+           collection.
+         </para>
+       </listitem>
+@@ -1138,7 +1209,7 @@
+         </term>
+ 	<listitem>
+ 	  <para>
+-            An RTS debugging flag; only availble if the program was
++            An RTS debugging flag; only available if the program was
+ 	    linked with the <option>-debug</option> option.  Various
+ 	    values of <replaceable>x</replaceable> are provided to
+ 	    enable debug messages and additional runtime sanity checks
+originalだけに発見: safe_haskell.xml
+diff -dur 7.0.4-original//separate_compilation.xml original/separate_compilation.xml
+--- 7.0.4-original//separate_compilation.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/separate_compilation.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -114,9 +114,9 @@
+ 	  has been specified, then the object filename is
+ 	  <replaceable>dir</replaceable>/<replaceable>mod</replaceable>.<replaceable>osuf</replaceable>,
+ 	  where <replaceable>mod</replaceable> is the module name with
+-	  dots replaced by slashes.  GHC will silently create the necessary directory 
++	  dots replaced by slashes.  GHC will silently create the necessary directory
+           structure underneath <replaceable>dir</replaceable>, if it does not
+-          already exist.</para> 
++          already exist.</para>
+ 	</listitem>
+       </itemizedlist>
+ 
+@@ -273,7 +273,7 @@
+           <para>If you use <command>ghc --make</command> and you don't
+           use the <option>-o</option>, the name GHC will choose
+           for the executable will be based on the name of the file
+-          containing the module <literal>Main</literal>. 
++          containing the module <literal>Main</literal>.
+           Note that with GHC the <literal>Main</literal> module doesn't
+           have to be put in file <filename>Main.hs</filename>.
+           Thus both
+@@ -433,7 +433,7 @@
+ 	</varlistentry>
+       </variablelist>
+     </sect2>
+-  
++
+     <sect2 id="keeping-intermediates">
+       <title>Keeping Intermediate Files</title>
+       <indexterm><primary>intermediate files, saving</primary>
+@@ -461,9 +461,7 @@
+ 	    <para>Keep intermediate <literal>.hc</literal> files when
+ 	    doing <literal>.hs</literal>-to-<literal>.o</literal>
+ 	    compilations via C (NOTE: <literal>.hc</literal> files
+-	    aren't generated when using the native code generator, you
+-	    may need to use <option>-fvia-C</option> to force them
+-	    to be produced).</para>
++	    are only generated by unregisterised compilers).</para>
+ 	  </listitem>
+ 	</varlistentry>
+ 
+@@ -498,22 +496,6 @@
+ 
+ 	<varlistentry>
+ 	  <term>
+-            <option>-keep-raw-s-file</option>,
+-            <option>-keep-raw-s-files</option>
+-            <indexterm><primary><option>-keep-raw-s-file</option></primary></indexterm>
+-            <indexterm><primary><option>-keep-raw-s-files</option></primary></indexterm>
+-          </term>
+-	  <listitem>
+-	    <para>Keep intermediate <literal>.raw-s</literal> files.
+-	    These are the direct output from the C compiler, before
+-	    GHC does &ldquo;assembly mangling&rdquo; to produce the
+-	    <literal>.s</literal> file.  Again, these are not produced
+-	    when using the native code generator.</para>
+-	  </listitem>
+-	</varlistentry>
+-
+-	<varlistentry>
+-	  <term>
+             <option>-keep-tmp-files</option>
+             <indexterm><primary><option>-keep-tmp-files</option></primary></indexterm>
+             <indexterm><primary>temporary files</primary><secondary>keeping</secondary></indexterm>
+@@ -711,22 +693,22 @@
+       This section explains how.</para>
+ 
+       <para>Every cycle in the module import graph must be broken by a <filename>hs-boot</filename> file.
+-      Suppose that modules <filename>A.hs</filename> and <filename>B.hs</filename> are Haskell source files, 
++      Suppose that modules <filename>A.hs</filename> and <filename>B.hs</filename> are Haskell source files,
+       thus:
+ <programlisting>
+ module A where
+     import B( TB(..) )
+-    
++
+     newtype TA = MkTA Int
+-    
++
+     f :: TB -&#62; TA
+     f (MkTB x) = MkTA x
+ 
+ module B where
+     import {-# SOURCE #-} A( TA(..) )
+-    
++
+     data TB = MkTB !Int
+-    
++
+     g :: TA -&#62; TB
+     g (MkTA x) = MkTB x
+ </programlisting>
+@@ -768,12 +750,12 @@
+ <programlisting>
+   ghc -c A.hs-boot
+ </programlisting>
+-When a hs-boot file <filename>A.hs-boot</filename> 
++When a hs-boot file <filename>A.hs-boot</filename>
+    is compiled, it is checked for scope and type errors.
+    When its parent module <filename>A.hs</filename> is compiled, the two are compared, and
+    an error is reported if the two are inconsistent.
+    </para></listitem>
+-   
++
+ 	<listitem>
+ 	  <para> Just as compiling <filename>A.hs</filename> produces an
+ 	    interface file <filename>A.hi</filename>, and an object file
+@@ -811,7 +793,7 @@
+    <command>ghc -M</command> will report an error if a cycle is found.
+    </para></listitem>
+ 
+-   <listitem><para> A module <literal>M</literal> that is 
++   <listitem><para> A module <literal>M</literal> that is
+    <literal>{-# SOURCE #-}</literal>-imported in a program will usually also be
+    ordinarily imported elsewhere.  If not, <command>ghc --make</command>
+    automatically adds <literal>M</literal> to the set of modules it tries to
+@@ -830,9 +812,9 @@
+ <para>A hs-boot file is written in a subset of Haskell:
+ <itemizedlist>
+ <listitem><para> The module header (including the export list), and import statements, are exactly as in
+-Haskell, and so are the scoping rules.  
++Haskell, and so are the scoping rules.
+    Hence, to mention a non-Prelude type or class, you must import it.</para></listitem>
+-   
++
+ <listitem><para> There must be no value declarations, but there can be type signatures for
+ values.  For example:
+ <programlisting>
+@@ -841,7 +823,7 @@
+ </para></listitem>
+ <listitem><para> Fixity declarations are exactly as in Haskell.</para></listitem>
+ <listitem><para> Type synonym declarations are exactly as in Haskell.</para></listitem>
+-<listitem><para> A data type declaration can either be given in full, exactly as in Haskell, or it 
++<listitem><para> A data type declaration can either be given in full, exactly as in Haskell, or it
+ can be given abstractly, by omitting the '=' sign and everything that follows.  For example:
+ <programlisting>
+   data T a b
+@@ -853,7 +835,7 @@
+ 	  You <emphasis>can</emphasis> also write out the constructors but, if you do so, you must write
+ 	  it out precisely as in its real definition.</para>
+ 	  <para>
+-	    If you do not write out the constructors, you may need to give a kind 
++	    If you do not write out the constructors, you may need to give a kind
+ 	    annotation (<xref linkend="kinding"/>), to tell
+ 	    GHC the kind of the type variable, if it is not "*".  (In source files, this is worked out
+ 	    from the way the type variable is used in the constructors.)  For example:
+@@ -956,7 +938,7 @@
+       brought up to date.  To bring it up to date,
+       <literal>make</literal> looks for a rule to do so; one of the
+       preceding suffix rules does the job nicely.  These dependencies
+-      can be generated automatically by <command>ghc</command>; see 
++      can be generated automatically by <command>ghc</command>; see
+       <xref linkend="makefile-dependencies"/></para>
+ 
+  </sect2>
+@@ -985,7 +967,7 @@
+         <filename>Makefile</filename>.</para>
+ 
+ 	<para>In general, <command>ghc -M Foo</command> does the following.
+-	For each module <literal>M</literal> in the set 
++	For each module <literal>M</literal> in the set
+ 	<literal>Foo</literal> plus all its imports (transitively),
+ 	it adds to the Makefile:
+ 	<itemizedlist>
+@@ -1008,7 +990,7 @@
+        (See <xref linkend="mutual-recursion"/> for details of
+        <literal>hi-boot</literal> style interface files.)
+       </para></listitem>
+-        </itemizedlist> 
++        </itemizedlist>
+ 	If <literal>M</literal> imports multiple modules, then there will
+        be multiple lines with <filename>M.o</filename> as the
+        target.</para>
+@@ -1145,7 +1127,7 @@
+ be a disaster in practice, so GHC tries to be clever. </para>
+ 
+ <para>In particular, if an instance declaration is in the same module as the definition
+-of any type or class mentioned in the <emphasis>head</emphasis> of the instance declaration 
++of any type or class mentioned in the <emphasis>head</emphasis> of the instance declaration
+ (the part after the &ldquo;<literal>=&gt;</literal>&rdquo;; see <xref linkend="instance-rules"/>), then
+ GHC has to visit that interface file anyway.  Example:</para>
+ <programlisting>
+@@ -1196,8 +1178,8 @@
+   least one <emphasis>orphan rule</emphasis>.</para> </listitem>
+ 
+   <listitem><para> An instance declaration in a module M is an <emphasis>orphan instance</emphasis> if
+-  <indexterm><primary>orphan instance</primary></indexterm> 
+-<itemizedlist> 
++  <indexterm><primary>orphan instance</primary></indexterm>
++<itemizedlist>
+ <listitem><para>
+   The class of the instance declaration is not declared in M, and
+ </para></listitem>
+@@ -1209,7 +1191,7 @@
+ 	</para></listitem>
+   </itemizedlist>
+   </para>
+-  <para> Only the instance head 
++  <para> Only the instance head
+   counts.  In the example above, it is not good enough for C's declaration
+   to be in module A; it must be the declaration of D or T.</para>
+   </listitem>
+@@ -1223,9 +1205,9 @@
+ 
+ 
+ 
+-<para>If you use the flag <option>-fwarn-orphans</option>, GHC will warn you 
++<para>If you use the flag <option>-fwarn-orphans</option>, GHC will warn you
+ if you are creating an orphan module.
+-Like any warning, you can switch the warning off with <option>-fno-warn-orphans</option>, 
++Like any warning, you can switch the warning off with <option>-fno-warn-orphans</option>,
+ and <option>-Werror</option>
+ will make the compilation fail if the warning is issued.
+ </para>
+diff -dur 7.0.4-original//shared_libs.xml original/shared_libs.xml
+--- 7.0.4-original//shared_libs.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/shared_libs.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -113,8 +113,8 @@
+       Building Haskell code into a shared library is a good way to include
+       Haskell code in a larger mixed-language project. While with static
+       linking it is recommended to use GHC to perform the final link step,
+-      with shared libaries a Haskell library can be treated just like any
+-      other shared libary. The linking can be done using the normal system C
++      with shared libraries a Haskell library can be treated just like any
++      other shared library. The linking can be done using the normal system C
+       compiler or linker.
+     </para>
+     <para>
+@@ -138,7 +138,7 @@
+       package. The <literal>-fPIC</literal> flag is required for all code
+       that will end up in a shared library. The <literal>-shared</literal>
+       flag specifies to make a shared library rather than a program. To make
+-      this clearer we can break this down into separate compliation and link
++      this clearer we can break this down into separate compilation and link
+       steps:
+ <programlisting>
+ ghc -dynamic -fPIC -c Foo.hs
+@@ -179,7 +179,7 @@
+       is to use a "runtime path" or "rpath" embedded into programs and
+       libraries themselves. These paths can either be absolute paths or on at
+       least Linux and Solaris they can be paths relative to the program or
+-      libary itself. In principle this makes it possible to construct fully
++      library itself. In principle this makes it possible to construct fully
+       relocatable sets of programs and libraries.
+     </para>
+     <para>
+diff -dur 7.0.4-original//sooner.xml original/sooner.xml
+--- 7.0.4-original//sooner.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/sooner.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -163,18 +163,6 @@
+       </varlistentry>
+ 
+       <varlistentry>
+-	<term>Compile via C and crank up GCC:</term>
+-	<listitem>
+-	  <para>The native code-generator is designed to be quick, not
+-          mind-bogglingly clever.  Better to let GCC have a go, as it
+-          tries much harder on register allocation, etc.</para>
+-
+-	  <para>So, when we want very fast code, we use: <option>-O
+-	  -fvia-C</option>.</para>
+-	</listitem>
+-      </varlistentry>
+-
+-      <varlistentry>
+ 	<term>Overloaded functions are not your friend:</term>
+ 	<listitem>
+ 	  <para>Haskell's overloading (using type classes) is elegant,
+diff -dur 7.0.4-original//ug-book.xml original/ug-book.xml
+--- 7.0.4-original//ug-book.xml	2011-06-15 21:01:20.000000000 +0800
++++ original/ug-book.xml	2011-08-15 14:59:40.000000000 +0800
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="iso-8859-1"?>
+ <bookinfo>
+-<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.0.4</title>
++<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.2.1</title>
+ <author><othername>The GHC Team</othername></author>
+ <address>
+ <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
+7.0.4-original/だけに発見: users_guide
+7.0.4-original/だけに発見: users_guide.xml
+diff -dur 7.0.4-original//using.xml original/using.xml
+--- 7.0.4-original//using.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/using.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -78,7 +78,7 @@
+ 
+   <sect1>
+     <title>Options overview</title>
+-    
++
+     <para>GHC's behaviour is controlled by
+     <firstterm>options</firstterm>, which for historical reasons are
+     also sometimes referred to as command-line flags or arguments.
+@@ -86,11 +86,11 @@
+ 
+     <sect2>
+       <title>Command-line arguments</title>
+-      
++
+       <indexterm><primary>structure, command-line</primary></indexterm>
+       <indexterm><primary>command-line</primary><secondary>arguments</secondary></indexterm>
+       <indexterm><primary>arguments</primary><secondary>command-line</secondary></indexterm>
+-      
++
+       <para>An invocation of GHC takes the following form:</para>
+ 
+ <screen>
+@@ -112,7 +112,7 @@
+ 
+     <sect2 id="source-file-options">
+       <title>Command line options in source files</title>
+-    
++
+       <indexterm><primary>source-file options</primary></indexterm>
+ 
+       <para>Sometimes it is useful to make the connection between a
+@@ -130,7 +130,7 @@
+ module X where
+ ...
+ </programlisting>
+-      
++
+       <para><literal>OPTIONS_GHC</literal> is a <emphasis>file-header pragma</emphasis>
+       (see <xref linkend="pragmas"/>).</para>
+ 
+@@ -163,7 +163,7 @@
+       for more details.</para>
+     </sect2>
+   </sect1>
+-    
++
+   <sect1 id="static-dynamic-flags">
+     <title>Static, Dynamic, and Mode options</title>
+     <indexterm><primary>static</primary><secondary>options</secondary>
+@@ -204,14 +204,14 @@
+ 	</listitem>
+       </varlistentry>
+     </variablelist>
+-    
++
+     <para>The flag reference tables (<xref
+     linkend="flag-reference"/>) lists the status of each flag.</para>
+ 
+     <para>There are a few flags that are static except that they can
+     also be used with GHCi's <literal>:set</literal> command; these
+     are listed as &ldquo;static/<literal>:set</literal>&rdquo; in the
+-    table.</para> 
++    table.</para>
+   </sect1>
+ 
+   <sect1 id="file-suffixes">
+@@ -266,7 +266,7 @@
+ 	  compiler.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term><filename>.ll</filename></term>
+ 	<listitem>
+@@ -336,7 +336,7 @@
+ 	  more detail in <xref linkend="ghci"/>.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term>
+ 	  <cmdsynopsis><command>ghc &ndash;&ndash;make</command>
+@@ -375,7 +375,7 @@
+ 	  more details.</para>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term>
+           <cmdsynopsis>
+@@ -531,7 +531,7 @@
+       <title>Using <command>ghc</command> <option>&ndash;&ndash;make</option></title>
+       <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
+       <indexterm><primary>separate compilation</primary></indexterm>
+-      
++
+       <para>In this mode, GHC will build a multi-module Haskell program by following
+       dependencies from one or more root modules (usually just
+       <literal>Main</literal>).  For example, if your
+@@ -583,7 +583,7 @@
+ 	  source.</para>
+ 	</listitem>
+       </itemizedlist>
+-      
++
+       <para>Any of the command-line options described in the rest of
+       this chapter can be used with
+       <option>&ndash;&ndash;make</option>, but note that any options
+@@ -596,7 +596,7 @@
+       (say, some auxiliary C code), then the object files can be
+       given on the command line and GHC will include them when linking
+       the executable.</para>
+-      
++
+       <para>Note that GHC can only follow dependencies if it has the
+       source file available, so if your program includes a module for
+       which there is no source file, even if you have an object and an
+@@ -609,7 +609,7 @@
+       to add directories to the search path (see <xref
+       linkend="search-path"/>).</para>
+     </sect2>
+-  
++
+     <sect2 id="eval-mode">
+       <title>Expression evaluation mode</title>
+ 
+@@ -633,7 +633,7 @@
+ <screen>
+ ghc -e Main.main Main.hs
+ </screen>
+-      
++
+       <para>or we can just use this mode to evaluate expressions in
+       the context of the <literal>Prelude</literal>:</para>
+ 
+@@ -646,22 +646,22 @@
+ 
+     <sect2 id="options-order">
+       <title>Batch compiler mode</title>
+-      
++
+       <para>In <emphasis>batch mode</emphasis>, GHC will compile one or more source files
+       given on the command line.</para>
+-      
++
+       <para>The first phase to run is determined by each input-file
+       suffix, and the last phase is determined by a flag.  If no
+       relevant flag is present, then go all the way through to linking.
+       This table summarises:</para>
+-      
++
+       <informaltable>
+ 	<tgroup cols="4">
+ 	  <colspec align="left"/>
+ 	  <colspec align="left"/>
+ 	  <colspec align="left"/>
+ 	  <colspec align="left"/>
+-	  
++
+ 	  <thead>
+ 	    <row>
+ 	      <entry>Phase of the compilation system</entry>
+@@ -677,7 +677,7 @@
+ 	      <entry>-</entry>
+ 	      <entry><literal>.hs</literal></entry>
+ 	    </row>
+-	    
++
+ 	    <row>
+ 	      <entry>C pre-processor (opt.) </entry>
+ 	      <entry><literal>.hs</literal> (with
+@@ -685,28 +685,28 @@
+ 	      <entry><option>-E</option></entry>
+ 	      <entry><literal>.hspp</literal></entry>
+ 	    </row>
+-	    
++
+ 	    <row>
+ 	      <entry>Haskell compiler</entry>
+ 	      <entry><literal>.hs</literal></entry>
+ 	      <entry><option>-C</option>, <option>-S</option></entry>
+ 	      <entry><literal>.hc</literal>, <literal>.s</literal></entry>
+ 	    </row>
+-	    
++
+ 	    <row>
+ 	      <entry>C compiler (opt.)</entry>
+ 	      <entry><literal>.hc</literal> or <literal>.c</literal></entry>
+ 	      <entry><option>-S</option></entry>
+ 	      <entry><literal>.s</literal></entry>
+ 	    </row>
+-	    
++
+ 	    <row>
+ 	      <entry>assembler</entry>
+ 	      <entry><literal>.s</literal></entry>
+ 	      <entry><option>-c</option></entry>
+ 	      <entry><literal>.o</literal></entry>
+ 	    </row>
+-	    
++
+ 	    <row>
+ 	      <entry>linker</entry>
+ 	      <entry><replaceable>other</replaceable></entry>
+@@ -716,17 +716,17 @@
+ 	  </tbody>
+ 	</tgroup>
+       </informaltable>
+-      
++
+       <indexterm><primary><option>-C</option></primary></indexterm>
+       <indexterm><primary><option>-E</option></primary></indexterm>
+       <indexterm><primary><option>-S</option></primary></indexterm>
+       <indexterm><primary><option>-c</option></primary></indexterm>
+-      
++
+       <para>Thus, a common invocation would be: </para>
+ 
+ <screen>
+ ghc -c Foo.hs</screen>
+-      
++
+       <para>to compile the Haskell source file
+       <filename>Foo.hs</filename> to an object file
+       <filename>Foo.o</filename>.</para>
+@@ -741,7 +741,7 @@
+       <option>-cpp</option><indexterm><primary><option>-cpp</option></primary></indexterm>
+       flag turns it on.  See <xref linkend="c-pre-processor"/> for more
+       details.</para>
+-      
++
+       <para>Note: The option <option>-E</option><indexterm><primary>-E
+       option</primary></indexterm> runs just the pre-processing passes
+       of the compiler, dumping the result in a file.</para>
+@@ -783,18 +783,6 @@
+     <variablelist>
+       <varlistentry>
+ 	<term>
+-          <option>-n</option>
+-          <indexterm><primary><option>-n</option></primary></indexterm>
+-        </term>
+-	<listitem>
+-	  <para>Does a dry-run, i.e. GHC goes through all the motions
+-          of compiling as normal, but does not actually run any
+-          external commands.</para>
+-	</listitem>
+-      </varlistentry>
+-
+-      <varlistentry>
+-	<term>
+           <option>-v</option>
+           <indexterm><primary><option>-v</option></primary></indexterm>
+         </term>
+@@ -812,7 +800,7 @@
+           verify.</para>
+ 	</listitem>
+       </varlistentry>
+-	
++
+       <varlistentry>
+ 	<term>
+           <option>-v</option><replaceable>n</replaceable>
+@@ -824,7 +812,7 @@
+ 	  argument.  Specifying <option>-v</option> on its own is
+ 	  equivalent to <option>-v3</option>, and the other levels
+ 	  have the following meanings:</para>
+-	  
++
+ 	  <variablelist>
+ 	    <varlistentry>
+ 	      <term><option>-v0</option></term>
+@@ -874,7 +862,7 @@
+ 	  </variablelist>
+ 	</listitem>
+       </varlistentry>
+-      
++
+       <varlistentry>
+ 	<term><option>-ferror-spans</option>
+           <indexterm><primary><option>-ferror-spans</option></primary>
+@@ -990,9 +978,11 @@
+ 	  <emphasis>not</emphasis> enabled by <option>-Wall</option>
+ 	  are
+             <option>-fwarn-tabs</option>,
++            <option>-fwarn-incomplete-uni-patterns</option>,
+             <option>-fwarn-incomplete-record-updates</option>,
+             <option>-fwarn-monomorphism-restriction</option>,
+-            <option>-fwarn-unused-do-bind</option>, and
++            <option>-fwarn-unrecognised-pragmas</option>,
++            <option>-fwarn-auto-orphans</option>,
+             <option>-fwarn-implicit-prelude</option>.</para>
+ 	</listitem>
+       </varlistentry>
+@@ -1010,7 +1000,7 @@
+ 	<term><option>-Werror</option>:</term>
+ 	<listitem>
+ 	  <indexterm><primary><option>-Werror</option></primary></indexterm>
+-	  <para>Makes any warning into a fatal error. Useful so that you don't 
++	  <para>Makes any warning into a fatal error. Useful so that you don't
+ 	    miss warnings when doing batch compilation. </para>
+ 	</listitem>
+       </varlistentry>
+@@ -1175,6 +1165,21 @@
+       </varlistentry>
+ 
+       <varlistentry>
++        <term><option>-fwarn-identities</option>:</term>
++	<listitem>
++          <indexterm><primary><option>-fwarn-identities</option></primary></indexterm>
++          <para>Causes the compiler to emit a warning when a Prelude numeric
++            conversion converts a type T to the same type T; such calls
++            are probably no-ops and can be omitted.  The functions checked for
++            are: <literal>toInteger</literal>,
++            <literal>toRational</literal>,
++            <literal>fromIntegral</literal>,
++            and <literal>realToFrac</literal>.
++          </para>
++	</listitem>
++      </varlistentry>
++
++      <varlistentry>
+         <term><option>-fwarn-implicit-prelude</option>:</term>
+         <listitem>
+           <indexterm><primary><option>-fwarn-implicit-prelude</option></primary></indexterm>
+@@ -1200,27 +1205,41 @@
+       </varlistentry>
+ 
+       <varlistentry>
+-	<term><option>-fwarn-incomplete-patterns</option>:</term>
++	<term><option>-fwarn-incomplete-patterns</option>,
++              <option>-fwarn-incomplete-uni-patterns</option>:
++        </term>
+ 	<listitem>
+ 	  <indexterm><primary><option>-fwarn-incomplete-patterns</option></primary></indexterm>
++	  <indexterm><primary><option>-fwarn-incomplete-uni-patterns</option></primary></indexterm>
+ 	  <indexterm><primary>incomplete patterns, warning</primary></indexterm>
+ 	  <indexterm><primary>patterns, incomplete</primary></indexterm>
+ 
+-          <para>Similarly for incomplete patterns, the functions
+-          <function>g</function> and <function>h</function> below will fail when applied to
++          <para>The option <option>-fwarn-incomplete-patterns</option> warns
++            about places where
++	    a pattern-match might fail at runtime.
++          The function
++          <function>g</function> below will fail when applied to
+           non-empty lists, so the compiler will emit a warning about
+           this when <option>-fwarn-incomplete-patterns</option> is
+-          enabled.</para>
+-
++          enabled.
+ <programlisting>
+ g [] = 2
+-h = \[] -> 2
+ </programlisting>
+-
+-	  <para>This option isn't enabled by default because it can be
++	  This option isn't enabled by default because it can be
+           a bit noisy, and it doesn't always indicate a bug in the
+           program.  However, it's generally considered good practice
+-          to cover all the cases in your functions.</para>
++          to cover all the cases in your functions, and it is switched
++          on by <option>-W</option>.</para>
++
++          <para>The flag <option>-fwarn-incomplete-uni-patterns</option> is
++          similar, except that it
++          applies only to lambda-expressions and pattern bindings, constructs
++	  that only allow a single pattern:
++<programlisting>
++h = \[] -> 2
++Just k = f y
++</programlisting>
++          </para>
+ 	</listitem>
+       </varlistentry>
+ 
+@@ -1269,6 +1288,39 @@
+       </varlistentry>
+ 
+       <varlistentry>
++	<term>
++          <option>-fwarn-missing-import-lists</option>:
++	  <indexterm><primary><option>-fwarn-import-lists</option></primary></indexterm>
++	  <indexterm><primary>missing import lists, warning</primary></indexterm>
++	  <indexterm><primary>import lists, missing</primary></indexterm>
++        </term>
++	<listitem>
++
++	  <para>This flag warns if you use an unqualified
++            <literal>import</literal> declaration
++	    that does not explicitly list the entities brought into scope. For
++	    example
++      </para>
++<programlisting>
++module M where
++  import X( f )
++  import Y
++  import qualified Z
++  p x = f x x
++</programlisting>
++        <para>
++          The <option>-fwarn-import-lists</option> flag will warn about the import
++	  of <literal>Y</literal> but not <literal>X</literal>
++	  If module <literal>Y</literal> is later changed to export (say) <literal>f</literal>,
++          then the reference to <literal>f</literal> in <literal>M</literal> will become
++	  ambiguous.  No warning is produced for the import of <literal>Z</literal>
++	  because extending <literal>Z</literal>'s exports would be unlikely to produce
++	  ambiguity in <literal>M</literal>.
++        </para>
++	</listitem>
++      </varlistentry>
++
++      <varlistentry>
+ 	<term><option>-fwarn-missing-methods</option>:</term>
+ 	<listitem>
+ 	  <indexterm><primary><option>-fwarn-missing-methods</option></primary></indexterm>
+@@ -1287,7 +1339,7 @@
+ 	        complexFn :: a -> a -> String
+ 	        complexFn x y = ... _simpleFn ...
+ 	      </programlisting>
+-	    The idea is that: (a) users of the class will only call <literal>complexFn</literal>; 
++	    The idea is that: (a) users of the class will only call <literal>complexFn</literal>;
+ 	    never <literal>_simpleFn</literal>; and (b)
+ 	    instance declarations can define either <literal>complexFn</literal> or <literal>_simpleFn</literal>.
+ 	    </para>
+@@ -1309,11 +1361,25 @@
+       </varlistentry>
+ 
+       <varlistentry>
++	<term><option>-fwarn-missing-local-sigs</option>:</term>
++	<listitem>
++	  <indexterm><primary><option>-fwarn-missing-local-sigs</option></primary></indexterm>
++	  <indexterm><primary>type signatures, missing</primary></indexterm>
++
++	  <para>If you use the
++          <option>-fwarn-missing-local-sigs</option> flag GHC will warn
++          you about any polymorphic local bindings. As part of
++	    the warning GHC also reports the inferred type. The
++          option is off by default.</para>
++	</listitem>
++      </varlistentry>
++
++      <varlistentry>
+ 	<term><option>-fwarn-name-shadowing</option>:</term>
+ 	<listitem>
+ 	  <indexterm><primary><option>-fwarn-name-shadowing</option></primary></indexterm>
+ 	  <indexterm><primary>shadowing, warning</primary></indexterm>
+-	  
++
+ 	  <para>This option causes a warning to be emitted whenever an
+           inner-scope value has the same name as an outer-scope value,
+           i.e. the inner value shadows the outer one.  This can catch
+@@ -1334,8 +1400,8 @@
+ 	  <indexterm><primary><option>-fwarn-orphans</option></primary></indexterm>
+ 	  <indexterm><primary>orphan instances, warning</primary></indexterm>
+ 	  <indexterm><primary>orphan rules, warning</primary></indexterm>
+-	  
+-	  <para>This option causes a warning to be emitted whenever the 
++
++	  <para>This option causes a warning to be emitted whenever the
+ 	    module contains an "orphan" instance declaration or rewrite rule.
+ 	    An instance declaration is an orphan if it appears in a module in
+ 	    which neither the class nor the type being instanced are declared
+@@ -1344,7 +1410,7 @@
+ 	  orphans is called an orphan module.</para>
+ 	  <para>The trouble with orphans is that GHC must pro-actively read the interface
+ 	    files for all orphan modules, just in case their instances or rules
+-	    play a role, whether or not the module's interface would otherwise 
++	    play a role, whether or not the module's interface would otherwise
+ 	    be of any use.  See <xref linkend="orphan-modules"/> for details.
+             </para>
+ 	</listitem>
+@@ -1432,8 +1498,8 @@
+           which are unused.  For top-level functions, the warning is
+           only given if the binding is not exported.</para>
+ 	  <para>A definition is regarded as "used" if (a) it is exported, or (b) it is
+-	    mentioned in the right hand side of another definition that is used, or (c) the 
+-	    function it defines begins with an underscore.  The last case provides a 
++	    mentioned in the right hand side of another definition that is used, or (c) the
++	    function it defines begins with an underscore.  The last case provides a
+ 	    way to suppress unused-binding warnings selectively.  </para>
+ 	  <para> Notice that a variable
+ 	    is reported as unused even if it appears in the right-hand side of another
+@@ -1481,7 +1547,7 @@
+ 	  <indexterm><primary>unused do binding, warning</primary></indexterm>
+ 	  <indexterm><primary>do binding, unused</primary></indexterm>
+ 
+-	  <para>Report expressions occuring in <literal>do</literal> and <literal>mdo</literal> blocks
++	  <para>Report expressions occurring in <literal>do</literal> and <literal>mdo</literal> blocks
+ 	  that appear to silently throw information away.
+           For instance <literal>do { mapM popInt xs ; return 10 }</literal> would report
+           the first statement in the <literal>do</literal> block as suspicious,
+@@ -1506,7 +1572,7 @@
+ 	  <indexterm><primary>apparently erroneous do binding, warning</primary></indexterm>
+ 	  <indexterm><primary>do binding, apparently erroneous</primary></indexterm>
+ 
+-	  <para>Report expressions occuring in <literal>do</literal> and <literal>mdo</literal> blocks
++	  <para>Report expressions occurring in <literal>do</literal> and <literal>mdo</literal> blocks
+ 	  that appear to lack a binding.
+           For instance <literal>do { return (popInt 10) ; return 10 }</literal> would report
+           the first statement in the <literal>do</literal> block as suspicious,
+@@ -1632,37 +1698,12 @@
+             <option>-O</option>.</para>
+ 	  </listitem>
+ 	</varlistentry>
+-
+-	<varlistentry>
+-	  <term>
+-            <option>-Ofile &lt;file&gt;</option>:
+-            <indexterm><primary>-Ofile &lt;file&gt; option</primary></indexterm>
+-            <indexterm><primary>optimising, customised</primary></indexterm>
+-          </term>
+-	  <listitem>
+-	    <para>(NOTE: not supported since GHC 4.x.  Please ask if
+-	    you're interested in this.)</para>
+-	    
+-	    <para>For those who need <emphasis>absolute</emphasis>
+-            control over <emphasis>exactly</emphasis> what options are
+-            used (e.g., compiler writers, sometimes :-), a list of
+-            options can be put in a file and then slurped in with
+-            <option>-Ofile</option>.</para>
+-
+-	    <para>In that file, comments are of the
+-            <literal>&num;</literal>-to-end-of-line variety; blank
+-            lines and most whitespace is ignored.</para>
+-
+-	    <para>Please ask if you are baffled and would like an
+-	    example of <option>-Ofile</option>!</para>
+-	  </listitem>
+-	</varlistentry>
+       </variablelist>
+ 
+       <para>We don't use a <option>-O*</option> flag for day-to-day
+       work.  We use <option>-O</option> to get respectable speed;
+       e.g., when we want to measure something.  When we want to go for
+-      broke, we tend to use <option>-O2 -fvia-C</option> (and we go for
++      broke, we tend to use <option>-O2</option> (and we go for
+       lots of coffee breaks).</para>
+ 
+       <para>The easiest way to see what <option>-O</option> (etc.)
+@@ -1817,7 +1858,7 @@
+ 	      <literal>State#</literal> token as argument is considered to be
+ 	      single-entry, hence it is considered OK to inline things inside
+ 	      it.  This can improve performance of IO and ST monad code, but it
+-	    runs the risk of reducing sharing.</para> 
++	    runs the risk of reducing sharing.</para>
+ 	  </listitem>
+ 	</varlistentry>
+ 
+@@ -1881,10 +1922,10 @@
+ 	    <indexterm><primary>unfolding, controlling</primary></indexterm>
+           </term>
+ 	  <listitem>
+-	    <para>(Default: 45) Governs the maximum size that GHC will 
++	    <para>(Default: 45) Governs the maximum size that GHC will
+             allow a function unfolding to be.   (An unfolding has a
+             &ldquo;size&rdquo; that reflects the cost in terms of
+-            &ldquo;code bloat&rdquo; of expanding that unfolding at
++            &ldquo;code bloat&rdquo; of expanding that unfolding
+             at a call site. A bigger function would be assigned a
+             bigger cost.) </para>
+ 
+@@ -1918,10 +1959,10 @@
+       </variablelist>
+ 
+     </sect2>
+-    
++
+   </sect1>
+-  
+-  &phases;  
++
++  &phases;
+ 
+   &shared_libs;
+ 
+@@ -1981,7 +2022,7 @@
+       use GHC to compile and run parallel programs, in <xref
+ 	linkend="lang-parallel" /> we describe the language features that affect
+     parallelism.</para>
+-    
++
+     <sect2 id="parallel-compile-options">
+       <title>Compile-time options for SMP parallelism</title>
+ 
+@@ -1989,7 +2030,7 @@
+ 	linked with the <option>-threaded</option> option (see <xref
+ 	  linkend="options-linker" />).  Additionally, the following
+ 	compiler options affect parallelism:</para>
+-      
++
+       <variablelist>
+         <varlistentry>
+           <term><option>-feager-blackholing</option></term>
+@@ -2046,7 +2087,7 @@
+ 	          results you find.</para></footnote>.  For example,
+ 	      on a dual-core machine we would probably use
+ 	      <literal>+RTS -N2 -RTS</literal>.</para>
+-	    
++
+             <para>Omitting <replaceable>x</replaceable>,
+               i.e. <literal>+RTS -N -RTS</literal>, lets the runtime
+               choose the value of <replaceable>x</replaceable> itself
+@@ -2106,28 +2147,9 @@
+             </para>
+           </listitem>
+         </varlistentry>
+-	<varlistentry>
+-	  <term><option>-qw</option></term>
+-          <indexterm><primary><option>-qw</option></primary><secondary>RTS
+-          option</secondary></indexterm>
+-	  <listitem>
+-            <para>Migrate a thread to the current CPU when it is woken
+-            up.  Normally when a thread is woken up after being
+-            blocked it will be scheduled on the CPU it was running on
+-            last; this option allows the thread to immediately migrate
+-            to the CPU that unblocked it.</para> 
+- 
+-            <para>The rationale for allowing this eager migration is
+-            that it tends to move threads that are communicating with
+-            each other onto the same CPU; however there are
+-            pathalogical situations where it turns out to be a poor
+-            strategy.  Depending on the communication pattern in your
+-            program, it may or may not be a good idea.</para>
+-          </listitem>
+-        </varlistentry>
+        </variablelist>
+     </sect2>
+-      
++
+     <sect2>
+       <title>Hints for using SMP parallelism</title>
+ 
+@@ -2183,27 +2205,6 @@
+         </listitem>
+       </varlistentry>
+ 
+-      <varlistentry>
+-	<term><option>-monly-[32]-regs</option>:</term>
+-	<listitem>
+-	  <para>(x86 only)<indexterm><primary>-monly-N-regs
+-          option (iX86 only)</primary></indexterm> GHC tries to
+-          &ldquo;steal&rdquo; four registers from GCC, for performance
+-          reasons; it almost always works.  However, when GCC is
+-          compiling some modules with four stolen registers, it will
+-          crash, probably saying:
+-
+-<screen>
+-Foo.hc:533: fixed or forbidden register was spilled.
+-This may be due to a compiler bug or to impossible asm
+-statements or clauses.
+-</screen>
+-
+-          Just give some registers back with
+-          <option>-monly-N-regs</option>.  Try `3' first, then `2'.
+-          If `2' doesn't work, please report the bug to us.</para>
+-	</listitem>
+-      </varlistentry>
+     </variablelist>
+ 
+   </sect1>
+@@ -2215,14 +2216,14 @@
+ 
+   <indexterm><primary>intermediate code generation</primary></indexterm>
+ 
+-  <para>GHC can dump its optimized intermediate code (said to be in &ldquo;Core&rdquo; format) 
++  <para>GHC can dump its optimized intermediate code (said to be in &ldquo;Core&rdquo; format)
+   to a file as a side-effect of compilation. Non-GHC back-end tools can read and process Core files; these files have the suffix
+   <filename>.hcr</filename>. The Core format is described in <ulink url="../../core.pdf">
+-  <citetitle>An External Representation for the GHC Core Language</citetitle></ulink>, 
++  <citetitle>An External Representation for the GHC Core Language</citetitle></ulink>,
+   and sample tools
+   for manipulating Core files (in Haskell) are available in the
+   <ulink url="http://hackage.haskell.org/package/extcore">extcore package on Hackage</ulink>.  Note that the format of <literal>.hcr</literal>
+-  files is <emphasis>different</emphasis> from the Core output format that GHC generates 
++  files is <emphasis>different</emphasis> from the Core output format that GHC generates
+   for debugging purposes (<xref linkend="options-debugging"/>), though the two formats appear somewhat similar.</para>
+ 
+   <para>The Core format natively supports notes which you can add to
+diff -dur 7.0.4-original//utils.xml original/utils.xml
+--- 7.0.4-original//utils.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/utils.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -270,6 +270,34 @@
+ 	</varlistentry>
+ 
+ 	<varlistentry>
++	  <term><literal>-k</literal> or
++	  <literal>&ndash;&ndash;keep-files</literal></term>
++	  <listitem>
++	    <para>Proceed as normal, but do not delete any intermediate files.</para>
++	  </listitem>
++	</varlistentry>
++
++	<varlistentry>
++	  <term><literal>-x</literal> or
++	  <literal>&ndash;&ndash;cross-compile</literal></term>
++	  <listitem>
++	    <para>Activate cross-compilation mode (see <xref linkend="hsc2hs_cross"/>).</para>
++	  </listitem>
++	</varlistentry>
++
++	<varlistentry>
++	  <term><literal>&ndash;&ndash;cross-safe</literal></term>
++	  <listitem>
++	    <para>Restrict the .hsc directives to those supported by the
++            <literal>--cross-compile</literal> mode (see <xref linkend="hsc2hs_cross"/>).
++            This should be useful if your <literal>.hsc</literal> files
++            must be safely cross-compiled and you wish to keep
++            non-cross-compilable constructs from creeping into them.</para>
++	  </listitem>
++	</varlistentry>
++
++
++	<varlistentry>
+ 	  <term><literal>-?</literal> or <literal>&ndash;&ndash;help</literal></term>
+ 	  <listitem>
+ 	    <para>Display a summary of the available flags and exit successfully.</para>
+@@ -544,6 +572,29 @@
+ 
+     </sect2>
+ 
++    <sect2 id="hsc2hs_cross">
++      <title>Cross-compilation</title>
++
++      <para><command>hsc2hs</command> normally operates by creating, compiling,
++      and running a C program. That approach doesn't work when cross-compiling --
++      in this case, the C compiler's generates code for the target machine,
++      not the host machine. For this situation, there's
++      a special mode <command>hsc2hs --cross-compile</command> which can generate
++      the .hs by extracting information from compilations only -- specifically,
++      whether or not compilation fails.
++      </para>
++
++      <para>Only a subset of <literal>.hsc</literal> syntax is supported by
++      <literal>--cross-compile</literal>. The following are unsupported:
++      <itemizedlist>
++	<listitem><literal>#{const_str}</literal></listitem>
++	<listitem><literal>#{let}</literal></listitem>
++	<listitem><literal>#{def}</literal></listitem>
++	<listitem>Custom constructs</listitem>
++      </itemizedlist>
++      </para>
++    </sect2>
++
+   </sect1>
+ 
+ </chapter>
+7.0.4-original/だけに発見: what_glasgow_exts_does.gen.xml
+diff -dur 7.0.4-original//win32-dlls.xml original/win32-dlls.xml
+--- 7.0.4-original//win32-dlls.xml	2011-06-14 01:10:05.000000000 +0800
++++ original/win32-dlls.xml	2011-08-08 01:10:05.000000000 +0800
+@@ -23,7 +23,7 @@
+ <!-- not clear whether there are current editions of Win32 OSes that
+      doesn't do this by default.
+ 
+-<para> Solution: don't use "Open With...", avoid spaces in file names, 
++<para> Solution: don't use "Open With...", avoid spaces in file names,
+ or fiddle with the appropriate registry setting:
+ <programlisting>
+   HKEY_CLASSES_ROOT\Unknown\shell\openas\command
+@@ -152,7 +152,7 @@
+ normal windows program - neither GHC nor the executables it produces
+ are aware of cygwin's pretended unix hierarchy. GHC will happily
+ accept either '/' or '\' as path separators, but it won't know where
+-to find <filename>/home/joe/Main.hs</filename> or <filename>/bin/bash</filename> 
++to find <filename>/home/joe/Main.hs</filename> or <filename>/bin/bash</filename>
+ or the like. This causes all
+ kinds of fun when GHC is used from within cygwin's bash, or in
+ make-sessions running under cygwin.
+@@ -162,9 +162,9 @@
+ <sect2><title>Things to do</title>
+ <itemizedlist>
+ <listitem>
+-<para> Don't use absolute paths in make, configure &amp; co if there is any chance 
++<para> Don't use absolute paths in make, configure &amp; co if there is any chance
+   that those might be passed to GHC (or to GHC-compiled programs). Relative
+-  paths are fine because cygwin tools are happy with them and GHC accepts 
++  paths are fine because cygwin tools are happy with them and GHC accepts
+   '/' as path-separator. And relative paths don't depend on where cygwin's
+   root directory is located, or on which partition or network drive your source
+   tree happens to reside, as long as you 'cd' there first.
+@@ -175,25 +175,25 @@
+   <literal>ROOT=`pwd`</literal> in makefile hierarchies or configure scripts), cygwin provides
+   a tool called <command>cygpath</command> that can convert cygwin's unix-style paths to their
+   actual windows-style counterparts. Many cygwin tools actually accept
+-  absolute windows-style paths (remember, though, that you either need 
+-  to escape '\' or convert '\' to '/'), so you should be fine just using those 
+-  everywhere. If you need to use tools that do some kind of path-mangling 
+-  that depends on unix-style paths (one fun example is trying to interpret ':' 
+-  as a separator in path lists..), you can still try to convert paths using 
++  absolute windows-style paths (remember, though, that you either need
++  to escape '\' or convert '\' to '/'), so you should be fine just using those
++  everywhere. If you need to use tools that do some kind of path-mangling
++  that depends on unix-style paths (one fun example is trying to interpret ':'
++  as a separator in path lists..), you can still try to convert paths using
+   <command>cygpath</command> just before they are passed to GHC and friends.
+ </para></listitem>
+-  
++
+ <listitem>
+ <para> If you don't have <command>cygpath</command>, you probably don't have cygwin and hence
+   no problems with it... unless you want to write one build process for several
+   platforms. Again, relative paths are your friend, but if you have to use
+   absolute paths, and don't want to use different tools on different platforms,
+   you can simply write a short Haskell program to print the current directory
+-   (thanks to George Russell for this idea): compiled with GHC, this will give 
+-  you the view of the file system that GHC depends on (which will differ 
++   (thanks to George Russell for this idea): compiled with GHC, this will give
++  you the view of the file system that GHC depends on (which will differ
+   depending on whether GHC is compiled with cygwin's gcc or mingw's
+-  gcc or on a real unix system..) - that little program can also deal with 
+-  escaping '\' in paths. Apart from the banner and the startup time, 
++  gcc or on a real unix system..) - that little program can also deal with
++  escaping '\' in paths. Apart from the banner and the startup time,
+   something like this would also do:
+ <programlisting>
+   $ echo "Directory.getCurrentDirectory >>= putStrLn . init . tail . show " | ghci
+@@ -258,7 +258,7 @@
+ The default on Win32 platforms is to link applications in such a way
+ that the executables will use the Prelude and system libraries DLLs,
+ rather than contain (large chunks of) them. This is transparent at the
+-command-line, so 
++command-line, so
+ </para>
+ 
+ <para>
+@@ -273,7 +273,7 @@
+ -rwxr-xr-x   1 544      everyone     4608 May  3 17:11 main.exe*
+ sh$ ./main
+ hello, world!
+-sh$ 
++sh$
+ </screen>
+ </para>
+ 
+@@ -447,8 +447,6 @@
+ // StartEnd.c
+ #include &lt;Rts.h&gt;
+ 
+-extern void __stginit_Adder(void);
+-
+ void HsStart()
+ {
+    int argc = 1;
+@@ -457,9 +455,6 @@
+    // Initialize Haskell runtime
+    char** args = argv;
+    hs_init(&amp;argc, &amp;args);
+-
+-   // Tell Haskell about all root modules
+-   hs_add_root(__stginit_Adder);
+ }
+ 
+ void HsEnd()
