@@ -3559,12 +3559,9 @@ class (F a ~ b) => C a b where
 </programlisting>
 つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の同値性で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
     </para>
-    <para>
-注意: スーパークラス文脈における同値性はGHC 6.10では完全には実装されていない。
-    </para>
   </sect3>
 
-  <sect3 id-="ty-fams-in-instances">
+  <sect3 id="ty-fams-in-instances">
     <title>型族とインスタンス宣言</title>
     <para>型族のもとでは、インスタンス頭部の形式についての規則(<xref linkend="flexible-instance-head"/>で与えられている)を拡張する必要がある。特に、
 <itemizedlist>
@@ -5726,73 +5723,6 @@ GHCはインライン化が永遠に続くことがないことを保証する�
       </sect3>
     </sect2>
 
-    <sect2 id="annotation-pragmas">
-      <title>ANNプラグマ</title>
-
-      <para>GHCは、コードのいろいろな構成要素に、三つのプラグマを使って追加のデータを注釈として付ける機能を提供する。そうしたデータは、後でGHC-as-a-libraryを使って観察することができる。</para>
-
-      <sect3 id="ann-pragma">
-        <title>値に注釈を付ける</title>
-
-        <indexterm><primary>ANN</primary></indexterm>
-
-        <para>最上位の値の束縛には、<literal>ANN</literal>プラグマを使って、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスであるような任意の式を添付することができる。したがって、特に、通常の値(例えば<literal>take</literal>)だけでなくデータ構築子(例えば<literal>Just</literal>)にも<literal>ANN</literal>を使って注釈を付けられる。例として、<literal>foo</literal>という関数に<literal>Just "Hello"</literal>を注釈として付けるには、次のようにする。</para>
-
-<programlisting>
-{-# ANN foo (Just "Hello") #-}
-foo = ...
-</programlisting>
-
-        <para>
-        注釈の利用には、いくつか制限が課せられる。
-          <itemizedlist>
-            <listitem><para>注釈を付ける束縛は最上位のものでなければならない(つまり、ネストしていてはならない)</para></listitem>
-            <listitem><para>注釈を付ける束縛は現在のモジュールで宣言されていなければならない</para></listitem>
-            <listitem><para>注釈とする式は、<literal>Typeable</literal>と<literal>Data</literal>の両方のインスタンスのある型でなければならない。</para></listitem>
-            <listitem><para>注釈とする式には<ulink linkend="using-template-haskell">Template Haskellの段階制約</ulink>が課せられるので、例えばコンパイル中のモジュールの関数を走らせることはできない。</para>
-
-            <para>正確には、注釈<literal>{-# ANN x e #-}</literal>が段階として正しい(well staged)のは、<literal>$(e)</literal>が段階として正しい場合であり、その場合に限る。(ただし、接合構文にかかる通常の型の制限は無視し、接合の中に接合を書くことについての通常の制限も無視する。<literal>$([|1|])</literal>は注釈として問題ない(冗長ではあるが)。)</para></listitem>
-          </itemizedlist>
-
-          これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。
-        </para>
-
-        <para>一方で、これらの制限を別にすれば、多くのことが許されており、完全に評価されていない式でさえも使うことができる。注釈式は、Template Haskellの接合がコンパイラによって評価されるのとちょうど同じように評価される。よって、この注釈は問題ない。</para>
-
-<programlisting>
-{-# ANN f SillyAnnotation { foo = (id 10) + $([| 20 |]), bar = 'f } #-}
-f = ...
-</programlisting>
-      </sect3>
-
-      <sect3 id="typeann-pragma">
-        <title>型に注釈を付ける</title>
-
-        <indexterm><primary>ANN type</primary></indexterm>
-        <indexterm><primary>ANN</primary></indexterm>
-
-        <para><literal>ANN</literal>プラグマで型に注釈を付けるには、<literal>type</literal>キーワードを使う。例を示す。</para>
-
-<programlisting>
-{-# ANN type Foo (Just "A `Maybe String' annotation") #-}
-data Foo = ...
-</programlisting>
-      </sect3>
-
-      <sect3 id="modann-pragma">
-        <title>モジュールに注釈を付ける</title>
-
-        <indexterm><primary>ANN module</primary></indexterm>
-        <indexterm><primary>ANN</primary></indexterm>
-
-        <para><literal>ANN</literal>プラグマでモジュールに注釈を付けるには、<literal>module</literal>キーワードを使う。例を示す。</para>
-
-<programlisting>
-{-# ANN module (Just "A `Maybe String' annotation") #-}
-</programlisting>
-      </sect3>
-    </sect2>
-
     <sect2 id="line-pragma">
       <title>LINEプラグマ</title>
 
@@ -5963,7 +5893,7 @@ data T = T {-# UNPACK #-} !Float
 
       <para>これにより、二つの非ボックス化Floatを保持する構築子<literal>T</literal>ができる。これは常に最適化になっているとは限らない。例えば、構築子<function>T</function>の内容を調べて、そのfloatを非正格な関数に渡す場合、それらを再びボックス化しなければならない。(これはコンパイラによって自動的に行われる)</para>
 
-      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
+      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである<footnote>実は、技術的な事情によりUNPACKプラグマは<option>-O</option>なしでは何もしない。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick 5252</ulink>を見よ)</footnote>。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
 
 <programlisting>
 f :: T -&#62; Float
@@ -6020,7 +5950,7 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
 </programlisting>
 </para>
 <para>
-どの規則が発火したかを見るには<option>-ddump-simpl-stats</option>というデバッグフラグを使えばよい。もっと情報が必要な場合は、<option>-ddump-rule-firings</option>によって、個々の規則発火を詳細に見ることができる。
+どの規則が発火したかを見るには<option>-ddump-simpl-stats</option>というデバッグフラグを使えばよい。もっと情報が必要な場合は、<option>-ddump-rule-firings</option>によって、個々の規則発火を見ることができるし、<option>-ddump-rule-rewrites</option>なら、書き換えの前と後でコードがどんな風であったかを見ることができる。
 </para>
 
 <sect2>
@@ -6501,7 +6431,7 @@ i2d (I# i) = D# (int2Double# i) -- Glasgowのprim-opを直接使う
 </listitem>
 
 <listitem>
-<para><option>-ddump-rule-firings</option>を使うと、どの規則が発火したかを極めて詳細に見ることができる。<option>-dppr-debug</option>を加えるとさらに詳細な一覧が得られる。
+<para><option>-ddump-rule-firings</option>や<option>-ddump-rule-rewrites</option>を使うと、どの規則が発火したかを極めて詳細に見ることができる。<option>-dppr-debug</option>を加えるとさらに詳細な一覧が得られる。
 </para>
 </listitem>
 
@@ -6604,212 +6534,180 @@ g x = show x
 <sect1 id="generic-classes">
 <title>総称クラス</title>
 
+<para>過去にGHCは総称クラスの実装を持っていた。これは論文"Derivable type classes", Ralf Hinze and Simon Peyton Jones, Haskell Workshop, Montreal Sept 2000, pp94-105で定義されている。これは削除され、もっと一般的な<link linkend="generic-programming">総称プログラミングのサポート</link>が代わりとなった。</para>
+
+</sect1>
+
+
+<sect1 id="generic-programming">
+<title>総称プログラミング</title>
+
 <para>
-この拡張の背後にある考えは"Derivable type classes", Ralf Hinze and Simon Peyton Jones, Haskell Workshop, Montreal Sept 2000, pp94-105で詳述されている。例を挙げればどういうものか分かるだろう。
-</para>
+<option>-XDeriveGeneric</option>(<xref linkend="deriving-typeable"/>)と<option>-XDefaultSignatures</option> (<xref linkend="class-default-signatures"/>)を組み合わせることで、データ型について総称的なプログラミングを<literal>GHC.Generics</literal>使って簡単に行なえる。この節は、その方法について極めて短かい概観を与える。</para>
+
+<para>
+GHCにおける総称プログラミングでは、ユーザがインスタンスを作成する際にメソッドを指定する必要がないようなクラスを定義することが可能になる。メソッド本体はGHCによって自動的に導出される。これは例えば<literal>Read</literal>や<literal>Show</literal>などの標準クラスの事情に似ているが、ユーザ定義のクラスについでである。</para>
+
+<sect2>
+<title>表現を導出する</title>
+
+<para>
+まず必要なのは総称的な型表現である。<literal>GHC.Generics</literal>には数個の基本的な型が定義されていて、これらを使ってHaskellのデータ型を表現することができる。
 
 <programlisting>
-  import Data.Generics
+-- | 単位: 引数のない構築子に使われる
+data U1 p = U1
 
-  class Bin a where
-    toBin   :: a -> [Int]
-    fromBin :: [Int] -> (a, [Int])
+-- | 定数、追加のパラメタ、類*の再帰
+newtype K1 i c p = K1 { unK1 :: c }
 
-    toBin {| Unit |}    Unit	  = []
-    toBin {| a :+: b |} (Inl x)   = 0 : toBin x
-    toBin {| a :+: b |} (Inr y)   = 1 : toBin y
-    toBin {| a :*: b |} (x :*: y) = toBin x ++ toBin y
+-- | メタ情報 (構築子名など)
+newtype M1 i c f p = M1 { unM1 :: f p }
 
-    fromBin {| Unit |}    bs      = (Unit, bs)
-    fromBin {| a :+: b |} (0:bs)  = (Inl x, bs')    where (x,bs') = fromBin bs
-    fromBin {| a :+: b |} (1:bs)  = (Inr y, bs')    where (y,bs') = fromBin bs
-    fromBin {| a :*: b |} bs	  = (x :*: y, bs'') where (x,bs' ) = fromBin bs
-							  (y,bs'') = fromBin bs'
+-- | 和: 構築子間での選択をエンコードする
+infixr 5 :+:
+data (:+:) f g p = L1 (f p) | R1 (g p)
+
+-- | 積: 構築子への複数の引数をエンコードする
+infixr 6 :*:
+data (:*:) f g p = f p :*: g p
 </programlisting>
-<para>
-このクラス宣言は、<literal>toBin</literal>と<literal>fromBin</literal>が任意のデータ型についてどのように動作するかを説明している。これを達成するために、単位、積、和のそれぞれの場合についての処理を与えている。これらは<literal>Data.Generics</literal>というライブラリモジュールで定義されている。
-</para>
-<programlisting>
-  data Unit    = Unit
-  data a :+: b = Inl a | Inr b
-  data a :*: b = a :*: b
-</programlisting>
-<para>
-これで、次のようにしてデータ型をBinのインスタンスにすることができる。
-<programlisting>
-  instance (Bin a, Bin b) => Bin (a,b)
-  instance Bin a => Bin [a]
-</programlisting>
-つまり、単に「where」節を省略すれば良い。もちろん、where節を書いて、望むメソッドを再定義することもできる。
 </para>
 
-    <sect2>
-      <title>総称性を使う</title>
-      <para>総称性を使うには以下のものが必要である。</para>
-      <itemizedlist>
-	<listitem>
-	  <para>フラグとして、<option>-XGenerics</option>(拡張構文を有効にし、データ型毎の追加コードを生成する)と<option>-package syb</option>(<literal>Data.Generics</literal>ライブラリを利用可能にする)を使う。</para>
-	</listitem>
-	<listitem>
-          <para><literal>syb</literal>パッケージの<literal>Data.Generics</literal>モジュールをインポートする。これによって、<literal>Unit</literal>、<literal>:*:</literal>、<literal>:+:</literal>の各データ型がスコープに導入される。(これらの型に明示的に言及しないならインポートは必要ない。インスタンス宣言を行うだけの場合など)</para>
-	</listitem>
-      </itemizedlist>
-    </sect2>
-
-<sect2> <title>論文からの変更点</title>
 <para>
-型構築子<literal>:+:</literal>および<literal>:*:</literal>は中置記法で書かれることに注意。(実際、コロンで始まるあらゆる演算子列が型構築子として使えるようになった)。また、型構築子は論文そのままではない(1の代わりにUnit、など)。最後に、クラス宣言のパターンの構文で使われる括弧は「<literal>{|</literal>」と「<literal>|}</literal>」である。中括弧だけだと、右辺で使われる(こういう拡張が必要になるかもしれない)ときに曖昧になる。
+<literal>Generic</literal>クラスは、ユーザ定義のデータ型と、それの積和形(sum-of-products)の内部表現との間の仲介を行なう。
+
+<programlisting>
+class Generic a where
+  -- ユーザのデータ型の表現をエンコードする
+  type Rep a :: * -> *
+  -- データ型をその表現に変換する
+  from  :: a -> (Rep a) x
+  -- 表現をデータ型に変換する
+  to    :: (Rep a) x -> a
+</programlisting>
+
+総称的なインスタンスを自動的に定義するにはこのクラスのインスタンスが必要であり、これは<option>-XDeriveGeneric</option> (<xref linkend="deriving-typeable"/>)を付けるとGHCによって自動導出できる。</para>
+
+<para>
+例えば、木のユーザ定義データ型<literal>data UserTree a = Node a (UserTree a) (UserTree a) | Leaf</literal>は以下の表現を得る。
+
+<programlisting>
+instance Generic (UserTree a) where
+  -- 表現型
+  type Rep (UserTree a) =
+    M1 D D1UserTree (
+          M1 C C1_0UserTree (
+                M1 S NoSelector (K1 P a)
+            :*: M1 S NoSelector (K1 R (UserTree a))
+            :*: M1 S NoSelector (K1 R (UserTree a)))
+      :+: M1 C C1_1UserTree U1)
+
+  -- 変換関数
+  from (Node x l r) = M1 (L1 (M1 (M1 (K1 x) :*: M1 (K1 l) :*: M1 (K1 r))))
+  from Leaf         = M1 (R1 (M1 U1))
+  to (M1 (L1 (M1 (M1 (K1 x) :*: M1 (K1 l) :*: M1 (K1 r))))) = Node x l r
+  to (M1 (R1 (M1 U1)))                                      = Leaf
+
+-- メタ情報
+data D1UserTree
+data C1_0UserTree
+data C1_1UserTree
+
+instance Datatype D1UserTree where
+  datatypeName _ = "UserTree"
+  moduleName _   = "Main"
+
+instance Constructor C1_0UserTree where
+  conName _ = "Node"
+
+instance Constructor C1_1UserTree where
+  conName _ = "Leaf"
+</programlisting>
+
+この表現は、<literal>deriving Generic</literal>がデータ型に付属していれば自動的に生成される。<link linkend="stand-aline-deriving">独立deriving</link>も使える。</para>
+
+</sect2>
+
+<sect2>
+<title>総称関数を書く</title>
+
+<para>
+総称関数は、クラスを作り、<literal>GHC.Generics</literal>の各表現型についてインスタンスを与えることで定義できる。例として総称的な直列化を示す。
+<programlisting>
+data Bin = O | I
+
+class GSerialize f where
+  gput :: f a -> [Bin]
+
+instance GSerialize U1 where
+  gput U1 = []
+
+instance (GSerialize a, GSerialize b) => GSerialize (a :*: b) where
+  gput (x :*: y) = gput x ++ gput y
+
+instance (GSerialize a, GSerialize b) => GSerialize (a :+: b) where
+  gput (L1 x) = O : gput x
+  gput (R1 x) = I : gput x
+
+instance (GSerialize a) => GSerialize (M1 i c a) where
+  gput (M1 x) = gput x
+
+instance (Serialize a) => GSerialize (K1 i a) where
+  gput (K1 x) = put x
+</programlisting>
+
+このクラスは表現型以外に関するインスタンスを持っても意味がないので、典型的にはエクスポートされない。
 </para>
 </sect2>
 
-<sect2> <title>用語と制約</title>
-<para>
-用語。クラス宣言中の「総称デフォルトメソッド」とは、上のような型パターンを使って定義されたもののことである。「多相デフォルトメソッド」とは、Haskell 98式のデフォルトメソッドのことである。「総称クラス宣言」とは、少なくとも一つの総称デフォルトメソッドを含むクラス宣言のことである。
-</para>
+<sect2>
+<title>総称的デフォルト</title>
 
 <para>
-制約は以下の通り。
+あとは、ユーザに露出される「フロントエンド」クラスを定義するだけである。
+<programlisting>
+class Serialize a where
+  put :: a -> [Bin]
+
+  default put :: (Generic a, GSerialize (Rep a)) => a -> [Bit]
+  put = gput . from
+</programlisting>
+ここでは、<link linkend="class-default-signatures">デフォルトシグネチャ</link>を使って、インスタンスとなる型に<literal>Generic</literal>インスタンスがある限り、ユーザが<literal>put</literal>の実装を提供する必要がないということを指定している。例えば、<literal>UserTree</literal>型に関しては、ユーザは単に次のように書くことができる。
+
+<programlisting>
+instance (Serialize a) => Serialize (UserTree a)
+</programlisting>
+
+すると<literal>put</literal>のデフォルトメソッド(これは直列化の総称実装に対応する)が使われる。
+</para>
+</sect2>
+
+
+<sect2>
+<title>さらなる情報</title>
+
+<para>
+さらなる詳細については、<ulink url="http://www.haskell.org/haskellwiki/Generics">HaskellWikiのページ</ulink>か以下の元論文を参照せよ。
+</para>
+
 <itemizedlist>
 <listitem>
 <para>
-残念ながら、構築子名とフィールドラベルに関するものはまだ実装していない。
+Jose Pedro Magalhaes, Atze Dijkstra, Johan Jeuring, and Andres Loeh.
+<ulink url="http://dreixel.net/research/pdf/gdmh.pdf">
+  A generic deriving mechanism for Haskell</ulink>.
+<citetitle>Proceedings of the third ACM Haskell symposium on Haskell</citetitle>
+(Haskell'2010), pp. 37-48, ACM, 2010.
 </para>
 </listitem>
-
-<listitem>
-<para>
-総称クラスのパラメタは一つでなければならない。総称的な多引数型クラスを書くことはできない。
-</para>
-</listitem>
-
-<listitem>
-<para>
-あるデフォルトメソッドは、全部型パターンを使って定義するか、全部型パターンなしで定義するかのいずれかでなければならない。従って以下は不正である。
-<programlisting>
-  class Foo a where
-    op :: a -> (a, Bool)
-    op {| Unit |} Unit = (Unit, True)
-    op x               = (x,    False)
-</programlisting>
-一方、ある総称クラスについて、総称デフォルトメソッドと多相デフォルトメソッドの両方があるのは、全く問題ない。
-</para>
-</listitem>
-
-<listitem>
-<para>
-総称メソッド宣言の型パターンに現れる型変数は右辺全体に渡るスコープを持つ。従って下記は合法である。(型変数「p」を右辺の型シグネチャで使っていることに注意)
-<programlisting>
-  class Foo a where
-    op :: a -> Bool
-    op {| p :*: q |} (x :*: y) = op (x :: p)
-    ...
-</programlisting>
-</para>
-</listitem>
-
-<listitem>
-<para>
-総称デフォルトメソッドにおける型パターンは以下のいずれかの形を取らなければならない。
-<programlisting>
-       a :+: b
-       a :*: b
-       Unit
-</programlisting>
-ここで「a」と「b」は型変数である。さらに、一つの型構築子(例えば<literal>:*:</literal>)についての型パターンは全て同じでなければならない。これは、同じ型変数を使わなければならないということである。したがって以下の例は非合法である。
-<programlisting>
-  class Foo a where
-    op :: a -> Bool
-    op {| a :+: b |} (Inl x) = True
-    op {| p :+: q |} (Inr y) = False
-</programlisting>
-あるクラスの異なるメソッドの間でも、やはり型パターンは相等しくなければならない。従って以下は非合法である。
-<programlisting>
-  class Foo a where
-    op1 :: a -> Bool
-    op1 {| a :*: b |} (x :*: y) = True
-
-    op2 :: a -> Bool
-    op2 {| p :*: q |} (x :*: y) = False
-</programlisting>
-(この制約があるのは、ひとつの総称インスタンス宣言を作る際、特定の型構築子についての等式を全て集めるからである)
-</para>
-</listitem>
-
-<listitem>
-<para>
-総称メソッド宣言では、この三つの型構築子のそれぞれの場合について処理を与えなければならない。
-</para>
-</listitem>
-
-<listitem>
-<para>
-総称メソッドの型は、以下の型のみから構成されていなければならない。
-  <itemizedlist>
-  <listitem> <para>関数の矢印</para> </listitem>
-  <listitem> <para>型変数</para> </listitem>
-  <listitem> <para>タプル</para> </listitem>
-  <listitem> <para>型変数を含まない任意の型</para> </listitem>
-  </itemizedlist>
-総称メソッドの型シグネチャの例である。
-<programlisting>
-    op1 :: a -> Bool
-    op2 :: Bool -> (a,Bool)
-    op3 :: [Int] -> a -> a
-    op4 :: [a] -> Bool
-</programlisting>
-ここで、op1、op2、op3は問題ないが、op4は拒否される。リストの中に型変数があるからである。
-</para>
-<para>
-この制約は実装上の都合によるものである。我々には、任意の型構築子について必要な双方向写像を実装する時間の余裕がない。Maybeやリストといった特定の型構築子を許されるようにするのは比較的簡単だろう。</para>
-</listitem>
-
-<listitem>
-<para>
-総称クラスのインスタンス宣言では、基本的には、総称テンプレートを基にして、コンパイラがメソッドを挿入する。しかし、これには以下の条件が必要である。
-  <itemizedlist>
-  <listitem>
-  <para>
-  インスタンス型が単純(Haskell 98の通りに、型構築子を型変数に適用したもの)であること。
-  </para>
-  </listitem>
-  <listitem>
-  <para>
-  インスタンス型の構築子に、非ボックス化フィールドを持つものがないこと。
-  </para>
-  </listitem>
-  </itemizedlist>
-(もちろん、これらは既にGHC拡張を使っている場合にのみ該当し得る)。また、明示的なコードで総称デフォルトメソッドを全て再定義することで、この規則に反する型にインスタンス宣言を与えることができる。
-</para>
-</listitem>
-
 </itemizedlist>
-</para>
 
-<para>
-<option>-ddump-deriv</option>オプションを使うと、総称宣言についてコンパイラが何をしているかの詳細を含んだ、理解困難な何かを表示することができる。
-</para>
-
+<emphasis>注意</emphasis>: GHCにおける現在の総称プログラミングサポートは準備段階のものである。特に、<literal>Generic</literal>のインスタンスを自動導出することしか許されていない。<literal>Generic1</literal>の自動導出への対応(よって、<literal>fmap</literal>などの類<literal>* -> *</literal>の総称関数を可能にすること)はもっと後の段階になる。
 </sect2>
 
-<sect2> <title>もう一つの例</title>
-<para>
-最後に、私が少し気に入っている例を挙げる。
-<programlisting>
-  class Tag a where
-    nCons :: a -> Int
-    nCons {| Unit |}    _ = 1
-    nCons {| a :*: b |} _ = 1
-    nCons {| a :+: b |} _ = nCons (bot::a) + nCons (bot::b)
-
-    tag :: a -> Int
-    tag {| Unit |}    _       = 1
-    tag {| a :*: b |} _       = 1
-    tag {| a :+: b |} (Inl x) = tag x
-    tag {| a :+: b |} (Inr y) = nCons (bot::a) + tag y
-</programlisting>
-</para>
-</sect2>
 </sect1>
+
 
 <sect1 id="monomorphism">
 <title>単相性の制御</title>
@@ -6845,7 +6743,6 @@ letおよびwhere束縛での一般化の扱いに関わるフラグが二つあ
 </para>
 </sect2>
 </sect1>
-
 
 
 <!-- Emacs stuff:
