@@ -1,0 +1,9 @@
+#!/bin/sh
+DOCBOOK_XSL_PATH="/usr/share/sgml/docbook/xsl-stylesheets-1.70.1"
+prefix="http://www.kotha.net/ghcguide_ja/$(./docversion.sh)/"
+rsync -a --copy-links --delete static/ xhtml
+nice xsltproc --stringparam custom.prefix $prefix custom.xsl users_guide.xml 2>build_log.txt && \
+  env LANG=en_US.iso_8859_1 selfprocess postprocess xhtml/*.html && \
+  echo "done!" >> build_log.txt &
+#  --stringparam suppress.header.navigation 1 \
+#  --stringparam suppress.footer.navigation 1 \
