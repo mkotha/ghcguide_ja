@@ -1,0 +1,17 @@
+#!/bin/sh
+
+com=$1
+temp=/tmp/destructively.$$
+
+trap 'rm -f $temp' EXIT
+
+shift
+
+for f in "$@"; do
+  if $com <"$f" >$temp; then
+    mv $temp "$f"
+  else
+    echo "failure while processing $f"
+    exit 1
+  fi
+done
