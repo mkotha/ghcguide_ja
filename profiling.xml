@@ -6,7 +6,7 @@
   <indexterm><primary>cost-centre profiling</primary></indexterm>
 
   <para>Glasgow Haskellには時間及び空間のプロファイルをとるためのシステムが付属している。このシステムの目的は、プログラムの実行時の振る舞いをより良く理解できるようにし、ひいてはそれを改善できるようにすることである。</para>
-  
+
   <para>あらゆる意見、提案、改善は歓迎される。おすすめの「プロファイル技」があるなら特に素晴らしい。</para>
 
   <para>プログラムのプロファイルをとるのは三つの段階からなる。</para>
@@ -27,16 +27,16 @@
       <indexterm><primary><option>-p</option></primary><secondary>RTS
       option</secondary></indexterm>
     </listitem>
-      
+
     <listitem>
       <para>生成されたプロファイル情報を調べる。これにはGHCのプロファイルツールを使う。どれを使うかは生成されたプロファイル情報によって異なる。</para>
     </listitem>
-    
+
   </orderedlist>
-  
+
   <sect1 id="cost-centres">
     <title>コスト集約点とコスト集約点スタック</title>
-    
+
     <para>GHCのプロファイルシステムでは<firstterm>コスト</firstterm>は<firstterm>コスト集約点</firstterm>(cost centre)に割り当てられる。コストとは式を評価するのに必要な時間と空間のことである。コスト集約点はプログラム上の注釈で、一定の範囲の式を支配する。注釈の付いた式が発生させたコストは全て、それを直接支配するコスト集約点に割り当てられる。さらに、GHCは任意の式についてそれを支配するコスト集約点のスタックを実行時に記憶していて、どこにどれだけコストが掛かったかという情報の付いた呼び出しグラフを生成する。<!--(訳注: この節では多少無理な翻訳をしているので語句の対応を示す。改善案募集。cost centre: コスト集約点、enclose: 支配、assign: 割り当てる、attribute: 割り当てる/配分する)--></para>
 
     <para>例を一つ見てみよう。</para>
@@ -270,7 +270,7 @@ x = nfib 25
 	</listitem>
       </varlistentry>
     </variablelist>
-      
+
     <para>この他にもいくつかプロファイルに関連したコンパイルオプションがある。これらは<option>-prof</option>と<emphasis>併用</emphasis>すること。これらのオプションは全てのモジュールで一斉に使う必要はない。</para>
 
     <variablelist>
@@ -284,7 +284,7 @@ x = nfib 25
           <para>INLINE指定されていない全ての最上位のエクスポートされた関数に、GHCが<function>_scc_</function><!--訳注: SCCとすべき。以下同様-->を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は、手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>
           <option>-auto-all</option>:
@@ -362,7 +362,7 @@ x = nfib 25
       </varlistentry>
 
     </variablelist>
-    
+
   </sect1>
 
   <sect1 id="prof-heap">
@@ -434,7 +434,7 @@ x = nfib 25
             <para><firstterm>型</firstterm>で分類する。型が不明/多相的な関数については、実際の型を近似する文字列が使われる。</para>
 	  </listitem>
 	</varlistentry>
-	
+
 	<varlistentry>
 	  <term>
             <option>-hr</option>
@@ -457,7 +457,7 @@ x = nfib 25
       </variablelist>
 
       <para>さらにプロファイルは特定の条件を満たすヒープデータに限って行うことができる。例えば、プロファイルを型ごとに表示したいが、これを特定のモジュールで生産されたデータについてのみ行いたい、あるいは、特定の型のデータについて維持原因のプロファイルを行いたい、ということがあるかもしれない。このような制限は以下のように指定できる。</para>
-      
+
       <variablelist>
 	<varlistentry>
 	  <term>
@@ -508,7 +508,7 @@ x = nfib 25
             <para>指定された型のクロージャのみを対象にする。</para>
 	  </listitem>
 	</varlistentry>
-	
+
 	<varlistentry>
 	  <term>
             <option>-hr</option><replaceable>cc</replaceable>,...
@@ -558,7 +558,7 @@ x = nfib 25
           </term>
 	  <listitem>
             <para>ヒーププロファイルに、スレッドが占めるメモリを含める。個々のスレッドは、スタック用の空間(スタックは通常小さい状態で開始し、必要に応じて成長する)と、それに加えてスレッド状態のための小さな領域を使う。</para>
-	    
+
             <para>これには主スレッドも含まれるので、<option>-xt</option>はプログラムが使っているスタック空間の大きさを知るのに良い。</para>
 
             <para>スレッドが占めるメモリとスタックは、クロージャの説明や型での分類に際しては「TSO」と表示される。</para>
@@ -577,7 +577,7 @@ x = nfib 25
       </variablelist>
 
     </sect2>
-    
+
     <sect2 id="retainer-prof">
       <title>維持原因プロファイル</title>
 
@@ -594,7 +594,7 @@ x = nfib 25
       <para>プログラムに<option>-hr</option>オプションが与えられ、維持原因プロファイルが要請されると、維持原因集合で分類されたグラフが生成される。維持原因集合はコスト集約点スタックの集合として表示される。通常これはプロファイルグラフに載せるには大きすぎるので、維持原因集合には一つずつ番号が振られ、グラフ中では番号つきで短縮して表示される。そして、維持原因集合の完全な一覧は<filename><replaceable>prog</replaceable>.prof</filename>というファイルに出力される。</para>
 
       <para>維持原因プロファイルでは、全てのオブジェクトについて維持原因集合を得るために生存ヒープを複数回走査しなければならず、これは場合によってはとても遅い。このため、維持原因集合の最大サイズが設定されていて、これよりも大きな維持原因集合は<literal>MANY</literal>という特殊な集合になる。この最大サイズはデフォルトでは8であり、RTSオプション<option>-R</option>で変更できる。</para>
-      
+
       <variablelist>
 	<varlistentry>
 	  <term><option>-R</option><replaceable>size</replaceable></term>
@@ -614,7 +614,7 @@ x = nfib 25
 <screen>
 <replaceable>prog</replaceable> +RTS -hr -hcB
 </screen>
-	
+
         <para>この技は完璧ではない。無関係なBのクロージャがヒープ中にあるかもしれないからである。しかし、これで大抵の場合うまく行くということが判っている。</para>
       </sect3>
     </sect2>
@@ -689,9 +689,9 @@ x = nfib 25
     <indexterm><primary>heap profiles</primary></indexterm>
     <indexterm><primary>postscript, from heap profiles</primary></indexterm>
     <indexterm><primary><option>-h&lt;break-down&gt;</option></primary></indexterm>
-    
+
     <para>使いかた:</para>
-    
+
 <screen>
 hp2ps [flags] [&lt;file&gt;[.hp]]
 </screen>
@@ -703,7 +703,7 @@ hp2ps [flags] [&lt;file&gt;[.hp]]
     <para>フラグは以下のものがある。</para>
 
     <variablelist>
-      
+
       <varlistentry>
 	<term><option>-d</option></term>
 	<listitem>
@@ -761,7 +761,7 @@ hp2ps [flags] [&lt;file&gt;[.hp]]
           <para>表題用に小さいボックスを使う。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term><option>-t&lt;float&gt;</option></term>
 	<listitem>
@@ -777,14 +777,14 @@ hp2ps [flags] [&lt;file&gt;[.hp]]
           <para>色付きの出力を生成する。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term><option>-y</option></term>
 	<listitem>
           <para>マークを無視する。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term><option>-?</option></term>
 	<listitem>
@@ -797,7 +797,7 @@ hp2ps [flags] [&lt;file&gt;[.hp]]
     <sect2 id="manipulating-hp">
       <title>hpファイルを操作する</title>
 
-<para>(Jan-Willhem Maessenが提供してくれた覚え書き)</para>
+<para>(Jan-Willem Maessenが提供してくれた覚え書き)</para>
 
 <para>プログラム<filename>FOO</filename>についてヒーププロファイルを行うと<filename>FOO.hp</filename>が生成されるが、これはとても単純な構造のテキストファイルである。以下に示すのは代表例だが、実際のデータは大部分省略されている。
 <screen>
@@ -843,7 +843,7 @@ END_SAMPLE 11695.47
 <para>
 <command>gv</command>や<command>ghostview</command>といったプログラムには「ファイルを監視する」というオプションがあり、これを使ってプログラムの実行にあわせてその時点のヒーププロファイルを見ることができる。これには、徐々に伸長するプロファイルを前の節で解説した方法で作り、それに対して<command>gv</command>を次のように実行すれば良い。
 <screen>
-  gv -watch -seascape FOO.ps 
+  gv -watch -seascape FOO.ps
 </screen>
 <literal>-watch</literal>フラグを付け忘れた場合でも「State」メニューから「Watch File」を選べば良い。これで、<filename>FOO.ps</filename>が新しくなるごとに表示が自動的に更新される。</para>
 
@@ -872,7 +872,7 @@ END_SAMPLE 11695.47
     head -`fgrep -n END_SAMPLE FOO.hp | tail -1 | cut -d : -f 1` FOO.hp \
       | hp2ps > FOO.ps
     kill -HUP $gvpsnum
-  done    
+  done
 </screen>
 </para>
 </sect2>
@@ -934,7 +934,7 @@ main = do
     <para>HPCの計器付与は-fhpcフラグで有効になる。</para>
 
 <screen>
-$ ghc -fhpc Recip.hs --make 
+$ ghc -fhpc Recip.hs --make
 </screen>
     <para>HPC index(.mix)ファイルはサブディレクトリ.hpcに置かれる。これはHPCにとっての.hiファイルのようなものだと考えられる。
    </para>
@@ -948,8 +948,8 @@ $ ./Recip
 $ hpc report Recip
  80% expressions used (81/101)
  12% boolean coverage (1/8)
-      14% guards (1/7), 3 always True, 
-                        1 always False, 
+      14% guards (1/7), 3 always True,
+                        1 always False,
                         2 unevaluated
        0% 'if' conditions (0/1), 1 always False
      100% qualifiers (0/0)
@@ -965,7 +965,7 @@ writing Recip.hs.html
     <para>
       これによって、Haskellモジュール一つにつき一つのファイルと、四つのインデックスファイル(hpc_index.html、hpc_index_alt.html、hpc_index_exp.html、hpc_index_fun.html)が生成される。
 	</para>
-     </sect2> 
+     </sect2>
 
      <sect2><title>網羅率の測定器を付与するオプション</title>
 	<para>
@@ -978,7 +978,7 @@ writing Recip.hs.html
 
       <para>hpcツールキットはcvs/svn/darcs的なインタフェースを持っている。つまり、一つのバイナリに沢山の機能単位が含まれている。</para>
 <screen>
-$ hpc 
+$ hpc
 Usage: hpc COMMAND ...
 
 Commands:
@@ -999,18 +999,18 @@ Others:
 </screen>
 
      <para>一般的に言って、これらのオプションは、計器付きバイナリが生成した後の.tixファイルに対して動作する。hpcは、生の.tixファイルと、生成される詳細な報告書の間の仲介として働く。</para>
-	  
+
 	<para>
           hpcツールは、アプリケーションをビルドした場所の最上位ディレクトリに居て、その同じ最上位ディレクトリに.tixファイルがあることを前提とする。別のディレクトリに対してhpcを使うには--srcdirフラグを使うことができる。また、複数の場所でコンパイルされたプログラム(パッケージでは普通のことである)を分析する場合は、--srcdirを複数回使えばよい。
 	</para>
-	  
+
 	<para>
         ここからは、hpcのメジャーモードについて詳しく説明する。
      </para>
 
        <sect3><title>hpc report</title>
 		<para>hpc reportは、網羅率のテキスト形式の報告書を与える。デフォルトで、includeやexcludeが使われない限り、報告書を生成する上ですべてのモジュールとパッケージが考慮に入る。--per-moduleフラグが使われない限り、報告書は要約である。--xml-outputオプションは、hpcを使って網羅率を収集するツールのためにある。
-		</para>	
+		</para>
 <screen>
 $ hpc help report
 Usage: hpc report [OPTION] .. &lt;TIX_FILE&gt; [&lt;MODULE&gt; [&lt;MODULE&gt; ..]]
@@ -1087,7 +1087,7 @@ Options:
 		</para>
 <screen>
 $ hpc help map
-Usage: hpc map [OPTION] .. &lt;TIX_FILE&gt; 
+Usage: hpc map [OPTION] .. &lt;TIX_FILE&gt;
 Map a function over a single .tix file
 
 Options:
@@ -1115,7 +1115,7 @@ Options:
     --hpcdir=DIR   sub-directory that contains .mix files
                    default .hpc [rarely used]
     --output=FILE  output FILE
-% hpc help draft  
+% hpc help draft
 Usage: hpc draft [OPTION] .. &lt;TIX_FILE&gt;
 
 Options:
@@ -1151,7 +1151,7 @@ Options:
     </para>
 
     <para>プログラムにticky-tickyの数値を出力させるには、
-    
+
       <itemizedlist>
         <listitem>
           <para>プログラムを<option>-debug</option>付きでリンクする(リンク時においては<option>-ticky</option>は<option>-debug</option>の同義語である)。これによって、ticky-tickyプロファイルの結果を収集して報告するためのコードを含んだデバッグ版RTSがリンクされる。
@@ -1163,7 +1163,7 @@ Options:
         </listitem>
       </itemizedlist>
     </para>
- 
+
     <para>以下に示すのはticky-ticky統計ファイルの例であり、<command>foo +RTS -rfoo.ticky</command>というコマンドで生成されたものである。</para>
 
 <screen>
