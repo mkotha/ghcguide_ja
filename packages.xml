@@ -64,6 +64,8 @@ $ ghc-pkg list
 
     <para>参考: Cabalを使っているなら、パッケージが露出されているか隠されているかという区別は関係しない。どのパッケージが利用可能かは<literal>.cabal</literal>の指定に列挙されている依存関係から決定される。露出されているか隠されているかの区別は<literal>ghc</literal>や<literal>ghci</literal>を直接使うときのみ影響する。</para>
 
+    <para>パッケージが隠されているかの状態と似たものに、パッケージが信用されているかどうかの区別がある。この性質は、GHCのSafe Haskell機能(<xref linkend="safe-haskell"/>を見よ)を使ってコードをコンパイルする場合にのみ意味を持つ。</para>
+
     <para>あるパッケージがどんなモジュールを公開しているかを見るには、<literal>ghc-pkg</literal>コマンドを使う。(<xref linkend="package-management"/>を見よ)</para>
     
 <screen>
@@ -163,6 +165,33 @@ exposed-modules: Network.BSD,
           <para>注意: <option>-package-name</option>の引数はそのパッケージの完全な<literal>パッケージ名-バージョン</literal>形式であるべきである。例えば、<literal>-package mypkg-1.2</literal>のように。</para>
         </listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term><option>-trust</option> <replaceable>P</replaceable>
+        <indexterm><primary><option>-trust</option></primary>
+          </indexterm></term>
+        <listitem>
+          <para>このオプションは、インストール済みパッケージ<replaceable>P</replaceable>を露出し、さらにGHCによって信用されるようにする。このコマンドは<option>-package</option>と非常に似た形で機能するが、追加の作用として、パッケージデータベースの内容にかかわらず、GHCが選択されたパッケージを信用するようにする。(<xref linkend="safe-haskell"/>を見よ)。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-distrust</option> <replaceable>P</replaceable>
+        <indexterm><primary><option>-distrust</option></primary>
+          </indexterm></term>
+        <listitem>
+          <para>このオプションは、インストール済みパッケージ<replaceable>P</replaceable>を露出し、さらにGHCによって信用されないようにする。このコマンドは<option>-package</option>と非常に似た形で機能するが、追加の作用として、パッケージデータベースの内容にかかわらず、GHCが選択されたパッケージに信用を置かないようにする。(<xref linkend="safe-haskell"/>を見よ)。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-distrust-all</option>
+        <indexterm><primary><option>-distrust-all</option></primary>
+          </indexterm></term>
+        <listitem>
+          <para>インストール済みパッケージ群の信用フラグを無視し、デフォルトで信用しないようにする。このフラグをSafe Haskellと共に使うなら、信用される必要があるパッケージは(<literal>base</literal>も含めて)<option>-trust</option>オプションを使って明示的に信用を与えられなければならない。このオプションはパッケージの隠し/露出状態を変えないので、システム中の全てのパッケージに<option>-distrust</option>を与えるのとは異なる。(<xref linkend="safe-haskell"/>を見よ)。</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </sect2>
 
@@ -173,7 +202,6 @@ exposed-modules: Network.BSD,
 <programlisting>
 /usr/bin/ld: Undefined symbols:
 _ZCMain_main_closure
-___stginit_ZCMain
 </programlisting>
 </para>
 
@@ -373,16 +401,16 @@ haskell98-1.0.1.0
       </varlistentry>
 
       <varlistentry>
-        <term><literal>ghc-pkg expose <replaceable>P</replaceable></literal></term>
+        <term><literal>ghc-pkg check</literal></term>
         <listitem>
-          <para>パッケージ<replaceable>P</replaceable>の<literal>exposed</literal>フラグ(訳注: 露出フラグ)を<literal>True</literal>に設定する。</para>
+          <para>パッケージデータベース内の依存関係の整合性を検査し、依存関係が満たされていないパッケージがあれば報告する。</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term><literal>ghc-pkg check</literal></term>
+        <term><literal>ghc-pkg expose <replaceable>P</replaceable></literal></term>
         <listitem>
-          <para>パッケージデータベース中の依存関係の整合性を検査し、依存関係が満たされていないパッケージがあれば報告する。</para>
+          <para>パッケージ<replaceable>P</replaceable>の<literal>exposed</literal>フラグ(訳注: 露出フラグ)を<literal>True</literal>に設定する。</para>
         </listitem>
       </varlistentry>
 
@@ -392,6 +420,20 @@ haskell98-1.0.1.0
           <para>パッケージ<replaceable>P</replaceable>の<literal>exposed</literal>フラグ(訳注: 露出フラグ)を<literal>False</literal>に設定する。</para>
         </listitem>
       </varlistentry>
+
+       <varlistentry>
+        <term><literal>ghc-pkg trust <replaceable>P</replaceable></literal></term>
+         <listitem>
+          <para>パッケージ<replaceable>P</replaceable>の<literal>trusted</literal>フラグを<literal>True</literal>に設定する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><literal>ghc-pkg distrust <replaceable>P</replaceable></literal></term>
+        <listitem>
+          <para>パッケージ<replaceable>P</replaceable>の<literal>trusted</literal>フラグを<literal>False</literal>に設定する。</para>
+         </listitem>
+       </varlistentry>
 
       <varlistentry>
         <term><literal>ghc-pkg list [<replaceable>P</replaceable>] [<option>--simple-output</option>]</literal></term>
@@ -685,6 +727,7 @@ exposed-modules: System.Posix System.Posix.DynamicLinker.Module
                  System.Posix.Signals.Exts System.Posix.Semaphore
                  System.Posix.SharedMem
 hidden-modules:
+trusted: False
 import-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
 library-dirs: /usr/lib/ghc-6.12.1/unix-2.3.1.0
 hs-libraries: HSunix-2.3.1.0
@@ -892,6 +935,16 @@ haddock-html: /usr/share/doc/ghc/html/libraries/unix
           <listitem>
             <para>(文字列の並び)このパッケージが提供するが、プログラマには露出されないモジュール。こういうモジュールをインポートすることはできないが、重複モジュール制限の対象にはなる。(訳注: この制限はもはや存在しない)つまり、同じプログラムの別のパッケージが同じ名前のモジュールを提供していてはいけない。</para>
         </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <literal>trusted</literal>
+            <indexterm><primary><literal>trusted</literal></primary><secondary>package specification</secondary></indexterm>
+          </term>
+          <listitem>
+            <para>(真偽値)このパッケージが信用されているか否か。</para>
+          </listitem>
         </varlistentry>
 
         <varlistentry>
