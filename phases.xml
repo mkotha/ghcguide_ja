@@ -5,7 +5,7 @@
   <sect2 id="replacing-phases">
     <title>それぞれの段階で使われるプログラムを変更する</title>
     <indexterm><primary>phases, changing</primary></indexterm>
-    
+
     <para>コンパイルシステムの段階のうち一つ一つについて、<command>ghc</command>に備え付けられたプログラムの代わりに別のものを使うように指定することができる。例えば、別のアセンブラを使ってみたいかもしれない。以下のオプションで、指定されたコンパイル段階で使われる外部プログラムを変更することができる。</para>
 
     <variablelist>
@@ -56,16 +56,6 @@
         </term>
         <listitem>
           <para>LLVMコンパイラとして<replaceable>cmd</replaceable>を使う。</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>
-          <option>-pgmm</option> <replaceable>cmd</replaceable>
-          <indexterm><primary><option>-pgmm</option></primary></indexterm>
-        </term>
-        <listitem>
-          <para>manglerとして<replaceable>cmd</replaceable>を使う。</para>
         </listitem>
       </varlistentry>
 
@@ -358,7 +348,7 @@ $ cat foo.hspp</screen>
 <programlisting>strmod = "\
 \ p \
 \ "</programlisting>
-      
+
       <para><filename>/usr/bin/cpp</filename>がバックスラッシュと改行を消し去るからである。</para>
 
       <para>一方、行末にスペースを加えれば、<command>cpp</command>(少なくともGNU <command>cpp</command>、他の<command>cpp</command>もそうかもしれない)はバックスラッシュと空白の対をそのまま残し、文字列間隙は期待どおりに働く。</para>
@@ -367,7 +357,7 @@ $ cat foo.hspp</screen>
 
   <sect2 id="pre-processor">
     <title>Haskell前処理器に影響するオプション</title>
-    
+
     <indexterm><primary>pre-processing: custom</primary></indexterm>
     <indexterm><primary>Pre-processor options</primary></indexterm>
 
@@ -409,17 +399,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fasm</option></primary></indexterm>
         </term>
         <listitem>
-          <para>Cを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>はデフォルトである。</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>
-          <option>-fvia-C</option>
-          <indexterm><primary><option>-fvia-C</option></primary></indexterm>
-        </term>
-        <listitem>
-          <para>ネイティブコード生成器を使わず、Cを介してコンパイルする。GHCにネイティブコード生成器のないアーキテクチャでは、これがデフォルトである。</para>
+          <para>LLVMを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>はデフォルトである。</para>
         </listitem>
       </varlistentry>
 
@@ -429,7 +409,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fllvm</option></primary></indexterm>
         </term>
         <listitem>
-          <para>ネイティブコード生成器を使わず、LLVMを介してコンパイルする。これは一般的に、ネイティブコード生成器に比べてやや長いコンパイル時間が掛かるが、Cを介してコンパイルするよりは高速である。生成されたコードは一般的に、他の二つのコード生成器と同等か、それより速い。LLVMを介したコンパイルには、LLVMのバージョン2.7以降がパスにあることが必要である。</para>
+          <para>ネイティブコード生成器を使わず、LLVMを介してコンパイルする。これは一般的に、ネイティブコード生成器に比べてやや長いコンパイル時間が掛かる。生成されたコードは一般的に、他の二つのコード生成器と同等か、それより速い。LLVMを介したコンパイルには、LLVMのバージョン2.7以降がパスにあることが必要である。</para>
         </listitem>
       </varlistentry>
 
@@ -673,7 +653,7 @@ $ cat foo.hspp</screen>
 
           <para>スレッド化ランタイムシステムには次のような利点がある。</para>
 
-          <itemizedlist> 
+          <itemizedlist>
             <listitem>
               <para>マルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>またはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械における並列性<indexterm><primary>parallelism</primary></indexterm>。<xref linkend="using-smp"/>を見よ。</para>
 
@@ -754,7 +734,7 @@ $ cat foo.hspp</screen>
           <para>Windowsでは、バイナリをリンクする際、GHCは通常<firstterm>マニフェスト</firstterm><indexterm><primary>manifest</primary></indexterm>ファイルを生成する。マニフェストは<literal><replaceable>prog</replaceable>.exe.manifest</literal>というファイルに置かれる。ここで、<replaceable>prog.exe</replaceable>が実行ファイルの名前である。現在、このマニフェストファイルの役割は唯一つである。Windows Vistaにおける「インストーラの検知」<indexterm><primary>installer detection</primary></indexterm>を無効にするのだ。(これは、ある種の名前(例えば、「install」「setup」「patch」を含む名前)の実行ファイルの権限を昇格させようとするものだ)。マニフェストファイルを使ってインストーラ検知を無効にしないと、Windowsがインストーラだと見なした実行ファイルを実行しようと試みた場合、起動者にパーミッションエラーのコードが返されることになる。この結果、起動者によって、ユーザに昇格の許可を求めるダイアログボックスを表示したり、単に権限不足のエラーになるかもしれない。</para>
 
           <para>インストーラ検知は、セキュリティコントロールパネルを使って大域的に無効にすることもできるが、GHCはデフォルトで、ユーザがインストーラ検知を無効にしてあることに依存しないバイナリを生成する。</para>
-          
+
           <para><option>-fno-gen-manifest</option>はこのマニフェストファイルの生成を無効にする。こうすることの一つの理由としては、例えば自分でマニフェストファイルを用意した場合というのがあるだろう。</para>
 
           <para>将来的には、GHCはマニフェストファイルをもっと多くのことに使うようになるかもしれない。依存しているDLLの位置を指定するなど。</para>
@@ -762,7 +742,7 @@ $ cat foo.hspp</screen>
           <para><option>-fno-gen-manifest</option>は<option>-fno-embed-manifest</option>も有効にする。下記参照。</para>
         </listitem>
       </varlistentry>
-          
+
       <varlistentry>
         <term>
           <option>-fno-embed-manifest</option>
@@ -771,7 +751,7 @@ $ cat foo.hspp</screen>
         </term>
         <listitem>
           <para>WindowsにおいてGHCがバイナリのリンク時に生成するマニフェストファイルは、デフォルトで、実行ファイル自体に埋め込まれる。これによって、バイナリを、マニフェストファイルを同時に供給する必要なしで配布することができる。この埋め込みは、<literal>windres</literal><indexterm><primary><literal>windres</literal></primary></indexterm>を走らせることによって為される。マニフェストを埋め込むためにGHCが何をしているが正確に知るには、<option>-v</option>フラグを使うとよい。このために、GHCのインストールには<literal>windres</literal>のコピーが付属している。</para>
-          
+
           <para><option>-pgmwindres</option>(<xref linkend="replacing-phases" />)と<option>-optwindres</option>(<xref linkend="forcing-options-through"/>)も参照。</para>
         </listitem>
       </varlistentry>
