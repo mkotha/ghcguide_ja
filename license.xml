@@ -3,7 +3,7 @@
 <title>The Glasgow Haskell Compiler License</title>
 
 <para>
-Copyright 2002 - 2007, The University Court of the University of Glasgow. 
+Copyright 2002 - 2007, The University Court of the University of Glasgow.
 All rights reserved.
 </para>
 
@@ -23,7 +23,7 @@ this list of conditions and the following disclaimer.
 </listitem>
 
 <listitem>
-<para> 
+<para>
 Redistributions in binary form must reproduce the above copyright notice,
 this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
@@ -31,7 +31,7 @@ and/or other materials provided with the distribution.
 </listitem>
 
 <listitem>
-<para> 
+<para>
 Neither name of the University nor the names of its contributors may be
 used to endorse or promote products derived from this software without
 specific prior written permission.
@@ -77,13 +77,13 @@ DAMAGE.
   </listitem>
 
   <listitem>
-  <para> 
+  <para>
   バイナリ形式で再配布する場合、上記の著作権表示、この条件一覧、及び下記の免責事項を、配布物とともに提供される文書その他に記載せねばならない。
   </para>
   </listitem>
 
   <listitem>
-  <para> 
+  <para>
   この大学の名前および貢献者の名前を、事前の書面による特別の許可無しに、このソフトウェアから派生した製品を推薦・宣伝するのに用いてはならない。
   </para>
   </listitem>
