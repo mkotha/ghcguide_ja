@@ -40,16 +40,16 @@ Hello World!</screen>
 
   <sect1>
     <title>オプション概観</title>
-    
+
     <para>GHCの振る舞いは<firstterm>オプション</firstterm>で制御される。歴史的な理由から、これはコマンド行フラグとか引数とも呼ばれる。オプションを指定する方法は次の三つである。</para>
 
     <sect2>
       <title>コマンド行引数</title>
-      
+
       <indexterm><primary>structure, command-line</primary></indexterm>
       <indexterm><primary>command-line</primary><secondary>arguments</secondary></indexterm>
       <indexterm><primary>arguments</primary><secondary>command-line</secondary></indexterm>
-      
+
       <para>GHCを起動するときは次のような形をとる。</para>
 
 <screen>
@@ -63,7 +63,7 @@ ghc [argument...]
 
     <sect2 id="source-file-options">
       <title>ソースファイル中のコマンド行オプション</title>
-    
+
       <indexterm><primary>source-file options</primary></indexterm>
 
       <para>ソースファイルと、それが必要とするコマンド行オプションの結合をとても強くした方が便利なことがある。例えば、あるHaskellソースファイルが意図的に名前の覆い隠しを使っているなら、それは<option>-fno-warn-name-shadowing</option>オプション付きでコンパイルされるべきである。<filename>Makefile</filename>でファイルごとのオプションの一覧を管理する代わりに、<literal>OPTIONS_GHC</literal>プラグマを使ってソースファイルに直接これを書き込むこともできる。<indexterm><primary>OPTIONS_GHC pragma</primary></indexterm></para>
@@ -73,7 +73,7 @@ ghc [argument...]
 module X where
 ...
 </programlisting>
-      
+
       <para><literal>OPTIONS_GHC</literal>は<emphasis>ファイルヘッダプラグマ</emphasis>である(<xref linkend="pragmas"/>を見よ)。</para>
 
       <para><literal>OPTIONS_GHC</literal>の中で使えるのは<emphasis>動的な</emphasis>フラグだけである(<xref linkend="static-dynamic-flags"/>を見よ)</para>
@@ -91,7 +91,7 @@ module X where
       <para>GHCiの中から<literal>:set</literal>コマンドを使ってオプションを変更することもできる。詳しくは<xref linkend="ghci-set"/>を見よ。</para>
     </sect2>
   </sect1>
-    
+
   <sect1 id="static-dynamic-flags">
     <title>静的オプション、動的オプション、モード指定オプション</title>
     <indexterm><primary>static</primary><secondary>options</secondary>
@@ -123,7 +123,7 @@ module X where
 	</listitem>
       </varlistentry>
     </variablelist>
-    
+
     <para>フラグの早見表(<xref linkend="flag-reference"/>)にはそれぞれのフラグがどれに分類されるか記されている。</para>
     <para>静的でありながら、GHCiの<literal>:set</literal>コマンドで設定できるフラグも少しながらある。これは表中では&ldquo;静/<literal>:set</literal>&rdquo;と表記される。</para>
   </sect1>
@@ -175,7 +175,7 @@ module X where
           <para>Haskellコンパイラによって生成されたもの以外のCファイル。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term><filename>.ll</filename></term>
 	<listitem>
@@ -231,7 +231,7 @@ module X where
           <para>対話的モード。<command>ghci</command>としても使える。対話的モードは<xref linkend="ghci"/>で詳しく説明されている。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
@@ -258,7 +258,7 @@ module X where
           <para>式を評価するモード。これは対話的モードによく似ているが、評価する式は一つだけで、コマンド行から与えられる。さらなる詳細は<xref linkend="eval-mode"/>を見よ。</para>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term>
           <cmdsynopsis>
@@ -394,7 +394,7 @@ module X where
       <title><command>ghc</command> <option>&ndash;&ndash;make</option>を使う</title>
       <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
       <indexterm><primary>separate compilation</primary></indexterm>
-      
+
       <para>このモードではGHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる一つ以上のモジュール(ふつうは<literal>Main</literal>だけ)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
 
 <screen>
@@ -423,16 +423,16 @@ ghc Main.hs
           <para>起動されるたびにGHCが依存関係を再計算するので、ソースとの整合性が失われることがない。</para>
 	</listitem>
       </itemizedlist>
-      
+
       <para>この章でこれ以降に解説されるコマンド行オプションは全て<option>&ndash;&ndash;make</option>とともに用いることができる。ただし、コマンド行から与えられたオプションは全てのソースファイルに適用されるので、単一のソースファイルにのみ適用したいオプションについては<literal>OPTIONS_GHC</literal>プラグマ(<xref linkend="source-file-options"/>を見よ)を使う必要があることに注意せよ。</para>
 
       <para>プログラムを追加のオブジェクト(例えばCの補助コード)にリンクする必要があるなら、そのオブジェクトファイルをコマンド行で与えれば、GHCは実行ファイルをリンクするときにそれを含める。</para>
-      
+
       <para>GHCはソースファイルがあるときしか依存関係を追跡できないので、ソースコードのないモジュールがプログラムに含まれていると、たとえオブジェクトファイルとインタフェースファイルがあったとしても、GHCは文句を言うことに注意せよ。パッケージのモジュールはこの規則の例外で、ソースファイルがあってもなくても良い。</para>
 
       <para>プログラムのソースファイルが全て同じディレクトリにある必要はない。<option>-i</option>オプションを使ってディレクトリを探索パスに加えることができる。(<xref linkend="search-path"/>を見よ)</para>
     </sect2>
-  
+
     <sect2 id="eval-mode">
       <title>式評価モード</title>
 
@@ -449,7 +449,7 @@ ghc -e <replaceable>expr</replaceable>
 <screen>
 ghc -e Main.main Main.hs
 </screen>
-      
+
       <para>また、このモードを、単に式を<literal>Prelude</literal>の文脈で評価するのに使うこともできる。</para>
 
 <screen>
@@ -461,18 +461,18 @@ olleh
 
     <sect2 id="options-order">
       <title>一括処理コンパイラモード</title>
-      
+
       <para><emphasis>一括処理</emphasis>モードでは、GHCはコマンド行で与えられた一つ以上のソースファイルをコンパイルする。</para>
-      
+
       <para>コンパイルが、複数ある段階のどこから始まるかは、それぞれの入力ファイルの接尾辞によって決定される。また、どこで終わるかは、フラグによって決定される。もしこれに関連するフラグが与えられなかったときは、リンクまでの全ての段階を実行する。次の表はこれをまとめたものである。</para>
-      
+
       <informaltable>
 	<tgroup cols="4">
 	  <colspec align="left"/>
 	  <colspec align="left"/>
 	  <colspec align="left"/>
 	  <colspec align="left"/>
-	  
+
 	  <thead>
 	    <row>
 	      <entry>コンパイルシステムの段階</entry>
@@ -488,35 +488,35 @@ olleh
 	      <entry>-</entry>
 	      <entry><literal>.hs</literal></entry>
 	    </row>
-	    
+
 	    <row>
 	      <entry>Cプリプロセッサ(省略可能)</entry>
 	      <entry><literal>.hs</literal> (<option>-cpp</option>が与えられたとき)</entry>
 	      <entry><option>-E</option></entry>
 	      <entry><literal>.hspp</literal></entry>
 	    </row>
-	    
+
 	    <row>
 	      <entry>Haskellコンパイラ</entry>
 	      <entry><literal>.hs</literal></entry>
 	      <entry><option>-C</option>, <option>-S</option></entry>
 	      <entry><literal>.hc</literal>, <literal>.s</literal></entry>
 	    </row>
-	    
+
 	    <row>
 	      <entry>Cコンパイラ(省略可能)</entry>
 	      <entry><literal>.hc</literal> or <literal>.c</literal></entry>
 	      <entry><option>-S</option></entry>
 	      <entry><literal>.s</literal></entry>
 	    </row>
-	    
+
 	    <row>
 	      <entry>アセンブラ</entry>
 	      <entry><literal>.s</literal></entry>
 	      <entry><option>-c</option></entry>
 	      <entry><literal>.o</literal></entry>
 	    </row>
-	    
+
 	    <row>
 	      <entry>リンカ</entry>
 	      <entry><replaceable>other</replaceable></entry>
@@ -526,23 +526,23 @@ olleh
 	  </tbody>
 	</tgroup>
       </informaltable>
-      
+
       <indexterm><primary><option>-C</option></primary></indexterm>
       <indexterm><primary><option>-E</option></primary></indexterm>
       <indexterm><primary><option>-S</option></primary></indexterm>
       <indexterm><primary><option>-c</option></primary></indexterm>
-      
+
       <para>そういうわけで、次のようなものがよくある起動のされかたである。</para>
 
 <screen>
 ghc -c Foo.hs</screen>
-      
+
       <para>これはHaskellソースファイル<filename>Foo.hs</filename>をコンパイルしてオブジェクトファイル<filename>Foo.o</filename>を生成する。</para>
 
       <para>注意: Haskellコンパイラが実際に出力するのが何かはネイティブコード生成器<indexterm><primary>native-code generator</primary></indexterm>が使われている(アセンブリ言語を出力する)かそうでない(Cを出力する)かによる。詳しくは、<xref linkend="options-codegen"/>を見よ。</para>
 
       <para>注意: Cプリプロセスは省略可能であり、<option>-cpp</option><indexterm><primary><option>-cpp</option></primary></indexterm>フラグによって有効になる。詳しくは<xref linkend="c-pre-processor"/>を見よ。</para>
-      
+
       <para>注意: <option>-E</option><indexterm><primary>-E option</primary></indexterm>オプションはコンパイラをプリプロセス段階まで走らせ、結果をファイルに出力する。</para>
 
       <sect3 id="overriding-suffixes">
@@ -575,16 +575,6 @@ ghc -c Foo.hs</screen>
     <variablelist>
       <varlistentry>
 	<term>
-          <option>-n</option>
-          <indexterm><primary><option>-n</option></primary></indexterm>
-        </term>
-	<listitem>
-          <para>ドライランを行う。すなわち、GHCは通常のようにコンパイルの手順を追うが、実際に外部コマンドを走らせることはしない。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
           <option>-v</option>
           <indexterm><primary><option>-v</option></primary></indexterm>
         </term>
@@ -594,7 +584,7 @@ ghc -c Foo.hs</screen>
           <para>心よりのお願いとして、バグを報告するときは<option>-v</option>オプションを使って頂きたい！我々は常に、あなたが正しいものを正しい順序で走らせているということを最初に確かめたいのである。</para>
 	</listitem>
       </varlistentry>
-	
+
       <varlistentry>
 	<term>
           <option>-v</option><replaceable>n</replaceable>
@@ -602,7 +592,7 @@ ghc -c Foo.hs</screen>
         </term>
 	<listitem>
           <para>より正確にコンパイラの多弁さを制御するために、<option>-v</option>は省略可能な数値引数をとる。<option>-v</option>を単独で指定するのは<option>-v3</option>と同じで、そのほかの水準は以下のような意味を持っている。</para>
-	  
+
 	  <variablelist>
 	    <varlistentry>
 	      <term><option>-v0</option></term>
@@ -641,7 +631,7 @@ ghc -c Foo.hs</screen>
 	  </variablelist>
 	</listitem>
       </varlistentry>
-      
+
       <varlistentry>
 	<term><option>-ferror-spans</option>
           <indexterm><primary><option>-ferror-spans</option></primary>
@@ -714,7 +704,7 @@ ghc -c Foo.hs</screen>
 	<term><option>-Wall</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-Wall</option></primary></indexterm>
-          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unused-do-bind</option>、<option>-fwarn-implicit-prelude</option>である。</para>
+          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-uni-patterns</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unrecognised-pragmas</option>、<option>-fwarn-auto-orphans</option>、<option>-fwarn-implicit-prelude</option>である。</para>
 	</listitem>
       </varlistentry>
 
@@ -857,6 +847,15 @@ foreign import "&amp;f" f :: FunPtr t
       </varlistentry>
 
       <varlistentry>
+        <term><option>-fwarn-identities</option>:</term>
+	<listitem>
+          <indexterm><primary><option>-fwarn-identities</option></primary></indexterm>
+          <para>Preludeの数値変換が、型Tを同じ型Tに変換しているときに警告を出力するようにする。このような呼び出しはno-opであり省くことができる。以下の関数が検査される。<literal>toInteger</literal>、<literal>toRational</literal>、<literal>fromIntegral</literal>、<literal>realToFrac</literal>。
+          </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
         <term><option>-fwarn-implicit-prelude</option>:</term>
         <listitem>
           <indexterm><primary><option>-fwarn-implicit-prelude</option></primary></indexterm>
@@ -870,20 +869,29 @@ foreign import "&amp;f" f :: FunPtr t
       </varlistentry>
 
       <varlistentry>
-	<term><option>-fwarn-incomplete-patterns</option>:</term>
+	<term><option>-fwarn-incomplete-patterns</option>,
+              <option>-fwarn-incomplete-uni-patterns</option>:
+        </term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-incomplete-patterns</option></primary></indexterm>
+	  <indexterm><primary><option>-fwarn-incomplete-uni-patterns</option></primary></indexterm>
 	  <indexterm><primary>incomplete patterns, warning</primary></indexterm>
 	  <indexterm><primary>patterns, incomplete</primary></indexterm>
 
-          <para>不完全なパターンについても同様で、<!-- 訳注 意図不明 -->下記の関数<function>g</function>と<function>h</function>は非空のリストに適用されたときに失敗する。<option>-fwarn-incomplete-patterns</option>が有効なときは、これに関する警告が出力される。</para>
+          <para><option>-fwarn-incomplete-patterns</option>は、パターン照合が実行時に失敗する可能性がある場合に警告する。下記の関数<function>g</function>は非空のリストに適用されたときに失敗するので、<option>-fwarn-incomplete-patterns</option>が有効ならコンパイラはこれについて警告を発する。
 
 <programlisting>
 g [] = 2
-h = \[] -> 2
 </programlisting>
 
-          <para>このオプションは少々うるさいことがあり、また常にプログラムのバグを示しているわけでもないので、デフォルトでは有効になっていない。しかし、関数を書くときは全ての場合に対応するのが一般には良い習慣とされている。</para>
+          このオプションは少々うるさいことがあり、また常にプログラムのバグを示しているわけでもないので、デフォルトでは有効になっていない。しかし、関数を書くときは全ての場合に対応するのが一般には良い習慣とされており、これは<option>-W</option>によって有効になる。</para>
+
+          <para>フラグ<option>-fwarn-incomplete-uni-patterns</option>はこれと似ているが、単一のパターンしか許さない構文要素、つまりラムダ式およびパターン束縛についてのみ適用される。
+<programlisting>
+h = \[] -> 2
+Just k = f y
+</programlisting>
+          </para>
 	</listitem>
       </varlistentry>
 
@@ -922,6 +930,28 @@ f foo = foo { x = 6 }
       </varlistentry>
 
       <varlistentry>
+	<term>
+          <option>-fwarn-missing-import-lists</option>:
+	  <indexterm><primary><option>-fwarn-import-lists</option></primary></indexterm>
+	  <indexterm><primary>missing import lists, warning</primary></indexterm>
+	  <indexterm><primary>import lists, missing</primary></indexterm>
+        </term>
+	<listitem>
+
+	  <para>qualifiedでない<literal>import</literal>宣言で、スコープに導入する実体を明示的に列挙していないものを使った場合に警告する。例を示す。</para>
+<programlisting>
+module M where
+  import X( f )
+  import Y
+  import qualified Z
+  p x = f x x
+</programlisting>
+        <para><option>-fwarn-import-lists</option>フラグは、<literal>Y</literal>のインポートについては警告するが、<literal>X</literal>については警告しない。もしモジュール<literal>Y</literal>が(たとえば)<literal>f</literal>をエクスポートするように後で変更されたら、<literal>M</literal>における<literal>f</literal>への参照が曖昧になる。<literal>Z</literal>のエクスポートを拡張しても<literal>M</literal>での曖昧性に繋がる可能性は低いので、<literal>Z</literal>のインポートについては警告は生成されない。
+        </para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-fwarn-missing-methods</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-missing-methods</option></primary></indexterm>
@@ -952,11 +982,21 @@ f foo = foo { x = 6 }
       </varlistentry>
 
       <varlistentry>
+	<term><option>-fwarn-missing-local-sigs</option>:</term>
+	<listitem>
+	  <indexterm><primary><option>-fwarn-missing-local-sigs</option></primary></indexterm>
+	  <indexterm><primary>type signatures, missing</primary></indexterm>
+
+	  <para><option>-fwarn-missing-local-sigs</option>フラグを使うと、GHCはあらゆる多相的な局所束縛について警告する。警告の一部としてGHCは推論された型も報告する。このオプションはデフォルトで無効である。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-fwarn-name-shadowing</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-name-shadowing</option></primary></indexterm>
 	  <indexterm><primary>shadowing, warning</primary></indexterm>
-	  
+
           <para>このオプションが有効だと、内側のスコープの値と同名の外側のスコープの値があるとき、つまり内側の値が外側のものを隠すときに警告する。これはミスタイプが原因の発見しがたいバグを捕らえることがある。例えば、<literal>f = ... let f = id in ... f ...</literal>において、再帰呼び出しであるはずのものが意図せず捕捉されるというものがある。</para>
           <para>この警告は、アンダースコアで始まる名前については抑制される。例。
           <programlisting>
@@ -972,7 +1012,7 @@ f foo = foo { x = 6 }
 	  <indexterm><primary><option>-fwarn-orphans</option></primary></indexterm>
 	  <indexterm><primary>orphan instances, warning</primary></indexterm>
 	  <indexterm><primary>orphan rules, warning</primary></indexterm>
-	  
+
           <para>このオプションが有効なら、モジュールに「孤立した」インスタンス宣言や書き換え規則があるときに警告する。インスタンス宣言が孤立インスタンス宣言なのは、クラスおよびインスタンス化される型の両方と別のモジュールに置かれているときである。規則が孤立規則なのは、それが別のモジュールで宣言された関数についての規則であるときである。「孤立した」ものを含むモジュールは孤立モジュールと呼ばれる。</para>
           <para>問題は、孤立モジュールについては、そのインスタンスや規則が意味を持つ場合に備えて、他に理由がなくても、GHCが積極的にインタフェースファイルを読まなければいけないということである。詳しくは<xref linkend="orphan-modules"/>を参照せよ。</para>
 	</listitem>
@@ -1180,26 +1220,9 @@ f "2"    = 2
             <para>現時点では、<option>-O2</option>が<option>-O</option>よりも良いコードを生成することは考えにくい。</para>
 	  </listitem>
 	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-Ofile &lt;file&gt;</option>:
-            <indexterm><primary>-Ofile &lt;file&gt; option</primary></indexterm>
-            <indexterm><primary>optimising, customised</primary></indexterm>
-          </term>
-	  <listitem>
-            <para>(注意: GHC 4.x以降サポートされていない。もしこれに興味があるなら尋ねて欲しい。)</para>
-	    
-            <para><emphasis>厳密に</emphasis>どのオプションが使われるかについて<emphasis>絶対的な</emphasis>制御をしたいと考える者(例えば、場合によっては、コンパイラ屋とか。 笑)向けの機能として、オプションの組み合わせをファイルに置いておき、それを<option>-Ofile</option>で読み込むことができる。</para>
-
-            <para>そのファイルでは、コメントは<literal>&num;</literal>から行末まで、という奴である。空行及び大部分の空白文字は無視される。</para>
-
-            <para>あなたが困っていて、<option>-Ofile</option>の例が欲しいなら、その旨知らせて欲しい。</para>
-	  </listitem>
-	</varlistentry>
       </variablelist>
 
-      <para>我々は日々の作業では<option>-O*</option>を使わない。それなりの速度が必要なときは<option>-O</option>を使う。例えば、何かを計測するときなどである。「とにかくハイクオリティがいいお( ＾ω＾) 時間とか気にしないお！CPU稼働率100％でも構わないお！」というあなたには、<option>-O2 -fvia-C</option>オプションをどうぞ。ガリガリ音を立てるPCを後にして、コーヒーを100万回飲みに行こう。(コーヒーブレイクするってレベルじゃねぇぞ！)</para>
+      <para>我々は日々の作業では<option>-O*</option>を使わない。それなりの速度が必要なときは<option>-O</option>を使う。例えば、何かを計測するときなどである。「とにかくハイクオリティがいいお( ＾ω＾) 時間とか気にしないお！CPU稼働率100％でも構わないお！」というあなたには、<option>-O2</option>オプションをどうぞ。ガリガリ音を立てるPCを後にして、コーヒーを100万回飲みに行こう。(コーヒーブレイクするってレベルじゃねぇぞ！)</para>
 
       <para><option>-O</option>(など)が何を「実際に意味している」かを知るもっとも簡単な方法は、<option>-v</option>を付けて走らせ、驚きのあまり後ずさることである。</para>
     </sect2>
@@ -1375,11 +1398,11 @@ f "2"    = 2
       </variablelist>
 
     </sect2>
-    
+
   </sect1>
-  
-  &phases;  
-  
+
+  &phases;
+
   &shared_libs;
 
   <sect1 id="using-concurrent">
@@ -1412,12 +1435,12 @@ f "2"    = 2
     <para><emphasis>並行性(concurrency)</emphasis>と<emphasis>並列性(parallelism)</emphasis>の間には明確な区別がある。並列性は、専ら、複数のプロセッサを同時に使うことでプログラムを<emphasis>速く</emphasis>することについてである。一方、並行性は抽象化の一手段である。具体的には、複数の非同期のイベントに対応せねばならないプログラムを構築するための便利な方法である。</para>
 
     <para>とはいうものの、この二つの用語は確かに関連している。複数のCPUを使うことで、複数の並行スレッドを並列に実行することができるようになる。GHCのSMP並列計算サポートはまさにこれを行う。しかし、並行性を利用しないプログラムにおいて、並列計算によってパフォーマンスを改善することも、また可能である。この節では、GHCを使って並列プログラムをコンパイル・実行する方法を解説し、<xref linkend="lang-parallel"/>では並列性に影響する言語機能を説明する。</para>
-    
+
     <sect2 id="parallel-compile-options">
       <title>SMP並列計算に関するコンパイル時オプション</title>
 
       <para>複数のCPUを利用するには、プログラムが<option>-threaded</option>オプション付きでリンクされていなればならない。(<xref linkend="options-linker"/>を見よ)。加えて、以下のコンパイラオプションが並列性に影響する。</para>
-      
+
       <variablelist>
         <varlistentry>
           <term><option>-feager-blackholing</option></term>
@@ -1450,7 +1473,7 @@ f "2"    = 2
             <para>マシンの全てのプロセッサを使う時には注意すること。もし他のプログラムがプロセッサをいくつか使っているなら、これによってパフォーマンスを改善するどころか悪影響になることがある。</para>
 
             <para><option>-N</option>を設定することには、並列ガベッジコレクタを有効にするという効果もある(<xref linkend="rts-options-gc"/>を見よ)。</para>
-            
+
             <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
 
             <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.numCapabilities</literal>でHaskellプログラムから得られる。</para>
@@ -1478,19 +1501,9 @@ f "2"    = 2
             <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
           </listitem>
         </varlistentry>
-	<varlistentry>
-	  <term><option>-qw</option></term>
-          <indexterm><primary><option>-qw</option></primary><secondary>RTS
-          option</secondary></indexterm>
-	  <listitem>
-            <para>スレッドが目覚めたとき、それを現在のCPUに移住させる。通常、スレッドがブロックしていて目覚めた場合、最後に走っていたCPUに割り振られる。このオプションによって、スレッドがブロックを解いたCPUに即座に移住できるようになる。</para>
- 
-            <para>この積極的な移住を可能にする根拠となるのは、これによって相互に連絡し合うスレッドが同じCPUに集められる傾向があることである。しかし、これが悪い戦略になるような病理的な例が存在する。プログラム中の連絡パターンによって、これは良案になるかもしれず、そうでないかもしれない。</para>
-          </listitem>
-        </varlistentry>
        </variablelist>
     </sect2>
-      
+
     <sect2>
       <title>SMP並列計算を使うにあたってのヒント</title>
 
@@ -1522,20 +1535,6 @@ f "2"    = 2
         </listitem>
       </varlistentry>
 
-      <varlistentry>
-	<term><option>-monly-[32]-regs</option>:</term>
-	<listitem>
-          <para>(x86のみ)<indexterm><primary>-monly-N-regs option (iX86 only)</primary></indexterm>GHCはパフォーマンスのために四つのレジスタをGCCから「盗もうと」する。これは大抵うまく行く。しかし、ある種のモジュールでは、四つのレジスタを盗まれた状態でGCCがコンパイルしていると、おそらく次のように言ってクラッシュする。
-
-<screen>
-Foo.hc:533: fixed or forbidden register was spilled.
-This may be due to a compiler bug or to impossible asm
-statements or clauses.
-</screen>
-
-          <option>-monly-N-regs</option>でレジスタをいくつか返してやると良い。まず「3」を試し、次に「2」を試す。「2」でもうまく行かないなら、バグとして報告して頂きたい。</para>
-	</listitem>
-      </varlistentry>
     </variablelist>
 
   </sect1>
