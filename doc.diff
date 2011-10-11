@@ -1,25 +1,3 @@
-diff -dur 7.0.4-original//sooner.xml original/sooner.xml
---- 7.0.4-original//sooner.xml	2011-06-14 01:10:05.000000000 +0800
-+++ original/sooner.xml	2011-08-08 01:10:05.000000000 +0800
-@@ -163,18 +163,6 @@
-       </varlistentry>
- 
-       <varlistentry>
--	<term>Compile via C and crank up GCC:</term>
--	<listitem>
--	  <para>The native code-generator is designed to be quick, not
--          mind-bogglingly clever.  Better to let GCC have a go, as it
--          tries much harder on register allocation, etc.</para>
--
--	  <para>So, when we want very fast code, we use: <option>-O
--	  -fvia-C</option>.</para>
--	</listitem>
--      </varlistentry>
--
--      <varlistentry>
- 	<term>Overloaded functions are not your friend:</term>
- 	<listitem>
- 	  <para>Haskell's overloading (using type classes) is elegant,
 diff -dur 7.0.4-original//ug-book.xml original/ug-book.xml
 --- 7.0.4-original//ug-book.xml	2011-06-15 21:01:20.000000000 +0800
 +++ original/ug-book.xml	2011-08-15 14:59:40.000000000 +0800

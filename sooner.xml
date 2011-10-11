@@ -98,15 +98,6 @@
       </varlistentry>
 
       <varlistentry>
-        <term>Cを介してコンパイルし、GCCに頑張ってもらう</term>
-	<listitem>
-          <para>ネイティブコード生成器は素早く動作するように設計されていて、ものすごく賢く動作するように設計されている訳ではない。GCCの方がレジスタ割り付けなどをずっと真剣に行うので、GCCにやらせた方が良い。</para>
-
-          <para>よって、とても速いコードが必要な時は、<option>-O -fvia-C</option>を使っている。</para>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
         <term>多重定義関数に気を付けよ</term>
 	<listitem>
           <para>Haskellの(型クラスを使った)多重定義は洗練されているし、趣味が良いし、美点を挙げればきりがないが、これが内側のループに残ったままになると性能には致命的である。これをつぶすには次のような方法がある。</para>
