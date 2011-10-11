@@ -19,7 +19,7 @@ GHCのWin32用インストーラは、GHCをインストールすると同時に
 <!-- not clear whether there are current editions of Win32 OSes that
      doesn't do this by default.
 
-<para> Solution: don't use "Open With...", avoid spaces in file names, 
+<para> Solution: don't use "Open With...", avoid spaces in file names,
 or fiddle with the appropriate registry setting:
 <programlisting>
   HKEY_CLASSES_ROOT\Unknown\shell\openas\command
@@ -99,7 +99,7 @@ GHC(および、GHCでコンパイルされた実行ファイル)をcygwinで使
 <listitem>
 <para>絶対パスを使わなければならない場合(makefileの階層やconfigureスクリプト中の一見無害な<literal>ROOT=`pwd`</literal>に注意)のために、cygwinには<command>cygpath</command>というツールがあり、cygwinのunix形式のパスを実際のwindows形式のものに変換することができる。cygwinツールの大部分は実際にはwindows形式のパスも受け付ける(ただし「\」をエスケープするか「\」の代わりに「/」を使う必要がある)ので、常にこれを使っていて問題ないはずである。unix形式のパスに依存するなんらかのパス操作を行うツールを使いたい場合(一つの楽しい例は「:」がパス区切りとして解釈されてしまう場合である)でも、パスがGHCやその仲間たちに渡される直前に<command>cygpath</command>で変換することができる。
 </para></listitem>
-  
+
 <listitem>
 <para>もしあなたが<command>cygpath</command>を持っていないなら、おそらくあなたはcygwinを持っていないので、問題ない。ただし、複数のプラットフォームで使えるビルド過程を書きたいなら話は別である。この場合でも相対パスを使えば良いが、絶対パスを使う必要があり、しかもプラットフォームごとに異なるツールを使いたくない場合、短いHaskellプログラムを書いてカレントディレクトリを出力させるという方法がある。(この考えを出したGeorge Russellに感謝)。それをGHCでコンパイルして実行すれば、GHCが見ているファイルシステムの姿(これはGHCがcygwinのgccでコンパイルされたか、mingwのgccか、それとも本物のunixシステムのgccかに依存する)が分かる。その小さなプログラムにパス中の「\」をエスケープさせることもできる。バナーが表示されるのと、起動に時間がかかることを除けば、以下のようなものでも良い。
 <programlisting>
@@ -153,7 +153,7 @@ cured the problem (it was supposedly fixed some years ago).
 The default on Win32 platforms is to link applications in such a way
 that the executables will use the Prelude and system libraries DLLs,
 rather than contain (large chunks of) them. This is transparent at the
-command-line, so 
+command-line, so
 </para>
 
 <para>
@@ -168,7 +168,7 @@ sh$ ls -l main.exe
 -rwxr-xr-x   1 544      everyone     4608 May  3 17:11 main.exe*
 sh$ ./main
 hello, world!
-sh$ 
+sh$
 </screen>
 </para>
 
@@ -313,8 +313,6 @@ foreign export stdcall adder :: Int -> Int -> IO Int
 // StartEnd.c
 #include &lt;Rts.h&gt;
 
-extern void __stginit_Adder(void);
-
 void HsStart()
 {
    int argc = 1;
@@ -323,9 +321,6 @@ void HsStart()
    // Haskellのランタイムを初期化する
    char** args = argv;
    hs_init(&amp;argc, &amp;args);
-
-   // Haskellに全ての根モジュールを通知する
-   hs_add_root(__stginit_Adder);
 }
 
 void HsEnd()
