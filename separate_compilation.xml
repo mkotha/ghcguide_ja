@@ -234,7 +234,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 	</varlistentry>
       </variablelist>
     </sect2>
-  
+
     <sect2 id="keeping-intermediates">
       <title>中間ファイルをそのままにする</title>
       <indexterm><primary>intermediate files, saving</primary>
@@ -257,7 +257,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
             <indexterm><primary><option>-keep-hc-files</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをCを介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.hc</literal>ファイルは生成されない。生成されるようにするのに<option>-fvia-C</option>を使う必要があるかもしれない)</para>
+            <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをCを介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: 非レジスタ化コンパイラによってしか<literal>.hc</literal>ファイルは生成されない。)</para>
 	  </listitem>
 	</varlistentry>
 
@@ -282,18 +282,6 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
           </term>
 	  <listitem>
             <para>中間の<literal>.s</literal>ファイルを消さない。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-keep-raw-s-file</option>
-            <option>-keep-raw-s-files</option>
-            <indexterm><primary><option>-keep-raw-s-file</option></primary></indexterm>
-            <indexterm><primary><option>-keep-raw-s-files</option></primary></indexterm>
-          </term>
-	  <listitem>
-            <para>中間の<literal>.raw-s</literal>ファイルを消さない。これはCコンパイラが直接出力したものであり、GHCが「アセンブリ・マングリング」(これの結果が<literal>.s</literal>ファイルである)を行う前のものである。このファイルもネイティブコード生成器が使われているときには作られない。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -422,17 +410,17 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 <programlisting>
 module A where
     import B( TB(..) )
-    
+
     newtype TA = MkTA Int
-    
+
     f :: TB -&#62; TA
     f (MkTB x) = MkTA x
 
 module B where
     import {-# SOURCE #-} A( TA(..) )
-    
+
     data TB = MkTB !Int
-    
+
     g :: TA -&#62; TB
     g (MkTA x) = MkTB x
 </programlisting>
@@ -467,7 +455,7 @@ module A where
 </programlisting>
 <filename>A.hs-boot</filename>というhs-bootファイルがコンパイルされると、通用範囲と型に関するエラーがないかどうか検査される。親モジュールである<filename>A.hs</filename>がコンパイルされるとき、この二つが比較され、不整合があればエラーが報告される。
    </para></listitem>
-   
+
 	<listitem>
           <para><filename>A.hs</filename>をコンパイルすると<filename>A.hi</filename>というインタフェースファイルと<filename>A.o</filename>というオブジェクトファイルが生成されるが、これと同様に<filename>A.hs-boot</filename>をコンパイルすると<filename>A.hi-boot</filename>というインタフェースファイルと<filename>A.o-boot</filename>という疑似オブジェクトファイルが生成される。</para>
 
@@ -494,7 +482,7 @@ hs-bootファイルにはブートストラップのための最小限の情報�
 <para>hs-bootファイルはHaskellのサブセットで書かれる。
 <itemizedlist>
 <listitem><para>モジュールヘッダ(エクスポート一覧を含む)、インポート文、有効範囲規則は、Haskellと全く同じである。したがって、プレリュード以外で定義された型やクラスに言及するには、それをインポートしなければならない。</para></listitem>
-   
+
 <listitem><para>値の宣言があってはならない。しかし、値の型シグネチャはあっても良い。例えば、
 <programlisting>
   double :: Int -&#62; Int
@@ -622,7 +610,7 @@ M.o : X.hi-boot
 </programlisting>
        (<literal>hi-boot</literal>様式のインタフェースファイルについて詳しくは<xref linkend="mutual-recursion"/>を見よ。)
       </para></listitem>
-        </itemizedlist> 
+        </itemizedlist>
         <literal>M</literal>が複数のモジュールをインポートしているなら、<filename>M.o</filename>をターゲットとする行が複数できることになる。</para>
        <para><command>ghc -M</command>コマンドの引数として全てのモジュールを列挙する必要はない。<command>ghc</command>が依存性を追跡する。これは<command>ghc --make</command>の場合と同様である。(GHC 6.4の新機能)</para>
 
@@ -720,7 +708,7 @@ M.o : X.hi-boot
   <listitem><para><emphasis>孤立モジュール</emphasis><indexterm><primary>orphan module</primary></indexterm>は、一つ以上の<emphasis>孤立インスタンス</emphasis>または一つ以上の<emphasis>孤立規則</emphasis>を含む。</para></listitem>
 
   <listitem><para>モジュールMにあるインスタンス宣言が<emphasis>孤立インスタンス</emphasis>なのは、<indexterm><primary>orphan instance</primary></indexterm>
-<itemizedlist> 
+<itemizedlist>
 <listitem><para>
   そのインスタンス宣言のクラスがMで宣言されたものでなく、かつ
 </para></listitem>
