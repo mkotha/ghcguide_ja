@@ -6625,7 +6625,7 @@ instance Constructor C1_1UserTree where
   conName _ = "Leaf"
 </programlisting>
 
-この表現は、<literal>deriving Generic</literal>がデータ型に付属していれば自動的に生成される。<link linkend="stand-aline-deriving">独立deriving</link>も使える。</para>
+この表現は、<literal>deriving Generic</literal>がデータ型に付属していれば自動的に生成される。<link linkend="stand-alone-deriving">独立deriving</link>も使える。</para>
 
 </sect2>
 
