@@ -58,7 +58,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
       <para>いつもと同様、<replaceable>size</replaceable>を取るRTSオプションについては、以下が適用される。<replaceable>size</replaceable>の最後の文字がKまたはkなら、数値は1000倍される。Mまたはmなら、1,000,000倍される。GまたはG<!-- 訳注: たぶん誤り -->なら、1,000,000,000倍される。(カウンタのオーバーフローは<emphasis>あなたの</emphasis>責任である)</para>
 
-      <para><literal>+RTS -?</literal><indexterm><primary><option>-?</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para> 
+      <para><literal>+RTS -?</literal><indexterm><primary><option>-?</option></primary><secondary>RTS option</secondary></indexterm>オプションを与えれば、実際に利用可能なRTSオプションを表示することができる。(これはどのようにコンパイルされたかによって異なる)</para>
 
       <para>注意: GHCはそれ自身GHCでコンパイルされているので、通常の<literal>+RTS ... -RTS</literal>の組み合わせを使ってRTSオプションを変更することができる。例えば、コンパイル時の最大ヒープサイズを128Mに増やすには、<literal>+RTS -M128m -RTS</literal>をコマンド行に加えれば良い。</para>
     </sect3>
@@ -184,7 +184,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
          <para>
            警告: このオプションはメモリ確保の問題を回避するためだけのものである。GHCiが「<literal>failed to mmap() memory below 2Gb</literal>」のようなメッセージを表示して失敗するのでない限り、使ってはいけない。あなたの機械でGHCiを動かすのにこのオプションを使う必要があるなら、バグとして報告してほしい。
          </para>
-         
+
          <para>
            64ビットの機械では、RTSはアドレス空間の下方2Gbの中にメモリを確保する必要がある。種々のOSにおけるこれの対応は不完全であり、ときどき失敗する。このオプションは、アドレス空間の下方2Gbの中でどこのメモリを確保できるかについてRTSにヒントを与えるために存在する。例えば、<literal>+RTS -xm20000000 -RTS</literal>とすれば、RTSが0.5Gb markから確保を開始すべきというヒントになる。デフォルトは、可能なら下方2Gb中にメモリを確保するためのOS組み込みの手段(例えばLinuxなら<literal>MAP_32BIT</literal>付きの<literal>mmap</literal>)を使い、それがなければ<literal>-xm40000000</literal>である。
          </para>
@@ -280,10 +280,10 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
         <listitem>
           <para>&lsqb;GHC 6.12.1から&rsqb; &lsqb;デフォルト: 0&rsqb;
             世代<replaceable>gen</replaceable>とそれより上の世代において、並列GCを使う。<replaceable>gen</replaceable>を省略すると、並列GCは完全に無効になり、逐次GCに戻る。</para>
-          
+
           <para>デフォルトの並列GC設定は、通常、並列プログラム(<literal>par</literal>やStrategyや複数のスレッドを使うもの)に適している。しかし、単一スレッドの逐次的なプログラムに関しても、並列GCを有効にする恩恵があることがある。特に、プログラムが大量のヒープデータを持ち、実行時間のかなりの部分をGCが占めるような場合である。逐次的なプログラムにおいて並列GCを使うには、適切な<literal>-N</literal>オプションを使って並列ランタイムを有効にすればよい。加えて、<literal>-qg1</literal>を使って並列GCを古い世代のみに制限すると良いかもしれない。</para>
         </listitem>
-      </varlistentry>        
+      </varlistentry>
 
       <varlistentry>
         <term>
@@ -295,7 +295,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <para>
             &lsqb;GHC 6.12.1から&rsqb; &lsqb;デフォルト: 1&rsqb;
             並列GCにおいて、世代<replaceable>gen</replaceable>とそれより上の世代で負荷分散を使う。<replaceable>gen</replaceable>を省略すると、負荷分散を完全に無効にする。</para>
-          
+
           <para>
             負荷分散とは、GCの作業を空いているコア間で分配することである。これは、ヒープが大きく、GCの作業を並列化する必要がある場合には良いことである。しかし、並列プログラムの若い世代における短い回収では、これは最悪である。なぜなら、データをCPUのキャッシュから動かすことで、局所性を損うからである。(訳注: 理解できないのでだれか助けて 原文は because it can harm locality by moving data from the cache of the CPU where is it being used to the cache of another CPU.)。実際、並列プログラムでは、<literal>-qb</literal>で負荷分散を完全に無効にした方が良いこともある。
           </para>
@@ -335,15 +335,45 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
       <varlistentry>
 	<term>
-         <option>-k</option><replaceable>size</replaceable>
+         <option>-ki</option><replaceable>size</replaceable>
          <indexterm><primary><option>-k</option></primary><secondary>RTS option</secondary></indexterm>
-         <indexterm><primary>stack, minimum size</primary></indexterm>
+         <indexterm><primary>stack, initial size</primary></indexterm>
         </term>
 	<listitem>
-          <para>&lsqb;デフォルト: 1k&rsqb; スレッドの初期スタックサイズを設定する。スレッドのスタック(主スレッドのスタックも含めて)はヒープ上にとられ、必要に応じて成長する。デフォルト値はたくさんの小さなスレッドを使う並行アプリケーションに適している。あなたのプログラムがこれに沿わないなら、このオプションを増加させると性能が向上するかもしれない。</para>
+          <para>&lsqb;デフォルト: 1k&rsqb; スレッドの初期スタックサイズを設定する。(注意: このフラグは単に<option>-k</option>であったが、GHC 7.2.1で<option>-ki</option>に改名された。古い名前も後方互換性のためにまだ受け付けられるが、将来の版では削除されるかもしれない)</para>
 
-          <para>通常、主スレッドはやや大きめのヒープで開始される。これは、プログラムが開始するときに起こる不必要なスタックの伸長を低減するためである。</para>
-	</listitem>
+          <para>スレッドのスタック(主スレッドのスタックも含めて)はヒープ上にとられる。スタックが成長するにつれ、必要に応じて新しいチャンクが追加される。スタックが再び収縮する場合、これらの追加されたスタックチャンクはGCによって回収される。デフォルトの初期スタックサイズは意図的に小さくしてある。これは、スレッド生成の時間的空間的オーバーヘッドを最小にとどめることで、ごく小さい仕事のためにスレッドを生成することを現実的にするためである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-kc</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-kc</option></primary><secondary>RTS
+          option</secondary></indexterm>
+          <indexterm><primary>stack</primary><secondary>chunk size</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>
+            &lsqb;デフォルト: 32k&rsqb; &ldquo;スタックチャンク&rdquo;の大きさを設定する。スレッドの現行スタックがオーバーフローしたとき、<option>-K</option>で設定された上限に達するまでは、新しいスタックチャンクが作成されてスレッドのスタックに加えられる。
+          </para>
+
+          <para>チャンクサイズを小さくすることの利点はこうである。ガベッジコレクタは、チャンクが前回のGC以降変更されていないことが分かると、それらを走査しないで済ませることができる。よって、チャンクサイズを減らすと、ガベッジコレクタがより多くのスタックを未変更と知ることができるので、GCのオーバーヘッドを削ることができるかもしれない。一方で、スタックチャンクを小さくしすぎると、チャンク間のオーバーフロー/アンダーフローが増えるので、オーバーヘッドが増える。32kというデフォルト設定は、大部分の場合においてそれなりな妥協点のようである。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-kb</option><replaceable>size</replaceable>
+          <indexterm><primary><option>-kc</option></primary><secondary>RTS
+          option</secondary></indexterm>
+          <indexterm><primary>stack</primary><secondary>chunk buffer size</secondary></indexterm>
+        </term>
+        <listitem>
+          <para>
+            &lsqb;デフォルト: 1k&rsqb; スタックチャンクバッファの大きさを設定する。スタックチャンクがオーバーフローして新しいチャンクが作成される時、前のスタックのデータの一部が新しいチャンクに移動される。これは、即座にアンダーフローが発生し、境界でオーバーフロー/アンダーフローが繰り返されるのを防ぐためである。ここで動かされるスタックの量が<option>-kb</option>によって設定される。</para>
+          <para>空間を無駄にするのを防ぐために、この値は典型的にはスタックチャンクの大きさ(<option>-kc</option>)の10%未満に設定されるべきである。スタックチャンクの連鎖の中で、それぞれのチャンクがこの大きさの未使用の空間を隙間として持つことになるからである。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -353,7 +383,8 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary>stack, maximum size</primary></indexterm>
         </term>
 	<listitem>
-          <para>&lsqb;デフォルト: 8M&rsqb; 個々のスレッドの最大スタックサイズを<replaceable>size</replaceable>に設定する。このオプションは、プログラムが無限ループに陥ったときに利用可能なメモリを使い果たすことがないようするためだけに存在している。</para>
+          <para>&lsqb;デフォルト: 8M&rsqb; 個々のスレッドの最大スタックサイズを<replaceable>size</replaceable>に設定する。スレッドがこの制限を超えようとした場合、<literal>StackOverflow</literal>例外が送られる。</para>
+          <para>このオプションは主に、プログラムが無限ループに陥ったときに利用可能なメモリを使い果たすことがないようするために存在している。</para>
 	</listitem>
       </varlistentry>
 
@@ -568,7 +599,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
         </para>
       </listitem>
     </itemizedlist>
- 
+
 	</listitem>
       </varlistentry>
     </variablelist>
