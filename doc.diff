@@ -1,14 +1,3 @@
-diff -dur 7.0.4-original//ug-book.xml original/ug-book.xml
---- 7.0.4-original//ug-book.xml	2011-06-15 21:01:20.000000000 +0800
-+++ original/ug-book.xml	2011-08-15 14:59:40.000000000 +0800
-@@ -1,6 +1,6 @@
- <?xml version="1.0" encoding="iso-8859-1"?>
- <bookinfo>
--<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.0.4</title>
-+<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.2.1</title>
- <author><othername>The GHC Team</othername></author>
- <address>
- <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
 7.0.4-original/だけに発見: users_guide
 7.0.4-original/だけに発見: users_guide.xml
 diff -dur 7.0.4-original//using.xml original/using.xml
