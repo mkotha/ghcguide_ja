@@ -1,103 +1,58 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <sect1 id="safe-haskell">
   <title>Safe Haskell</title>
 
-  <para>
-  Safe Haskell is an extension to the Haskell language that is implemented in
-  GHC as of version 7.2. It allows for unsafe code to be securely included in a
-  trusted code base by restricting the features of GHC Haskell the code is
-  allowed to use. Put simply, it makes the types of programs trustable.  Safe
-  Haskell itself is aimed to be as minimal as possible while still providing
-  strong enough guarantees about compiled Haskell code for more advance secure
-  systems to be built on top of it. These include techniques such as
-  information flow control security or encrypted computations.
-  </para>
+  <para>Safe Haskellは、バージョン7.2でGHCに実装された言語拡張である。これは、コードが使うことが許されるGHC Haskellの機能を限定することによって、unsafeなコードを信頼されたコードベースに安全な形で含めることができるようにする。単純化して言うと、これはプログラム内の型を信頼に足るものにする。Safe Haskell自体は最小限のものであることを目標としていて、その上により高度な安全システム(例えば情報フロー制御によるセキュリティや、暗号化計算)を構築するのに必要十分な強さの保証を提供する。</para>
 
-  The design of Safe Haskell covers the following aspects:
+Safe Haskellの設計は以下の面にわたっている。
 
   <itemizedlist>
-    <listitem>A <link linkend="safe-language">safe language</link> dialect of
-      Haskell that provides guarantees about the code. It allows types and
-      module boundaries to be trusted.
-    </listitem>
-    <listitem>A new <emphasis>safe import</emphasis> extension that specifies
-      that the module being imported must be trusted.
-    </listitem>
-    <listitem>A definition of <emphasis>trust</emphasis> (or safety) and how it
-      operates, along with ways of defining and changing the trust of modules
-      and packages.
-    </listitem>
+    <listitem>コードに関する保証を提供するHaskellの<link linkend="safe-language">safe language</link>方言。これは、型およびモジュール境界を信頼することを可能にする。</listitem>
+    <listitem>新しい<emphasis>safe import</emphasis>拡張。これは、インポートされるモジュールが信頼されていなければならないことを指定する。</listitem>
+    <listitem><emphasis>信頼</emphasis>(あるいは安全性)と、それがどのように操作されるかの定義、さらにモジュールやパッケージの信頼を定義したり変更したりする方法。</listitem>
   </itemizedlist>
 
   <sect2 id="safe-use-cases">
-    <title>Uses of Safe Haskell</title>
+    <title>Safe Haskellの用途</title>
 
-    Safe Haskell has been designed with two use cases in mind:
+    Safe Haskellは以下の二つの利用例を念頭に置いて設計されている。
 
     <itemizedlist>
-      <listitem>Enforcing strict type safety at compile time</listitem>
-      <listitem>Compiling and executing untrusted code</listitem>
+      <listitem>厳格な型安全性をコンパイル時に強制する</listitem>
+      <listitem>信頼されていないコードをコンパイルし、実行する</listitem>
     </itemizedlist>
 
     <sect3>
-      <title>Strict type-safety (good style)</title>
+      <title>厳格な型安全性(良いスタイル)</title>
 
-      Haskell offers a powerful type system and separation of pure and
-      effectual functions through the <literal>IO</literal> monad. There are
-      several loop holes in the type system though, the most obvious offender
-      being the <literal>unsafePerformIO :: IO a -> a</literal> function. The
-      safe language dialect of Safe Haskell disallows the use of such
-      functions. This can be useful for a variety of purposes as it makes
-      Haskell code easier to analyze and reason about. It also codifies an
-      existing culture in the Haskell community of trying to avoid using such
-      unsafe functions unless absolutely necessary. As such using the safe
-      language (through the <option>-XSafe</option> flag) can be thought of as a
-      way of enforcing good style, similar to the function of
-      <option>-Wall</option>.
+      Haskellは、強力な型システムと、<literal>IO</literal>モナドを通した純粋な関数と作用のある関数の分離を提供している。しかし、この型システムには抜け穴がいくつかある。最も分かり易いのは関数<literal>unsafePerformIO :: IO a -> a</literal>である。Safe Haskellのsafe language方言はこのような関数の利用を禁止する。これによってHaskellコードを分析したり論証したりし易くなるので、色々の目的のために便利である。また、このようなunsafeな関数はどうしても必要でない限り使うべきでないという既存のHaskellコミュニティの文化を成文化するものでもある。こういう訳で、(<option>-XSafe</option>を使った)safe languageの利用は、<option>-Wall</option>の機能と似て、良いスタイルを強制する手段だととらえることができる。
     </sect3>
 
     <sect3>
-      <title>Building secure systems (restricted IO Monads)</title>
+      <title>セキュアなシステムを構築する(制約付きIOモナド)</title>
 
-      <para>
-      Safe Haskell is designed to give users enough guarantees about the safety
-      properties of compiled code so that secure systems can be built using
-      Haskell. A lot of work has been done with Haskell, building such systems
-      as information flow control security, capability based security, DSLs for
-      working with encrypted data... etc. These systems all rely on properties
-      of the Haskell language that aren't true in the general case where uses
-      of functions like <literal>unsafePerformIO</literal> are allowed.
-      </para>
+      <para>Safe Haskellは、コンパイルされたコードの性質に関して、Haskellを使ってセキュアなシステムを構築するのに十分なだけの保証を与えるように設計されている。情報フロー制御、capability-basedセキュリティ、暗号化されたデータを扱うためのDSL、といったシステムをHaskellで構築するための作業が大量に為されてきた。これらのシステムは全て、<literal>unsafePerformIO</literal>のような関数が許される一般の場合には成り立たないようなHaskell言語の性質に依拠している。</para>
 
-      <para>
-      As an example lets define an interface for a plugin system where the
-      plugin authors are untrusted, possibly malicious third-parties. We do
-      this by restricting the plugin interface to pure functions or to a
-      restricted <literal>IO</literal> monad that we have defined that only
-      allows a safe subset of <literal>IO</literal> actions to be executed. We
-      define the plugin interface here so that it requires the plugin module,
-      <literal>Danger</literal>, to export a single computation,
-      <literal>Danger.runMe</literal>, of type <literal>RIO ()</literal>, where
-      <literal>RIO</literal> is a new monad defined as follows:
+      <para>例として、プラグイン作者が信用されず、悪意のある第三者かもしれないようなプラグインシステムのためのインタフェースを定義してみよう。このために、プラグインのインタフェースを純粋な関数にするか、<literal>IO</literal>動作の安全なサブセットしか実行することを許されないような制限された<literal>IO</literal>モナドにする。ここではプラグインのインタフェースを以下のようにする。すなわち、プラグインモジュール<literal>Danger</literal>は、型<literal>RIO ()</literal>を持つ単一の計算<literal>Danger.runMe</literal>を定義することを要求される。ただし<literal>RIO</literal>は以下のように定義された新しいモナドである。
       </para>
 
       <programlisting>
-        -- Either of the following Safe Haskell pragmas would do
+        -- 以下のSafe Haskellのプラグマはどちらでも良い
         {-# LANGUAGE Trustworthy #-}
         {-# LANGUAGE Safe #-}
 
         module RIO (RIO(), runRIO, rioReadFile, rioWriteFile) where
 
-        -- Notice that symbol UnsafeRIO is not exported from this module!
+        -- UnsafeRIOシンボルがこのモジュールからエクスポートされていないのに注意！
         newtype RIO a = UnsafeRIO { runRIO :: IO a }
 
         instance Monad RIO where
             return = UnsafeRIO . return
             (UnsafeRIO m) >>= k = UnsafeRIO $ m >>= runRIO . k
 
-        -- Returns True iff access is allowed to file name
+        -- ファイル名にアクセスが許可されている場合、かつその場合に限りTrue
         pathOK :: FilePath -> IO Bool
-        pathOK file = {- Implement some policy based on file name -}
+        pathOK file = {- ファイル名についての何らかのポリシーの実装 -}
 
         rioReadFile :: FilePath -> RIO String
         rioReadFile file = UnsafeRIO $ do
@@ -110,7 +65,7 @@
           if ok then writeFile file contents else return ()
       </programlisting>
 
-      We compile Danger using the new Safe Haskell <option>-XSafe</option> flag:
+      Dangerを、新しいSafe Haskellのフラグである<option>-XSafe</option>付きでコンパイルする
 
       <programlisting>
         {-# LANGUAGE Safe #-}
@@ -120,406 +75,189 @@
         runMe = ...
       </programlisting>
 
-      Before going into the Safe Haskell details, lets point out some of
-      the reasons this design would fail without Safe Haskell:
+      Safe Haskellの詳細に入る前に、この設計がSafe Haskellなしではうまく行かない理由の一部を指摘しておこう。
 
       <itemizedlist>
-        <listitem>The design attempts to restrict the operations that Danger
-          can perform by using types, specifically the <literal>RIO</literal>
-          type wrapper around <literal>IO</literal>. The author of Danger can
-          subvert this though by simply writing arbitrary
-          <literal>IO</literal> actions and using <literal>unsafePerformIO ::
-          IO a -> a</literal> to execute them as pure functions.
+        <listitem>この設計は、Dangerが実行することのできる操作を型によって、具体的には<literal>IO</literal>のラッパである<literal>RIO</literal>によって制限している。Dangerの作者は、単に<literal>unsafePerformIO :: IO a -> a</literal>を使って任意の<literal>IO</literal>アクションを純粋関数として実行することでこの制限を覆すことができる。
         </listitem>
-        <listitem>The design also relies on the Danger module not being able
-          to access the <literal>UnsafeRIO</literal> constructor.
-          Unfortunately Template Haskell can be used to subvert module
-          boundaries and so could be used gain access to this constructor.
+        <listitem>またこの設計はDangerモジュールが<literal>UnsafeRIO</literal>構築子にアクセスできないことを前提としている。残念なことにTemplate Haskellを使うとモジュール境界を破壊することができ、この構築子へのアクセスを得ることもできるだろう。
         </listitem>
-        <listitem>There is no way to place restrictions on the modules that
-          the untrusted Danger module can import. This gives the author of
-          Danger a very large attack surface, essentially any package
-          currently installed on the system. Should any of these packages
-          have a vulnerability then the Danger module can exploit this. The
-          only way to stop this would be to patch or remove packages with
-          known vulnerabilities even if they should only be used by
-          trusted code such as the RIO module.
+        <listitem>信用されていないDangerモジュールがインポートできるモジュールに制限を掛ける方法がない。これによって非常に広いattack surface(実質的に、システムにインストールされている全てのパッケージ)をDangerの作者に与えることになる。仮にこれらのパッケージのいずれかに脆弱性があれば、Dangerモジュールはそれを利用できる。これを防ぐ唯一の方法は、既知の脆弱性のあるモジュールにパッチを当てるか削除することである。それらがRIOモジュールなどの信頼されたモジュールからのみ使われるべきものであったとしても。
         </listitem>
       </itemizedlist>
 
-      <para>
-      To stop these attacks Safe Haskell can be used. This is done by compiling
-      the RIO module with the <option>-XTrustworthy</option> flag and compiling
-      the Danger module with the <option>-XSafe</option> flag.
+      <para>これらの攻撃を止めるためにSafe Haskellを使うことができる。これには、RIOモジュールを<option>-XTrustworthy</option>フラグ付きでコンパイルし、Dangerモジュールを<option>-XSafe</option>フラグ付きでコンパイルする。</para>
+
+      <para><option>-XSafe</option>フラグを使うことで、利用可能なHaskellの機能を<link linkend="safe-language">安全なサブセット</link>に限定してDangerモジュールをコンパイルすることができる。これには、<literal>unsafePerfromIO</literal>、Template Haskell、純粋なFFI関数、一般化newtype deriving、RULESを禁止し、重複インスタンスの操作に制限を加えることを含む。さらに、<option>-XSafe</option>は、Dangerがインポートできるモジュールを信頼されているとみなされるもののみに制限する。信頼されるモジュールは、<option>-XSafe</option>付きでコンパイルされたもの(この場合、コードが安全であることをGHCが機械的に保証する)または、<option>-XTrustworthy</option>付きでコンパイルされたもの(この場合、モジュール作者がこのモジュールが安全だと主張する)である。</para>
+
+      <para>これが、RIOモジュールがDangerモジュールからインポートできるように<option>-XTrustworthy</option>付きでコンパイルされている理由である。<option>-XTrustworthy</option>は、<option>-XSafe</option>と異なり、モジュールについていかなる制限も課さない。代わりに、コードが内部的にunsafeな機能を使っていても、安全に使えるAPIしか露出していないということをモジュール作者が主張する。ここで、問題が一つある。あらゆるモジュールのあらゆる作者が<option>-XTrustworthy</option>を使えるのである。このため、Trustworthyとされたモジュールが信頼され、<option>-XSafe</option>でコンパイルされるコードから使うことを許されるためには、コードをコンパイルしているクライアントCが、このTrustworthyとされたモジュールが所属するパッケージを信頼する旨をGHCに伝えなければならない。これは実質的に、「このパッケージは<option>-XSafe</option>でコンパイルされる信頼されないモジュールによって使えるTrustworthyモジュールを含んでいるが、私はこのパッケージの作者を信頼し、このモジュールが安全なAPIしか露出しないことを信頼する」と言う手段をCに与える。パッケージへの信頼はいつでも変えられるので、もしパッケージに脆弱性が見付かったら、Cはそのパッケージが信頼されないと宣言し、そのパッケージに対する将来のいかなるコンパイルも失敗するようにできる。この機構についてのより詳細な概観は<xref linkend="safe-trust"/>を見よ。
       </para>
 
-      <para>
-      The use of the <option>-XSafe</option> flag to compile the Danger module
-      restricts the features of Haskell that can be used to a
-      <link linkend="safe-language">safe subset</link>. This includes
-      disallowing <literal>unsafePerfromIO</literal>, Template Haskell, pure
-      FFI functions, Generalized Newtype Deriving, RULES and restricting the
-      operation of Overlapping Instances. The <option>-XSafe</option> flag also
-      restricts the modules can be imported by Danger to only those that are
-      considered trusted.  Trusted modules are those compiled with
-      <option>-XSafe</option>, where GHC provides a mechanical guarantee that
-      the code is safe. Or those modules compiled with
-      <option>-XTrustworthy</option>, where the module author claims that the
-      module is Safe.
-      </para>
-
-      <para>
-      This is why the RIO module is compiled with
-      <option>-XTrustworthy</option>, to allow the Danger module to import it.
-      The <option>-XTrustworthy</option> flag doesn't place any restrictions on
-      the module like <option>-XSafe</option> does. Instead the module author
-      claims that while code may use unsafe features internally, it only
-      exposes an API that can used in a safe manner. There is an issue here as
-      <option>-XTrustworthy</option> may be used by an arbitrary module and
-      module author. Because of this for trustworthy modules to be considered
-      trusted, and so allowed to be used in <option>-XSafe</option> compiled
-      code, the client C compiling the code must tell GHC that they trust the
-      package the trustworthy module resides in. This is essentially a way of
-      for C to say, while this package contains trustworthy modules that can be
-      used by untrusted modules compiled with <option>-XSafe </option>, I trust
-      the author(s) of this package and trust the modules only expose a safe
-      API. The trust of a package can be changed at any time, so if a
-      vulnerability found in a package, C can declare that package untrusted so
-      that any future compilation against that package would fail.  For a more
-      detailed overview of this mechanism see <xref linkend="safe-trust"/>.
-      </para>
-
-      <para>
-      So Danger can import module RIO because RIO is marked trustworthy. Thus,
-      Danger can make use of the rioReadFile and rioWriteFile functions to
-      access permitted file names. The main application then imports both RIO
-      and Danger. To run the plugin, it calls RIO.runRIO Danger.runMe within
-      the IO monad. The application is safe in the knowledge that the only IO
-      to ensue will be to files whose paths were approved by the pathOK test.
-      </para>
+      <para>以上により、RIOはTrustworthyと標示されているのでDangerはRIOをインポートできる。よって、DangerはrioReadFileとrioWriteFileの各関数を使って許可されたファイル名にアクセスできる。次に主アプリケーションがRIOとDangerの両方をインポートし、RIO.runRIO Danger.runMeをIOモナド中で呼ぶことでプラグインを走らせる。pathOKの検査によって認められたパスを持つファイルにしかIOできないと分かっているので、このアプリケーションは安全である。</para>
     </sect3>
   </sect2>
 
   <sect2 id="safe-language">
-    <title>Safe Language</title>
+    <title>safe language</title>
 
-    The Safe Haskell <emphasis>safe language</emphasis> guarantees the
-    following properties:
+    Safe Haskellの<emphasis>safe language</emphasis>は以下の性質を保証する。
 
     <itemizedlist>
-      <listitem><emphasis>Referential transparency</emphasis> &mdash; Functions
-        in the safe language are deterministic, evaluating them will not
-        cause any side effects. Functions in the <literal>IO</literal> monad
-        are still allowed and behave as usual. Any pure function though, as
-        according to its type, is guaranteed to indeed be pure. This property
-        allows a user of the safe language to trust the types. This means,
-        for example, that the <literal>unsafePerformIO :: IO a -> a</literal>
-        function is disallowed in the safe language.
+      <listitem><emphasis>参照透明性</emphasis> &mdash; safe languageの関数は決定的であり、それらを評価することはいかなる副作用も引き起こさない。<literal>IO</literal>モナドの関数は通常通りに振る舞うことが許される。しかし、純粋な関数は全て、その型に従って実際に純粋であることが保証される。この性質によって、safe languageの利用者は型を信頼することが可能になる。これは、例えば<literal>unsafePerformIO :: IO a -> a</literal>がsafe languageにおいて禁止されることを意味している。
       </listitem>
-      <listitem><emphasis>Module boundary control</emphasis> &mdash; Haskell
-        code compiled using the safe language is guaranteed to only access
-        symbols that are publicly available to it through other modules export
-        lists. An important part of this is that safe compiled code is not
-        able to examine or create data values using data constructors
-        that it cannot import. If a module M establishes some invariants
-        through careful use of its export list then code compiled using the
-        safe language that imports M is guaranteed to respect those invariants.
-        Because of this, <emphasis><link linkend="template-haskell">Template
-        Haskell</link></emphasis> and <emphasis>
-        <link linkend="newtype-deriving">GeneralizedNewtypeDeriving</link>
-        </emphasis> are both disabled in the safe language as they can be used
-        to violate this property.
+      <listitem><emphasis>モジュール境界の制御</emphasis> &mdash; safe languageを使ってコンパイルされたHaskellコードは、他のモジュールのエクスポートリストから公的に利用可能なシンボルにしかアクセスできないことが保証される。このうち重要な点として、safeでコンパイルされたコードは、自分がインポートできない構築子を使ってデータ値を検査したり作ったりすることができない。モジュールMが、エクスポートリストを注意深く使うことである不変条件を確立しているなら、safe languageを使ってコンパイルされたコードでMをインポートするものは、これらの不変条件を守ることが保証される。このために、<emphasis><link linkend="template-haskell">Template Haskell</link></emphasis>と<emphasis><link linkend="newtype-deriving">GeneralizedNewtypeDeriving</link></emphasis>はsafe languageにおいてはどちらも無効にされる。これらを使ってこの性質に違反することができるからである。
       </listitem>
-      <listitem><emphasis>Semantic consistency</emphasis> &mdash; The safe
-        language is strictly a subset of Haskell as implemented by GHC. Any
-        expression that compiles in the safe language has the same meaning as
-        it does when compiled in normal Haskell. In addition, in any module
-        that imports a safe language module, expressions that compile both
-        with and without the safe import have the same meaning in both cases.
-        That is, importing a module using the safe language cannot change the
-        meaning of existing code that isn't dependent on that module. So for
-        example, there are some restrictions placed on the <emphasis>
-        <link linkend="instance-overlap">Overlapping Instances</link>
-        </emphasis> extension as it can violate this property.
+      <listitem><emphasis>意味的な整合性</emphasis> &mdash; safe languageはHaskellのGHC実装の厳密なサブセットである。safe languageでコンパイル可能なあらゆる式は、通常のHaskellでコンパイルされた場合と全く同じ意味を持つ。さらに、safe languageモジュールをインポートするあらゆるモジュールにおいて、このsafe importを付けても付けなくてもコンパイル可能なあらゆる式は、どちらの場合でも同じ意味を持つ。つまり、safe languageを使ってモジュールをインポートすることで、そのモジュールに依存していない既存コードの意味を変えることはできない。よって例えば、<emphasis><link linkend="instance-overlap">重複インスタンス</link></emphasis>拡張はこの性質に違反できるので、いくらかの制限が課される。
       </listitem>
     </itemizedlist>
 
-    <para>
-    These three properties guarantee that you can trust the types in the safe
-    language, can trust that module export lists are respected in the safe
-    language and can trust that code that successfully compiles using the safe
-    language has the same meaning as it normally would.
-    </para>
+    <para>これらの三つの性質は、safe languageにおいて型を信頼できること、safe languageのコードがモジュールのエクスポートリストに従うこと、safe languageを使ってコンパイルに成功したコードは通常持つべき意味と同じ意味を持つこと、を保証する。</para>
 
-    Lets now look at the details of the safe language. In the safe language
-    dialect (enabled by <option>-XSafe</option>) we disable completely the
-    following features:
+    ではsafe languageの詳細を見ていこう。safe lauguage方言(<option>-XSafe</option>によって有効になる)においては、以下の機能は完全に無効になる。
 
     <itemizedlist>
-      <listitem><emphasis>GeneralizedNewtypeDeriving</emphasis> &mdash; It can
-        be used to violate constructor access control, by allowing untrusted
-        code to manipulate protected data types in ways the data type author
-        did not intend. For example can be used to break invariants of data
-        structures.</listitem>
-      <listitem><emphasis>TemplateHaskell</emphasis> &mdash; Is particularly
-        dangerous, as it can cause side effects even at compilation time and
-        can be used to access abstract data types. It is very easy to break
-        module boundaries with TH.</listitem>
+      <listitem><emphasis>GeneralizedNewtypeDeriving</emphasis> &mdash; これは構築子のアクセス制御に違反するために使うことができる。信頼されていないコードが、保護されたデータ型をデータ型の作者が意図しない方法で操作することを可能にすることによる。例えばこれを使ってデータ構造の不変条件を破ることができる。</listitem>
+      <listitem><emphasis>TemplateHaskell</emphasis> &mdash; これは、コンパイル時に副作用を起こすことを可能にし、抽象データ型にアクセスするために使えるので特に危険である。THを使うと非常に簡単にモジュール境界を壊すことができる。</listitem>
    </itemizedlist>
 
-    In the safe language dialect we restrict the following features:
+    safe language方言では以下の機能に制限が加えられる。
     <itemizedlist>
-      <listitem><emphasis>ForeignFunctionInterface</emphasis> &mdash; This is
-        mostly safe, but foreign import declarations that import a function
-        with a non-IO type are disallowed. All FFI imports must reside in the
-        IO Monad.</listitem>
-      <listitem><emphasis>RULES</emphasis> &mdash; As they can change the
-        behaviour of trusted code in unanticipated ways, violating semantic
-        consistency they are restricted in function. Specifically any RULES
-        defined in a module M compiled with <option>-XSafe</option> are
-        dropped. RULES defined in trustworthy modules that M imports are still
-        valid and will fire as usual.</listitem>
-      <listitem><emphasis>OverlappingInstances</emphasis> &mdash; This
-        extension can be used to violate semantic consistency, because
-        malicious code could redefine a type instance (by containing a more
-        specific instance definition) in a way that changes the behaviour of
-        code importing the untrusted module. The extension is not disabled for
-        a module M compiled with <option>-XSafe</option> but restricted. While M
-        can define overlapping instance declarations, they can only overlap
-        other instance declaration defined in M. If in a module N that imports
-        M, at a call site that uses a type-class function there is a choice of
-        which instance to use (i.e. an overlap) and the most specific instances
-        is from M, then all the other choices must also be from M. If not, a
-        compilation error will occur. A simple way to think of this is a
-        <emphasis>same origin policy</emphasis> for overlapping instances
-        defined in Safe compiled modules.</listitem>
-	  <listitem><emphasis>Data.Typeable</emphasis> &mdash; We restrict Typeable
-		  instances to only derived ones (offered by GHC through the 
-		  <link linkend="deriving-typeable"><option>-XDeriveDataTypeable</option>
-		  </link> extension). Hand crafted instances of the Typeable type class
-		  are not allowed in Safe Haskell as this can easily be abused to 
-		  unsafely coerce between types.</listitem>
+      <listitem><emphasis>ForeignFunctionInterface</emphasis> &mdash; これは大部分において安全であるが、関数をIOでない型でインポートするforeign import宣言は禁止される。全てのFFIインポートはIOモナドに生息しなければならない。</listitem>
+      <listitem><emphasis>RULES</emphasis> &mdash; 信頼されたコードの振る舞いを予測不可能な形で変更し、意味上の整合性に違反することができるので、機能が制限される。具体的には、<option>-XSafe</option>でコンパイルされたモジュールMで定義されたRULESは全て捨てられる。MがインポートするTrustworthyモジュールで定義されたRULESはなお有効であり、通常通り発火する。</listitem>
+      <listitem><emphasis>OverlappingInstances</emphasis> &mdash; この拡張は意味上の整合性に違反するために使うことができる。悪意のあるコードは、この信頼されていないモジュールをインポートしているコードの振る舞いを変えるようなインスタンスを再定義できるかもしれない(より特殊性の高いインスタンス宣言を持つことで)からである。<option>-XSafe</option>でコンンパイルされたモジュールMにおいて、この拡張は無効されないが制限を受ける。Mは重複インスタンス宣言を定義できるが、それらはMで定義された別のインスタンス宣言としか重複できない。MをインポートするモジュールNの中、型クラス関数を使う呼び出し地点で、どのインスタンスを使うかの選択肢(つまり重複)があり、最も特殊性の高いインスタンスがM由来の場合、他の全ての選択肢もM由来でなければならない。これについての簡単な考え方は、Safeコンパイルされたモジュールで定義された重複インスタンスに関する<emphasis>同一生成元ポリシー</emphasis>(same origin policy)だと思うことである。</listitem>
+	  <listitem><emphasis>Data.Typeable</emphasis> &mdash; Typeableインスタンスを自動導出(GHCによって<link linkend="deriving-typeable"><option>-XDeriveDataTypeable</option></link>拡張を介して提供されている)されたもののみに制限している。Typeable型クラスの手書きインスタンスは、unasfeに型変換を行うように簡単に悪用できるので、Safe Haskellでは許されていない。</listitem>
     </itemizedlist>
   </sect2>
 
   <sect2 id="safe-imports">
-    <title>Safe Imports</title>
+    <title>safeインポート</title>
 
-    Safe Haskell enables a small extension to the usual import syntax of
-    Haskell, adding a <emphasis>safe</emphasis> keyword:
+    Safe Haskellは、Haskellの通常のインポート構文に対する小さな拡張を有効にする。次のように<emphasis>safe</emphasis>キーワードを加える。
     <programlisting>
       impdecl -> import [safe] [qualified] modid [as modid] [impspec]
     </programlisting>
 
-    When used, the module being imported with the safe keyword must be a
-    trusted module, otherwise a compilation error will occur. The safe import
-    extension is enabled by either of the <option>-XSafe</option>,
-    <option>-XTrustworthy</option>, or <option>-XSafeImports</option>
-    flags and corresponding PRAGMA's. When the <option>-XSafe</option> flag
-    is used, the safe keyword is allowed but meaningless, every import
-    is required to be safe regardless.
+    使われると、safeキーワード付きでインポートされるモジュールは信頼されたものでなければならず、そうでなければコンパイルエラーが発生する。このsafeインポート拡張は<option>-XSafe</option>、<option>-XTrustworthy</option>、<option>-XSafeImports</option>のいずれか、あるいは対応するプラグマによって有効になる。<option>-XSafe</option>フラグが使われている場合、このsafeキーワードは許されるが無意味である。いずれにせよ全てのインポートが安全でなければならない。
   </sect2>
 
   <sect2 id="safe-trust">
-    <title>Trust</title>
+    <title>信頼</title>
 
-    The Safe Haskell extension introduces the following two new language flags:
+    Safe Haskell拡張は以下の二つの新しい言語フラグを導入する。
 
     <itemizedlist>
-      <listitem><emphasis>-XSafe</emphasis> &mdash; Enables the safe language
-        dialect, asking GHC to guarantee trust. The safe language dialect
-        requires that all imports be trusted or a compilation error will
-        occur.</listitem>
-      <listitem><emphasis>-XTrustworthy</emphasis> &mdash; Means that while
-        this module may invoke unsafe functions internally, the module's
-        author claims that it exports an API that can't be used in an unsafe
-        way.  This doesn't enable the safe language or place any restrictions
-        on the allowed Haskell code.  The trust guarantee is provided by the
-        module author, not GHC. An import statement with the safe keyword
-        results in a compilation error if the imported module is not trusted.
-        An import statement without the keyword behaves as usual and can
-        import any module whether trusted or not.</listitem>
+      <listitem><emphasis>-XSafe</emphasis> &mdash; safe language方言を有効にし、GHCに信頼を保証するように頼む。safe language方言は全てのインポートが信頼されていることを要求し、そうでなければコンパイルエラーが発生する。</listitem>
+      <listitem><emphasis>-XTrustworthy</emphasis> &mdash; このモジュールは内部的にunsafeな関数を呼びかもしれないが、unsafeな形で使うことのできないAPIしかエクスポートしないとモジュールの作者が主張していることを意味する。これはsafe languageを有効にせず、どんなHaskellコードが許されるかについて制限を加えることもない。信頼の保証はGHCによってではなくモジュール作者によって与えられる。safeキーワードの付いたインポート文は、インポート先モジュールが信頼されていない場合にコンパイルエラーになる。このキーワードの付いていないインポート文は通常通りに振る舞い、信頼されているかどうかにかかわらず、あらゆるモジュールをインポートできる。</listitem>
     </itemizedlist>
 
-    <para>
-    Whether or not a module is trusted depends on a notion of trust for
-    packages, which is determined by the client C invoking GHC (i.e. you). A
-    package <emphasis>P</emphasis> is trusted when either C's package database
-    records that <emphasis>P</emphasis> is trusted (and no command-line
-    arguments override this), or C's command-line flags say to trust it
-    regardless of what is recorded in the package database. In either case, C
-    is the only authority on package trust. It is up to the client to decide
-    which <link linkend="safe-package-trust">packages they trust</link>.
-    </para>
+    <para>あるモジュールが信頼されるかどうかは、パッケージへの信頼という概念に依存する。これはGHCを起動するクライアントC(つまり、あなたである)によって決定される。パッケージ<emphasis>P</emphasis>が信頼されるのは、Cのパッケージデータベースのレコードが<emphasis>P</emphasis>が信頼されていると記録している(しかも、コマンド行引数によって再定義されていない)場合、あるいはCのコマンド行フラグが、パケージデータベースの記録に関係なく信頼しろと言っている場合である。どちらの場合でも、パッケージの信頼に関して決定権はCにしかない。どの<link linkend="safe-package-trust">パッケージを信頼する</link>かはクライアントによる。</para>
 
-    So a <emphasis>module M in a package P is trusted by a client C</emphasis>
-    if and only if:
+    よって、<emphasis>パッケージPのモジュールMがクライアントCに信頼される</emphasis>のは、以下の条件が満されるとき、かつそのときに限る。
 
     <itemizedlist>
-      <listitem>Both of these hold:
+      <listitem>以下が両方とも成り立つ
         <itemizedlist>
-          <listitem> The module was compiled with <option>-XSafe</option>
+          <listitem>このモジュールが<option>-XSafe</option>付きでコンパイルされている
             </listitem>
-          <listitem> All of M's direct imports are trusted by C</listitem>
+          <listitem>Mが直接インポートしているモジュールが全てCに信頼されている</listitem>
         </itemizedlist>
       </listitem>
-      <listitem><emphasis>OR</emphasis> all of these hold:
+      <listitem><emphasis>あるいは</emphasis>以下が全て成り立つ
         <itemizedlist>
-          <listitem>The module was compiled with <option>-XTrustworthy</option>
+          <listitem>このモジュールが<option>-XTrustworthy</option>付きでコンパイルされている
             </listitem>
-          <listitem>All of M's direct safe imports are trusted by C</listitem>
-          <listitem>Package P is trusted by C</listitem>
+          <listitem>Mが直接safeインポートしているモジュールが全てCに信頼されている</listitem>
+          <listitem>パッケージPがCに信頼されている</listitem>
         </itemizedlist>
       </listitem>
     </itemizedlist>
 
-    For the first trust definition the trust guarantee is provided by GHC
-    through the restrictions imposed by the safe language. For the second
-    definition of trust, the guarantee is provided initially by the
-    module author. The client C then establishes that they trust the
-    module author by indicating they trust the package the module resides
-    in. This trust chain is required as GHC provides no guarantee for
-    <literal>-XTrustworthy</literal> compiled modules.
+    一番目の信頼の定義については、信頼の保証は、safe languageによって課される制約を通してGHCによって与えられる。二番目の定義については、この保証はまずモジュール作者によって与えられる。次にクライアントCが、このモジュールを含むパッケージを信頼することを示すことによって、モジュール作者への信頼を明示する。この信頼の連鎖が必要なのは、<literal>-XTrustworthy</literal>でコンパイルされたモジュールに関してGHCはいかなる保証も提供しないからである。
 
     <sect3 id="safe-trust-example">
-      <title>Example</title>
+      <title>例</title>
 
       <programlisting>
-        Package Wuggle:
+        パッケージWuggle:
            {-# LANGUAGE Safe #-}
            module Buggle where
              import Prelude
              f x = ...blah...
 
-        Package P:
+        パッケージP:
            {-# LANGUAGE Trustworthy #-}
            module M where
              import System.IO.Unsafe
              import safe Buggle
       </programlisting>
 
-      <para>
-      Suppose a client C decides to trust package P. Then does C trust module
-      M? To decide, GHC must check M's imports &mdash; M imports
-      System.IO.Unsafe. M was compiled with <option>-XTrustworthy</option>, so
-      P's author takes responsibility for that import. C trusts P's author, so
-      C trusts M to only use its unsafe imports in a safe and consistent
-      manner with respect to the API M exposes. M also has a safe import of
-      Buggle, so for this import P's author takes no responsibility for the
-      safety, so GHC must check whether Buggle is trusted by C. Is it? Well,
-      it is compiled with <option>-XSafe</option>, so the code in Buggle
-      itself is machine-checked to be OK, but again under the assumption that
-      all of Buggle's imports are trusted by C. Prelude comes from base, which
-      C trusts, and is compiled with <option>-XTrustworthy</option> (While
-      Prelude is typically imported implicitly, it still obeys the same rules
-      outlined here). So Buggle is considered trusted.
-      </para>
+      <para>クライアントCがパッケージPを信頼することを決めたとしよう。ではCはモジュールMを信用するか？これを決めるために、GHCはMのインポートを検査しなければいけない。MはSystem.IO.Unsafeをインポートしている。Mは<option>-XTrustworthy</option>付きでコンパイルされているから、このインポートについてはMの作者が責任を負う。CはPの作者を信頼しているので、CはMがunsafeなインポートを安全かつMが露出するAPIに整合的な形でしか使わないということを信頼している。Mには、BuggleへのSafeインポートもある。safeインポートなのでPの作者はこれの安全性について責任を負わないため、BuggleがCに信頼されているかをGHCが検査しないといけない。どうか？うーん、これは<option>-XSafe</option>付きでコンパイルされているので、Buggle自体のコードは問題ないことが機械的に検査されている。ただしこれもBuggleのインポートが全てCに信頼されていることが条件である。Preludeはbase由来であり、Cはこれを信頼しており、<option>-XTrustworthy</option>付きでコンパイルされている。(Preludeは典型的には暗黙にインポートされるが、その場合でもここで述べた規則に沿う)。よってBuggleは信頼されているとみなされる。</para>
 
-      <para>
-      Notice that C didn't need to trust package Wuggle; the machine checking
-      is enough. C only needs to trust packages that contain
-      <option>-XTrustworthy</option> modules.
-      </para>
+      <para>CはパッケージWuggleを信頼する必要がなかったことに注意。機械による検査だけで十分である。Cは、<option>-XTrustworthy</option>なモジュールを含むパッケージだけを信頼すれば良い。</para>
     </sect3>
 
     <sect3 id="safe-package-trust">
-      <title>Package Trust</title>
+      <title>パッケージの信頼</title>
 
-      Safe Haskell gives packages a new Boolean property, that of trust.
-      Several new options are available at the GHC command-line to specify the
-      trust property of packages:
+      Safe Haskellは各パッケージに新しい真偽値のプロパティを与える。信頼プロパティである。GHCのコマンド行でパッケージの信頼プロパティを指定するためのオプションがいくつか新たに利用可能である。
 
       <itemizedlist>
-        <listitem><emphasis>-trust P</emphasis> &mdash; Exposes package P if it
-          was hidden and considers it a trusted package regardless of the
-          package database.</listitem>
-        <listitem><emphasis>-distrust P</emphasis> &mdash; Exposes package P if
-          it was hidden and considers it an untrusted package regardless of the
-          package database.</listitem>
-        <listitem><emphasis>-distrust-all-packages</emphasis> &mdash; Considers
-          all packages distrusted unless they are explicitly set to be trusted
-          by subsequent command-line options.</listitem>
+        <listitem><emphasis>-trust P</emphasis> &mdash; パッケージPを隠されているなら露出し、パッケージデータベースに関係なく、信頼されているとみなす。</listitem>
+        <listitem><emphasis>-distrust P</emphasis> &mdash; パッケージPを隠されているなら露出し、パッケージデータベースに関係なく、信頼されていないとみなす。</listitem>
+        <listitem><emphasis>-distrust-all-packages</emphasis> &mdash; 後続のコマンド行オプションで明示的に信頼されていると指定されていない限り、全てのパッケージを信頼されていないとみなす。</listitem>
       </itemizedlist>
 
-      To set a package's trust property in the package database please refer to
-      <xref linkend="packages"/>.
+      パッケージの信頼プロパティをパッケージデータベース中で設定するには、<xref linkend="packages"/>を参照してほしい。
     </sect3>
 
     <sect3 id="safe-no-trust">
-      <title>Safe Imports without Trust</title>
+      <title>信頼なしのsafeインポート</title>
 
-      If you are writing a module and want to import a module from an untrusted
-      author, then you would use the following syntax:
+      モジュールを書いていて、信頼できない作者によるモジュールをインポートしたいなら、次のように書くだろう。
 
       <programlisting>
         import safe Untrusted.Module
       </programlisting>
 
-      As the safe import keyword is a feature of Safe Haskell and not Haskell98
-      this would fail though unless you enabled Safe imports through on the of
-      the Safe Haskell language flags. Three flags enable safe imports,
-      <option>-XSafe, -XTrustworthy</option> and
-      <option>-XSafeImports</option>. However <option>-XSafe</option> and
-      <option>-XTrustworthy</option> do more then just enable the keyword which
-      may be undesirable. Using the <option>-XSafeImports</option> language
-      flag allows you to enable safe imports and nothing more.
+      safeインポートキーワードはSafe Haskellの機能であってHaskell98ではないので、Safe Haskelの言語フラグのどれかを指定しないとこれは失敗する。safeインポートを有効にするフラグは<option>-XSafe</option>、<option>-XTrustworthy</option>、<option>-XSafeImports</option>の三つである。しかし、<option>-XSafe</option>と<option>-XTrustworthy</option>は単にこのキーワードを有効にする以上のことをするので、望ましくないことがある。<option>-XSafeImports</option>を使うとsafeインポートを有効にしつつ、その他にはなにもしないということができる。
     </sect3>
   </sect2>
 
   <sect2 id="safe-flag-summary">
-    <title>Safe Haskell Flag Summary</title>
+    <title>Safe Haskellのフラグまとめ</title>
 
-    In summary, Safe Haskell consists of the following language flags:
+    まとめると、Safe Haskellは以下の言語フラグからなる。
 
     <variablelist>
       <varlistentry>
         <term>-XSafe</term>
-        <listitem>To be trusted, all of the module's direct imports must be
-          trusted, but the module itself need not reside in a trusted
-          package, because the compiler vouches for its trustworthiness. The
-          "safe" keyword is allowed but meaningless in import statements,
-          every import is required to be safe regardless.
+        <listitem>信頼されるためには全ての直接のインポート先が信頼されていなければならないが、モジュール自体は信頼済みパッケージに存在している必要はない。これが信頼に足るものであることはコンパイラが保証するからである。インポート文において"safe"キーワードは許されるが無意味であり、いずれにせよ全てのインポートが安全でなければならない。
           <itemizedlist>
-            <listitem><emphasis>Module Trusted</emphasis> &mdash; Yes</listitem>
-            <listitem><emphasis>Haskell Language</emphasis> &mdash; Restricted to Safe
-              Language</listitem>
-            <listitem><emphasis>Imported Modules</emphasis> &mdash; All forced to be
-              safe imports, all must be trusted.</listitem>
+            <listitem><emphasis>モジュールが信頼されるか</emphasis> &mdash; される</listitem>
+            <listitem><emphasis>Haskell言語</emphasis> &mdash; safe languageに制限される</listitem>
+            <listitem><emphasis>インポートされるモジュール</emphasis> &mdash; 全て強制的にsafeインポートになり、全てが信頼されていなければならない。</listitem>
           </itemizedlist>
         </listitem>
       </varlistentry>
 
       <varlistentry>
         <term>-XTrustworthy</term>
-        <listitem>This establishes that the module is trusted, but the
-          guarantee is provided by the module's author. A client of this
-          module then specifies that they trust the module author by
-          specifying they trust the package containing the module.
-          <option>-XTrustworthy</option> has no effect on the accepted range
-          of Haskell programs or their semantics, except that they allow the
-          safe import keyword.
+        <listitem>これはモジュールが信頼されることを定めるが、その保証はモジュール作者によって与えられる。このモジュールのクライアントは次に、モジュールが含まれるパッケージを信頼すると指定することにより、このモジュール作者への信頼を指定する。<option>-XTrustworthy</option>はどのようなHaskellプログラムが受理されるかについて、およびそれらの意味について影響を与えない。例外は、safeインポートキーワードを許すことである。
           <itemizedlist>
-            <listitem><emphasis>Module Trusted</emphasis> &mdash; Yes but only if the
-              package the module resides in is also trusted.</listitem>
-            <listitem><emphasis>Haskell Language</emphasis> &mdash; Unrestricted
-            </listitem>
-            <listitem><emphasis>Imported Modules</emphasis> &mdash; Under control of
-              module author which ones must be trusted.</listitem>
+            <listitem><emphasis>モジュールが信頼されるか</emphasis> &mdash; されるが、モジュールのあるパッケージが信頼されている場合に限る。</listitem>
+            <listitem><emphasis>Haskell言語</emphasis> &mdash; 制限されない</listitem>
+            <listitem><emphasis>インポートされるモジュール</emphasis> &mdash; どれが信頼されていなければいけないかは、モジュール作者に制御される。</listitem>
           </itemizedlist>
         </listitem>
       </varlistentry>
 
       <varlistentry>
         <term>-XSafeImport</term>
-        <listitem>Enable the Safe Import extension so that a module can
-          require a dependency to be trusted without asserting any trust
-          about itself.
+        <listitem>safeインポート拡張を有効にする。モジュールが、自身の信用について何も述べることなく、依存関係が信頼されていることを要求できる。
           <itemizedlist>
-            <listitem><emphasis>Module Trusted</emphasis> &mdash; No</listitem>
-            <listitem><emphasis>Haskell Language</emphasis> &mdash;
-              Unrestricted</listitem>
-            <listitem><emphasis>Imported Modules</emphasis> &mdash; Under control of
-              module author which ones must be trusted.</listitem>
+            <listitem><emphasis>モジュールが信頼されるか</emphasis> &mdash; されない</listitem>
+            <listitem><emphasis>Haskell言語</emphasis> &mdash; 制限されない</listitem>
+            <listitem><emphasis>インポートされるモジュール</emphasis> &mdash; どれが信頼されていなければいけないかは、モジュール作者に制御される。</listitem>
           </itemizedlist>
         </listitem>
       </varlistentry>
