@@ -5893,7 +5893,7 @@ data T = T {-# UNPACK #-} !Float
 
       <para>これにより、二つの非ボックス化Floatを保持する構築子<literal>T</literal>ができる。これは常に最適化になっているとは限らない。例えば、構築子<function>T</function>の内容を調べて、そのfloatを非正格な関数に渡す場合、それらを再びボックス化しなければならない。(これはコンパイラによって自動的に行われる)</para>
 
-      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである<footnote>実は、技術的な事情によりUNPACKプラグマは<option>-O</option>なしでは何もしない。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick 5252</ulink>を見よ)</footnote>。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
+      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである<footnote><para>実は、技術的な事情によりUNPACKプラグマは<option>-O</option>なしでは何もしない。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick 5252</ulink>を見よ)</para></footnote>。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
 
 <programlisting>
 f :: T -&#62; Float
