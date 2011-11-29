@@ -7,3 +7,7 @@ nice xsltproc --stringparam custom.prefix $prefix custom.xsl users_guide.xml 2>b
   echo "done!" >> build_log.txt &
 #  --stringparam suppress.header.navigation 1 \
 #  --stringparam suppress.footer.navigation 1 \
+
+if ! [ -f xhtml/prof_scc ]; then
+  echo "xhtml/prof_scc not found!!!"
+fi
