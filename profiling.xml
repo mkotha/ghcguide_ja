@@ -208,7 +208,7 @@ main = do let xs = {-# SCC "X" #-} [1..1000000]
            other than making the PS file generation work, rather than
            falling over.  The result seems to be broken PS on the page
            with the image. -->
-      <imagedata fileref="prof_scc" contentwidth="645px"
+      <imagedata fileref="prof_scc.png" contentwidth="645px"
       contentdepth="428px"/>
 
     </sect2>
