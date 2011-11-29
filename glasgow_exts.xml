@@ -1511,7 +1511,7 @@ import safe qualified Network.Socket as NS
   data T a    -- T :: * -> *
 </programlisting>
 
-<para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような類について多相的でも良いが、類が<literal>*</literal>でないなら、明示的な類注釈を使う必要がある。(<xref linkend="kinding"/>を見よ)</para>
+<para>構文的にいうと、この宣言は「= constrs」の部分を欠いている。このように定義される型は多相的でも良く、さらにどのような種について多相的でも良いが、種が<literal>*</literal>でないなら、明示的な種注釈を使う必要がある。(<xref linkend="kinding"/>を見よ)</para>
 
 <para>このようなデータ型はボトムというただ一つの値しか持たないが、「幽霊型(phantom type)」を定義するときには便利なことがある。</para>
 </sect2>
@@ -1652,10 +1652,10 @@ GHCでは、型構築子、クラス、型変数を演算子として定義し�
 </para>
 
 <para>
-GHCは現在、型シノニムを展開する前に類検査を行っている。(ただしこれも変えることはできるだろう)
+GHCは現在、型シノニムを展開する前に種検査を行っている。(ただしこれも変えることはできるだろう)
 </para>
 <para>
-型シノニムを展開した後、GHCは、以下のような、類検査では発見できない誤りを見つけるために、型に対して妥当性検査を行う。
+型シノニムを展開した後、GHCは、以下のような、種検査では発見できない誤りを見つけるために、型に対して妥当性検査を行う。
 <itemizedlist>
 <listitem><para>
 型構築子がforall付きの型に適用されている。
@@ -2114,7 +2114,7 @@ instance Eq T where
 </para></listitem>
 
 <listitem><para>
-Haskell 98様式のデータ型宣言と異なり、「<literal>data Set a where</literal>」というヘッダに出てくる型変数にはスコープがない。実際、代わりに類シグネチャを書くこともできる。
+Haskell 98様式のデータ型宣言と異なり、「<literal>data Set a where</literal>」というヘッダに出てくる型変数にはスコープがない。実際、代わりに種シグネチャを書くこともできる。
 <programlisting>
   data Set :: * -> * where ...
 </programlisting>
@@ -2122,7 +2122,7 @@ Haskell 98様式のデータ型宣言と異なり、「<literal>data Set a where
 <programlisting>
   data Bar a :: (* -> *) -> * where ...
 </programlisting>
-型変数(与えられるなら)は明示的に類付けされていても良いので、<literal>Foo</literal>のヘッダを以下のように書くこともできる。
+型変数(与えられるなら)は明示的に種付けされていても良いので、<literal>Foo</literal>のヘッダを以下のように書くこともできる。
 <programlisting>
   data Bar a (b :: * -> *) where ...
 </programlisting>
@@ -2390,7 +2390,7 @@ GHCはこれを拡張し、新たにいくつかのクラスが自動的に導�
 <itemizedlist>
 <listitem><para><option>-XDeriveDataTypeable</option>を使うと、<literal>Typeable</literal>と<literal>Data</literal>の両クラスのインスタンスを自動導出できる。これらのクラスは、ライブラリ中、それぞれ<literal>Data.Typeable</literal>と<literal>Data.Generics</literal>で定義されている。
 </para>
-<para><literal>Typeable</literal>のインスタンスは、データ型の型パラメタの数が七個以下で、その全てが類<literal>*</literal>を持っているときのみ自動導出できる。これは、<literal>Typeable</literal>クラスが<ulink url="http://research.microsoft.com/%7Esimonpj/papers/hmap/gmap2.ps">Scrap More Boilerplate: Reflection, Zips, and Generalised Casts</ulink>で述べられている形を使って導出されているからである。(この論文の7.4節では、使われる複数の<literal>Typeable</literal>について述べられているが、ライブラリが提供するのは<literal>Typeable1</literal>から<literal>Typeable7</literal>までだけである)。この条件を満たさない場合、プログラマは、そのデータ構築子に合った類を持つ<literal>TypeableX</literal>を書き、そのデータ型についてのインスタンスを手で書くことができる。</para>
+<para><literal>Typeable</literal>のインスタンスは、データ型の型パラメタの数が七個以下で、その全てが種<literal>*</literal>を持っているときのみ自動導出できる。これは、<literal>Typeable</literal>クラスが<ulink url="http://research.microsoft.com/%7Esimonpj/papers/hmap/gmap2.ps">Scrap More Boilerplate: Reflection, Zips, and Generalised Casts</ulink>で述べられている形を使って導出されているからである。(この論文の7.4節では、使われる複数の<literal>Typeable</literal>について述べられているが、ライブラリが提供するのは<literal>Typeable1</literal>から<literal>Typeable7</literal>までだけである)。この条件を満たさない場合、プログラマは、そのデータ構築子に合った種を持つ<literal>TypeableX</literal>を書き、そのデータ型についてのインスタンスを手で書くことができる。</para>
 </listitem>
 
 <listitem><para><option>-XDeriveGeneric</option>を使うと、<literal>Generic</literal>クラスのインスタンスを自動導出できる。このクラスは<literal>GHC.Generics</literal>で定義されている。<xref linkend="generic-programming"/>にあるように、これらを使って総称的な関数を定義することができる。</para></listitem>
@@ -2509,7 +2509,7 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 <literal>ci</literal>はクラスの部分適用であり、<literal>C t1'...tj'</literal>という形をとる。ただし<literal>C</literal>の引数の数は<literal>j+1</literal>である。すなわち、<literal>C</literal>はただ一つの引数を欠いている。
 </para></listitem>
 <listitem><para>
-  <literal>k</literal>は、<literal>ci (T v1...vk)</literal>の類が正しくなるように選ばれる。
+  <literal>k</literal>は、<literal>ci (T v1...vk)</literal>の種が正しくなるように選ばれる。
 </para></listitem>
 <listitem><para>
   型<literal>t</literal>は任意の型である。
@@ -2792,7 +2792,7 @@ fではxとyの値を一つの集まりに対して順番にinsertしようと�
 <programlisting>
    class C a b where ...
 </programlisting>
-このようにすると、Cは型(aやbの類によっては型構築子)上の二項関係と捉えられる。次の例のように、クラス定義中に節を追加して、引数間の従属性に関する情報を追加することができる。
+このようにすると、Cは型(aやbの種によっては型構築子)上の二項関係と捉えられる。次の例のように、クラス定義中に節を追加して、引数間の従属性に関する情報を追加することができる。
 <programlisting>
    class D a b | a -> b where ...
    class E a b | a -> b, b -> a where ...
@@ -2826,7 +2826,7 @@ fではxとyの値を一つの集まりに対して順番にinsertしようと�
       insert :: e -> ce -> ce
       member :: e -> ce -> Bool
 </programlisting>
-ここで、<literal>ce -&gt; e</literal>という従属関係は、要素の型eが集まりの型ceによって一意に定まることを指定している。引数の類はどちらも*であることに注意してほしい。つまりこれは構築子クラスではない。また、最初に挙げたCollectsのインスタンスは全てこの新しい定義の下で有効である。
+ここで、<literal>ce -&gt; e</literal>という従属関係は、要素の型eが集まりの型ceによって一意に定まることを指定している。引数の種はどちらも*であることに注意してほしい。つまりこれは構築子クラスではない。また、最初に挙げたCollectsのインスタンスは全てこの新しい定義の下で有効である。
 </para>
 <para>
 元々の定義を使ったときに現れた曖昧性の問題はどうだろうか。empty関数の型はCollects e ce => ceのままだが、もはやこれを曖昧だとみなす必要はない。変数eは=>記号の右辺に現れていないが、Collectsクラスの従属関係から、これがceによって一意に決定されることがわかる。ceは=>記号の右側に現れているので、emptyが使われるときの文脈から得られる情報で、ceとeの両方の型を曖昧さなく決定できる。一般的に、ある型が曖昧だとされるのは、=>の左辺に、右辺の変数によって(直接または間接に)一意に決定されない変数が存在するときだけである。
@@ -2916,7 +2916,7 @@ Haskell 98では、インスタンス宣言の頭部は<literal>C (T a1 ... an)<
 </para>
 
 <para>
-<option>-XFlexibleContexts</option>フラグは、この規則を緩め、さらに型シグネチャについての同様の規則も緩める(<xref linkend="flexible-contexts"/>を見よ)。このフラグが有効なら、インスタンス宣言の文脈は、下記の規則に従う限り、(類の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
+<option>-XFlexibleContexts</option>フラグは、この規則を緩め、さらに型シグネチャについての同様の規則も緩める(<xref linkend="flexible-contexts"/>を見よ)。このフラグが有効なら、インスタンス宣言の文脈は、下記の規則に従う限り、(種の正しい)任意の表明<literal>(C t1 ... tn)</literal>から成っていてよい。
 <orderedlist>
 <listitem><para>
 Paterson条件: 文脈中の各表明に対して、次が求められる。
@@ -3228,11 +3228,11 @@ main = do
 <programlisting>
 data family GMap k :: * -> *
 </programlisting>
-この特別な<literal>family</literal>が、族を標準的なデータ宣言から区別する。結果の類注釈は省略可能であり、省かれた場合は通常同様に<literal>*</literal>が使われる。例を示す。
+この特別な<literal>family</literal>が、族を標準的なデータ宣言から区別する。結果の種注釈は省略可能であり、省かれた場合は通常同様に<literal>*</literal>が使われる。例を示す。
 <programlisting>
 data family Array e
 </programlisting>
-名前の付いた引数にも必要なら明示的な類シグネチャを与えることができる。[http://www.haskell.org/ghc/docs/latest/html/users_guide/gadt.html GADT宣言]の場合と同様、名前付き引数は完全に省略可能なので、<literal>Array</literal>を次のように宣言することもできる。
+名前の付いた引数にも必要なら明示的な種シグネチャを与えることができる。[http://www.haskell.org/ghc/docs/latest/html/users_guide/gadt.html GADT宣言]の場合と同様、名前付き引数は完全に省略可能なので、<literal>Array</literal>を次のように宣言することもできる。
 <programlisting>
 data family Array :: * -> *
 </programlisting>
@@ -3264,7 +3264,7 @@ data instance GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
 </programlisting>
 この例では、宣言にただ一つのvariantしかないが、一般にはいくつあってもよい(訳注: データ構築子が複数あってもいいということ？)。
     </para>
-    <para>データインスタンス宣言およびnewtypeインスタンス宣言は適切な族宣言がスコープにある場合のみ認められる。これはちょうど、クラスインスタンス宣言にクラス宣言が可視であることが必要なのと同じである。さらに、各インスタンス宣言は、その族宣言によって決まる類に準拠していなければならない。つまり、インスタンス宣言のパラメタの個数は、その族の類から決まるアリティと一致するということである。
+    <para>データインスタンス宣言およびnewtypeインスタンス宣言は適切な族宣言がスコープにある場合のみ認められる。これはちょうど、クラスインスタンス宣言にクラス宣言が可視であることが必要なのと同じである。さらに、各インスタンス宣言は、その族宣言によって決まる種に準拠していなければならない。つまり、インスタンス宣言のパラメタの個数は、その族の種から決まるアリティと一致するということである。
     </para>
     <para>データ族インスタンス宣言は、通常の<literal>data</literal>や<literal>newtype</literal>宣言が持つ表現力を完全に利用できる。
       <itemizedlist>
@@ -3424,20 +3424,20 @@ instance Show v => Show (GMap () v) where ...
 <programlisting>
 type family Elem c :: *
 </programlisting>
-この特別な<literal>family</literal>によって、通常の型宣言と族宣言が区別される。結果の類注釈は省略可能であり、通常と同様に、省略された場合は<literal>*</literal>が使われる。例えば次のようになる。
+この特別な<literal>family</literal>によって、通常の型宣言と族宣言が区別される。結果の種注釈は省略可能であり、通常と同様に、省略された場合は<literal>*</literal>が使われる。例えば次のようになる。
 <programlisting>
 type family Elem c
 </programlisting>
-必要ならパラメタにも明示的な類シグネチャを付けることができる。型族宣言におけるパラメタの数をその族のアリティと呼び、その型族の適用は全てそのアリティに対して完全に飽和していなければ(訳注: つまり部分適用であっては)ならない。この制限は通常の型シノニムにはないものである<!-- 訳注: ほんとか？ -->。これにより、型族の類を知っただけではその族のアリティを決定できないので、型族の適用が正しいものかどうかも一般的には判断できない。例として、次の宣言を考える。
+必要ならパラメタにも明示的な種シグネチャを付けることができる。型族宣言におけるパラメタの数をその族のアリティと呼び、その型族の適用は全てそのアリティに対して完全に飽和していなければ(訳注: つまり部分適用であっては)ならない。この制限は通常の型シノニムにはないものである<!-- 訳注: ほんとか？ -->。これにより、型族の種を知っただけではその族のアリティを決定できないので、型族の適用が正しいものかどうかも一般的には判断できない。例として、次の宣言を考える。
 <programlisting>
-type family F a b :: * -> *   -- Fの類は全体として見れば * -> * -> * -> *
+type family F a b :: * -> *   -- Fの種は全体として見れば * -> * -> * -> *
                               -- しかし、アリティは2である
 </programlisting>
 この宣言のもとで、以下に正しい型と間違った型の例を示す。
 <programlisting>
-F Char [Int]       -- 正 類: * -> *
-F Char [Int] Bool  -- 正 類: *
-F IO Bool          -- 誤 最初の引数で類が不一致
+F Char [Int]       -- 正 種: * -> *
+F Char [Int] Bool  -- 正 種: *
+F IO Bool          -- 誤 最初の引数で種が不一致
 F Bool             -- 誤 適用が飽和していない
 </programlisting>
       </para>
@@ -3467,7 +3467,7 @@ class C a b c where
 type instance Elem [e] = e
 </programlisting>
     </para>
-    <para>型族インスタンス宣言は、適切な族宣言がスコープにあるときのみ認められる。これはちょうど、クラスインスタンスにはクラス宣言が可視であることが必要なのと同じである。さらに、個々のインスタンス宣言は、その族宣言によって決まる類に準拠していなければならず、インスタンス宣言の型パラメタの数は族宣言の型パラメタの数と一致していなければならない。最後に、型インスタンスの右辺は単相型でなければ(つまり、forallを含んでいては)ならず、また飽和した通常の(訳注: vanilla; 型シノニム族でない)型シノニムを全て展開した時点で、族シノニム以外のシノニムが残っていてはならない。許される型インスタンスとそうでない型インスタンスの例をいくつか挙げる。
+    <para>型族インスタンス宣言は、適切な族宣言がスコープにあるときのみ認められる。これはちょうど、クラスインスタンスにはクラス宣言が可視であることが必要なのと同じである。さらに、個々のインスタンス宣言は、その族宣言によって決まる種に準拠していなければならず、インスタンス宣言の型パラメタの数は族宣言の型パラメタの数と一致していなければならない。最後に、型インスタンスの右辺は単相型でなければ(つまり、forallを含んでいては)ならず、また飽和した通常の(訳注: vanilla; 型シノニム族でない)型シノニムを全て展開した時点で、族シノニム以外のシノニムが残っていてはならない。許される型インスタンスとそうでない型インスタンスの例をいくつか挙げる。
 <programlisting>
 type family F a :: *
 type instance F [Int]              = Int         -- OK!
@@ -4005,20 +4005,20 @@ and you'd be right.  That is why they are an experimental feature.
 ================ END OF Linear Implicit Parameters commented out -->
 
 <sect2 id="kinding">
-<title>明示的に類付けされた量化</title>
+<title>明示的に種付けされた量化</title>
 
 <para>
-Haskellでは全ての型変数の類は推論される。(機械で検査できる)文書化のために、類を明示的に与えるのが良いことがある。これは関数に型シグネチャを与えると良いのと同様である。場合によっては、これが本質的に必要になることもある。例えば、John Hughesは、彼の論文"Restricted Data Types in Haskell" (Haskell Workshop 1999)のなかで、次のようにデータ型を定義しなければならなかった。
+Haskellでは全ての型変数の種は推論される。(機械で検査できる)文書化のために、種を明示的に与えるのが良いことがある。これは関数に型シグネチャを与えると良いのと同様である。場合によっては、これが本質的に必要になることもある。例えば、John Hughesは、彼の論文"Restricted Data Types in Haskell" (Haskell Workshop 1999)のなかで、次のようにデータ型を定義しなければならなかった。
 <screen>
      data Set cxt a = Set [a]
                     | Unused (cxt a -> ())
 </screen>
-構築子<literal>Unused</literal>は、型変数<literal>cxt</literal>が正しい類を与えられるようにするためだけに存在する。
+構築子<literal>Unused</literal>は、型変数<literal>cxt</literal>が正しい種を与えられるようにするためだけに存在する。
 </para>
 <para>
-GHCでは、このようなことをしなくても、<option>-XKindSignatures</option>を使えば、型変数が明示的に束縛されるときはいつでも、その型変数の類を直接指定できるようになった。</para>
+GHCでは、このようなことをしなくても、<option>-XKindSignatures</option>を使えば、型変数が明示的に束縛されるときはいつでも、その型変数の種を直接指定できるようになった。</para>
 <para>
-このフラグによって、以下の場所で類シグネチャを使えるようになる。
+このフラグによって、以下の場所で種シグネチャを使えるようになる。
 <itemizedlist>
 <listitem><para><literal>data</literal>宣言。
 <screen>
@@ -4044,7 +4044,7 @@ GHCでは、このようなことをしなくても、<option>-XKindSignatures</
 </para>
 
 <para>
-この拡張の一部として、型に類注釈を加えることもできる。
+この拡張の一部として、型に種注釈を加えることもできる。
 <screen>
    f :: (Int :: *) -> Int
    g :: forall a. a -> (a :: *)
@@ -6558,7 +6558,7 @@ GHCにおける総称プログラミングでは、ユーザがインスタン�
 -- | 単位: 引数のない構築子に使われる
 data U1 p = U1
 
--- | 定数、追加のパラメタ、類*の再帰
+-- | 定数、追加のパラメタ、種*の再帰
 newtype K1 i c p = K1 { unK1 :: c }
 
 -- | メタ情報 (構築子名など)
@@ -6703,7 +6703,7 @@ Jose Pedro Magalhaes, Atze Dijkstra, Johan Jeuring, and Andres Loeh.
 </listitem>
 </itemizedlist>
 
-<emphasis>注意</emphasis>: GHCにおける現在の総称プログラミングサポートは準備段階のものである。特に、<literal>Generic</literal>のインスタンスを自動導出することしか許されていない。<literal>Generic1</literal>の自動導出への対応(よって、<literal>fmap</literal>などの類<literal>* -> *</literal>の総称関数を可能にすること)はもっと後の段階になる。
+<emphasis>注意</emphasis>: GHCにおける現在の総称プログラミングサポートは準備段階のものである。特に、<literal>Generic</literal>のインスタンスを自動導出することしか許されていない。<literal>Generic1</literal>の自動導出への対応(よって、<literal>fmap</literal>などの種<literal>* -> *</literal>の総称関数を可能にすること)はもっと後の段階になる。
 </sect2>
 
 </sect1>

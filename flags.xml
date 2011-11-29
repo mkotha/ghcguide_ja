@@ -864,7 +864,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XKindSignatures</option></entry>
-	      <entry><link linkend="kinding">類シグネチャ</link>を有効にする。</entry>
+	      <entry><link linkend="kinding">種シグネチャ</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoKindSignatures</option></entry>
 	    </row>
