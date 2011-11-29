@@ -1396,7 +1396,7 @@ Prelude> :. cmds.ghci
           <indexterm><primary><literal>:kind</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>type</replaceable>の類を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。</para>
+          <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。</para>
 	</listitem>
       </varlistentry>
 
