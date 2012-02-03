@@ -3,19 +3,20 @@
   <title>既知のバグと問題点</title>
 
   <sect1 id="vs-Haskell-defn">
-    <title>Haskell&nbsp;98とGlasgow&nbsp;Haskell、言語上の不準拠点
+    <title>Haskell&nbsp;標準とGlasgow&nbsp;Haskell、言語上の不準拠点
 </title>
 
-    <indexterm><primary>GHC vs the Haskell 98 language</primary></indexterm>
-    <indexterm><primary>Haskell 98 language vs GHC</primary></indexterm>
+    <indexterm><primary>GHC vs the Haskell standards</primary></indexterm>
+    <indexterm><primary>Haskell standards language vs GHC</primary></indexterm>
 
-  <para>この節では、Haskell&nbsp;98の実装についてのGlasgow Haskellの問題点を列挙する。クラッシュ、スペースリークなどの良くない現象については「うまくいかないとき」の節(<xref linkend="wrong"/>)も参照せよ。</para>
+  <para>この節では、Haskell&nbsp;98およびHaskell&nbsp;2010の実装についてのGlasgow Haskellの問題点を列挙する。クラッシュ、スペースリークなどの良くない現象については「うまくいかないとき」の節(<xref linkend="wrong"/>)も参照せよ。</para>
 
   <para>この制限一覧は、(大体)Haskellレポートの順で並んでいる。</para>
 
   <sect2 id="haskell98-divergence">
-    <title>Haskell&nbsp;98からの逸脱</title>
+    <title>Haskell&nbsp;98およびHaskell&nbsp;2010からの逸脱</title>
 
+    <para>デフォルトではGHCは(大部分)Haskell&nbsp;2010のコンパイラのように振る舞おうとするが、<literal>-XHaskell98</literal>や<literal>-XHaskell2010</literal>フラグを使うことで特定の言語バージョンのように振る舞うようにすることもできる。標準からの逸脱は以下に記述する。特に述べていない場合、逸脱はHaskell&nbsp;98、Haskell&nbsp;2010、デフォルトの各モードに関するものである。</para>
 
     <sect3 id="infelicities-lexical">
       <title>字句的構文</title>
@@ -32,7 +33,7 @@
 	
 	<itemizedlist>
 	  <listitem>
-	    <para>GHCは、<literal>do</literal>式でのレイアウト規則について、多少寛容である。具体的には、「入れ子の内側の文脈は、外側の文脈よりも多くインデントされなければならない」という規則を緩和して、外側の文脈が<literal>do</literal>の場合、内側の文脈が外側の文脈と同じ水準でも良いとする。</para>
+	    <para>Haskell&nbsp;98モードおよびデフォルトモード(Haskell 2010モードはそうでない)において、GHCは、<literal>do</literal>式でのレイアウト規則について、多少寛容である。具体的には、「入れ子の内側の文脈は、外側の文脈よりも多くインデントされなければならない」という規則を緩和して、外側の文脈が<literal>do</literal>の場合、内側の文脈が外側の文脈と同じ水準でも良いとする。</para>
 
 	    <para>例えば、GHCは以下のコードを受け付ける。
 
@@ -42,11 +43,12 @@ main = do args &lt;- getArgs
           ps &lt;- mapM process args
           mapM print ps</programlisting>
 
+          この振る舞いは<literal>NondecreasingIndentation</literal>拡張によって制御される。
 	      </para>
 	  </listitem>
 
 	<listitem>
-	  <para>GHCはパース中に式の中での結合性の解決を行わない。例えば、Haskellレポートによれば、以下のものは合法的なHaskellである。
+	  <para>Haskell&nbsp;98は(Haskell&nbsp;2010は違う)パース中に式の中で結合性の解決を行なうことを要求するが、GHCはこれを行なわない。例えば、Haskell&nbsp;レポートによれば、以下のものは合法的なHaskellである。
 <programlisting>
     let x = 42 in x == 42 == True</programlisting>
         そして、これは以下のようにパースされるとする。
@@ -55,9 +57,7 @@ main = do args &lt;- getArgs
 
           これは、レポートによれば、<literal>let</literal>式は<quote>できるだけ右へ拡張される</quote>からである。二番目の等号を越えて拡張しようとするとパースエラーが発生する(<literal>==</literal>は非結合的なので)ため、<literal>let</literal>式はそこで終わる。GHCは単純に式全部を飲み込む。パースは次のようになる。
 <programlisting>
-    (let x = 42 in x == 42 == True)</programlisting>
-
-          ここではおそらくHaskellレポートが間違っているが、それでもこれはGHCとHaskell 98との差異である。</para>
+    (let x = 42 in x == 42 == True)</programlisting></para>
 	</listitem>
       </itemizedlist>
     </sect3>
@@ -72,6 +72,8 @@ main = do args &lt;- getArgs
       <title>宣言と束縛</title>
 
       <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-XNoMonoPatBinds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
+
+      <para>データ型の文脈は、次の版の言語標準では取り除かれることが決まったので、デフォルトモードにおいてGHCはこれを受け付けない。この振る舞いは<option>DatatypeContexts</option>拡張で制御できる。<xref linkend="datatype-contexts" />を見よ。</para>
     </sect3>
 
       <sect3 id="infelicities-Modules">
@@ -86,6 +88,25 @@ main = do args &lt;- getArgs
       <title>数値、基本型、組込みクラス</title>
 
       <variablelist>
+	<varlistentry>
+	  <term>Numのスーパークラス</term>
+	  <listitem>
+	    <para><literal>Num</literal>クラスは、スーパークラスとして<literal>Show</literal>および<literal>Eq</literal>を持たない。
+            </para>
+
+	    <para>以下のようにすることで、Haskell98/Haskell2010とGHCの両方で動くコードを作ることができる。
+              <itemizedlist>
+                <listitem>
+                  <para><literal>Num</literal>のインスタンスを作るときは必ず、<literal>Show</literal>と<literal>Eq</literal>のインスタンスにもする。</para>
+                </listitem>
+                <listitem>
+                  <para><literal>Num t</literal>という制約を持つ関数またはインスタンスまたはクラスを与える場合は必ず、<literal>Show t</literal>と<literal>Eq t</literal>制約も与える。</para>
+                </listitem>
+              </itemizedlist>
+            </para>
+	    </listitem>
+	  </varlistentry>
+
 	<varlistentry>
 	  <term>配列要素の複数回定義は検査されない</term>
 	  <listitem>
@@ -142,10 +163,23 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
           </varlistentry>
 	</variablelist>
     </sect3>
+
+    <sect3 id="infelicities-ffi">
+      <title>多言語関数インタフェース</title>
+      <variablelist>
+        <varlistentry>
+          <term><literal>hs_exit()</literal>の後に<literal>hs_init()</literal>を呼ぶことが許されない</term>
+          <listitem>
+            <para>FFI仕様の要求するところによると、実装は、<literal>hs_exit()</literal>によって停止した後に再び初期化を行うのに対応していなければならないが、GHCは現在これを行えない。</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </sect3>
+
   </sect2>
 
-  <sect2 id="haskell98-undefined">
-    <title>Haskell&nbsp;98の未定義動作についてのGHCの解釈</title>
+  <sect2 id="haskell-98-2010-undefined">
+    <title>Haskell&nbsp;98とHaskell&nbsp;2010の未定義動作についてのGHCの解釈</title>
 
     <para>この節では、Haskell 98で未定義、または実装固有とされている諸問題について、GHCの立場を解説する。</para>
 
@@ -208,7 +242,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
   <sect1 id="bugs">
     <title>既知のバグと問題点</title>
 
-    <para>バグトラッカには、報告されたもののまだ修正されていないGHCのバグが列挙されている。<ulink url="http://sourceforge.net/projects/ghc/">SourceForge GHC page</ulink>を見よ。加えて、GHCには、既知のバグや問題点として以下のものがある。これらはより永続的である。つまり、これらはどれも短期的に修正される可能性が低い。</para>
+    <para>バグトラッカには、報告されたもののまだ修正されていないGHCのバグが列挙されている。<ulink url="http://hackage.haskell.org/trac/ghc/">GHC Trac</ulink>を見よ。加えて、GHCには、既知のバグや問題点として以下のものがある。これらはより永続的である。つまり、これらはどれも短期的に修正される可能性が低い。</para>
 
   <sect2 id="bugs-ghc">
     <title>GHCのバグ</title>
