@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="code-generators">
+  <title>GHCのバックエンド</title>
+  <indexterm><primary>ghc backends</primary></indexterm>
+  <indexterm><primary>ghc code generators</primary></indexterm>
+  
+  <para>GHCは複数のコードジェネレータをバックエンドとして使うことができる。これは、GHCが使う中間表現のなかで最後のもの(Cmmと呼ばれる、単純でC風な言語)を取って、それを実行可能コードにコンパイルする。GHCは以下に述べるバックエンドに対応している。
+  </para>
+
+  <sect2 id="native-code-gen">
+    <title>ネイティブコード生成器(<option>-fasm</option>)</title>
+    <indexterm><primary>native code generator</primary></indexterm>
+
+    GHCのデフォルトのバックエンド。Cmmからアセンブリコードまでコンパイルするネイティブコード生成器である。最速のバックエンドであり、一般的に良いパフォーマンスのコードを生成する。共有ライブラリをコンパイルすることに最も良く対応している。<option>-fasm</option>フラグで選択できる。
+  </sect2>
+
+  <sect2 id="llvm-code-gen">
+    <title>LLVMコード生成器(<option>-fllvm</option>)</title>
+    <indexterm><primary>LLVM code generator</primary></indexterm>
+
+    <para>これは<ulink url="http://llvm.org">LLVM</ulink>コンパイラを使って実行可能コードを生成する大体バックエンドである。一般的にはネイティブコード生成器とパフォーマンスで同等のコードを生成するが、場合によってはずっと速いコードを生成する。これは特に、vectorのようなパッケージを使った、数値的で配列を多用するコードについて真である。欠点は、コンパイル時間が有意に増えることである。LLVMバックエンドは<option>-fllvm</option>で選択できる。現在<emphasis>LLVM 2.8</emphasis>以降に対応している。</para>
+       
+    <para>LLVMコード生成器が動作するためには、LLVMをインストールしてPATHに置かなければならない。具体的にはGHCは<command>opt</command>と<command>llc</command>ツールを呼ぶ必要がある。第二に、Mac OS XをLLVM 3.0以降と共に使っているなら、<ulink url="http://clang.llvm.org">Clang c compiler</ulink>コンパイラもPATHに置かなければならない。OS X 10.6以降にはデフォルトでclangとLLVMがどちらも含まれている。
+    </para>
+
+    <para>LLVMとClangをインストールする方法。
+      <itemizedlist>
+        <listitem><emphasis>Linux</emphasis>: パッケージ管理ツールを使う。
+        </listitem>
+        <listitem><emphasis>Mac OS X</emphasis>: <literal>10.6</literal>ではLLVMとClangがデフォルトで含まれている。<literal>10.5</literal>では、OS Xのためのパッケージマネージャである<ulink url="http://mxcl.github.com/homebrew/">Homebrew</ulink>をインストールする。LLVMとClangのバイナリを<ulink url="http://llvm.org/releases/download.html">ここ</ulink>からダウンロードすることもできる。
+        </listitem>
+        <listitem><emphasis>Windows</emphasis>: LLVMとClangのバイナリを<ulink url="http://llvm.org/releases/download.html">ここ</ulink>からダウンロードする。
+        </listitem>
+      </itemizedlist>
+    </para>
+  </sect2>
+
+  <sect2 id="c-code-gen">
+    <title>Cコード生成器(<option>-fvia-C</option>)</title>
+    <indexterm><primary>C code generator</primary></indexterm>
+    <indexterm><primary>-fvia-C</primary></indexterm>
+
+    <para>これはGHCの最古のコード生成器であり、GHC 7.0で非推奨化され、一般にはもはや含まれていない。<option>-fvia-C</option>フラグで選択する。</para>
+
+    <para>Cコード生成器は、GHCが非レジスタ化モードでビルドされている場合にのみ対応されている。このモードは、GHCを新しいプラットフォームに移植することを助けるために、「ポータブルな」CコードをGHCが生成するモードである。しかしこのモードは普通よりずっと遅いコードを生成するので、あなたのGHCがこの方法でビルドされている可能性は低い。もしそうなら、おそらくネイティブコード生成器は利用不能である。<link linkend="ghc-info"><literal>ghc --info</literal></link>を呼ぶことでこの情報を確認できる。</para>
+  </sect2>
+
+  <sect2 id="unreg">
+    <title>非レジスタ化コンパイル</title>
+    <indexterm><primary>unregisterised compilation</primary></indexterm>
+
+    <para>「非レジスタ化」という用語は実際には「純粋なCを介してコンパイルする」ということを意味している。つまり、通常GHCがプログラムを速くするために使うプラットフォーム固有の技を一部使わないということである。非レジスタ化コンパイルするときは、GHCは単純にgccでコンパイルできるCファイルを生成する。</para>
+
+    <para>GHCが非レジスタ化モードでコンパイルされている場合、LLVMおよびCコード生成器のみが利用可能である。ネイティブコード生成器は使えない。非レジスタ化モードにおいて、通常、LLVMにはCバックエンドに比べてかなり大きな性能上の恩恵がある。</para>
+
+    <para>非レジスタ化コンパイルはGHCを新しい機械に移植するときに便利である。これを使うと、予め必要なツールは<command>gcc</command>、<command>as</command>、<command>ld</command>だけになるし、さらに、非レジスタ化コンパイルが動作するようにするために書かなければならないプラットフォーム固有のコードは通常かなり少ないからである。</para>
+
+   <para>コンパイルの段階で非レジスタ化コンパイルを選ぶことはできない。GHCをビルドするときに適切なオプションを設定する必要があるのだ。詳細はGHCのビルドの手引きを参照せよ。</para>
+    <para><link linkend="ghc-info"><literal>ghc --info</literal></link>を呼ぶことで、GHCが非レジスタ化版かどうか確かめることができる。</para>
+  </sect2>
+
+</sect1>
+
+<!-- Emacs stuff:
+     ;;; Local Variables: ***
+     ;;; sgml-parent-document: ("users_guide.xml" "book" "chapter" "sect1") ***
+     ;;; End: ***
+ -->
