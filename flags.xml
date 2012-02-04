@@ -264,6 +264,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+	      <entry><option>-dumpdir</option> <replaceable>dir</replaceable></entry>
+              <entry>ダンプファイルの出力先を変更する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
 	      <entry><option>-outputdir</option> <replaceable>dir</replaceable></entry>
 	      <entry>出力ディレクトリを設定する</entry>
 	      <entry>動</entry>
@@ -633,7 +639,7 @@
 	  <tbody>
 	    <row>
 	      <entry><option>-fglasgow-exts</option></entry>
-	      <entry>大部分の言語拡張を有効にする</entry>
+	      <entry>大部分の言語拡張を有効にする。具体的には<xref linkend="options-language"/>を見よ。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-glasgow-exts</option></entry>
 	    </row>
@@ -722,6 +728,12 @@
 	      <entry><option>-XNPlusKPatterns</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XNoTraditionalRecordSyntax</option></entry>
+	      <entry>伝統的なレコード構文(Haskell 98が対応しているもの)<literal>C {f = x}</literal>への対応を無効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XTraditionalRecordSyntax</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XNoMonoPatBinds</option></entry>
 	      <entry><link linkend="monomorphism">パターン束縛を多相的に</link>する。</entry>
 	      <entry>動</entry>
@@ -763,6 +775,24 @@
 	      <entry><link linkend="type-families">型の族</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoTypeFamilies</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XConstraintKinds</option></entry>
+	      <entry><link linkend="constraint-kind">制約の種</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoConstraintKinds</option></entry>
+	    </row>
+        <row>
+          <entry><option>-XDataKinds</option></entry>
+          <entry><link linkend="kind-polymorphism-and-promotion">データ型の昇格</link>を有効にする。</entry>
+          <entry>動</entry>
+          <entry><option>-XNoDataKinds</option></entry>
+        </row>
+	    <row>
+	      <entry><option>-XPolyKinds</option></entry>
+	      <entry><link linkend="kind-polymorphism-and-promotion">種多相</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoPolyKinds</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XScopedTypeVariables</option></entry>
@@ -929,10 +959,10 @@
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XPArr</option></entry>
+	      <entry><option>-XParallelArrays</option></entry>
 	      <entry>parallel arrayを有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoPArr</option></entry>
+	      <entry><option>-XNoParallelArrays</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecordWildCards</option></entry>
@@ -1043,14 +1073,14 @@
 	      <entry><option>-</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XSafeLanguage</option></entry>
-        <entry><link linkend="safe-haskell">Safe Haskell</link>のSafe言語を有効にする。</entry>
+	      <entry><option>-XUnsafe</option></entry>
+        <entry><link linkend="safe-haskell">Safe Haskell</link>のUnsafeモードを有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XSafeImports</option></entry>
-        <entry><link linkend="safe-imports-ext">safeインポート</link>を有効にする。</entry>
+	      <entry><option>-fpackage-trust</option></entry>
+        <entry><link linkend="safe-haskell">Safe Haskell</link>のtrustworthyモジュールに関するパッケージの信頼要件を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-</option></entry>
 	    </row>
@@ -1293,6 +1323,20 @@
 	    <entry><option>-fno-warn-wrong-do-bind</option></entry>
 	  </row>
 
+	  <row>
+	    <entry><option>-fwarn-unsafe</option></entry>
+       <entry>コンパイルしているモジュールがunsafeと見なされる場合に警告する。安全性推論を使う場合に、モジュールが安全かどうかを確認するために使うべきである。</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-unsafe</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-safe</option></entry>
+       <entry>コンパイルしているモジュールがsafeと見なされる場合に警告する。安全性推論を使う場合に、モジュールが安全かどうかを確認するために使うべきである。</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-safe</option></entry>
+	  </row>
+
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1355,6 +1399,13 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-fcse</option></entry>
+	      <entry>共通部分式の除去を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-cse</entry>
+	    </row>
+
+	    <row>
 	      <entry><option>-fdicts-strict</option></entry>
 	      <entry>辞書を正格にする</entry>
 	      <entry>静</entry>
@@ -1376,10 +1427,38 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-feager-blackholing</option></entry>
+	      <entry><link linkend="parallel-compile-options">eager blackholing</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fenable-rewrite-rules</option></entry>
+	      <entry>全ての書き換え規則(多重定義関数の自動特殊化で生成されたものも含む)を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-enable-rewrite-rules</option></entry>
+ 	    </row>
+
+	    <row>
 	      <entry><option>-fexcess-precision</option></entry>
 	      <entry>中間値の精度超過を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-excess-precision</option></entry>
+	    </row>
+
+            <row>
+	      <entry><option>-ffloat-in</option></entry>
+	      <entry>"float-in"最適化を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-float-in</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-ffull-laziness</option></entry>
+              <entry>完全遅延(束縛を外側に向かって浮遊させる)を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-full-laziness</entry>
 	    </row>
 
 	    <row>
@@ -1397,10 +1476,24 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fomit-interface-pragmas</option></entry>
-	      <entry>インタフェースプログラムを生成しない</entry>
+	      <entry><option>-fliberate-case</option></entry>
+	      <entry>liberate-case変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-omit-interface-pragmas</option></entry>
+	      <entry>-fno-liberate-case</entry>
+	    </row>
+
+	    <row>
+	      <entry><option>-fliberate-case-threshold</option>=<replaceable>n</replaceable></entry>
+	      <entry>liberate-case変換における大きさ閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
+ 	      <entry>静</entry>
+	      <entry><option>-fno-liberate-case-threshold</option></entry>
+ 	    </row>
+
+	    <row>
+	      <entry><option>-fmax-simplifier-iterations</option></entry>
+	      <entry>単純化器の最大繰り返し回数を設定する</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
 	    </row>
 
 	    <row>
@@ -1411,16 +1504,16 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fsimplifier-phases</option></entry>
-	      <entry>単純化器の段階の数を設定する(デフォルトは2)。<option>-O0</option>が与えられたときには無視される。</entry>
-	      <entry>動</entry>
+	      <entry><option>-fno-opt-coercion</option></entry>
+	      <entry>coercion最適化器を使わない</entry>
+	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fmax-simplifier-iterations</option></entry>
-	      <entry>単純化器の最大繰り返し回数を設定する</entry>
-	      <entry>動</entry>
+	      <entry><option>-fno-pre-inlining</option></entry>
+              <entry>pre-inliningを無効にする</entry>
+	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
 
@@ -1431,55 +1524,34 @@
 	      <entry>-</entry>
 	    </row>
 
-	    <row>
-	      <entry><option>-fcse</option></entry>
-              <entry>共通部分式削除を使う。<option>-O</option>によって有効になる。</entry>
-	      <entry>動</entry>
-	      <entry>-fno-cse</entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-fspecialise</option></entry>
-	      <entry>多重定義された関数の特殊化を有効にする。<option>-O</option>によっても有効になる。</entry>
-	      <entry>動</entry>
-	      <entry>-fno-specialise</entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-ffull-laziness</option></entry>
-              <entry>完全遅延(束縛を外側に向かって浮遊させる)を有効にする。<option>-O</option>によっても有効になる。</entry>
-	      <entry>動</entry>
-	      <entry>-fno-full-laziness</entry>
-	    </row>
-
-            <row>
-	      <entry><option>-ffloat-in</option></entry>
-	      <entry>"float-in"最適化を有効にする。<option>-O</option>によっても有効になる。</entry>
-	      <entry>動</entry>
-	      <entry>-fno-float-in</entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-fenable-rewrite-rules</option></entry>
-	      <entry>全ての書き換え規則(多重定義関数の自動特殊化で生成されたものも含む)を有効にする。<option>-O</option>によっても有効になる。</entry>
-	      <entry>動</entry>
-	      <entry><option>-fno-enable-rewrite-rules</option></entry>
+ 	    <row>
+	      <entry><option>-fpedantic-bottoms</option></entry>
+	      <entry>GHCがボトムをより精密に扱うようにする(しかし、<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。</entry>
+              <entry>動</entry>
+	      <entry><option>-fno-pedantic-bottoms</option></entry>
  	    </row>
 
 	    <row>
-	      <entry><option>-fstrictness</option></entry>
-              <entry>正格性解析を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry><option>-fomit-interface-pragmas</option></entry>
+	      <entry>インタフェースプラグマを生成しない</entry>
 	      <entry>動</entry>
-	      <entry>-fno-strictness</entry>
+	      <entry><option>-fno-omit-interface-pragmas</option></entry>
 	    </row>
 
-            <row>
-              <entry><option>-fstrictness=before</option>=<replaceable>n</replaceable></entry>
-              <entry>単純化器の段階<replaceable>n</replaceable>の前に、追加で正格性解析を行なう。</entry>
-              <entry>動</entry>
-              <entry>-</entry>
-            </row>
+	    <row>
+	      <entry><option>-fsimplifier-phases</option></entry>
+	      <entry>単純化器の段階の数を設定する(デフォルトは2)。<option>-O0</option>が与えられたときには無視される。</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
 
+ 	    <row>
+               <entry><option>-fsimpl-tick-factor=<replaceable>n</replaceable></option></entry>
+               <entry>単純化器のtickの倍率を百分率で指定する(デフォルトは100)。</entry>
+ 	      <entry>動</entry>
+	      <entry>-</entry>
+ 	    </row>
+ 
 	    <row>
 	      <entry><option>-fspec-constr</option></entry>
 	      <entry>SpecConstr変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
@@ -1502,11 +1574,25 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fliberate-case</option></entry>
-	      <entry>liberate-case変換を有効にする。<option>-O2</option>によっても有効になる。</entry>
+	      <entry><option>-fspecialise</option></entry>
+	      <entry>多重定義された関数の特殊化を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
-	      <entry>-fno-liberate-case</entry>
+	      <entry>-fno-specialise</entry>
 	    </row>
+
+	    <row>
+	      <entry><option>-fstrictness</option></entry>
+              <entry>正格性解析を有効にする。<option>-O</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry>-fno-strictness</entry>
+	    </row>
+
+            <row>
+              <entry><option>-fstrictness=before</option>=<replaceable>n</replaceable></entry>
+              <entry>単純化器の段階<replaceable>n</replaceable>の前に、追加で正格性解析を行なう。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
 
 	    <row>
 	      <entry><option>-fstatic-argument-transformation</option></entry>
@@ -1514,13 +1600,6 @@
 	      <entry>動</entry>
 	      <entry>-fno-static-argument-transformation</entry>
 	    </row>
-
-	    <row>
-	      <entry><option>-fliberate-case-threshold</option>=<replaceable>n</replaceable></entry>
-	      <entry>liberate-case変換における大きさ閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
- 	      <entry>静</entry>
-	      <entry><option>-fno-liberate-case-threshold</option></entry>
- 	    </row>
 
 	    <row>
 	      <entry><option>-funbox-strict-fields</option></entry>
@@ -1556,27 +1635,6 @@
 	      <entry>静</entry>
 	      <entry><option>-fno-unfolding-use-threshold</option></entry>
 	    </row>
-
-	    <row>
-	      <entry><option>-fno-pre-inlining</option></entry>
-              <entry>pre-inliningを無効にする</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-fno-opt-coercion</option></entry>
-	      <entry>coercion最適化器を使わない</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
-
-	    <row>
-	      <entry><option>-feager-blackholing</option></entry>
-	      <entry><link linkend="parallel-compile-options">eager blackholing</link>を有効にする</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1599,28 +1657,40 @@
 	  </thead>
 	  <tbody>
 	    <row>
-	      <entry><option>-auto</option></entry>
-	      <entry>エクスポートされていてINLINE指定されていない全ての関数に自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>動</entry>
-	      <entry><option>-no-auto</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-auto-all</option></entry>
-	      <entry>INLINE指定されていない全ての最上位の関数に自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>動</entry>
-	      <entry><option>-no-auto-all</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-caf-all</option></entry>
-	      <entry>全てのCAFに自動的に<literal>_scc_</literal>を付加する</entry>
-	      <entry>動</entry>
-	      <entry><option>-no-caf-all</option></entry>
-	    </row>
-	    <row>
 	      <entry><option>-prof</option></entry>
 	      <entry>プロファイルを有効にする</entry>
 	      <entry>静</entry>
 	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fprof-auto</option></entry>
+	      <entry>INLINE指定されていない全ての関数に自動的に<literal>SCC</literal>を付加する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-prof-auto</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fprof-auto-top</option></entry>
+	      <entry>INLINE指定されていない全ての最上位の関数に自動的に<literal>SCC</literal>を付加する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-prof-auto</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fprof-auto-exported</option></entry>
+	      <entry>エクスポートされていてINLINE指定されていない全ての関数に自動的に<literal>SCC</literal>を付加する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-prof-auto</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fprof-cafs</option></entry>
+	      <entry>全てのCAFに自動的に<literal>SCC</literal>を付加する</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-prof-cafs</option></entry>
+	    </row>
+	    <row>
+              <entry><option>-fno-prof-count-entries</option></entry>
+              <entry>進入回数を収集しない</entry>
+	      <entry>動</entry>
+              <entry><option>-fprof-count-entries</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-ticky</option></entry>
@@ -1756,13 +1826,13 @@
 	  <tbody>
 	    <row>
 	      <entry><option>-fasm</option></entry>
-	      <entry>ネイティブコード生成器を使う</entry>
+	      <entry><link linkend="native-code-gen">ネイティブコード生成器</link>を使う</entry>
 	      <entry>動</entry>
 	      <entry>-fllvm</entry>
 	    </row>
 	    <row>
 	      <entry><option>-fllvm</option></entry>
-	      <entry>LLVMを介してコンパイルする</entry>
+	      <entry><link linkend="llvm-code-gen">LLVMコード生成器</link>を使う</entry>
 	      <entry>動</entry>
 	      <entry>-fasm</entry>
 	    </row>
@@ -2651,8 +2721,14 @@
 	    </row>
 	    <row>
 	      <entry><option>-funregisterised</option></entry>
-	      <entry>非レジスタ化コンパイル(代わりに<option>-unreg</option>を使うこと)</entry>
+	      <entry><link linkend="unreg">非レジスタ化</link>コンパイル(代わりに<option>-unreg</option>を使うこと)</entry>
 	      <entry>静</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-fno-ghci-history</option></entry>
+	      <entry>GHCiのコマンドヒストリ<literal>ghci_history</literal>を読み書きしない。</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
