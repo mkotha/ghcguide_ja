@@ -157,45 +157,64 @@ int main(int argc, char *argv[])
 
         <para><literal>hs_init()</literal>に<literal>argc</literal>と<literal>argv</literal>への参照を渡している。これは、RTSへの引数(つまり、<literal>+RTS...-RTS</literal>の間の引数)を抽出できるようにするためである。</para>
 
-        <!-- 訳注: この表は削除されるべき -->
-	<informaltable>
-	 <tgroup cols="2" align="left" colsep="1" rowsep="1">
-	   <thead>
-	     <row>
-	       <entry>文字</entry>
-	       <entry>変換先</entry>
-	     </row>
-	   </thead>
-	   <tbody>
-	     <row>
-	       <entry><literal>.</literal></entry>
-	       <entry><literal>zd</literal></entry>
-	     </row>
-	     <row>
-	       <entry><literal>_</literal></entry>
-	       <entry><literal>zu</literal></entry>
-	     </row>
-	     <row>
-	       <entry><literal>`</literal></entry>
-	       <entry><literal>zq</literal></entry>
-	     </row>
-	     <row>
-	       <entry><literal>Z</literal></entry>
-	       <entry><literal>ZZ</literal></entry>
-	     </row>
-	     <row>
-	       <entry><literal>z</literal></entry>
-	       <entry><literal>zz</literal></entry>
-	     </row>
-	    </tbody>
-	  </tgroup>
-	</informaltable>
-
         <para>Haskellの関数を呼び出し終えた後、<literal>hs_exit()</literal>を呼んでRTSを終了させることができる。</para>
 
-        <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。<xref linkend="ffi-divergence" />を見よ。</para></footnote>を呼ぶ必要がある。</para>
+        <para><literal>hs_init()</literal>を複数回呼んでも良いが、毎回それに対応して一回(だけ)<literal>hs_exit()</literal><footnote><para>実際にシステムを脱初期化するのは最も外側の<literal>hs_exit()</literal>である。これが起きた後、GHCのランタイムシステムを信頼性のある方法で再初期化することは今のところできないことに注意。<xref linkend="infelicities-ffi" />を見よ。</para></footnote>を呼ぶ必要がある。</para>
 
 	<para>参考: 最終的なプログラムをリンクする際、通常最も簡単なのは、GHCを使ってリンクすることである。(絶対に必要な訳ではないが)。GHCを使うなら、フラグ<option>-no-hs-main</option><indexterm><primary><option>-no-hs-main</option></primary></indexterm>を使うことを忘れないように。さもないと、GHCは<literal>Main</literal>というHaskellモジュールをリンクしようとする。</para>
+
+        <para><literal>hs_init()</literal>とともに<literal>+RTS</literal>フラグを使うには、例に多少の変更を加えなければならない。デフォルトでは、GHCのRTSは「安全な」<literal>+RTS</literal>フラグ(<xref linkend="options-linker" />を見よ)のみを受け付け、これを変えるにはリンク時フラグ<option>-rtsopts</option><indexterm><primary><option>-rtsopts</option></primary></indexterm>を使う。しかし<option>-rtsopts</option>は<option>-no-hs-main</option>が使われているときには効果を持たない(<option>-with-rtsopts</option>も同様)。これらのオプションを設定するには、<literal>hs_init()</literal>の代わりにGHC固有のAPIを呼ぶ必要がある。</para>
+
+<programlisting>
+#include &lt;stdio.h&gt;
+#include "HsFFI.h"
+
+#ifdef __GLASGOW_HASKELL__
+#include "foo_stub.h"
+#include "Rts.h"
+#endif
+
+int main(int argc, char *argv[])
+{
+  int i;
+
+#if __GLASGOW_HASKELL__ >= 703
+  {
+      RtsConfig conf = defaultRtsConfig;
+      conf.rts_opts_enabled = RtsOptsAll;
+      hs_init_ghc(&amp;argc, &amp;argv, conf);
+  }
+#else
+  hs_init(&amp;argc, &amp;argv);
+#endif
+
+  for (i = 0; i &lt; 5; i++) {
+    printf("%d\n", foo(2500));
+  }
+
+  hs_exit();
+  return 0;
+}</programlisting>
+
+      <para>変更点が二つある。まず<literal>Rts.h</literal>をインクルードした。これはGHC固有の外部RTSインタフェースを定義する。そして<literal>hs_init_ghc()</literal>を呼ぶ代わりに、 <literal>RtsConfig</literal>型の引数を渡して<literal>hs_init_ghc()</literal>を呼んだ。<literal>RtsConfig</literal>は、ランタイムシステムの振る舞いに影響を与えるいろいろなフィールドを持つ構造体である。これの定義は以下。</para>
+
+<programlisting>
+typedef struct {
+    RtsOptsEnabledEnum rts_opts_enabled;
+    const char *rts_opts;
+} RtsConfig;
+
+extern const RtsConfig defaultRtsConfig;
+
+typedef enum {
+    RtsOptsNone,         // +RTSはエラーになる
+    RtsOptsSafeOnly,     // 安全なRTSオプションが許される。それ以外はエラー
+    RtsOptsAll           // 全てのRTSオプションが許される
+  } RtsOptsEnabledEnum;
+</programlisting>
+
+      <para>デフォルト値として<literal>defaultRtsConfig</literal>があり、<literal>RtsConfig</literal>型の変数の初期化に用いられるべきである。将来、<literal>RtsConfig</literal>にもっと多くのフィールドが加えられることは間違いないので、コードを前方互換に保つためには、上のコード例のように<literal>defaultRtsConfig</literal>で初期化してから必要なフィールドを変更するのが良い。</para>
+
       </sect3>
 
       <sect3 id="ffi-library">
@@ -234,7 +253,7 @@ int main(int argc, char *argv[])
 
       <para>Cの関数は、通常、Cのヘッダファイルでプロトタイプを使って宣言される。前の版のGHC(6.8.3以前)は、Haskellコードから生成されるCソースファイルにヘッダを<literal>&num;include</literal>していたので、FFIを介して呼ばれるCの関数が正しい型で呼ばれているかどうかを、Cコンパイラが検査することができた。</para>
 
-      <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、ネイティブコードのバックエンド(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、他言語呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された他言語呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に他言語呼び出しをインライン化できるようになるからである。</para>
+      <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、<ulink linkend="native-code-gen">ネイティブコードのバックエンド</ulink>(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、他言語呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された他言語呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に他言語呼び出しをインライン化できるようになるからである。</para>
 
       <para><literal>-&num;include</literal>オプションはもはや非推奨であり、Cabalのパッケージ仕様の中の<literal>include-files</literal>フィールドは無視される。</para>
 
