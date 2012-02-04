@@ -1,57 +1,3 @@
-originalだけに発見: codegens.xml
-diff -urd 7.2.2-original/debugging.xml original/debugging.xml
---- 7.2.2-original/debugging.xml	2011-11-10 02:10:39.000000000 +0800
-+++ original/debugging.xml	2012-02-02 02:10:32.000000000 +0800
-@@ -286,7 +286,19 @@
-                 <indexterm><primary><option>-ddump-asm</option></primary></indexterm>
- 	      </term>
- 	      <listitem>
--		<para>assembly language from the native-code generator</para>
-+            <para>assembly language from the
-+              <link linkend="native-code-gen">native code generator</link></para>
-+	      </listitem>
-+	    </varlistentry>
-+
-+	    <varlistentry>
-+	      <term>
-+	        <option>-ddump-llvm</option>:
-+                <indexterm><primary><option>-ddump-llvm</option></primary></indexterm>
-+	      </term>
-+	      <listitem>
-+	        <para>LLVM code from the <link linkend="llvm-code-gen">LLVM code
-+	          generator</link></para>
- 	      </listitem>
- 	    </varlistentry>
- 
-@@ -777,28 +789,6 @@
- 
-   </sect2>
- 
--  <sect2 id="unreg">
--    <title>Unregisterised compilation</title>
--    <indexterm><primary>unregisterised compilation</primary></indexterm>
--
--    <para>The term "unregisterised" really means "compile via vanilla
--    C", disabling some of the platform-specific tricks that GHC
--    normally uses to make programs go faster.  When compiling
--    unregisterised, GHC simply generates a C file which is compiled
--    via gcc.</para>
--
--    <para>Unregisterised compilation can be useful when porting GHC to
--    a new machine, since it reduces the prerequisite tools to
--    <command>gcc</command>, <command>as</command>, and
--    <command>ld</command> and nothing more, and furthermore the amount
--    of platform-specific code that needs to be written in order to get
--    unregisterised compilation going is usually fairly small.</para>
--
--   <para>Unregisterised compilation cannot be selected at
--   compile-time; you have to build GHC with the appropriate options
--   set.  Consult the GHC Building Guide for details.</para>
--  </sect2>
--
- </sect1>
- 
- <!-- Emacs stuff:
 diff -urd 7.2.2-original/ffi-chap.xml original/ffi-chap.xml
 --- 7.2.2-original/ffi-chap.xml	2011-11-10 02:10:39.000000000 +0800
 +++ original/ffi-chap.xml	2012-02-02 02:10:32.000000000 +0800
@@ -5067,7 +5013,7 @@ diff -urd 7.2.2-original/ug-ent.xml original/ug-ent.xml
 +<!ENTITY oldrelnotes2   SYSTEM "7.2.2-notes.xml" >
 +<!ENTITY relnotes1      SYSTEM "7.4.1-notes.xml" >
  <!ENTITY using          SYSTEM "using.xml" >
-+<!ENTITY code-gens      SYSTEM "codegens.xml" >
+ <!ENTITY code-gens      SYSTEM "codegens.xml" >
  <!ENTITY runtime        SYSTEM "runtime_control.xml" >
  <!ENTITY prof           SYSTEM "profiling.xml" >
  <!ENTITY debug          SYSTEM "debugging.xml" >
@@ -5284,8 +5230,8 @@ diff -urd 7.2.2-original/using.xml original/using.xml
  
    </sect1>
  
-+  &code-gens;
-+
+   &code-gens;
+ 
    &phases;
  
    &shared_libs;

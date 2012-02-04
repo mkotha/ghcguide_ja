@@ -270,7 +270,17 @@
                 <indexterm><primary><option>-ddump-asm</option></primary></indexterm>
 	      </term>
 	      <listitem>
-                <para>ネイティブコード生成器が出力するアセンブリ言語</para>
+                <para><link linkend="native-code-gen">ネイティブコード生成器</link>が出力するアセンブリ言語</para>
+	      </listitem>
+	    </varlistentry>
+
+	    <varlistentry>
+	      <term>
+	        <option>-ddump-llvm</option>:
+                <indexterm><primary><option>-ddump-llvm</option></primary></indexterm>
+	      </term>
+	      <listitem>
+	        <para><link linkend="llvm-code-gen">LLVMコード生成器</link>が出力するLLVMコード</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -696,17 +706,6 @@ Main.skip2{-r1L6-} =
 
     <para>(「これは一つの単純な関数型言語に過ぎない」はPeyton Jones Enterprises, plc.の非レジスタ化商標です。)</para>
 
-  </sect2>
-
-  <sect2 id="unreg">
-    <title>非レジスタ化コンパイル</title>
-    <indexterm><primary>unregisterised compilation</primary></indexterm>
-
-    <para>「非レジスタ化」という用語は実際には「純粋なCを介してコンパイルする」ということを意味している。つまり、通常GHCがプログラムを速くするために使うプラットフォーム固有の技を一部使わないということである。非レジスタ化コンパイルするときは、GHCは単純にgccでコンパイルできるCファイルを生成する。</para>
-
-    <para>非レジスタ化コンパイルはGHCを新しい機械に移植するときに便利である。これを使うと、予め必要なツールは<command>gcc</command>、<command>as</command>、<command>ld</command>だけになるし、さらに、非レジスタ化コンパイルが動作するようにするために書かなければならないプラットフォーム固有のコードは通常かなり少ないからである。</para>
-
-   <para>コンパイルの段階で非レジスタ化コンパイルを選ぶことはできない。GHCをビルドするときに適切なオプションを設定する必要があるのだ。詳細はGHCのビルドの手引きを参照せよ。</para>
   </sect2>
 
 </sect1>
