@@ -22,9 +22,7 @@ Loading package ffi-1.0 ... linking ... done.
 Prelude>
 </screen>
 
-    <para>GHCiがプレリュードと標準ライブラリをロードするのに少し時間が掛かるかもしれない。その後、プロンプトが表示される。バナーにある通り、<literal>:?</literal>と打ち込めば利用可能なコマンド一覧と、それぞれの短い説明が得られる。</para>
-
-    <para>これらのコマンドの大部分はこれから説明する。Hugsの利用者へ: 多くのことがHugsと同じように動作するので、すぐに使えるようになるはずである。</para>
+    <para>GHCiがプレリュードと標準ライブラリをロードするのに少し時間が掛かるかもしれない。その後、プロンプトが表示される。バナーにある通り、<literal>:?</literal>と打ち込めば利用可能なコマンド一覧と、それぞれの短い説明が得られる。これらの大部分はこれから説明する。また、全てのコマンドについての完全な文書が<xref linkend="ghci-commands" />にある。</para>
 
     <para>プロンプトでは、Haskellの式を入力することができる。</para>
     <indexterm><primary>prompt</primary><secondary>GHCi</secondary>
@@ -40,40 +38,8 @@ Prelude>
 
     <para>GHCiは行全体を一つの式だと解釈し、それを評価する。式は複数の行に渡っていてはいけない。エンターキーが押されると、GHCiは即座にそれを評価しようとする。</para>
 
-    <para>GHCiには複数行モード<indexterm><primary><literal>:set +m</literal></primary></indexterm>もあり、これは空行で終了する。次のように。</para>
-
-<screen>
-Prelude> :set +m
-Prelude> let x = 42 in x / 9
-Prelude|
-4.666666666666667
-Prelude>
-</screen>
-
+    <!-- 訳注: 次の段落は削除されるべき -->
     <para>Haskellでは、<literal>let</literal>式には<literal>in</literal>が続く。しかし、GHCiでは、式は<literal>IO</literal>モナドの中でも解釈され得るので、付属する<literal>in</literal>文のない<literal>let</literal>束縛は、上の例のように空行を使うことで示すことができる。</para>
-
-    <para>複数行モードは、モナドな<literal>do</literal>文を複数入力するのに便利である。</para>
-
-<screen>
-Control.Monad.State> flip evalStateT 0 $ do
-Control.Monad.State| i &lt;- get
-Control.Monad.State| lift $ do
-Control.Monad.State|   putStrLn "Hello World!"
-Control.Monad.State|   print i
-Control.Monad.State|
-"Hello World!"
-0
-Control.Monad.State>
-</screen>
-
-   <para>ユーザは、複数行の対話の途中で中断してトップレベルプロンプトに戻ることができる。</para>
-
-<screen>
-Prelude> do
-Prelude| putStrLn "Hello, World!"
-Prelude| ^C
-Prelude>
-</screen>
   </sect1>
 
   <sect1 id="loading-source-files">
@@ -367,6 +333,103 @@ xs :: [Integer]
 
     </sect2>
 
+    <sect2 id="ghci-multiline">
+      <title>複数行入力</title>
+
+      <para>上で言及した<literal>:{ ... :}</literal>構文による複数行入力の他に、GHCには<literal>:set +m</literal><indexterm><primary><literal>:set +m</literal></primary></indexterm>で有効になる複数行モードがある。このモードでは現在の文が終わっていない場合にGHCiが自動的にそれを検出し、さらに行を加えることを許す。複数行入力は空行で終わる。例を挙げる。</para>
+
+<screen>
+Prelude> :set +m
+Prelude> let x = 42
+Prelude|
+</screen>
+
+       <para>この<literal>let</literal>文には続けて束縛を加えることができるので、GHCiはプロンプトを変更して、次の行が続きであることを示している。レイアウトが有効なので、この<literal>let</literal>に束縛を加えるには行頭を揃える必要があることに注意。</para>
+
+<screen>
+Prelude> :set +m
+Prelude> let x = 42
+Prelude|     y = 3
+Prelude| 
+Prelude>
+</screen>
+
+       <para>通常通り、レイアウトの代わりに明示的な中括弧とセミコロンを使うこともできる。</para>
+
+<screen>
+Prelude> do {
+Prelude| putStrLn "hello"
+Prelude| ;putStrLn "world"
+Prelude| }
+hello
+world
+Prelude>
+</screen>
+
+       <para>閉じ中括弧の後では、現在の文が終わったことをGHCiが知っているので、空行が必要ないことに注意。</para>
+
+       <para>複数行モードはモナドな<literal>do</literal>の文を入力するのに便利である。</para>
+
+<screen>
+Control.Monad.State> flip evalStateT 0 $ do
+Control.Monad.State| i &lt;- get
+Control.Monad.State| lift $ do
+Control.Monad.State|   putStrLn "Hello World!"
+Control.Monad.State|   print i
+Control.Monad.State|
+"Hello World!"
+0
+Control.Monad.State>
+</screen>
+
+   <para>複数行での操作中、ユーザは中断して最上位のプロンプトに戻ることができる。</para>
+
+<screen>
+Prelude> do
+Prelude| putStrLn "Hello, World!"
+Prelude| ^C
+Prelude>
+</screen>
+    </sect2>
+
+    <sect2 id="ghci-decls">
+      <title>型、クラスおよびその他の宣言</title>
+
+      <para>[<emphasis role="bold">バージョン7.4.1の新機能</emphasis>] GHCiプロンプトではまた、Haskellの任意の最上位宣言を入力することができる。これには以下の各宣言が含まれる。<literal>data</literal>、<literal>type</literal>、<literal>newtype</literal>、<literal>class</literal>、<literal>instance</literal>、<literal>deriving</literal>、<literal>foreign</literal>。例を挙げる。</para>
+
+<screen>
+Prelude> data T = A | B | C deriving (Eq, Ord, Show, Enum)
+Prelude> [A ..]
+[A,B,C]
+Prelude> :i T
+data T = A | B | C      -- Defined at &lt;interactive>:2:6
+instance Enum T -- Defined at &lt;interactive>:2:45
+instance Eq T -- Defined at &lt;interactive>:2:30
+instance Ord T -- Defined at &lt;interactive>:2:34
+instance Show T -- Defined at &lt;interactive>:2:39
+</screen>
+
+    <para>通常の値の束縛と同様に、後で定義されたものは古い定義を隠すので、定義を再入力することでそれの問題を修正したり拡張したりできる。ただし落とし穴が一つある。新しい宣言が古いものを隠すとき、古い定義を参照している別の宣言があるかもしれない。覚えておくべきなのは、この古い型はまだ存在し、この別の宣言はまだ古い型を参照しているということである。しかし、古い型と新しい型は同名であるが、GHCiはこれらを別々のものとして扱う。例を示す。</para>
+
+<screen>
+Prelude> data T = A | B
+Prelude> let f A = True; f B = False
+Prelude> data T = A | B | C
+Prelude> f A
+
+&lt;interactive>:2:3:
+    Couldn't match expected type `main::Interactive.T'
+                with actual type `T'
+    In the first argument of `f', namely `A'
+    In the expression: f A
+    In an equation for `it': it = f A
+Prelude> 
+</screen>
+
+    <para>古い、隠された方の<literal>T</literal>はGHCiによって<literal>main::Interactive.T</literal>と表示されている。これは、新しい<literal>T</literal>(単に<literal>T</literal>と表示される)と区別しようとしてこうなっている。</para>
+
+    </sect2>
+
     <sect2 id="ghci-scope">
       <title>プロンプトで実際にスコープにあるのは何か</title>
 
@@ -374,7 +437,8 @@ xs :: [Integer]
 
 <screen>Prelude></screen>
 
-      <para>これは、<literal>Prelude</literal>モジュールの全てのものが現在スコープにあるということを示している。ここでファイルをGHCiにロードすると、プロンプトは次のように変わる。</para>
+      <para>これは、<literal>Prelude</literal>モジュールの全てのものが現在スコープにあるということを示している。可視な識別子は、ちょうど<literal>import</literal>宣言のないHaskellファイルで可視なものである。</para>
+      <para>ここでファイルをGHCiにロードすると、プロンプトは次のように変わる。</para>
 
 <screen>
 Prelude> :load Main.hs
@@ -390,24 +454,58 @@ Compiling Main             ( Main.hs, interpreted )
 
       <para>注意: 技術的な理由から、GHCiは解釈実行されるモジュールについてしか<literal>*</literal>形式をサポートしない。そのため、コンパイル済みモジュールとパッケージのモジュールは、それがエクスポートしたものでしかプロンプトのスコープに寄与できない。GHCiがモジュールの解釈実行版を使っていることを確実にするには、モジュールをロードする時に<literal>*</literal>を加えれば良い。例えば<literal>:load *M</literal>のように。</para>
 
-      <para>スコープは<literal>:module</literal>コマンドで操作できる。例えば、現在のスコープが<literal>Prelude</literal>なら、次のようにして、<literal>IO</literal>モジュールでエクスポートされたものをスコープに導入することができる。</para>
+      <para>モジュールをスコープに加えるには、通常のHaskellの<literal>import</literal>構文を使う。</para>
 
 <screen>
-Prelude> :module +IO
-Prelude IO> hPutStrLn stdout "hello\n"
+Prelude> import System.IO
+Prelude System.IO> hPutStrLn stdout "hello\n"
 hello
-Prelude IO>
+Prelude System.IO>
 </screen>
 
-      <para>(注意: 通常のHaskellの<literal>import</literal>構文を使うこともできるが、この場合<literal>*</literal>形式には対応しない)。また、<literal>:module</literal>は<literal>:m</literal>に短縮できる。<literal>:module</literal>コマンドの完全な構文は次の通り。</para>
+      <para><literal>hiding</literal>節と<literal>as</literal>節を含めて、完全なHaskellのimport構文に対応している。プロンプトは現在インポートされているモジュールを示すが、<literal>hiding</literal>や<literal>as</literal>などの詳細は省略される。詳しい事情を知りたければ、<literal>:show imports</literal>を使うことができる。</para>
+
+<screen>
+Prelude> import System.IO
+Prelude System.IO> import Data.Map as Map
+Prelude System.IO Map> :show imports
+import Prelude -- implicit
+import System.IO
+import Data.Map as Map
+Prelude System.IO Map>
+</screen>
+
+      <para><literal>Prelude</literal>のインポートがimplicitと標示されているのに注意。通常のHaskellモジュール内と同様に、明示的に<literal>Prelude</literal>をインポートすればそちらが優先される。</para>
+
+      <para>スコープを操作するもう一つの方法は<literal>:module</literal>コマンドである。これは、通常の<literal>import</literal>宣言では実現できないことをする方法を提供する。</para>
+      <itemizedlist>
+        <listitem>
+          <para><literal>:module</literal>は、モジュールに付く<literal>*</literal>修飾子に対応する。これは、単にモジュールがエクスポートしているものだけでなく、そのモジュールの完全な最上位スコープを開く。</para>
+        </listitem>
+        <listitem>
+          <para><literal>:module -M</literal>構文を使うと、文脈からモジュールを<emphasis>削除</emphasis>することができる。<literal>import</literal>構文は(Haskellモジュール内と同じく)累積的なので、これがスコープから一部を取り除く唯一の方法である。</para>
+        </listitem>
+      </itemizedlist>
+      <literal>:module</literal>コマンドの完全な構文は以下である。
 
 <screen>
 :module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable>
 </screen>
 
-      <para><literal>+</literal>を使えばモジュールが現在のスコープに加えられ、<literal>-</literal>では削除される。<literal>+</literal>も<literal>-</literal>もない場合は、指定されたモジュール群がそのままで現在のスコープになる。この形式を使って、しかも<literal>Prelude</literal>を含めなかった場合、GHCiは<literal>Prelude</literal>が実は必要とされていると推定し、それを追加することに注意せよ。(<literal>Prelude</literal>が必要ない場合は、<literal>:m -Prelude</literal>で削除すれば良い)。</para>
+      <para><literal>+</literal>を使えばモジュールが現在のスコープに加えられ、<literal>-</literal>では削除される。<literal>+</literal>も<literal>-</literal>もない場合は、指定されたモジュール群がそのままで現在のスコープになる。この形式を使って、しかも<literal>Prelude</literal>を含めなかった場合、GHCiは暗黙の<literal>Prelude</literal>インポートを自動的に追加する。</para>
 
-      <para><literal>:load</literal>コマンドが実行されると、直近にロードされた「ターゲット」モジュールがスコープとして自動的に設定される。このとき、可能なら<literal>*</literal>形式が使われる。例えば、<literal>:load foo.hs bar.hs</literal>と入力したとき、<filename>bar.hs</filename>には<literal>Bar</literal>というモジュールがあるとすると、スコープは、<literal>Bar</literal>が解釈実行されているなら<literal>*Bar</literal>になり、<literal>Bar</literal>がコンパイル済みなら<literal>Prelude Bar</literal>になる。(GHCiは<literal>Prelude</literal>が指定されておらず、しかも<literal>*</literal>形式のモジュールが一つもないとき、自動的に<literal>Prelude</literal>を付け加える)</para>
+      <para><literal>:load</literal>コマンドが実行されると、直近にロードされた「ターゲット」モジュールに対するインポートが自動的に追加される。このとき、可能なら<literal>*</literal>形式が使われる。例えば、<literal>:load foo.hs bar.hs</literal>と入力したとき、<filename>bar.hs</filename>には<literal>Bar</literal>というモジュールがあるとすると、スコープは、<literal>Bar</literal>が解釈実行されているなら<literal>*Bar</literal>になり、<literal>Bar</literal>がコンパイル済みなら<literal>Prelude Bar</literal>になる。(GHCiは<literal>Prelude</literal>が指定されておらず、しかも<literal>*</literal>形式のモジュールが一つもないとき、自動的に<literal>Prelude</literal>を付け加える)。これらの自動追加されたインポートは<literal>:show imports</literal>で見ることができる。
+
+<screen>
+Prelude> :load hello.hs
+[1 of 1] Compiling Main             ( hello.hs, interpreted )
+Ok, modules loaded: Main.
+*Main> :show imports
+:module +*Main -- added automatically
+*Main>
+</screen>
+
+      この自動追加されたインポートは、次に<literal>:load</literal>または<literal>:add</literal>または<literal>:reload</literal>を行なったときに別のものに置き換えられる。通常のインポートと同様に<literal>:module</literal>で削除することもできる。</para>
 
       <para>複数のモジュールがスコープにあるとき、特に複数の<literal>*</literal>形式のモジュールがあるときは、名前の衝突が起こりやすい。Haskellでは、名前の衝突は曖昧な識別子が使われたときのみ報告されると定められており、GHCiもプロンプトで入力される式についてこれに倣っている。</para>
 
@@ -422,11 +520,11 @@ Prelude IO>
 
         <itemizedlist>
           <listitem>
-            <para>現在<emphasis>ロードされている</emphasis>モジュールの集合。この集合は、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>によって変更される。
+            <para>現在<emphasis>ロードされている</emphasis>モジュールの集合。この集合は、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>によって変更され、<literal>:show modules</literal>で見ることができる。
             </para>
           </listitem>
           <listitem>
-            <para>現在<emphasis>スコープにある</emphasis>モジュールの集合。この集合は<literal>:module</literal>によって変更される。また、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の後に自動的に設定される</para>
+            <para>現在<emphasis>スコープにある</emphasis>モジュールの集合。この集合は<literal>import</literal>と<literal>:module</literal>によって変更される。また、上述のように<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の後に自動的に変更が加えられる</para>
           </listitem>
         </itemizedlist>
 
@@ -933,7 +1031,7 @@ a :: a
 
     <sect2 id="ghci-debugger-exceptions">
       <title>例外をデバッグする</title>
-      <para>もう一つデバッグ中によく発生する疑問として、「この例外はどこから来たんだ？」というものがある。<literal>error</literal>や<literal>head []</literal>によって発生する例外には文脈情報が付属していない。プログラム中のどの<literal>head</literal>の呼び出しがエラーの原因になったかを調べるのは骨の折れる作業であり、通常<literal>Debug.Trace.trace</literal>を使ったり、プロファイル付きでコンパイルして<literal>+RTS -xc</literal>(<xref linkend="prof-time-options"/>を見よ)を使ったりすることになる。</para>
+      <para>もう一つデバッグ中によく発生する疑問として、「この例外はどこから来たんだ？」というものがある。<literal>error</literal>や<literal>head []</literal>によって発生する例外には文脈情報が付属していない。プログラム中のどの<literal>head</literal>の呼び出しがエラーの原因になったかを調べるのは骨の折れる作業であり、通常<literal>Debug.Trace.trace</literal>を使ったり、プロファイル付きでコンパイルして<literal>Debug.Trace.traceStack</literal>や<literal>+RTS -xc</literal>(<xref linkend="prof-time-options"/>を見よ)を使ったりすることになる。</para>
 
       <para>GHCiデバッガの提供する方法を使うと、このようなエラーを素早く、かつコードを再コンパイルすることなしに突き止めることが、うまくすればできるかもしれない。一つの方法は、ソースコード中で例外を投げた場所にブレークポイントを設定し、<literal>:trace</literal>と<literal>:history</literal>を使って文脈を把握することだろう。しかし、<literal>head</literal>はライブラリ中にあり、そこに直接ブレークポイントを設定する訳にはいかない。このために、GHCiには<literal>-fbreak-on-exception</literal>フラグが用意されていて、これを使うと、例外が投げられた時に評価器が停止するようにできる。<literal>-fbreak-on-error</literal>も同様だが、これは例外が捕捉されなかった場合のみ停止する。例外によって停止したときは、GHCiはちょうどブレークポイントに当ったのと同じように振る舞うが、違いとして、ソースコード中の位置が表示されない。したがって、<literal>:trace</literal>と組み合わせて、例外が発生する直前のステップを記録するようにしないと、これらのコマンドはあまり有用でない。例えば次のように。</para>
 
@@ -1181,8 +1279,17 @@ $ ghci -lm
           <indexterm><primary><literal>:browse</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>module</replaceable>で定義されている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<replaceable>module</replaceable>が省略された場合、直近にロードされたモジュールが使われる。</para>
-          <para><literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>でスコープにある<emphasis>全ての</emphasis>識別子が表示される。そうでない場合、一覧は<replaceable>module</replaceable>がエクスポートしたものに限定される。<literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。このコマンドの後ろに<literal>!</literal>記号が置かれた場合、データ構築子とクラスメソッドは個々に表示される。そうでなければ、データ型宣言やクラス宣言の一部としてのみ表示される。<literal>!</literal>の形式では、さらに、項目をグループに分けて、それぞれについて可能なインポートについてのコメントを付加する。</para>
+          <para><replaceable>module</replaceable>からエクスポートされている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<replaceable>module</replaceable>が省略された場合、直近にロードされたモジュールが使われる。</para>
+	  <para>GHCiのコマンド全てと同様に、出力はGHCiの現在のスコープ(<xref linkend="ghci-scope"/>)で表示される。</para>
+
+          <para>browseコマンドには二つの変種がある。
+          <itemizedlist>
+          <listitem>
+            <para><literal>*</literal>記号がモジュール名の前に置かれたときは、<replaceable>module</replaceable>でスコープにある<emphasis>全ての</emphasis>識別子が(エクスポートされたものだけでなく)表示される。</para>
+            <para><literal>*</literal>形式は解釈実行されているモジュールに対してのみ有効である。コンパイル済みモジュール(パッケージ由来のモジュールも含む)に対しては非<literal>*</literal>形式の<literal>:browse</literal>のみが利用可能である。</para>
+          </listitem>
+          <listitem>
+          <para>データ構築子やクラスメソッドは通常データ型宣言やクラス宣言の一部として表示される。しかし、このコマンドの後ろに<literal>!</literal>記号が置かれた場合、これらが個々に表示される。<literal>!</literal>の形式は、さらに、項目をグループに分けて、それぞれについて可能なインポートについてのコメントを付加する。例を示す。
 <screen>
 Prelude> :browse! Data.Maybe
 -- not currently imported
@@ -1200,9 +1307,11 @@ data Maybe a = Nothing | Just a
 Nothing :: Maybe a
 maybe :: b -> (a -> b) -> Maybe a -> b
 </screen>
-  <para>
-    この出力が示すのは、現在のセッションの文脈(<literal>Prelude</literal>のスコープ)で、<literal>Data.Maybe</literal>の項目の最初の一団がインポートされておらず(ただしGHCiセッションでは完全修飾された形で利用できる。<xref linkend="ghci-scope"/>を見よ)、二番目の一団が<literal>Prelude</literal>を介してインポートされていて、修飾なし、あるいは<literal>Prelude.</literal>という修飾子付きの形式で利用できる、ということである。
+    この出力が示すのは、現在のセッションの文脈(<literal>Prelude</literal>のスコープ)で、<literal>Data.Maybe</literal>の項目の最初の一団はスコープになく(ただしGHCiセッションでは完全修飾された形で利用できる。<xref linkend="ghci-scope"/>を見よ)、二番目の一団は(<literal>Prelude</literal>を介して)スコープにあり、修飾なし、あるいは<literal>Prelude.</literal>という修飾子付きの形式で利用できる、ということである。
   </para>
+          </listitem>
+	</itemizedlist>
+      </para>
 	</listitem>
       </varlistentry>
 
@@ -1392,11 +1501,12 @@ Prelude> :. cmds.ghci
 
       <varlistentry>
 	<term>
-          <literal>:kind</literal> <replaceable>type</replaceable>
+          <literal>:kind</literal><optional><literal>!</literal></optional> 
+                        <replaceable>type</replaceable>
           <indexterm><primary><literal>:kind</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。</para>
+          <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。省略可能な"<literal>!</literal>"を指定した場合、GHCはさらに、型シノニムを展開して型関数の適用を評価することによって型を正規化し、その結果を表示する。</para>
 	</listitem>
       </varlistentry>
 
@@ -1635,6 +1745,16 @@ bar
 
       <varlistentry>
 	<term>
+          <literal>:show imports</literal>
+          <indexterm><primary><literal>:show imports</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para><literal>import</literal>コマンドや<literal>:module</literal>コマンドによって作られ現在効力を持っているインポートを表示する。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:show modules</literal>
           <indexterm><primary><literal>:show modules</literal></primary></indexterm>
         </term>
@@ -1772,7 +1892,7 @@ bar
             <indexterm><primary><literal>+m</literal></primary></indexterm>
           </term>
 	  <listitem>
-	    <para>複数行コマンドのパースを有効にする。複数行コマンドは、現在の行が閉じていないレイアウト文脈を含んでいる場合に受け付けられる。</para>
+	    <para>複数行コマンドのパースを有効にする。複数行コマンドは、現在の行が閉じていないレイアウト文脈を含んでいる場合に受け付けられる(<xref linkend="ghci-multiline" />を見よ)。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1815,16 +1935,16 @@ bar
     <sect2 id="ghci-cmd-line-options">
       <title>GHCiからGHCのコマンド行オプションを設定する</title>
 
-      <para>通常のGHCのコマンド行オプションを<literal>:set</literal>を使って設定することもできる。例えば、<option>-fglasgow-exts</option>を有効にするには、次のように入力すれば良い。</para>
+      <para>通常のGHCのコマンド行オプションを<literal>:set</literal>を使って設定することもできる。例えば、<option>-fwarn-missing-signatures</option>を有効にするには、次のように入力すれば良い。</para>
 
 <screen>
-Prelude> :set -fglasgow-exts
+Prelude> :set -fwarn-missing-signatures
 </screen>
 
       <para>GHCのコマンド行オプションのうち、<firstterm>動的な</firstterm>オプション(<xref linkend="flag-reference"/>の表を見よ)として設計されているものは全て、<literal>:set</literal>を使って有効にすることができる。オプションを無効にするには、逆の効果を持つオプションを有効にすれば良い。</para><indexterm><primary>dynamic</primary><secondary>options</secondary></indexterm>
 
 <screen>
-Prelude> :set -fno-glasgow-exts
+Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
 </screen>
 
       <para><xref linkend="flag-reference"/>には、可能なオプション全てについて逆の効果を持つオプションが記されている。</para>
@@ -1857,10 +1977,10 @@ Prelude> :set -fno-glasgow-exts
     </listitem>
    </orderedlist>
 
-    <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトがGHC拡張とCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
+    <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトが多引数の型クラスとスコープのある型変数ととCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
 
 <screen>
-:set -fglasgow-exts -cpp
+:set -XMultiParamTypeClasses -XScopedTypeVariables -cpp
 :set -iA:B:C
 </screen>
 
