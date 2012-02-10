@@ -106,7 +106,7 @@
 </title>
 
 <para>
-非ボックス化タプルは<literal>GHC.Exts</literal>でエクスポートされている訳ではなく、<option>-fglasgow-exts</option>が使われているときはそのままで使用可能である。非ボックス化タプルは次のような形をしている。
+非ボックス化タプルは<literal>GHC.Exts</literal>でエクスポートされている訳ではない。これは言語フラグ<option>-XUnboxedTuples</option>によって有効になる構文的拡張である。非ボックス化タプルは次のような形をしている。
 </para>
 
 <para>
@@ -137,7 +137,6 @@
 
 <para>
 非ボックス化タプル型の変数は存在し得ない。構築子や関数の引数が非ボックス化タプル型の引数を取ることはできない。以下の例は全て不正である。
-
 <programlisting>
   data Foo = Foo (# Int, Int #)
 
@@ -148,6 +147,14 @@
   g (# a,b #) = a
 
   h x = let y = (# x,x #) in ...
+</programlisting>
+</para>
+</listitem>
+<listitem>
+<para>
+非ボックス化タプルはネストできない。よってこれは許されない。
+<programlisting>
+f :: (# Int, (# Int, Int #), Bool #)
 </programlisting>
 </para>
 </listitem>
@@ -563,10 +570,22 @@ f ((view -> B, p3), p4) = e2
 
 <sect2 id="n-k-patterns">
 <title>n+kパターン</title>
-<indexterm><primary><option>-XNoNPlusKPatterns</option></primary></indexterm>
+<indexterm><primary><option>-XNPlusKPatterns</option></primary></indexterm>
 
 <para>
-<literal>n+k</literal>パターンへの対応はデフォルトで有効になっている。無効にするには、<option>-XNoNPlusKPatterns</option>フラグが使える。
+<literal>n+k</literal>パターンへの対応はデフォルトで無効になっている。有効にするには、<option>-XNPlusKPatterns</option>フラグが使える。
+</para>
+
+</sect2>
+
+    <!-- ===================== Traditional record syntax ===================  -->
+
+<sect2 id="traditional-record-syntax">
+<title>伝統的なレコード構文</title>
+<indexterm><primary><option>-XNoTraditionalRecordSyntax</option></primary></indexterm>
+
+<para>
+<literal>C {f = x}</literal>のような伝統的なレコード構文はデフォルトで有効になっている。無効にするには、<option>-XNoTraditionalRecordSyntax</option>フラグが使える。
 </para>
 
 </sect2>
@@ -646,7 +665,7 @@ class Monad m => MonadFix m where
 再帰的do記法を使うにあたって、他にもいくつか重要な点がある。
 <itemizedlist>
 <listitem><para>
-これは<literal>-XDoRec</literal>フラグで有効になる。このフラグは<literal>-fglasgow-exts</literal>で有効になる。
+これは<literal>-XDoRec</literal>フラグで有効になる。
 </para></listitem>
 
 <listitem><para>
@@ -748,7 +767,7 @@ employees = [ ("Simon", "MS", 80)
 
 output = [ (the dept, sum salary)
 | (name, dept, salary) &lt;- employees
-, then group by dept
+, then group by dept using groupWith
 , then sortWith by (sum salary)
 , then take 5 ]
 </programlisting>
@@ -757,7 +776,7 @@ output = [ (the dept, sum salary)
 [("Yale", 60), ("Ed", 85), ("MS", 180)]
 </programlisting>
 </para>
-<para>新しいキーワードが三つある。<literal>group</literal>、<literal>by</literal>、<literal>using</literal>である。(関数<literal>sortWith</literal>はキーワードではない。<literal>GHC.Exts</literal>からエクスポートされている普通の関数である。)</para>
+<para>新しいキーワードが三つある。<literal>group</literal>、<literal>by</literal>、<literal>using</literal>である。(関数<literal>sortWith</literal>と<literal>groupWith</literal>はキーワードではない。<literal>GHC.Exts</literal>からエクスポートされている普通の関数である。)</para>
 
 <para>内包表記修飾子の新しい形式が五つあり、すべて(既存の)キーワード<literal>then</literal>で導入される。
     <itemizedlist>
@@ -813,17 +832,6 @@ output = [ (the x, y)
     <para>関数<literal>the</literal>を使って、xの型をリストから元の数値型に戻したのに注意。対照的に、変数yは、グループ化によって導入されたリスト形式のままにしてある。</para>
 
     </listitem>
-
-    <listitem>
-
-<programlisting>
-then group by e
-</programlisting>
-
-    <para>この形式のグループ化は、要するに上述のものと同じだが、グループ化に用いられる関数が与えられていないので、代わりに<ulink url="&libraryBaseLocation;/GHC-Exts.html"><literal>GHC.Exts</literal></ulink>で定義されている<literal>groupWith</literal>が用いられる。最初の例で使ったグループ化の形式はこれである。</para>
-
-    </listitem>
-
 
     <listitem>
 
@@ -924,22 +932,9 @@ do (x,y) &lt;- take 2 (do x &lt;- [1..10]
             </para>
 
 <programlisting>
-[ x | x &lt;- [1,1,2,2,3], then group by x ]
 [ x | x &lt;- [1,1,2,2,3], then group by x using GHC.Exts.groupWith ]
 [ x | x &lt;- [1,1,2,2,3], then group using myGroup ]
 </programlisting>
-
-            <para>基本形の<literal>then group by e</literal>は<literal>mgroupWith</literal>関数を使って翻訳される。これには<ulink url="&libraryBaseLocation;/Control-Monad-Group.html"><literal>Control.Monad.Group</literal></ulink>で定義されている<literal>MonadGroup</literal>のインスタンスが必要である。</para>
-
-<programlisting>
-do x &lt;- mgroupWith (do x &lt;- [1,1,2,2,3]
-                       return x)
-   return x
-</programlisting>
-
-            <para>グループ化文によって<literal>x</literal>の型が変えられていることに注意。</para>
-
-            <para>グループ化関数を<literal>using</literal>を使って定義することもできる。</para>
 
         </listitem>
         <listitem>
@@ -977,7 +972,7 @@ do (x,y) &lt;- mzip (do x &lt;- [1..10]
 
 -- 基本形
 D[ e | ]               = return e
-D[ e | p &lt;- e, Q ]     = e &gt;&gt;= \p -&gt; D[ e | Q ]
+D[ e | p &lt;- e, Q ]  = e &gt;&gt;= \p -&gt; D[ e | Q ]
 D[ e | e, Q ]          = guard e &gt;&gt; \p -&gt; D[ e | Q ]
 D[ e | let d, Q ]      = let d in D[ e | Q ]
 
@@ -993,8 +988,6 @@ D[ e | Q then group using f, R ]      = f D[ Qv | Q ] &gt;&gt;= \ys -&gt;
                                         case (fmap selQv1 ys, ..., fmap selQvn ys) of
                                  	     Qv -&gt; D[ e | R ]
 
-D[ e | Q then group by b, R ]         = D[ e | Q then group by b using mgroupWith, R ]
-
 D[ e | Q then group by b using f, R ] = f (\Qv -&gt; b) D[ Qv | Q ] &gt;&gt;= \ys -&gt;
                                         case (fmap selQv1 ys, ..., fmap selQvn ys) of
                                            Qv -&gt; D[ e | R ]
@@ -1009,7 +1002,6 @@ return       GHC.Base               t1 -&gt; m t2
 (&gt;&gt;)         GHC.Base               m1 t1 -&gt; m2 t2         -&gt; m3 t3
 guard        Control.Monad          t1 -&gt; m t2
 fmap         GHC.Base               forall a b. (a-&gt;b) -&gt; n a -&gt; n b
-mgroupWith   Control.Monad.Group    forall a. (a -&gt; t) -&gt; m1 a -&gt; m2 (n a)
 mzip         Control.Monad.Zip      forall a b. m a -&gt; m b -&gt; m (a,b)
 </programlisting>
 内包表記は、それを脱糖したものが型検査に通るなら型検査に通るべきである。
@@ -1376,7 +1368,7 @@ import "network" Network.Socket
 <sect2 id="safe-imports-ext">
   <title>safeインポート</title>
 
-  <para><option>-XSafeImports</option>フラグを付けると、GHCはimport宣言の構文を拡張して<literal>import</literal>キーワードの後に任意で<literal>safe</literal>キーワードを受け取るようにする。この機能はSafe HaskellというGHC拡張の一部である。例えば、</para>
+  <para><option>-XSafe</option>、<option>-XTrustworthy</option>、<option>-XUnsafe</option>のいずれかのフラグを付けると、GHCはimport宣言の構文を拡張して<literal>import</literal>キーワードの後に任意で<literal>safe</literal>キーワードを受け取るようにする。この機能はSafe HaskellというGHC拡張の一部である。例えば、</para>
 
 <programlisting>
 import safe qualified Network.Socket as NS
@@ -1470,6 +1462,15 @@ import safe qualified Network.Socket as NS
 
       <varlistentry>
 	<term>
+	  <literal>'<replaceable>varid</replaceable></literal>
+	</term>
+	<listitem><para>
+	<option>-XTemplateHaskell</option>と<option>-XPolyKinds</option>によって盗まれる。
+	  </para></listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
 	  <literal>[:<replaceable>varid</replaceable>|</literal>
           <indexterm><primary>quasi-quotation</primary></indexterm>
 	</term>
@@ -1504,7 +1505,7 @@ import safe qualified Network.Socket as NS
 <sect2 id="nullary-types">
 <title>構築子のないデータ型</title>
 
-<para><option>-fglasgow-exts</option>フラグが指定されていると、構築子なしでデータ型を宣言できるようになる。例えば、以下のようにである。</para>
+<para><option>-XEmptyDataDecls</option>フラグ(または同等のLANGUAGEプラグマ)が指定されていると、構築子なしでデータ型を宣言できるようになる。例えば、以下のようにである。</para>
 
 <programlisting>
   data S      -- S :: *
@@ -2565,9 +2566,6 @@ Haskell 98では、次のようにしてパーサモナドを定義すること�
 <para>
 この節及び次の節では、型クラスに関するGHCの拡張を説明する。論文<ulink url="http://research.microsoft.com/~simonpj/Papers/type-class-design-space/" >Type classes: exploring the design space</ulink> (Simon Peyton Jones, Mark Jones, Erik Meijer)には、多くの背景事項が書かれている。
 </para>
-<para>
-これらの拡張は全て<option>-fglasgow-exts</option>フラグで有効になる。
-</para>
 
 <sect3>
 <title>多引数の型クラス</title>
@@ -2615,6 +2613,17 @@ Haskell 98と同様に、クラス階層に循環があってはならない。�
 
 この場合、<literal>C</literal>は<literal>D</literal>のスーパークラスであるが、<literal>C</literal>のクラス演算である<literal>op</literal>が<literal>D</literal>に言及するのは問題ない。(<literal>D</literal>を<literal>C</literal>のスーパークラスにするのは駄目である)
 </para>
+<para><link linkend="constraint-kind">制約の種</link>を追加する拡張を使うと、さらに風変りなスーパークラス定義を書くことができる。この場合、スーパークラス循環の検査はさらに緩和される。たとえばこれは問題ない。
+
+<programlisting>
+  class A cls c where
+    meth :: cls c => c -> c
+
+  class A B c => B c where
+</programlisting>
+
+クラス<literal>C</literal>のスーパークラス文脈が許されるのは、型シノニムをその右辺へと展開し、使われている(<literal>C</literal>以外の)クラスをそれらのスーパークラスへと展開したときに、構文的にその文脈内に<literal>C</literal>が現れない場合である。
+</para>
 </sect3>
 
 
@@ -2638,7 +2647,7 @@ Haskell 98では<literal>elem</literal>の型は不正である。制約<literal
 
 
 <sect3 id="class-default-signatures">
-<title>デフォルトシグネチャ</title>
+<title>デフォルトメソッドシグネチャ</title>
 
 <para>
 Haskell 98は、クラスを宣言する際にデフォルト実装を定義することを許している。以下のように。
@@ -3238,21 +3247,6 @@ data family Array :: * -> *
 </programlisting>
     </para>
 
-    <sect4 id="assoc-data-family-decl">
-      <title>関連データ族宣言</title>
-      <para>データ族が型クラスの一部として宣言される場合、特別子<literal>family</literal>は使わない。<literal>GMap</literal>の宣言は次のような形をとる。
-<programlisting>
-class GMapKey k where
-  data GMap k :: * -> *
-  ...
-</programlisting>
-最上位の宣言とは対照的に、型添字として使われる予定の全ての型パラメタについて、名前付き引数が用いられねばならない。さらに、それらの引数名はクラスのパラメタでなければならない。それぞれのクラスパラメタは一つの関連型につき一回しか使えないが、使われないクラスパラメタがあってもよく、順序はクラス頭部と異っていてもよい。従って、以下の人為的な例は正当である。
-<programlisting>
-  class C a b c where
-  data T c a :: *
-</programlisting>
-      </para>
-    </sect4>
   </sect3>
 
   <sect3 id="data-instance-declarations">
@@ -3300,7 +3294,7 @@ foo B = 2             -- ...型エラーが発生する
 </programlisting>
 代わりに、<literal>foo</literal>をクラスの演算として書かなければならないだろう。
 <programlisting>
-class C a where
+class Foo a where
   foo :: T a -> Int
 instance Foo Int where
   foo A = 1
@@ -3309,103 +3303,12 @@ instance Foo Char where
 </programlisting>
 (GADT(一般化代数的データ型)の提供する機能を見ると、上のような定義が可能であるべきだと思えるかもしれない。しかし、型族は、GADTとは対照的に、<emphasis>開かれて</emphasis>いる。つまり、常に新しいインスタンスを加えることが可能な(しかも別モジュールでかもしれない)のである。異なるデータインスタンスに跨がるパターン照合に対応するには、一種の拡張可能なcase構造が必要になることだろう。)
     </para>
+    </sect3>
 
-    <sect4 id="assoc-data-inst">
-      <title>関連データインスタンス</title>
-      <para>関連データ族インスタンスが型クラスインスタンスの中で宣言される場合、族インスタンスにおける<literal>instance</literal>キーワードは使わない。そのため、<literal>GMap</literal>の<literal>Either</literal>インスタンスは次のようになる。
-<programlisting>
-instance (GMapKey a, GMapKey b) => GMapKey (Either a b) where
-  data GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
-  ...
-</programlisting>
-関連族インスタンスに関して最も重要な点は、クラスパラメタに対応する型添字が、インスタンス頭部で与えられる型と同一でなければならないということである。この例ではこれは<literal>GMap</literal>の第一引数である<literal>Either a b</literal>であるが、これは(一つしかない)クラスパラメタと同じになっている。族構築子の引数のうち、クラスパラメタに対応しないものは、すべてのインスタンスにおいて変数でなければならない。ここではこれは変数<literal>v</literal>である。
-      </para>
-      <para>関連族のインスタンスは、その族が宣言されたクラスのインスタンス宣言の一部としてしか、現れることができない。これはクラスのメソッドの等式についてと同じである。また、これもメソッドの扱いと対応するが、クラスインスタンスにおいて関連型の宣言を省略することができる。関連族インスタンスが省略された場合、それに対応するインスタンス型は無内容(not inhabited)になる。すなわち、<literal>undefined</literal>などの発散する式のみがその型を持てる。
-      </para>
-    </sect4>
-
-    <sect4 id="scoping-class-params">
-      <title>クラスパラメタのスコープ規則</title>
-      <para>多引数の型クラスの場合、クラスパラメタが関連族インスタンスの右辺から可視かどうかは、そのデータ族のパラメタによって<emphasis>のみ</emphasis>決まる。例として、次の単純なクラス宣言を考える。
-<programlisting>
-class C a b where
-  data T a
-</programlisting>
-二つのクラスパラメタのうち一つだけがデータ族のパラメタになっている。このため、次のインスタンス宣言は不正である。
-<programlisting>
-instance C [c] d where
-  data T [c] = MkT (c, d)    -- 間違ってるよ!!  「d」はスコープにない
-</programlisting>
-ここでは、データインスタンスの左辺に現れない型変数<literal>d</literal>が右辺で言及されている。このようなデータインスタンスを認めると型安全性を犠牲にすることになるので、これは認められていない。
-      </para>
-    </sect4>
-
-    <sect4 id="family-class-inst">
-      <title>族インスタンスについての型クラスインスタンス</title>
-      <para>データ族のインスタンスについての型クラスインスタンスは通常と同じように定義できる。特に、データインスタンス宣言は<literal>deriving</literal>節を持つことができる。例えば、以下のように書くことができる。
-<programlisting>
-data GMap () v = GMapUnit (Maybe v)
-               deriving Show
-</programlisting>
-これは、以下のような形のインスタンスを暗黙に定義する。
-<programlisting>
-instance Show v => Show (GMap () v) where ...
-</programlisting>
-      </para>
-      <para>クラスインスタンスは常にデータ族の特定の<emphasis>インスタンス</emphasis>を対象にするのであって、族全体を対象にするのではないことに注意。この理由は、本質的には、一つの型族の<emphasis>異なる</emphasis>インスタンスのデータ構築子についてパターン照合を行う最上位の関数を定義できない理由と同じである。これには、一種の拡張可能なcase構造が必要になるだろう。
-      </para>
-    </sect4>
-
-    <sect4 id="data-family-overlap">
+    <sect3 id="data-family-overlap">
       <title>データインスタンスの重複</title>
       <para>一つのプログラムの中で、あるデータ族のインスタンス宣言に少しでも重複部分があってはならない。このことは関連族であるかそうでないかによらない。型クラスのインスタンスの場合と異なり、これは単なる整合性の問題ではなく、型安全性の問題である。
       </para>
-    </sect4>
-
-  </sect3>
-
-  <sect3 id="data-family-import-export">
-    <title>インポートとエクスポート</title>
-
-    <para>型族とデータ構築子の関連は、通常のデータ型やnewtypeの宣言の場合と比べて動的である。通常の場合、インポートリストやエクスポートリストにおける<literal>T(..)</literal>という記法は、その型構築子と、その宣言で導入された全てのデータ構築子を記述するものである。一方、族宣言はデータ構築子を導入することがない。代わりにデータ構築子は族インスタンスによって導入される。結果として、ある型族にどのデータ構築子が関連しているかは、その族についてのインスタンス宣言として今どれが可視であるかに依存する。従って、<literal>T(..)</literal>という形のインポート/エクスポート項目は、その族構築子と、それのデータ構築子のうちで現在可視であるもの全てを表す。エクスポート項目の場合、これにはそのモジュールにインポートされたものも、そのモジュールで定義されたものも含まれる。<literal>GMap(GMapEither)</literal>のように、データ構築子を明示的に列挙したエクスポート/インポート項目の扱いも同様である。
-    </para>
-
-    <sect4 id="data-family-impexp-assoc">
-      <title>関連族</title>
-      <para>期待される通り、<literal>C(..)</literal>という形式のインポート/エクスポート項目は、そのクラスのメソッドと関連型全てを示す。しかし、クラス項目の中の項目として関連型が明示的に列挙される場合、なんらかの新しい構文が必要になる。なぜなら、クラス項目の中に出現する大文字の項目は通常データ構築子であって型構築子ではないからである。ここでは、型を示しているということを明確にするために、個々の関連型の名前の前に<literal>type</literal>を置く必要がある。よって、例えば、<literal>GMapKey</literal>クラスの内容を明示的に列挙する場合、<literal>GMapKey(type GMap, empty, lookup, insert)</literal>と書く。
-      </para>
-    </sect4>
-
-    <sect4 id="data-family-impexp-examples">
-      <title>例</title>
-      <para>ここまで使ってきた<literal>GMapKey</literal>クラスの例を使って、エクスポートリストとその意味をいくつか見てみよう。
-	<itemizedlist>
-	  <listitem>
-	    <para><literal>module GMap (GMapKey) where...</literal>: クラス名だけをエクスポートする。</para>
-	  </listitem>
-	  <listitem>
-	    <para><literal>module GMap (GMapKey(..)) where...</literal>: クラスと、関連型<literal>GMap</literal>と、メンバ関数<literal>empty</literal>、<literal>lookup</literal>、<literal>insert</literal>をエクスポートする。データ構築子は全くエクスポートされない。</para>
-	  </listitem>
-	  <listitem>
-	    <para><literal>module GMap (GMapKey(..), GMap(..)) where...</literal>: 上と同じだが、データ構築子<literal>GMapInt</literal>、<literal>GMapChar</literal>、<literal>GMapUnit</literal>、<literal>GMapPair</literal>、<literal>GMapUnit</literal>をもエクスポートする。</para>
-	  </listitem>
-	  <listitem>
-	    <para><literal>module GMap (GMapKey(empty, lookup, insert), GMap(..)) where...</literal>: 上と同じ。</para>
-	  </listitem>
-	  <listitem>
-	    <para><literal>module GMap (GMapKey, empty, lookup, insert, GMap(..)) where...</literal>: 上と同じ。</para>
-	  </listitem>
-	</itemizedlist>
-      </para>
-      <para>最後に、<literal>GMapKey(type GMap)</literal>と書くことで、クラス<literal>GMapKey</literal>とその関連型<literal>GMap</literal>の両方を表すことができる。しかし、<literal>GMapKey(type GMap(..))</literal>と書くことはできない。つまり、内容指定は入れ子にできないのである。<literal>GMap</literal>のデータ構築子を指定するなら、<literal>GMap</literal>を(訳注: <literal>GMapKey</literal>とは)別に書かねばならない。
-      </para>
-    </sect4>
-
-    <sect4 id="data-family-impexp-instances">
-      <title>インスタンス</title>
-      <para>クラスインスタンスと同様に、族インスタンスは暗黙にインポートされる。ただし、これはインスタンスの頭部についてだけで、インスタンスが定義するデータ構築子には適用されない。
-      </para>
-    </sect4>
 
   </sect3>
 
@@ -3441,23 +3344,6 @@ F IO Bool          -- 誤 最初の引数で種が不一致
 F Bool             -- 誤 適用が飽和していない
 </programlisting>
       </para>
-
-    <sect4 id="assoc-type-family-decl">
-      <title>関連型族宣言</title>
-      <para>型族が型クラスの一部として宣言される場合、<literal>family</literal>特別子は使わない。<literal>Elem</literal>の宣言は次のような形になる。
-<programlisting>
-class Collects ce where
-  type Elem ce :: *
-  ...
-</programlisting>
-型族の引数名はクラスパラメタでなければならない。各クラスパラメタは一つの関連型について一回しか出現してはならないが、一回も出現しないものがあったり、クラスの頭部と異なる順序であっても良い。よって、以下の人為的な例は認められる。
-<programlisting>
-class C a b c where
-  type T c a :: *
-</programlisting>
-これらの規則は関連データ族の場合とまったく同じである。
-      </para>
-    </sect4>
   </sect3>
 
   <sect3 id="type-instance-declarations">
@@ -3481,23 +3367,9 @@ type instance G Int            = (,)     -- 誤: 引数は二つでないとい�
 type instance G Int Char Float = Double  -- 誤: 引数は二つでないといけない
 </programlisting>
     </para>
+    </sect3>
 
-    <sect4 id="assoc-type-instance">
-      <title>関連型インスタンス宣言</title>
-      <para>型クラスインスタンスの中で関連族インスタンスを宣言するときは、族インスタンス中に<literal>instance</literal>キーワードを使わない。よって、<literal>Elem</literal>の<literal>[e]</literal>インスタンスは次のようになる。
-<programlisting>
-instance (Eq (Elem [e])) => Collects ([e]) where
-  type Elem [e] = e
-  ...
-</programlisting>
-関連族インスタンスに関して最も重要なのは、クラスパラメタに対応する型添字が、インスタンス頭部で与えられたものと同一であることである。これはここでは<literal>[e]</literal>であり、一つしかないクラスパラメタと一致している。
-      </para>
-      <para>
-関連族のインスタンスは、その族が宣言されたクラスについてのインスタンス宣言の一部としてしか現れ得ない。クラスのメソッドの等式とちょうど同じである。また、同じくメソッドの扱いに対応することとして、クラスインスタンス中での関連型の宣言を省くことができる。関連型族インスタンスが省かれた場合、対応するインスタンス型は無内容(not inhabited)になる。すなわち、<literal>undefined</literal>のような発散する式以外に、その型を持てる式は存在しない。
-      </para>
-    </sect4>
-
-    <sect4 id="type-family-overlap">
+    <sect3 id="type-family-overlap">
       <title>型シノニムインスタンスの重複</title>
       <para>
 ある一つのプログラム内で使われる型族のインスタンス宣言に関して、重複が許されるのは、重複するインスタンスの右辺が共通部分の型に対しては一致する場合だけである。より形式的に言うと、二つのインスタンス宣言が重複するとは、インスタンスの左辺を構文的に一致させるような代入(substitution)が存在するときである。これに該当する場合は必ず、この同じ代入のもとでインスタンスの右辺も構文的に同じにならなければならない。この条件は族が関連族であるかどうかに拠らない。また、これは単なる整合性の問題ではなく、型安全性の問題である。
@@ -3512,9 +3384,9 @@ type instance G (a, Int)  = [a]
 type instance G (Char, a) = [a]  -- 非合法な重複、[Char] /= [Int]であるため
 </programlisting>
       </para>
-    </sect4>
+    </sect3>
 
-    <sect4 id="type-family-decidability">
+    <sect3 id="type-family-decidability">
       <title>型シノニムインスタンスの決定可能性</title>
       <para>
 	      型族の存在下での型推論が決定可能であることを保証するため、型インスタンス宣言の形式に追加で制限を課す必要がある。(&ldquo;<ulink url="http://www.cse.unsw.edu.au/~chak/papers/SPCS08.html">Type Checking with Open Type Functions</ulink>&rdquo;のDefinition 5 (Relaxed Condition)も参照)。インスタンス宣言の一般形式は次の通りである。
@@ -3536,39 +3408,203 @@ type instance F t1 .. tn = t
 これらの制限は容易に検査することができ、型インスタンスが停止することを保証する。しかし、<literal>a ~ [F a]</literal>のように、型構築子が族適用とデータ構築子適用の下にある、いわゆる「ループ的同値」の存在下では、型推論の完全性を保証するのに足りない。詳細については上で挙げた論文を参照のこと。</para>
       <para><option>-XUndecidableInstances</option>オプションがコンパイラに渡されると、上記の制約は強制されず、型推論中に型族の正規化が停止することを保証するのはプログラマの責任になる。
       </para>
-    </sect4>
-  </sect3>
+    </sect3>
+  </sect2>
 
-  <sect3 id="equality-constraints">
-    <title>同値性制約</title>
-    <para>型文脈には<literal>t1 ~ t2</literal>という形の同値性制約を含めることができる。これは、<literal>t1</literal>と<literal>t2</literal>の二つの型が同じでなければならないということを示す。型族の存在下では、一般に二つの型が等しいかどうかを局所的に決めることは出来ない。このため、次の例のように、関数のシグネチャの文脈に同値性制約が使われることがある。
-<programlisting>
-sumCollects :: (Collects c1, Collects c2, Elem c1 ~ Elem c2) => c1 -> c2 -> c2
-</programlisting>
-ここでは、<literal>c1</literal>と<literal>c2</literal>の要素の型が同じであることを要求している。一般に、同値性制約における<literal>t1</literal>と<literal>t2</literal>は任意の単相型であってよい。単相型であるというのは、ランクの高い型が有効になっているかどうかにかかわらず、量化子を含んでいてはならないということである。
-    </para>
-    <para>
-同値性制約は、クラスとインスタンスの文脈でも使うことができる。前者によって、関数従属を使うプログラムから、代わりに族シノニムを使うプログラムへの、単純な翻訳が出来るようになる。一般的な考え方として、次のような形のクラス宣言があったとする。
-<programlisting>
-class C a b | a -> b
-</programlisting>
-これを、以下のように書き換える。
-<programlisting>
-class (F a ~ b) => C a b where
-  type F a
-</programlisting>
-つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の同値性で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
-    </para>
-  </sect3>
 
-  <sect3 id="ty-fams-in-instances">
+<sect2 id="assoc-decl">
+<title>関連データ族と関連型族</title>
+<para>
+データまたは型シノニムを型クラスの一部として宣言することができる。次にように。
+<programlisting>
+class GMapKey k where
+  data GMap k :: * -> *
+  ...
+
+class Collects ce where
+  type Elem ce :: *
+  ...
+</programlisting>
+このようにするとき、「<literal>family</literal>」キーワードは使わない。
+</para>
+<para>型パラメタはもちろん全て型変数でなければならない。そして、そのうちのいくつか(全部でなくてよい)はクラスパラメタであってよい。個々のクラスパラメタは関連型一個につき高々一回しか使われてはならないが、使われないものがあっても良いし、クラス頭部とは違う順番であっても良い。よって、次の不自然な例は許容される。
+<programlisting>
+  class C a b c where
+    type T c a x :: *
+</programlisting>
+        ここで<literal>c</literal>と<literal>a</literal>はクラスパラメタであるが、この型は第三のパラメタ<literal>x</literal>によっても添字付けされている。
+      </para>
+
+    <sect3 id="assoc-data-inst">
+      <title>関連インスタンス</title>
+      <para>関連データ族インスタンスや関連型シノニムインスタンスが型クラスインスタンスの中で宣言される場合、族インスタンスにおける<literal>instance</literal>キーワードは使わない。
+<programlisting>
+instance (GMapKey a, GMapKey b) => GMapKey (Either a b) where
+  data GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
+  ...
+
+instance (Eq (Elem [e])) => Collects ([e]) where
+  type Elem [e] = e
+  ...
+</programlisting>
+関連族インスタンスに関して最も重要な点は、クラスパラメタに対応する型添字が、インスタンス頭部で与えられる型と同一でなければならないということである。この例ではこれは<literal>GMap</literal>の第一引数である<literal>Either a b</literal>であるが、これは(一つしかない)クラスパラメタと同じになっている。
+</para>
+      <para>関連族のインスタンスは、その族が宣言されたクラスのインスタンス宣言の一部としてしか現れることができない。これはクラスのメソッドの等式と同じである。また、これもメソッドの扱いと対応するが、クラスインスタンスにおいて関連型の宣言を省略することができる。関連族インスタンスが省略された場合、それに対応するインスタンス型は無内容(not inhabited)になる。すなわち、<literal>undefined</literal>などの発散する式のみがその型を持てる。</para>
+      <para>珍しいことだが、単一のインスタンス宣言の中に、ある関連族のインスタンスが<emphasis>複数</emphasis>あってもよい。たとえば、次のものは合法である。
+<programlisting>
+instance GMapKey Flob where
+  data GMap Flob [v] = G1 v
+  data GMap Flob Int = G2 Int
+  ...
+</programlisting>
+ここでは二つのデータインスタンス宣言を与えている。片方では最後のパラメタが<literal>[v]</literal>であり、もう片方では<literal>Int</literal>である。<emphasis>これ以降に</emphasis><literal>(GMap Flob ...)</literal>のインスタンスを与えることができないので、この機能は、自由な添字変数の種が(<literal>*</literal>とは違って)有限個の選択肢から成る場合に最も便利である。
+      </para>
+    </sect3>
+
+    <sect3 id="assoc-decl-defs">
+    <title>関連型シノニムのデフォルト</title>
+      <para>関連型を定義するクラスは、関連型インスタンスのためにデフォルトを指定することができる。よってこれは問題ない。
+<programlisting>
+class IsBoolMap v where
+  type Key v
+  type Key v = Int
+
+  lookupKey :: Key v -> v -> Maybe Bool
+
+instance IsBoolMap [(Int, Bool)] where
+  lookupKey = lookup
+</programlisting>
+
+重複部分がない限り、一つの型に複数のデフォルトがあっても良い。
+<programlisting>
+class C a where
+  type F a b
+  type F a Int  = Bool
+  type F a Bool = Int
+</programlisting>
+
+関連<emphasis>データ</emphasis>型についてはデフォルト宣言は認められない。
+      </para>
+    </sect3>
+
+    <sect3 id="scoping-class-params">
+      <title>クラスパラメタのスコープ規則</title>
+      <para>クラスパラメタが関連族インスタンスの右辺から可視かどうかは、そのデータ族のパラメタ<emphasis>のみ</emphasis>によって決まる。例として、次の単純なクラス宣言を考える。
+<programlisting>
+class C a b where
+  data T a
+</programlisting>
+二つのクラスパラメタのうち一つだけがデータ族のパラメタになっている。このため、次のインスタンス宣言は不正である。
+<programlisting>
+instance C [c] d where
+  data T [c] = MkT (c, d)    -- 間違ってるよ!!  「d」はスコープにない
+</programlisting>
+ここでは、データインスタンスの左辺に現れない型変数<literal>d</literal>が右辺で言及されている。このようなデータインスタンスを認めると型安全性を犠牲にすることになるので、これは認められていない。
+      </para>
+    </sect3>
+  </sect2>
+
+  <sect2 id="data-family-import-export">
+    <title>インポートとエクスポート</title>
+
+    <para>エクスポートリストのための規則(Haskell Reportの<ulink url="http://www.haskell.org/onlinereport/modules.html#sect5.2">5.2節</ulink>)は、型族を扱えるように調整する必要がある。
+<itemizedlist>
+<listitem><para><literal>T(..)</literal>という形、ただし<literal>T</literal>はデータ族。これは<literal>T</literal>と、<literal>T</literal>のデータインスタンスである構築子のうち(修飾形であれ非修飾形であれ)スコープにあるもの全てを指名する。
+  </para></listitem>
+<listitem><para>
+<literal>T(.., ci, .., fj, ..)</literal>という形、ただし<literal>T</literal>はデータ族。これは通常と同様に、<literal>T</literal>と、指定された構築子<literal>ci</literal>およびフィールド<literal>fj</literal>を指名する。構築子とフィールドは<literal>T</literal>のデータインスタンスのいずれかに属していなければならないが、<emphasis>同じもの</emphasis>に属している必要はない。
+  </para></listitem>
+<listitem><para>
+<literal>C(..)</literal>という形、ただし<literal>C</literal>はクラス。これは、クラス<literal>C</literal>と、そのメソッド全てと、<emphasis>その関連型</emphasis>を指名する。
+  </para></listitem>
+<listitem><para>
+<literal>C(.., mi, .., type Tj, ..)</literal>という形、ただし<literal>C</literal>はクラス。これは、クラス<literal>C</literal>と、指定されたメソッド<literal>mi</literal>および関連型<literal>Tj</literal>を指名する。データ構築子と区別するために、型には「<literal>type</literal>」キーワードが必要である。
+  </para></listitem>
+</itemizedlist>
+</para>
+
+    <sect3 id="data-family-impexp-examples">
+      <title>例</title>
+      <para>ここまで使ってきた<literal>GMapKey</literal>クラスの例を思い出して欲しい。
+<programlisting>
+class GMapKey k where
+  data GMap k :: * -> *
+  insert :: GMap k v -> k -> v -> GMap k v
+  lookup :: GMap k v -> k -> Maybe v
+  empty  :: GMap k v
+
+instance (GMapKey a, GMapKey b) => GMapKey (Either a b) where
+  data GMap (Either a b) v = GMapEither (GMap a v) (GMap b v)
+  ...method declarations...
+</programlisting>
+以下に、エクスポートリストいくつかと、その意味を記す。
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>module GMap( GMapKey )</literal>: クラス名のみをエクスポートする。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap( GMapKey(..) )</literal>: クラス、関連型<literal>GMap</literal>、メンバ関数<literal>empty</literal>、<literal>lookup</literal>、<literal>insert</literal>をエクスポートする。<literal>GMap</literal>のデータ構築子(この場合は<literal>GMapEither</literal>)はエクスポートされない。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap( GMapKey( type GMap, empty, lookup, insert ) )</literal>: 前項と同じ。「<literal>type</literal>」キーワードに注意。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap( GMapKey(..), GMap(..) )</literal>:
+              前項と同じだが、<literal>GMap</literal>の全ての構築子、つまり<literal>GMapEither</literal>もエクスポートする。</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap ( GMapKey( empty, lookup, insert), GMap(..) )</literal>:
+              前項と同じ</para>
+	  </listitem>
+	  <listitem>
+	    <para><literal>module GMap ( GMapKey, empty, lookup, insert, GMap(..) )</literal>:
+              前項と同じ</para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+      <para>
+注意点を二つ。
+  <itemizedlist>
+      <listitem><para>
+        <literal>GMapKey(type GMap(..))</literal>と書くことはできない。つまり、内容指定は入れ子にできない。<literal>GMap</literal>のデータ構築子を指定するなら、それを別に書かねばならない。
+      </para></listitem>
+      <listitem><para>
+  次の例を考えよ
+<programlisting>
+  module X where
+    data family D
+
+  module Y where
+    import X
+    data instance D Int = D1 | D2
+</programlisting>
+    モジュールYは、Yで定義された全ての実体をエクスポートする。つまりデータ構築子<literal>D1</literal>および<literal>D2</literal>をエクスポートするが、<emphasis>データ型族<literal>D</literal>はエクスポートしない</emphasis>。これは(うっとおしいことに)「<literal>import Y( D(D1,D2) )</literal>」としてYを選択的にインポートすることができないこをと意味する。Yが<literal>D</literal>をエクスポートしていないからである。こうする代わりに、エクスポートリストを明示的に指定するべきである。次のように。
+<programlisting>
+        module Y( D(..) ) where ...
+または  module Y( module Y, D ) where ...
+</programlisting>
+      </para></listitem>
+  </itemizedlist>
+</para>
+</sect3>
+
+    <sect3 id="data-family-impexp-instances">
+      <title>インスタンス</title>
+      <para>クラスインスタンスと同様に、族インスタンスは暗黙にインポートされる。ただし、これはインスタンスの頭部についてだけ適用される。インスタンスが定義するデータ構築子には適用されない。
+      </para>
+    </sect3>
+
+  </sect2>
+
+  <sect2 id="ty-fams-in-instances">
     <title>型族とインスタンス宣言</title>
+
     <para>型族のもとでは、インスタンス頭部の形式についての規則(<xref linkend="flexible-instance-head"/>で与えられている)を拡張する必要がある。特に、
 <itemizedlist>
  <listitem><para>データ型族はインスタンス頭部に現れてもよい</para></listitem>
  <listitem><para>型シノニム族はインスタンス頭部に(全く)現われてはいけない</para></listitem>
 </itemizedlist>
-後者の制約があるのは、これを検査する方法がないからである。次の例を考えよ。
+後者の制約があるのは、インスタンスが適合しているか検査する方法がないからである。次の例を考えよ。
 <programlisting>
    type family F a
    type instance F Bool = Int
@@ -3580,8 +3616,290 @@ class (F a ~ b) => C a b where
 </programlisting>
 ここで、<literal>(C (F Bool))</literal>という制約は両方のインスタンスに適合する。<literal>F Bool</literal>の型インスタンスは別のモジュールにあるかもしれず、さらにはまだ書かれていないモジュールにあることさえあり得るので、この状況は特にまずい。
 </para>
-</sect3>
+<para>
+一方、データ族のインスタンスについての型クラスインスタンスは、通常のデータ型とほとんど同じに書ける。例えば次のように言うことができる。
+<programlisting>
+data instance T Int = T1 Int | T2 Bool
+instance Eq (T Int) where
+  (T1 i) == (T1 j) = i==j
+  (T2 i) == (T2 j) = i==j
+  _      == _      = False
+</programlisting>クラスのインスタンスになるのは常にデータ族の特定の<emphasis>インスタンス</emphasis>であって、族全体ではないのに注意。これは要するに、一つの型族の<emphasis>異なる</emphasis>構築子に対してパターン照合を行う最上位関数を定義できないのと同じ理由による。これをするには拡張可能なcase構造が必要になるだろう。</para>
+<para>データインスタンス宣言はまた、<literal>deriving</literal>節を持っていても良い。例えば次のように書くことができる。
+<programlisting>
+data GMap () v = GMapUnit (Maybe v)
+               deriving Show
+</programlisting>
+これは次の形のインスタンスを暗黙に定義する。
+<programlisting>
+instance Show v => Show (GMap () v) where ...
+</programlisting>
+      </para>
+
 </sect2>
+
+</sect1>
+
+<sect1 id="kind-polymorphism-and-promotion">
+<title>種多相と昇格</title>
+
+<para>
+標準のHaskellには豊かな型言語が備わっている。型は式を分類し、多くのよくあるプログラミング上の間違いを避けるのに役立つ。一方で、Haskellの種言語(訳注: kind language; 型の型の言語)は比較的単純であり、持ち上げられた型(種<literal>*</literal>)と型構築子(たとえば種<literal>* -> * -> *</literal>)と持ち上げられていない型(<xref linkend="glasgow-unboxed"/>)を区別するのみである。特に型族(<xref linkend="type-families"/>)やGADT(<xref linkend="gadt"/>)などの高度な型システムの機能を使う場合、この単純な種システムでは不十分であり、単純な間違いを防ぐことができない。例として、型水準の自然数と、長さによって添字付けられたベクトルを考えよ。
+<programlisting>
+data Ze
+data Su n
+
+data Vec :: * -> * -> * where
+  Nil  :: Vec a Ze
+  Cons :: a -> Vec a n -> Vec a (Su n)
+</programlisting>
+<literal>Vec</literal>の種は<literal>* -> * -> *</literal>である。これば、例えば<literal>Vec Int Char</literal>が種の正しい型であることを意味する。長さによって添字付けられたベクトルを定義するときにこれを意図している訳ではないにもかかわらずである。
+</para>
+
+<para>
+<option>-XPolyKinds</option>および<option>-XDataKinds</option>フラグによって、より豊かな種言語の利用が可能になる。<option>-XPolyKinds</option>は種多相を有効にし、<option>-XDataKinds</option>はデータ型の昇格を通してユーザが種を定義することを可能にする。<option>-XDataKinds</option>を使うと、上の例は次のように書き直せる。
+<programlisting>
+data Nat = Ze | Su Nat
+
+data Vec :: * -> Nat -> * where
+  Nil  :: Vec a Ze
+  Cons :: a -> Vec a n -> Vec a (Su n)
+</programlisting>
+この改善された<literal>Vec</literal>の種のもとでは、<literal>Vec Int Char</literal>のようなものは今や種が間違っており、GHCはエラーを報告するだろう。
+</para>
+
+<para>
+この節では、この新しい種システムの使い型の例を少し示す。この拡張はTLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。
+</para>
+
+<sect2 id="kind-polymorphism">
+<title>種多相</title>
+<para>
+現在、Typeableの実装にはコードの重複が沢山ある(<xref linkend="deriving-typeable"/>)。
+<programlisting>
+class Typeable (t :: *) where
+  typeOf :: t -> TypeRep
+
+class Typeable1 (t :: * -> *) where
+  typeOf1 :: t a -> TypeRep
+
+class Typeable2 (t :: * -> * -> *) where
+  typeOf2 :: t a b -> TypeRep
+</programlisting>
+</para>
+
+<para>
+種多相(<option>-XPolyKinds</option>で)は、これらのクラスを一つにまとめることを可能にする。
+<programlisting>
+data Proxy t = Proxy
+
+class Typeable t where
+  typeOf :: Proxy t -> TypeRep
+
+instance Typeable Int  where typeOf _ = TypeRep
+instance Typeable []   where typeOf _ = TypeRep
+</programlisting>
+データ型<literal>Proxy</literal>は<literal>forall k. k -> *</literal>という種を持っていることに注意(GHCによって推論される)。またこの新しい<literal>Typeable</literal>クラスの種は<literal>forall k. k -> Constraint</literal>である。
+</para>
+
+<para>
+現在の実装にはいくつか制約がある。
+<itemizedlist>
+ <listitem><para>種に関して抽象化したり、種変数に言及することは(まだ)できない。よって以下のものは全て拒絶される。
+<programlisting>
+data D1 (t :: k)
+
+data D2 :: k -> *
+
+data D3 (k :: BOX)
+</programlisting></para>
+ </listitem>
+ <listitem><para>型族の戻り種は常にデフォルトの<literal>*</literal>が使われる。よって以下のものは拒絶される。
+<programlisting>
+type family F a
+type instance F Int = Maybe
+</programlisting></para>
+ </listitem>
+</itemizedlist>
+</para>
+
+</sect2>
+
+<sect2 id="promotion">
+<title>データ型の昇格</title>
+<para>
+<option>-XDataKinds</option>を使うと、GHCは全ての適したデータ型を種へと昇格させ、その(値)構築子を型構築子へと昇格させる。以下の型は、
+<programlisting>
+data Nat = Ze | Su Nat
+
+data List a = Nil | Cons a (List a)
+
+data Pair a b = Pair a b
+ 
+data Sum a b = L a | R b
+</programlisting>
+以下の種と型構築子を生み出す。
+<programlisting>
+Nat :: BOX
+Ze :: Nat
+Su :: Nat -> Nat
+
+List k :: BOX
+Nil  :: List k
+Cons :: k -> List k -> List k
+
+Pair k1 k2 :: BOX
+Pair :: k1 -> k2 -> Pair k1 k2
+
+Sum k1 k2 :: BOX
+L :: k1 -> Sum k1 k2
+R :: k2 -> Sum k1 k2
+</programlisting>
+例えば<literal>List</literal>が<literal>BOX -> BOX</literal>という種を得ないことに注意。種はそれ以上区別されないからである。全ての種は<literal>BOX</literal>というソートを持つ。
+</para>
+
+<para>
+昇格には以下の制約が適用される。
+<itemizedlist>
+ <listitem><para>我々は<literal>* -> ... -> * -> *</literal>という形の種を持つデータ型しか昇格させない。特に、<literal>data Fix f = In (f (Fix f))</literal>のような高階の種を持つデータ型や、<literal>Vec :: * -> Nat -> *</literal>のように昇格後の型が関わっている種を持つデータ型を昇格させることはしない。</para></listitem>
+ <listitem><para>構築子が種多相であったり、制約が関わっていたり、存在量化を使っていたりするデータ型は昇格させない。
+ </para></listitem>
+</itemizedlist>
+</para>
+
+<sect3 id="promotion-syntax">
+<title>型と構築子の区別</title>
+<para>
+昇格があると、構築子と型が同じ名前空間を共有するので、型名が曖昧になることがある。
+<programlisting>
+data P          -- 1
+
+data Prom = P   -- 2
+
+type T = P      -- 1か、それとも昇格した2か？
+</programlisting>
+このような場合には、昇格した構築子に言及したい場合、名前に引用符を前置する必要がある。
+<programlisting>
+type T1 = P     -- 1
+
+type T2 = 'P    -- 昇格した2
+</programlisting>
+昇格したデータ型は名前の付いた種を生み出すことに注意。これらが曖昧になることはないので、種名に引用符を付けることは認めていない。
+</para>
+</sect3>
+
+<sect3 id="promoted-lists-and-tuples">
+<title>昇格したリスト型とタプル型</title>
+<para>
+Haskellのリストおよびタプル型は言語レベルで種へと昇格されており、引用符を前置する必要があるものの型水準でも同じ便利な記法が使える。
+<programlisting>
+data HList :: [*] -> * where
+  HNil  :: HList '[]
+  HCons :: a -> HList t -> HList (a ': t)
+
+data Tuple :: (*,*) -> * where
+  Tuple :: a -> b -> Tuple '(a,b)
+</programlisting>
+これは<option>-XTypeOperators</option>を必要とすることに注意。
+</para>
+</sect3>
+
+</sect2>
+
+<sect2 id="kind-polymorphism-limitations">
+<title>現在の実装の欠点</title>
+<para>
+GHC 7.4のリリースに際しては、我々は新しい種多相的なcoreが既存のあらゆる(種多相を使っていない)プログラムを扱えるようにすることに焦点を置いた。<option>-XPolyKinds</option>に関して既に多くものが正しく動作するが、動かないものもあることを予想している。もし困難に陥ったら、どうか<link linkend="bug-reporting">バグ報告</link>をしてほしい！
+</para>
+</sect2>
+
+</sect1>
+<sect1 id="equality-constraints">
+  <title>同値性制約</title>
+  <para>型文脈には<literal>t1 ~ t2</literal>という形の同値性制約を含めることができる。これは、<literal>t1</literal>と<literal>t2</literal>の二つの型が同じでなければならないということを示す。型族の存在下では、一般に二つの型が等しいかどうかを局所的に決めることは出来ない。このため、次の例のように、関数のシグネチャの文脈に同値性制約が使われることがある。
+<programlisting>
+sumCollects :: (Collects c1, Collects c2, Elem c1 ~ Elem c2) => c1 -> c2 -> c2
+</programlisting>
+ここでは、<literal>c1</literal>と<literal>c2</literal>の要素の型が同じであることを要求している。一般に、同値性制約における<literal>t1</literal>と<literal>t2</literal>は任意の単相型であってよい。単相型であるというのは、ランクの高い型が有効になっているかどうかにかかわらず、量化子を含んでいてはならないということである。
+  </para>
+  <para>
+同値性制約は、クラスとインスタンスの文脈でも使うことができる。前者によって、関数従属を使うプログラムから、代わりに族シノニムを使うプログラムへの、単純な翻訳が出来るようになる。一般的な考え方として、次のような形のクラス宣言があったとする。
+<programlisting>
+class C a b | a -> b
+</programlisting>
+これを、以下のように書き換える。
+<programlisting>
+class (F a ~ b) => C a b where
+type F a
+</programlisting>
+つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の同値性で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
+  </para>
+</sect1>
+
+<sect1 id="constraint-kind">
+<title><literal>Constraint</literal>という種</title>
+
+<para>通常、<emphasis>制約</emphasis>(型中で<literal>=></literal>の左に出現するもの)の構文は極めて強く制限されている。次のものにしかなれない。
+	<itemizedlist>
+		<listitem>
+			<para>クラス制約、たとえば<literal>Show a</literal></para>
+		</listitem>
+		<listitem>
+			<para><link linkend="implicit-parameters">暗黙パラメタ</link>制約、たとえば<literal>?x::Int</literal> (<option>-XImplicitParams</option>フラグがあれば)</para>
+		</listitem>
+		<listitem>
+			<para><link linkend="equality-constraints">等値制約</link>、たとえば<literal>a ~ Int</literal> (<option>-XTypeFamilies</option>または<option>-XGADTs</option>フラグがあれば)</para>
+		</listitem>
+	</itemizedlist>
+</para>
+
+<para><option>-XConstraintKinds</option>フラグを使うと、プログラム内で制約としてより幅広い範囲ものもを受け付けるようになる。正確にいうと、このフラグのもとでは新しい種<literal>Constraint</literal>を持つあらゆる<emphasis>型</emphasis>を制約として使える。以下のものが種<literal>Contraint</literal>を持つ。
+
+	<itemizedlist>
+		<listitem>このフラグなしでも制約として正しいもの全て。すなわち型クラスの完全な適用、暗黙パラメタ制約および等値制約。
+		</listitem>
+		<listitem>全ての要素が種<literal>Constraint</literal>を持つようなタプル。よって、たとえば型<literal>(Show a, Ord a)</literal>の種は<literal>Constraint</literal>になる。
+		</listitem>
+		<listitem>形はまだ分かっていないが、ユーザが種<literal>Constraint</literal>を持つとして宣言したもの全て。よって例えば<literal>type Foo (f :: * -> Constraint) = forall b. f b => b -> b</literal>は許される。また次の型族を使った例も許される。
+<programlisting>
+type family Typ a b :: Constraint
+type instance Typ Int  b = Show b
+type instance Typ Bool b = Num b
+
+func :: Typ a b => a -> b -> b
+func = ...
+</programlisting>
+		</listitem>
+	</itemizedlist>
+</para>
+
+<para>制約は特定の種を持った単なる型として扱われるので、この拡張によって制約シノニムが可能になる。
+</para>
+
+<programlisting>
+type Stringy a = (Read a, Show a)
+foo :: Stringy a => a -> (String, String -> a)
+foo x = (show x, read)
+</programlisting>
+
+<para>現在、標準的な制約とタプルおよびこれら二種類の制約のシノニムのみがインスタンス文脈とスーパークラス文脈で(別のフラグなしで)使用できる。この理由は、もっと一般的な制約を許すと型検査のループを引き起し得るからである。以下の二つのプログラムはそのような例である。
+</para>
+
+<programlisting>
+type family Clsish u a
+type instance Clsish () a = Cls a
+class Clsish () a => Cls a where
+</programlisting>
+
+<programlisting>
+class OkCls a where
+
+type family OkClsish u a
+type instance OkClsish () a = OkCls a
+instance OkClsish () a => OkCls a where
+</programlisting>
+
+<para>インスタンス文脈やスーパークラスに変わった種類の制約を使うプログラムを書くことはできるが、それには<option>-XUndecidableInstances</option>を使って、型検査器が終了しなくても気にしないことを示す必要がある。</para>
 
 </sect1>
 
@@ -4790,6 +5108,9 @@ Hello
 <listitem><para>
 クォートされる<replaceable>string</replaceable>は任意であり、改行を含んでもよい。
 </para></listitem>
+<listitem><para>
+クォートされる<replaceable>string</replaceable>は、<literal>"|]"</literal>という二文字の並びが最初に出現したところで終わる。一切のエスケープは行なわれない。文字列中にこの文字の並びを埋め込みたい場合、自分でエスケープ方式を発明し(たとえば<literal>"|~]"</literal>で代用するなど)、クォート関数が<literal>"|~]"</literal>を<literal>"|]"</literal>と解釈するようにしなければならない。これをする一つの方法は、あなたのエスケープ方式を実行する前処理過程をクォート子に合成することである。詳細は<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5348">Trac上の議論</ulink>を見よ。
+</para></listitem>
 </itemizedlist>
 </para></listitem>
 
@@ -5113,9 +5434,9 @@ case input of
 <title>制御構造を自分で定義する</title>
 
 <para>
-既に見たように、アロー記法には、逐次実行、値再帰、および条件分岐について、式のものを手本とした構文要素が提供されている。しかし、適切なコンビネータ(これはHaskellで普通に定義できる)があれば、それを、既存のコマンドから新しいコマンドをつくり出すのに使うこともできる。基本的な考え方としては、コマンドを、環境から値へのアローとみなすのである。環境は、コマンド中の自由な局所変数に値を割り当てる。これにより、アローからアローをつくり出すコンビネータは、コマンドからコマンドを構築するのにも使える。例えば、<literal>ArrowChoice</literal>クラスには次のコンビネータがある。
+既に見たように、アロー記法には、逐次実行、値再帰、および条件分岐について、式のものを手本とした構文要素が提供されている。しかし、適切なコンビネータ(これはHaskellで普通に定義できる)があれば、それを、既存のコマンドから新しいコマンドをつくり出すのに使うこともできる。基本的な考え方としては、コマンドを、環境から値へのアローとみなすのである。環境は、コマンド中の自由な局所変数に値を割り当てる。これにより、アローからアローをつくり出すコンビネータは、コマンドからコマンドを構築するのにも使える。例えば、<literal>ArrowPlus</literal>クラスには次のコンビネータがある。
 <programlisting>
-ArrowChoice a => (&lt;+>) :: a e c -> a e c -> a e c
+ArrowPlus a => (&lt;+>) :: a e c -> a e c -> a e c
 </programlisting>
 よって、これを使ってコマンドを組み立てることができる。
 <programlisting>
@@ -5760,10 +6081,31 @@ GHCはインライン化が永遠に続くことがないことを保証する�
   {-# SPECIALIZE hammeredLookup :: [(Widget, value)] -> Widget -> value #-}
 </programlisting>
 
-      <para>関数についての<literal>SPECIALIZE</literal>プラグマは、その関数の型シグネチャが書けるところならどこにでも書ける。</para>
+<itemizedlist>
+<listitem>
+      <para>関数についての<literal>SPECIALIZE</literal>プラグマは、その関数の型シグネチャが書けるところならどこにでも書ける。さらに、定義の地点で<literal>INLINABLE</literal>プラグマを与えられている(<xref linkend="inlinable-pragma"/>)関数であれば、<emphasis>インポートした</emphasis>関数を<literal>SPECIALIZE</literal>することができる。
+      </para>
 
-      <para><literal>SPECIALIZE</literal>の効果は、その関数の特殊化版を生成することと、およびその関数の未特殊化版の呼び出しを特殊化版の呼び出しに書き換える規則(<xref linkend="rewrite-rules"/>を見よ)を生成することである。</para>
+      <para><literal>SPECIALIZE</literal>の効果は、その関数の特殊化版を生成することと、およびその関数の未特殊化版の呼び出しを特殊化版の呼び出しに書き換える規則(<xref linkend="rewrite-rules"/>を見よ)を生成することである。さらに、関数<literal>f</literal>に<literal>SPECIALIZE</literal>が与えられていると、<literal>f</literal>によって呼ばれている(型クラスによる)多重定義関数全てについて、もしそれがこの<literal>SPECIALIZE</literal>プラグマと同じモジュールにあるか<literal>INLINABLE</literal>であるならば、GHCは自動的にそれの特殊化版を作る。これは推移的に繰り返される。</para>
+</listitem>
 
+<listitem>
+   <para><literal>SPECIALIZE</literal>プラグマによって生成されたRULEに段階制御(<xref linkend="phase-control"/>)を付け加えることができる。RULEを直接書いた場合と全く同様である。例を示す。
+<programlisting>
+  {-# SPECIALIZE [0] hammeredLookup :: [(Widget, value)] -> Widget -> value #-}
+</programlisting>
+   これは、段階0(最後の段階)にのみ発火する特殊化規則を生成する。<literal>SPECIALIZE</literal>中に段階制御を指定しなかった場合、段階制御はその関数のインラインプラグマ(あれば)から継承される。例。
+<programlisting>
+  foo :: Num a => a -> a
+  foo = ...blah...
+  {-# NOINLINE [0] foo #-}
+  {-# SPECIALIZE foo :: Int -> Int #-}
+</programlisting>
+  この<literal>NOINLINE</literal>は、段階0になるまで<literal>foo</literal>をインライン化しないようにGHCに指示する。そしてこの性質は特殊化規則に継承されるので、これも段階0にのみ発火する。</para>
+  <para>特殊化に対して段階制御を使うことの主な理由は、まずコンパイルパイプラインの初期に発火する最適化RULESを書いて、<emphasis>その後で</emphasis>関数の呼び出しを特殊化できるからである。特殊化が行なわれるのが早すぎると最適化RULESが発火しないかもしれない。
+  </para>
+</listitem>
+<listitem>
       <para>SPECIALIZEプラグマ中の型は元の関数の型より多相性が低いものならなんでも良い。ちゃんとした言い方では次のようになる。元の関数が<literal>f</literal>だとする。
 <programlisting>
   {-# SPECIALIZE f :: &lt;type&gt; #-}
@@ -5786,6 +6128,8 @@ GHCはインライン化が永遠に続くことがないことを保証する�
 </programlisting>
 最後の例では、生成されたRULSの左辺がかなり複雑なものになる(試してみよ)ので、あまりうまく発動しないかもしれない。この手の特殊化を使うことがあったら、どの程度うまくいったか知らせてほしい。
 </para>
+</listitem>
+</itemizedlist>
 
     <sect3 id="specialize-inline">
       <title>SPECIALIZE INLINE</title>
@@ -5804,6 +6148,7 @@ data Arr e where
 (ArrPair _ a1 a2) !: i      = (a1 !: i, a2 !: i)
 </programlisting>
 ここでは、<literal>(!:)</literal>は<literal>Arr e</literal>型の配列の添字演算を行う再帰関数である。<literal>(Int,Int)</literal>での<literal>(!:)</literal>の呼び出しを考えてみよう。二番目の特殊化が発動し、その特殊化された関数がインライン化される。それには<literal>(!:)</literal>の呼び出しが二つあり、どちらも<literal>Int</literal>型についてのものである。これらの呼び出しは両方とも最初の特殊化を発動させ、その本体も再びインライン化される。結果として、添字演算関数についての型によるアンロールができたことになる。</para>
+<para><literal>INLINE</literal>プラグマにするのと同様に、段階制御(<xref linkend="phase-control"/>)を<literal>SPECIALISE INLINE</literal>プラグマに加えることができる。そうした場合、書き換え規則と、特殊化される関数のINLINE制御の両方に、同じ段階が使われる。</para>
 <para>警告: <literal>SPECIALISE INLINE</literal>を非多相再帰な関数に対して使うと、GHCは発散する。</para>
 </sect3>
 
@@ -5918,6 +6263,20 @@ data S = S {-# UNPACK #-} !Int {-# UNPACK #-} !Int
       この場合、二つの非ボックス化<literal>Int#</literal>が構築子<function>T</function>に直接置かれる。アンパックはnewtypeを透過して起こる。</para>
 
       <para><option>-funbox-strict-fields</option>フラグも見よ。これは、簡単に言うと、あらゆる正格な構築子フィールドに<literal>{-#&nbsp;UNPACK&nbsp;#-}</literal>を加えるのと同じ効果がある。</para>
+    </sect2>
+
+    <sect2 id="nounpack-pragma">
+      <title>NOUNPACKプラグマ</title>
+
+      <indexterm><primary>NOUNPACK</primary></indexterm>
+
+      <para><literal>NOUNPACK</literal>はコンパイラに、構築子フィールドの中身をアンパックするべきでないということを伝える。例。
+      </para>
+<programlisting>
+data T = T {-# NOUNPACK #-} !(Int,Int)
+</programlisting>
+      <para>フラグ<option>-funbox-strict-fields</option>および<option>-O</option>を使っていても、構築子<function>T</function>のフィールドはアンパックされない。
+      </para>
     </sect2>
 
     <sect2 id="source-pragma">
@@ -6336,12 +6695,6 @@ cons構築子(例: <literal>3:4:[]</literal>)
 
 <para>
  <function>msum</function>
-</para>
-</listitem>
-<listitem>
-
-<para>
- <function>sortBy</function>
 </para>
 </listitem>
 
