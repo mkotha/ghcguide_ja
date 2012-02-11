@@ -1,15 +1,3 @@
-diff -urd 7.2.2-original/parallel.xml original/parallel.xml
---- 7.2.2-original/parallel.xml	2011-11-10 02:10:39.000000000 +0800
-+++ original/parallel.xml	2012-02-02 02:10:32.000000000 +0800
-@@ -185,7 +185,7 @@
-       parallel <literal>map</literal>.</para>
-   </sect2>
- 
--<sect2 id="dph"><title>Data Parallel Haskell</title>
-+<sect2><title>Data Parallel Haskell</title>
-   <para>GHC includes experimental support for Data Parallel Haskell (DPH). This code
-         is highly unstable and is only provided as a technology preview. More
-         information can be found on the corresponding <ulink
 diff -urd 7.2.2-original/phases.xml original/phases.xml
 --- 7.2.2-original/phases.xml	2011-11-10 02:10:39.000000000 +0800
 +++ original/phases.xml	2012-02-02 02:10:32.000000000 +0800
