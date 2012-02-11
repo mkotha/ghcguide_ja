@@ -399,7 +399,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fasm</option></primary></indexterm>
         </term>
         <listitem>
-          <para>LLVMを介するのではなく、GHCのネイティブコード生成器を使ってコンパイルする。こうするとコンパイルは速くなるが(最大で二倍ほど)、生成されたコードはCを介したものよりも多少遅くなるかもしれない。<option>-fasm</option>はデフォルトである。</para>
+          <para>LLVMを介するのではなく、GHCの<link linkend="native-code-gen">ネイティブコード生成器</link>を使ってコンパイルする。<option>-fasm</option>はデフォルトである。</para>
         </listitem>
       </varlistentry>
 
@@ -409,7 +409,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fllvm</option></primary></indexterm>
         </term>
         <listitem>
-          <para>ネイティブコード生成器を使わず、LLVMを介してコンパイルする。これは一般的に、ネイティブコード生成器に比べてやや長いコンパイル時間が掛かる。生成されたコードは一般的に、他の二つのコード生成器と同等か、それより速い。LLVMを介したコンパイルには、LLVMのバージョン2.7以降がパスにあることが必要である。</para>
+          <para>ネイティブコード生成器を使わず、<link linkend="llvm-code-gen">LLVM</link>を介してコンパイルする。これは一般的に、ネイティブコード生成器に比べてやや長いコンパイル時間が掛かる。生成されたコードは一般的に、他の二つのコード生成器と同等か、それより速い。LLVMを介したコンパイルには、LLVMがパスにあることが必要である。</para>
         </listitem>
       </varlistentry>
 
@@ -449,7 +449,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-fPIC</option></primary></indexterm>
         </term>
         <listitem>
-          <para>位置独立なコード(共有ライブラリや共有バイナリに置けるコード)を生成する。これは現在、Linux x86とx86-64において、ネイティブコード生成器(-fasm)を使っているときに動作する。Windowsでは位置独立コードは決して使われないので、このプラットフォームではこのフラグは何もしない。</para>
+          <para>位置独立なコード(共有ライブラリや共有バイナリに置けるコード)を生成する。これは現在、Linux x86とx86-64において動作する。Windowsでは位置独立コードは決して使われないので、このプラットフォームではこのフラグは何もしない。</para>
         </listitem>
       </varlistentry>
 
@@ -628,6 +628,10 @@ $ cat foo.hspp</screen>
           <para>リンカにわたされるコマンド行はかなり複雑なので、複数言語のアプリケーションの最終リンクには<command>ghc</command>を使うのが良いだろう。ただしこれは必須ではない。ドライバがどんなオプションをリンカに渡しているかを見るには一度<option>-v</option>付きでリンクしてみるだけで良い。</para>
 
           <para><option>-no-hs-main</option>フラグは、<option>--make</option>モードにおいて、Haskellの<literal>Main</literal>モジュールがないときでもコンパイラにリンクを行わせるために使うこともできる。(通常、<literal>Main</literal>がないときはコンパイラはリンクを試みない)</para>
+
+          <para><option>-rtsopts</option>および<option>-with-rtsopts</option>フラグは、GHCが生成する<literal>main</literal>の定義を変更することで実装されているので、<option>-no-hs-main</option>と共に使われると効果がない。自分の<literal>main</literal>を使っている場合に<option>-rtsopts</option>と<option>-with-rtsopts</option>の効果を得る方法については<xref linkend="using-own-main" />を見よ。
+          </para>
+
         </listitem>
       </varlistentry>
 
@@ -708,8 +712,8 @@ $ cat foo.hspp</screen>
               </listitem>
             </varlistentry>
           </variablelist>
-          <para>GHC 6.12.3以前では、全てのRTSオプションを処理するのがデフォルトだった。しかし、RTSオプションは任意のファイルに対するログデータの書き込みを、実行プログラムのコンテキストで許すので、セキュリティ上の問題が発生する余地がある。このため、GHC 7.0.1以降のデフォルトは<option>-rtsopts=some</option>である。
-          </para>
+          <para>GHC 6.12.3以前では、全てのRTSオプションを処理するのがデフォルトだった。しかし、RTSオプションは任意のファイルに対するログデータの書き込みを、実行プログラムのコンテキストで許すので、セキュリティ上の問題が発生する余地がある。このため、GHC 7.0.1以降のデフォルトは<option>-rtsopts=some</option>である。</para>
+          <para><option>-rtsopts</option>は、<option>-no-hs-main</option>を使っているときには効果がないことに注意。詳細は<xref linkend="using-own-main" />を見よ。</para>
         </listitem>
       </varlistentry>
 
@@ -721,6 +725,7 @@ $ cat foo.hspp</screen>
         <listitem>
           <para>このオプションは、RTSオプションのデフォルトをリンク時に設定できるようにする。例えば、<option>-with-rtsopts="-H128m"</option>はヒープのデフォルトの大きさを128MBにする。このプログラムのデフォルトのヒープサイズは、ユーザによって上書きされない限り、常にこれになる。(<option>-rtsopts</option>オプションの設定によっては、ユーザが実行時にRTSオプションを設定することができないかもしれない。その場合には<option>-with-rtsopts</option>がそれを設定する<emphasis>唯一</emphasis>の方法である。)
           </para>
+          <para><option>-with-rtsopts</option>は、<option>-no-hs-main</option>を使っているときには効果がないことに注意。詳細は<xref linkend="using-own-main" />を見よ。</para>
         </listitem>
       </varlistentry>
 
