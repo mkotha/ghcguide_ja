@@ -64,7 +64,7 @@ $ ghc-pkg list
 
     <para>参考: Cabalを使っているなら、パッケージが露出されているか隠されているかという区別は関係しない。どのパッケージが利用可能かは<literal>.cabal</literal>の指定に列挙されている依存関係から決定される。露出されているか隠されているかの区別は<literal>ghc</literal>や<literal>ghci</literal>を直接使うときのみ影響する。</para>
 
-    <para>パッケージが隠されているかの状態と似たものに、パッケージが信用されているかどうかの区別がある。この性質は、GHCのSafe Haskell機能(<xref linkend="safe-haskell"/>を見よ)を使ってコードをコンパイルする場合にのみ意味を持つ。</para>
+    <para>パッケージが隠されているかの状態と似たものに、パッケージが信用されているかどうかの区別がある。この性質は、<option>-fpackage-trust</option>フラグを有効にし、GHCのSafe Haskell機能(<xref linkend="safe-haskell"/>を見よ)を使ってコードをコンパイルする場合にのみ意味を持つ。</para>
 
     <para>あるパッケージがどんなモジュールを公開しているかを見るには、<literal>ghc-pkg</literal>コマンドを使う。(<xref linkend="package-management"/>を見よ)</para>
     
@@ -546,18 +546,6 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
     <variablelist>
       <varlistentry>
         <term>
-          <option>&ndash;&ndash;auto-ghci-libs</option><indexterm><primary><option>&ndash;&ndash;auto-ghci-libs</option></primary>
-          </indexterm>
-        </term>
-        <listitem>
-          <para>各<filename>.a</filename>のHaskellライブラリについて、GHCi用<filename>.o</filename>版を自動的に生成する。これにはGNU ldが(可能なら)使われる。このオプションが指定されていないなら、<literal>ghc-pkg</literal>はパッケージにGHCi版のHaskellライブラリが含まれていないときに警告する。</para>
-            
-            <para>GHCiの<literal>.o</literal>ライブラリは、必ずしも対応する<literal>.a</literal>ライブラリと同じディレクトリにある必要はない。しかし、このオプションでは、GHCiライブラリは<literal>.a</literal>ライブラリと同じディレクトリに作られる。</para>
-        </listitem>
-      </varlistentry>
-
-      <varlistentry>
-        <term>
           <option>-f</option> <replaceable>file</replaceable>
           <indexterm><primary><option>-f</option></primary>
           </indexterm>
@@ -669,7 +657,10 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
       </listitem>
       <listitem>
-        <para>HaskellライブラリのGHCi用の版を含めることもできる。GHCiは<literal>.a</literal>ファイルを直接ロードすることができず、代わりに<filename>HSfoo.o</filename>という名前のオブジェクトファイルを探してそれをロードする。システムによっては、<literal>ghc-pkg</literal>ツールが各ライブラリのGHCi用の版を自動的にビルドすることができる。これについては<xref linkend="package-management"/>を見よ。これらのライブラリを<literal>.a</literal>アーカイブから手で作るには、GNU <command>ld</command>を次のように使うことが可能である。</para>
+        <para>パッケージ<literal>foo</literal>をロードするに当たって、GHCはそれの<literal>libHSfoo.a</literal>ライブラリを直接ロードすることもできるが、リンク済みの単一の<literal>HSfoo.o</literal>の形のパッケージをロードすることもできる。<literal>.o</literal>ファイルをロードするのはやや速いが、代わりにコンパイル済みパッケージのコピーを一つ余分に持つ必要がある。経験的には、パッケージのモジュールが<option>-split-objs</option>付きでコンパイルされたのなら、パッケージをGHCiにロードする時間を減らせるので<literal>HSfoo.o</literal>を使う価値がある。<option>-split-objs</option>なしでは、<literal>.o</literal>と<literal>.a</literal>のライブラリの間にあまり大きなロード時間の違いがないので、<literal>.a</literal>だけを置いておくことでディスク領域を節約した方が良い。GHC配布物中では、GHCパッケージ自体を除く大部分のパッケージに<literal>.o</literal>を用意している。
+        </para>
+
+        <para><literal>HSfoo.o</literal>ファイルはCabalによって自動的にビルドされる。これを無効にするには<option>--disable-library-for-ghci</option>を使う。手動でビルドするには、以下のGNU <command>ld</command>コマンドを使うことができる。</para>
 
 <screen>ld -r &ndash;&ndash;whole-archive -o HSfoo.o libHSfoo.a</screen>
 
