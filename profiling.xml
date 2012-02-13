@@ -5,31 +5,25 @@
   </indexterm>
   <indexterm><primary>cost-centre profiling</primary></indexterm>
 
-  <para>Glasgow Haskellには時間及び空間のプロファイルをとるためのシステムが付属している。このシステムの目的は、プログラムの実行時の振る舞いをより良く理解できるようにし、ひいてはそれを改善できるようにすることである。</para>
-
-  <para>あらゆる意見、提案、改善は歓迎される。おすすめの「プロファイル技」があるなら特に素晴らしい。</para>
+  <para>GHCには時間及び空間のプロファイルをとるためのシステムが付属している。このシステムの目的は、「なぜ私のプログラムはこんなに遅いのか」「なぜ私のプログラムはこんなに沢山のメモリを使うのか」といった疑問に答えられるようにすることである。</para>
 
   <para>プログラムのプロファイルをとるのは三つの段階からなる。</para>
 
   <orderedlist>
     <listitem>
-      <para>プログラムをプロファイル用にコンパイルする。これには、<literal>-prof</literal>オプションと、多くの場合<literal>-auto</literal>と<literal>-auto-all</literal>オプションのいずれかを付ける。これらのオプションは<xref linkend="prof-compiler-options"/>でさらに詳しく解説されている。</para>
-      <indexterm><primary><literal>-prof</literal></primary>
-      </indexterm>
-      <indexterm><primary><literal>-auto</literal></primary>
-      </indexterm>
-      <indexterm><primary><literal>-auto-all</literal></primary>
-      </indexterm>
+      <para>プログラムをプロファイル用にコンパイルする。これには、<literal>-prof</literal>オプションと、多くの場合、自動注釈を付けるオプションの一つを付ける。<literal>-fprof-auto</literal>が最も一般的である<footnote><para><option>-fprof-auto</option>は、GHC 7.4.1より前は<option>-auto-all</option><indexterm><primary><literal>-auto-all</literal></primary></indexterm>という名前だった。</para></footnote>。</para>
+
+      <para><literal>cabal</literal>で外部ライブラリを使っているなら、それらのライブラリをプロファイル対応付きで再インストールする必要があるかもしれない。これは典型的には<literal>cabal install -p <replaceable>package</replaceable> --reinstall</literal>とする。</para>
     </listitem>
 
     <listitem>
-      <para>プロファイルオプションのどれか(例えば<literal>+RTS -p -RTS</literal>)を付けてプログラムを実行する。プロファイル情報のファイルが生成される。プロファイル中は複数プロセッサによる実行(例えば<literal>+RTS -N2</literal>)に対応していないことに注意。</para>
-      <indexterm><primary><option>-p</option></primary><secondary>RTS
-      option</secondary></indexterm>
+      <para>プログラムをプロファイル用にコンパイルしたら、次はプロファイルを生成するためにそれを走らせる必要がある。例えば、単純な時間プロファイルはプログラムを<option>+RTS -p</option><indexterm><primary><option>-p</option></primary><secondary>RTS option</secondary></indexterm>付きで走らせることによって生成できる。これは<literal><replaceable>prog</replaceable>.prof</literal>という名前のファイルを生成する。ただし<replaceable>prog</replaceable>はあなたのプログラムの名前である(Windows上なら<literal>.exe</literal>拡張子を除いたもの)。</para>
+
+      <para>生成できるプロファイルには沢山の種類があり、異なるRTSオプションによって選択できる。この章の残りの部分ではこの色々な種類のプロファイルを記述する。プロファイルの中には、プログラムを実行した後にさらに別のツールで処理することを必要とするものもある。</para>
     </listitem>
 
     <listitem>
-      <para>生成されたプロファイル情報を調べる。これにはGHCのプロファイルツールを使う。どれを使うかは生成されたプロファイル情報によって異なる。</para>
+      <para>生成されたプロファイル情報を調べ、その情報を使ってプログラムを最適化し、必要に応じて繰り返す。</para>
     </listitem>
 
   </orderedlist>
@@ -37,87 +31,88 @@
   <sect1 id="cost-centres">
     <title>コスト集約点とコスト集約点スタック</title>
 
-    <para>GHCのプロファイルシステムでは<firstterm>コスト</firstterm>は<firstterm>コスト集約点</firstterm>(cost centre)に割り当てられる。コストとは式を評価するのに必要な時間と空間のことである。コスト集約点はプログラム上の注釈で、一定の範囲の式を支配する。注釈の付いた式が発生させたコストは全て、それを直接支配するコスト集約点に割り当てられる。さらに、GHCは任意の式についてそれを支配するコスト集約点のスタックを実行時に記憶していて、どこにどれだけコストが掛かったかという情報の付いた呼び出しグラフを生成する。<!--(訳注: この節では多少無理な翻訳をしているので語句の対応を示す。改善案募集。cost centre: コスト集約点、enclose: 支配、assign: 割り当てる、attribute: 割り当てる/配分する)--></para>
+    <para>GHCのプロファイルシステムでは<firstterm>コスト</firstterm>は<firstterm>コスト集約点</firstterm>(cost centre)に割り当てられる。コストとは式を評価するのに必要な時間と空間(メモリ)のことである。コスト集約点はプログラム上の注釈で、一定の範囲の式を支配する。注釈の付いた式が発生させたコストは全て、それを直接支配するコスト集約点に割り当てられる。さらに、GHCは任意の式についてそれを支配するコスト集約点のスタックを実行時に記憶していて、どこにどれだけコストが掛かったかという情報の付いた呼び出し木を生成する。<!--(訳注: この節では多少無理な翻訳をしているので語句の対応を示す。改善案募集。cost centre: コスト集約点、enclose: 支配、assign: 割り当てる、attribute: 割り当てる/配分する)--></para>
 
     <para>例を一つ見てみよう。</para>
 
     <programlisting>
-main = print (nfib 25)
-nfib n = if n &lt; 2 then 1 else nfib (n-1) + nfib (n-2)
+main = print (fib 30)
+fib n = if n &lt; 2 then 1 else fib (n-1) + fib (n-2)
 </programlisting>
 
     <para>このプログラムを次のようにコンパイルし、実行する。</para>
 
     <screen>
-$ ghc -prof -auto-all -o Main Main.hs
+$ ghc -prof -fprof-auto -rtsopts Main.hs
 $ ./Main +RTS -p
 121393
 $
 </screen>
 
-    <para>GHCでコンパイルされたプログラムは、<option>-p</option>というRTSオプション付きで実行されると、<filename>&lt;prog&gt;.prof</filename>というファイルを生成する。この場合、ファイルの内容は以下のようなものである。</para>
+    <para>GHCでコンパイルされたプログラムは、<option>-p</option>というRTSオプション付きで実行されると、<filename><replaceable>prog</replaceable>.prof</filename>というファイルを生成する。この場合、ファイルの内容は以下のようなものである。</para>
 
 <screen>
-          Fri May 12 14:06 2000 Time and Allocation Profiling Report  (Final)
+        Wed Oct 12 16:14 2011 Time and Allocation Profiling Report  (Final)
 
            Main +RTS -p -RTS
 
-        total time  =        0.14 secs   (7 ticks @ 20 ms)
-        total alloc =   8,741,204 bytes  (excludes profiling overheads)
+        total time  =        0.68 secs   (34 ticks @ 20 ms)
+        total alloc = 204,677,844 bytes  (excludes profiling overheads)
 
-COST CENTRE          MODULE     %time %alloc
+COST CENTRE MODULE  %time %alloc
 
-nfib                 Main       100.0  100.0
+fib         Main    100.0  100.0
 
 
-                                              individual     inherited
-COST CENTRE              MODULE      entries %time %alloc   %time %alloc
+                                                      individual     inherited
+COST CENTRE MODULE                  no.     entries  %time %alloc   %time %alloc
 
-MAIN                     MAIN             0    0.0   0.0    100.0 100.0
- main                    Main             0    0.0   0.0      0.0   0.0
- CAF                     PrelHandle       3    0.0   0.0      0.0   0.0
- CAF                     PrelAddr         1    0.0   0.0      0.0   0.0
- CAF                     Main             6    0.0   0.0    100.0 100.0
-  main                   Main             1    0.0   0.0    100.0 100.0
-   nfib                  Main        242785  100.0 100.0    100.0 100.0
+MAIN        MAIN                    102           0    0.0    0.0   100.0  100.0
+ CAF        GHC.IO.Handle.FD        128           0    0.0    0.0     0.0    0.0
+ CAF        GHC.IO.Encoding.Iconv   120           0    0.0    0.0     0.0    0.0
+ CAF        GHC.Conc.Signal         110           0    0.0    0.0     0.0    0.0
+ CAF        Main                    108           0    0.0    0.0   100.0  100.0
+  main      Main                    204           1    0.0    0.0   100.0  100.0
+   fib      Main                    205     2692537  100.0  100.0   100.0  100.0
 </screen>
 
+    <para>ファイルの最初の部分は、プログラムの名前、オプション、実行時に計測された合計実行時間と合計メモリ確保量を示している。(合計メモリ確保量はある一つの時点においてプログラムが必要とする<emphasis>生存</emphasis>メモリの量とは異なることに注意。後者はヒーププロファイルで量れるが、これについては後で<xref linkend="prof-heap" />内で説明する)</para>
 
-    <para>ファイルの最初の部分は、プログラムの名前、オプション、実行時に計測された合計実行時間と合計メモリ確保量を示している。(合計メモリ確保量はある一つの時点においてプログラムが必要とする<emphasis>生存</emphasis>メモリの量とは異なることに注意。後者はヒーププロファイルで量れるが、これについては後で説明する)</para>
+    <para>ファイルの二番目の部分は、プログラムの中でコストが高い関数をコスト集約点で分類したものである。この例では、プログラムにはコストの高い関数が一つ(<function>fib</function>)しかなく、これがプログラムの時間と確保量の両方について100&percnt;のコストを占めている。</para>
 
-    <para>ファイルの二番目の部分は、プログラムの中でコストが高い関数をコスト集約点で分類したものである。この例では、プログラムにはコストの高い関数が一つ(<function>nfib</function>)しかなく、これがプログラムの時間と確保量の両方について100&percnt;のコストを占めている。</para>
-
-    <para>三番目の最後の節はコスト集約点スタックで分類されたプロファイルを表示している。これはプログラムの呼び出しグラフとだいたい同じである。上記の例では、コストの高い<function>nfib</function>の呼び出しが<function>main</function>由来のものであることが明らかになっている。</para>
+    <para>三番目の最後の節はコスト集約点スタックで分類されたプロファイルを表示している。これはプログラムの呼び出し木とだいたい同じである。上記の例では、コストの高い<function>fib</function>の呼び出しが<function>main</function>由来のものであることが明らかになっている。</para>
 
     <para>プログラムの特定の部分の時間と確保量は二種類が表示されている。「individual」はこのコスト集約点スタックに相当する部分のコードが消費したものだけを示す。「inherited」はこのノードの子が消費したものも全て含む。</para>
 
     <para>例を少し変えると、コスト集約点スタックの有用性がより良く分かるようになる。</para>
 
     <programlisting>
-main = print (f 25 + g 25)
-f n  = nfib n
-g n  = nfib (n `div` 2)
-nfib n = if n &lt; 2 then 1 else nfib (n-1) + nfib (n-2)
+main = print (f 30 + g 30)
+  where
+    f n  = fib n
+    g n  = fib (n `div` 2)
+
+fib n = if n &lt; 2 then 1 else fib (n-1) + fib (n-2)
 </programlisting>
 
     <para>このプログラムを前と同じようにコンパイル・実行し、新しいプロファイル結果を見てみる。</para>
 
 <screen>
-COST CENTRE              MODULE         scc  %time %alloc   %time %alloc
+COST CENTRE MODULE                  no.     entries  %time %alloc   %time %alloc
 
-MAIN                     MAIN             0    0.0   0.0    100.0 100.0
- main                    Main             0    0.0   0.0      0.0   0.0
- CAF                     PrelHandle       3    0.0   0.0      0.0   0.0
- CAF                     PrelAddr         1    0.0   0.0      0.0   0.0
- CAF                     Main             9    0.0   0.0    100.0 100.0
-  main                   Main             1    0.0   0.0    100.0 100.0
-   g                     Main             1    0.0   0.0      0.0   0.2
-    nfib                 Main           465    0.0   0.2      0.0   0.2
-   f                     Main             1    0.0   0.0    100.0  99.8
-    nfib                 Main        242785  100.0  99.8    100.0  99.8
+MAIN        MAIN                    102           0    0.0    0.0   100.0  100.0
+ CAF        GHC.IO.Handle.FD        128           0    0.0    0.0     0.0    0.0
+ CAF        GHC.IO.Encoding.Iconv   120           0    0.0    0.0     0.0    0.0
+ CAF        GHC.Conc.Signal         110           0    0.0    0.0     0.0    0.0
+ CAF        Main                    108           0    0.0    0.0   100.0  100.0
+  main      Main                    204           1    0.0    0.0   100.0  100.0
+   main.g   Main                    207           1    0.0    0.0     0.0    0.1
+    fib     Main                    208        1973    0.0    0.1     0.0    0.1
+   main.f   Main                    205           1    0.0    0.0   100.0   99.9
+    fib     Main                    206     2692537  100.0   99.9   100.0   99.9
 </screen>
 
-    <para><function>nfib</function>の呼び出しをプログラム中で二回行ったが、時間を食っているのが<function>f</function>経由の呼び出しだということが明らかだ。</para>
+    <para><function>nfib</function>の呼び出しをプログラム中で二回行ったが、時間を食っているのが<function>f</function>経由の呼び出しだということが明らかだ。<literal>main</literal>の<literal>where</literal>節で定義されている関数<literal>f</literal>と<literal>g</literal>は、それぞれ<literal>main.f</literal>と<literal>main.g</literal>という固有のコスト集約点を与えられている。</para>
 
     <para>出力の各列の実際の意味は以下の通りである。</para>
 
@@ -125,14 +120,14 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
       <varlistentry>
 	<term>entries</term>
 	<listitem>
-          <para>呼び出しグラフのこの場所に入った回数。</para>
+          <para>呼び出し木のこの場所に入った回数。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
 	<term>individual &percnt;time</term>
 	<listitem>
-          <para>呼び出しグラフ中のこの場所で消費された時間の、総時間に対する割合。</para>
+          <para>呼び出し木中のこの場所で消費された時間の、総時間に対する割合。</para>
 	</listitem>
       </varlistentry>
 
@@ -146,7 +141,7 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
       <varlistentry>
 	<term>inherited &percnt;time</term>
 	<listitem>
-          <para>呼び出しグラフ中のこの点以下で消費された時間の、プログラムの総実行時間に占める割合。</para>
+          <para>呼び出し木中のこの点以下で消費された時間の、プログラムの総実行時間に占める割合。</para>
 	</listitem>
       </varlistentry>
 
@@ -176,78 +171,64 @@ MAIN                     MAIN             0    0.0   0.0    100.0 100.0
       </varlistentry>
     </variablelist>
 
-    <para>再帰的関数や相互に再帰的な一群の関数についてはどうだろうか。コストはどこに割り当てられるのか。答えはこうである。GHCは一群の関数が互いに再帰的に呼び合ったという情報は保持するが、時刻と確保の基本プロファイルにおいてはこの情報は表示されず、呼び出しグラフは平坦化されて木として表示される。</para>
+    <para>再帰的関数や相互に再帰的な一群の関数についてはどうだろうか。コストはどこに割り当てられるのか。答えはこうである。GHCは一群の関数が互いに再帰的に呼び合ったという情報は保持するが、時刻と確保の基本プロファイルにおいてはこの情報は表示されず、呼び出しグラフはある方法で平坦化されて木として表示される。すなわち、現在の呼び出しスタックの別の場所に出現する関数を呼び出してもスタックに項目は追加されず、その呼び出しのコストは呼び出し元に集積される。<footnote><para>この方針はGHC 7.4.1で微妙に変わり、これからさらに変わるかもしれないことに注意。意見歓迎。</para></footnote></para>
 
-    <sect2><title>コスト集約点を手動で挿入する</title>
+    <sect2 id="scc-pragma"><title>コスト集約点を手動で挿入する</title>
 
-      <para>コスト集約点は、単なるプログラム上の注釈である。コンパイラに<option>-auto-all</option>を指示すると、INLINE指定されていない全ての最上位の関数の周りに自動的にコスト集約点が挿入される。しかし、自分でコスト集約点を挿入するのも完全に自由である。</para>
+      <para>コスト集約点は、単なるプログラム上の注釈である。コンパイラに<option>-fprof-all</option>を指示すると、INLINE指定されていない全ての関数の周りに自動的にコスト集約点が挿入される。しかし、自分でコスト集約点を挿入するのも完全に自由である。</para>
 
       <para>コスト集約点の注釈の構文は以下である。</para>
 
-      <programlisting>
+<programlisting>
      {-# SCC "name" #-} &lt;expression&gt;
 </programlisting>
 
-      <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。(SCCは「Set Cost Centre」(コスト集約点を設定せよ)の意である)</para>
+      <para>ここで、<literal>"name"</literal>は任意の文字列であり、これがこのコスト集約点の名前としてプロファイル出力に現れる。<literal>&lt;expression&gt;</literal>は任意のHaskellの式である。パース時には<literal>SCC</literal>注釈は右側に可能な限り長く続くように解釈される。(SCCは「Set Cost Centre」(コスト集約点を設定せよ)の意である)。<literal>name</literal>がHaskellの識別子であるなら、二重引用符は省略できる。例を示す。</para>
+
+<programlisting>
+     {-# SCC my_function #-} &lt;expression&gt;
+</programlisting>
 
       <para>SCCをいくつか使ったプログラムの例を示す。</para>
 
 <programlisting>
 main :: IO ()
-main = do let xs = {-# SCC "X" #-} [1..1000000]
-          let ys = {-# SCC "Y" #-} [1..2000000]
-          print $ last xs
-          print $ last $ init xs
-          print $ last ys
-          print $ last $ init ys
+main = do let xs = [1..1000000]
+          let ys = [1..2000000]
+          print $ {-# SCC last_xs #-} last xs
+          print $ {-# SCC last_init_xs #-} last $ init xs
+          print $ {-# SCC last_ys #-} last ys
+          print $ {-# SCC last_init_ys #-}last $ init ys
 </programlisting>
 
-      <para>実行すると、次のようなヒーププロファイルが得られる。</para>
+      <para>実行すると、次のようなプロファイルが得られる。</para>
 
-      <!-- contentwidth/contentheight don't appear to have any effect
-           other than making the PS file generation work, rather than
-           falling over.  The result seems to be broken PS on the page
-           with the image. -->
-      <imagedata fileref="prof_scc" contentwidth="645px"
-      contentdepth="428px"/>
+<screen>
+COST CENTRE     MODULE                  no.     entries  %time %alloc   %time %alloc
 
+MAIN            MAIN                    102           0    0.0    0.0   100.0  100.0
+ CAF            GHC.IO.Handle.FD        130           0    0.0    0.0     0.0    0.0
+ CAF            GHC.IO.Encoding.Iconv   122           0    0.0    0.0     0.0    0.0
+ CAF            GHC.Conc.Signal         111           0    0.0    0.0     0.0    0.0
+ CAF            Main                    108           0    0.0    0.0   100.0  100.0
+  main          Main                    204           1    0.0    0.0   100.0  100.0
+   last_init_ys Main                    210           1   25.0   27.4    25.0   27.4
+   main.ys      Main                    209           1   25.0   39.2    25.0   39.2
+   last_ys      Main                    208           1   12.5    0.0    12.5    0.0
+   last_init_xs Main                    207           1   12.5   13.7    12.5   13.7
+   main.xs      Main                    206           1   18.8   19.6    18.8   19.6
+   last_xs      Main                    205           1    6.2    0.0     6.2    0.0
+</screen>
     </sect2>
 
     <sect2 id="prof-rules">
       <title>コストの配分規則</title>
+      <para>プロファイルを有効にしてプログラムを実行している間、GHCは舞台裏でコスト集約点スタックを管理し、発生したあらゆるコスト(メモリ確保量と時間)をその時点でのコスト集約点に配分する。</para>
+      <para>機構は単純である。プログラムがSCC注釈の付いた式<literal>{-# SCC c -#} E</literal>を評価するときはいつも、<literal>c</literal>がその時点のスタックにプッシュされ、このスタックへの進入回数に1が加算される。このスタックを保存したり復元したりする必要があることもある。特に、プログラムが<firstterm>サンク</firstterm>(lazyな中断)を作るとき、現在のコスト集約点スタックがサンクに保存され、そのサンクが評価されるときに復元される。こうすることで、コスト集約点スタックはGHCが実行時に実際に使う評価の順番とは独立になる。</para>
 
-      <para>プログラム中のそれぞれの式を評価するときに発生したコストは以下の規則にしたがってコスト集約点スタックに配分される。</para>
+      <para>関数呼び出しに際しては、GHCは呼ばれる関数に保存されているスタック(これは最上位の関数については空)を取り出し、それをその時点のスタックの<emphasis>後ろに連結</emphasis>する。このとき、その時点のスタックのprefixであるようなprefixは全て無視する。</para>
 
-      <itemizedlist>
-	<listitem>
-          <para>その式が、最上位の定義を評価するときの<firstterm>一回限りの</firstterm>コストの一部であるなら、コストが配分されるのは、その式が字句的に囲まれている<literal>SCC</literal>注釈のスタックを、<literal>CAF</literal>という特殊なコスト集約点の上に載せたものになる。</para>
-	</listitem>
-
-	<listitem>
-          <para>そうでない場合、コストが配分されるのは、その式が字句的に囲まれている<literal>SCC</literal>のスタックに、<firstterm>呼び出し地点</firstterm><footnote><para>呼び出し地点とは、その特定の関数や変数に言及している、ソースコード中の位置のことである。</para></footnote>でのコスト集約点スタックを連結したものになる。これが再帰的な定義であることに注意せよ。</para>
-	</listitem>
-
-	<listitem>
-          <para>他言語のコード(<xref linkend="ffi"/>を見よ)で経過した時間は常に、その他言語関数をHaskellから呼び出している地点でのコスト集約点に配分される。</para>
-	</listitem>
-      </itemizedlist>
-
-      <para>一回限りのコストとは何か。Haskellは遅延言語であり、ある種の式はただ一回しか評価されない。例えば、次のように書いたとする。</para>
-
-      <programlisting>
-x = nfib 25
-</programlisting>
-
-      <para>すると<varname>x</varname>は(もし評価されるなら)ただ一回だけ評価され、それ以降<varname>x</varname>が必要になったときはキャッシュされた結果を使う。<varname>x</varname>のような引数のない定義はCAF(Constant Applicative Form; 定作用形)と呼ばれる。</para>
-
-      <para>プロファイルについて話すときは、「式<literal>nfib 25</literal>は<varname>x</varname>を評価するときの一回限りのコストに属している」という。</para>
-
-      <para>一回限りのコストは厳密にはプログラムの呼び出しグラフの一部ではないので、特別な最上位のコスト集約点である<literal>CAF</literal>に割り当てられる。<literal>CAF</literal>コスト集約点はモジュールに一つ(デフォルト)か、一回限りのコストのある全ての最上位の定義ごとに一つ(<option>-caf-all</option>をGHCに渡すことでこの挙動になる)ある。</para>
-
-      <indexterm><primary><literal>-caf-all</literal></primary>
-      </indexterm>
-
-      <para>プロファイルが変だと思ったときや、呼び出しグラフが思ったようになっていないときは、遠慮せずにそれ(とプログラム)を<email>glasgow-haskell-bugs@haskell.org</email>から我々に送ってほしい。</para>
+      <para>遅延された計算すなわちサンクが、作成された時にその時点のスタックを捕捉することは先に言及した。最上位のサンクについてはどうか？これらはプログラムがコンパイルされたときに「作成」されるのだから、どんなスタックを与えるべきか？最上位のサンクを指す述語はCAF(Constant Applicative Form; 定作用形)である。GHCはモジュール中の全てのCAFに単一のコスト集約点<literal>M.CAF</literal>を与える。ここで<literal>M</literal>はそのモジュールの名前である。それぞれのCAFに異なるスタックを与えることも可能であり、<option>-fprof-cafs</option><indexterm><primary><option>-fprof-cafs</option></primary></indexterm>オプションを使う。</para>
     </sect2>
   </sect1>
 
@@ -276,29 +257,50 @@ x = nfib 25
     <variablelist>
       <varlistentry>
 	<term>
-          <option>-auto</option>:
-          <indexterm><primary><option>-auto</option></primary></indexterm>
+          <option>-fprof-auto</option>:
+          <indexterm><primary><option>-fprof-auto</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>INLINE指定されていない<emphasis>全て</emphasis>の関数は、エクスポートされているか、最上位が局所的かにかかわらず、<function>SCC</function>注釈が自動的に与えられる。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-fprof-auto-top</option>:
+          <indexterm><primary><option>-fprof-auto-top</option></primary></indexterm>
           <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
         </term>
 	<listitem>
-          <para>INLINE指定されていない全ての最上位のエクスポートされた関数に、GHCが<function>_scc_</function><!--訳注: SCCとすべき。以下同様-->を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は、手動で付け加えなければならない。</para>
+          <para>INLINE指定されていない全ての最上位の関数に、GHCが<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
 	<term>
-          <option>-auto-all</option>:
-          <indexterm><primary><option>-auto-all</option></primary></indexterm>
+          <option>-fprof-auto-exported</option>:
+          <indexterm><primary><option>-fprof-auto-top</option></primary></indexterm>
+          <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
         </term>
 	<listitem>
-          <para>INLINE指定されていない<emphasis>全て</emphasis>の最上位の関数が、エクスポートされているかにかかわらず、自動的に<function>_scc_</function>化される。INLINE指定された関数には手動でコスト集約点を与えなければならない。</para>
+          <para>INLINE指定されていない全てのエクスポートされた関数に、GHCが<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
 	<term>
-          <option>-caf-all</option>:
-          <indexterm><primary><option>-caf-all</option></primary></indexterm>
+          <option>-fprof-auto-calls</option>:
+          <indexterm><primary><option>-fprof-auto-calls</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>全ての<emphasis>呼び出し地点</emphasis>に自動的に<literal>SCC</literal>注釈を加える。これはスタックトレースを生成する目的でプロファイルを使っている場合に特に便利である。詳細は、<literal>Debug.Trace</literal>モジュールの<literal>traceStack</literal>かRTSフラグ<literal>-xc</literal>(<xref linkend="rts-options-debugging" />)を見よ。</para>
+	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-fprof-cafs</option>:
+          <indexterm><primary><option>-fprof-cafs</option></primary></indexterm>
         </term>
 	<listitem>
           <para>一つのモジュール内の全てのCAFのコストは通常一つの「大きな」CAFというコスト集約点に割り当てられる。このオプションを使うと、全てのCAFが独自のコスト集約点を持つようになる。「他のことがうまくいかなかったら」試すオプションである。</para>
@@ -307,14 +309,36 @@ x = nfib 25
 
       <varlistentry>
 	<term>
-          <option>-ignore-scc</option>:
-          <indexterm><primary><option>-ignore-scc</option></primary></indexterm>
+          <option>-fno-prof-auto</option>:
+          <indexterm><primary><option>-no-fprof-auto</option></primary></indexterm>
         </term>
 	<listitem>
-          <para><function>_scc_</function>を全て無視する。従って、既に<function>_scc_</function>のあるモジュールを注釈を無視したままプロファイル用にコンパイルすることができる。</para>
-	</listitem>
+          <para>既に指定された<option>-fprof-auto</option>、<option>-fprof-auto-top</option>、<option>-fprof-auto-exported</option>オプションを無効にする。
+          </para>
+        </listitem>
       </varlistentry>
 
+      <varlistentry>
+	<term>
+          <option>-fno-prof-cafs</option>:
+          <indexterm><primary><option>-fno-prof-cafs</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>既に指定された<option>-fprof-cafs</option>オプションを無効にする。
+          </para>
+        </listitem>
+       </varlistentry>
+
+      <varlistentry>
+	<term>
+          <option>-fno-prof-count-entries</option>:
+          <indexterm><primary><option>-fno-prof-count-entries</option></primary></indexterm>
+        </term>
+	<listitem>
+          <para>このモジュールについて、実行時に関数が何回進入されたかの情報(時間プロファイルの「entries」列)を収集しないようGHCに指示する。正しい進入回数を管理する必要がないときはGHCがより攻撃的な最適化を行なえるので、このオプションはプロファイルされるコードの実行を高速化する傾向がある。このオプションは進入回数に興味がないときに便利である(たとえばヒーププロファイルだけを意図している場合)。
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
 
   </sect1>
@@ -357,8 +381,8 @@ x = nfib 25
           <indexterm><primary><option>-xc</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-          <para>このオプションは、コスト集約点スタックプロファイラが持つ独自の情報を使って、実行時エラーの発生位置について有用な情報を提供する。<xref linkend="rts-options-debugging"/>を見よ。</para>
-	</listitem>
+          <para>このオプションは、例外が発生するたびにその時点のコスト集約点スタックをランタイムが表示するようにする。これは、悪名高い<literal>Prelude.head: empty list</literal>エラーなど、例外の位置をデバッグするのに特に便利である。<xref linkend="rts-options-debugging"/>を見よ。</para>
+        </listitem>
       </varlistentry>
 
     </variablelist>
@@ -368,7 +392,7 @@ x = nfib 25
   <sect1 id="prof-heap">
     <title>メモリ使用状況のプロファイルを取る</title>
 
-    <para>プログラムの時間的、及びメモリ確保の挙動についてプロファイルを取るのに加えて、プログラムのメモリ使用状況の時間的な変化を表したグラフを生成することができる。これは、プログラムが実行時に必要以上のメモリを使っているときに<firstterm>スペースリーク</firstterm>の原因を探るのに便利である。スペースリークはGCを酷使するので実行時間が長くなりがちであるし、場合によってはプログラムがメモリを使い果たすこともあり得る。</para>
+    <para>プログラムの時間的、及びメモリ確保の挙動についてプロファイルを取るのに加えて、プログラムのメモリ使用状況の時間的な変化を表したグラフを生成することができる。これは、プログラムが実行時に必要以上のメモリを使っているときに<firstterm>スペースリーク</firstterm>の原因を探るのに便利である。スペースリークはGCを酷使するので実行が遅くなりがちであるし、場合によってはプログラムがメモリを使い果たすこともあり得る。</para>
 
     <para>プログラムのヒーププロファイルを生成するには、以下の手順に従う。</para>
 
@@ -377,7 +401,7 @@ x = nfib 25
 	<para>プログラムをプロファイル用にコンパイルする。(<xref linkend="prof-compiler-options"/>)</para>
       </listitem>
       <listitem>
-        <para>下で解説されているヒーププロファイルオプションのどれかを付けて実行する。(例えば、基本的な生産者プロファイルなら<option>-hc</option>)。これで<filename><replaceable>prog</replaceable>.hp</filename>というファイルが生成される。</para>
+        <para>下で解説されているヒーププロファイルオプションのどれかを付けて実行する。(例えば、基本的な生産者プロファイルなら<option>-h</option>)。これで<filename><replaceable>prog</replaceable>.hp</filename>というファイルが生成される。</para>
       </listitem>
       <listitem>
         <para><command>hp2ps</command>を実行して、Postscriptファイルである<filename><replaceable>prog</replaceable>.ps</filename>を作る。<command>hp2ps</command>ユーティリティは<xref linkend="hp2ps"/>で詳述されている。</para>
@@ -386,6 +410,15 @@ x = nfib 25
         <para>できたヒーププロファイルを<application>Ghostview</application>のようなpostscript閲覧器を使って表示するか、Postscript対応のプリンタで印刷する。</para>
       </listitem>
     </orderedlist>
+
+    <para>例として、これは上の<xref linkend="scc-pragma" />で与えたプログラムに対して生成されたヒーププロファイルである。</para>
+
+      <!-- contentwidth/contentheight don't appear to have any effect
+           other than making the PS file generation work, rather than
+           falling over.  The result seems to be broken PS on the page
+           with the image. -->
+      <imagedata fileref="prof_scc" contentwidth="645px"
+      contentdepth="428px"/>
 
     <para>ヒーププロファイルを表示するためのより高度な道具の集まり(GHCには付属していない)として、<ulink url="http://www.haskell.org/haskellwiki/Hp2any">hp2any</ulink>も見てみると良いかもしれない。</para>
 
@@ -401,7 +434,7 @@ x = nfib 25
             <indexterm><primary><option>-hc</option></primary><secondary>RTS option</secondary></indexterm>
           </term>
 	  <listitem>
-            <para>そのデータを生成したコスト集約点スタックで分類する。</para>
+            <para>(-hに短縮可能)そのデータを生成したコスト集約点スタックで分類する。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -561,7 +594,7 @@ x = nfib 25
 
             <para>これには主スレッドも含まれるので、<option>-xt</option>はプログラムが使っているスタック空間の大きさを知るのに良い。</para>
 
-            <para>スレッドが占めるメモリとスタックは、クロージャの説明や型での分類に際しては「TSO」と表示される。</para>
+            <para>スレッドが占めるメモリとスタックは、クロージャの説明での分類、型での分類に際しそれぞれ「TSO」「STACK」と表示される。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -880,6 +913,22 @@ END_SAMPLE 11695.47
 
   </sect1>
 
+  <sect1 id="prof-threaded">
+    <title>並列・並行プログラムのプロファイルを取る</title>
+
+    <para><option>-threaded</option>と<option>-prof</option>の組み合わせは全く問題なく、実際<option>+RTS -N</option>オプションを使って複数のプロセッサ上で走っているプログラムのプロファイルを取ることは可能である。<footnote>この機能はGHC 7.4.1で追加された。</footnote>
+    </para>
+
+    <para>ただしいくつか注意点がある。現在の実装では、ロックを要する共有データ構造をプロファイル実装にいくつか使っているため、プロファイル版プログラムは通常よりずっとスケールしない可能性が高い。さらに、プロファイル版プログラムが収集するメモリ確保量の統計は、共有メモリに置かれるものの(速度のために)ロック<emphasis>されない</emphasis>。したがってこれらの数字は並列プログラムについては不正確なものになる。
+    </para>
+
+    <para>複数コア上でプロファイルを取るためにプログラムをコンパイルするときは、<option>-fno-prof-count-entries</option>を使うことを強く推奨する。これは、進入回数もまた共有メモリにあり、複数のコアでこれを常に更新し続けるのは極めて遅いためである。
+    </para>
+
+    <para>また、並列プログラムのプロファイルを取るには<ulink url="http://www.haskell.org/haskellwiki/ThreadScope">ThreadScope</ulink>を使うことを推奨する。これは並列実行を視覚化するGUIを提供し、GHCが提供する時間と空間プロファイルを補完する。
+    </para>
+  </sect1>
+
   <sect1 id="hpc">
     <title>コード網羅率を観察する</title>
     <indexterm><primary>code coverage</primary></indexterm>
@@ -887,16 +936,16 @@ END_SAMPLE 11695.47
     <indexterm><primary>hpc</primary></indexterm>
 
     <para>
-      コード網羅ツールは、コードのどの部分が実際に実行され、どの部分が一回も呼ばれなかったかを、プログラマが判断できるようにする。GHCには計器付きコードを生成するオプションがあり、生成されたコードは<ulink url="http://www.haskell.org/hpc">Haskell Program Coverage</ulink>(HPC)ツールキット(GHCに付属している)の一員としてコード網羅率を記録する。このコード網羅率情報は、HPCツールを使って人間が理解できる形式に変換することができる。</para>
+      コード網羅ツールは、コードのどの部分が実際に実行され、どの部分が一回も呼ばれなかったかを、プログラマが判断できるようにする。GHCには計器付きコードを生成するオプションがあり、生成されたコードはHaskell Program Coverage(HPC)ツールキット(GHCに付属している)の一員としてコード網羅率を記録する。このコード網羅率情報は、HPCツールを使って人間が理解できる形式に変換することができる。</para>
 
     <para>正しい計器付きコードは二種類の網羅率情報を供給する。ソース網羅率と真偽値制御網羅率である。ソース網羅率は、プログラムがどれくらい隅々まで使われたかの度合いで、三つの水準、すなわち宣言(最上位のものと局所的なものの両方)、分岐(複数の等式やcaseの枝からの選択)、式(あらゆる深さのもの)で測られる。真偽値網羅率は、構文的に真偽値が要求される全ての場所(ガード、条件、qualifier(訳者: qualifierって何？))について、どれくらいTrueとFalseの両方が得られたかである。</para>
 
-    <para>HPCは、この両方の種類の情報を、二つの主要な方法で表示する。一つは、統計要約の付いたテキスト形式の報告書(hpc報告)であり、もう一つはソースの色付きマークアップ(hpcマークアップ)である。真偽値網羅については、それぞれのガード、条件、qualifierについて、四つの結果があり得る。TrueとFalseの両方が起こった、Trueだけ、Falseだけ、一回も評価されなかった、である。hpcマークアップの出力において、黄色の背景による強調はプログラムのその部分が一回も評価されなかったことを示し、緑の背景は常にTrueだったことを、赤い背景は常にFalseだったことを示す。</para>
+    <para>HPCは、この両方の種類の情報を、二つの主要な方法で表示する。一つは、統計要約の付いたテキスト形式の報告書(<literal>hpc report</literal>)であり、もう一つはソースの色付きマークアップ(<literal>hpc markup</literal>)である。真偽値網羅については、それぞれのガード、条件、qualifierについて、四つの結果があり得る。TrueとFalseの両方が起こった、Trueだけ、Falseだけ、一回も評価されなかった、である。hpcマークアップの出力において、黄色の背景による強調はプログラムのその部分が一回も評価されなかったことを示し、緑の背景は常にTrueだったことを、赤い背景は常にFalseだったことを示す。</para>
 
    <sect2><title>小さな例: 逆数をとる</title>
 
     <para>
-      例として、Recip.hsという、逆数の正確な十進表現を計算するプログラムを使おう。小数の循環部分は括弧に入れて示すことにする。
+      例として、<filename>Recip.hs</filename>という、逆数の正確な十進表現を計算するプログラムを使おう。小数の循環部分は括弧に入れて示すことにする。
     </para>
 <programlisting>
 reciprocal :: Int -> (String, Int)
@@ -934,16 +983,18 @@ main = do
     <para>HPCの計器付与は-fhpcフラグで有効になる。</para>
 
 <screen>
-$ ghc -fhpc Recip.hs --make
+$ ghc -fhpc Recip.hs
 </screen>
-    <para>HPC index(.mix)ファイルはサブディレクトリ.hpcに置かれる。これはHPCにとっての.hiファイルのようなものだと考えられる。
-   </para>
+    <para>GHCはカレントディレクトリに<filename>.hpc</filename>サブディレクトリを作成し、HPCインデックス(<filename>.mix</filename>)ファイルを、コンパイルするモジュール一つにつき一個そこに置く。これらのファイルについて心配する必要はない。これらは、プログラムが実行された後に<literal>hpc</literal>ツールがコンパイルされたモジュールの網羅率データを生成するのに必要な情報を含んでいる。</para>
 <screen>
 $ ./Recip
 1/3
 = 0.(3)
 </screen>
-    <para>以下のようにして、網羅率のテキスト要約を生成できる。</para>
+    <para>プログラムを実行すると接尾辞<literal>.tix</literal>を持つファイル、この例では<filename>Recip.tix</filename>が生成される。これはプログラムの今回の実行の網羅率データを含んでいる。プログラムは(たとえば違うテストデータで)複数回走らせることができ、そうすると別々の実行の網羅率データがこの<filename>.tix</filename>に蓄積される。網羅率データをリセットしてやりなおすには、単に<filename>.tix</filename>ファイルを削除すれば良い。
+    </para>
+
+    <para>プログラムを走らせたので、テキスト形式で網羅率の要約を生成することができる。</para>
 <screen>
 $ hpc report Recip
  80% expressions used (81/101)
@@ -968,15 +1019,23 @@ writing Recip.hs.html
      </sect2>
 
      <sect2><title>網羅率の測定器を付与するオプション</title>
-	<para>
-          網羅率を有効にするのは簡単で、-fhpcフラグを使えばよい。計器付きのものと計器付きでないものは自由に混ぜて構わない。Mainモジュールをコンパイルするとき、hpcコンパイルされたモジュールがあれば、GHCが自動的にそれを検出して、正しい初期化コードを追加する。
-	</para>
+     <variablelist>
+       <varlistentry>
+         <term><option>-fhpc</option></term>
+         <indexterm><primary><option>-fhpc</option></primary></indexterm>
+        <listitem>
+          <para>現在のモジュール、またはコンパイルされているモジュール群に対するコード網羅率の計測を有効にする。</para>
+
+          <para>このオプションを使ってコンパイルされたモジュールは、これなしでコンパイルされたモジュールと自由に混ぜて構わない。実際、大部分のライブタリは典型的には<option>-fhpc</option>なしでコンパイルされるだろう。プログラムが実行されるとき、網羅率データは<option>-fhpc</option>付きでコンパイルされたモジュールについてのみ生成され、<literal>hpc</literal>はそれらのモジュールについての情報のみを示す。
+          </para>
+	</listitem>
+      </varlistentry>
+     </variablelist>
 
      </sect2>
-
      <sect2><title>hpcツールキット</title>
 
-      <para>hpcツールキットはcvs/svn/darcs的なインタフェースを持っている。つまり、一つのバイナリに沢山の機能単位が含まれている。</para>
+      <para>hpcコマンドにはいくつかサブコマンドがある。</para>
 <screen>
 $ hpc
 Usage: hpc COMMAND ...
@@ -998,10 +1057,10 @@ Others:
   version     Display version for hpc
 </screen>
 
-     <para>一般的に言って、これらのオプションは、計器付きバイナリが生成した後の.tixファイルに対して動作する。hpcは、生の.tixファイルと、生成される詳細な報告書の間の仲介として働く。</para>
+     <para>一般的に言って、これらのオプションは、計器付きバイナリが生成した後の.tixファイルに対して動作する。</para>
 
 	<para>
-          hpcツールは、アプリケーションをビルドした場所の最上位ディレクトリに居て、その同じ最上位ディレクトリに.tixファイルがあることを前提とする。別のディレクトリに対してhpcを使うには--srcdirフラグを使うことができる。また、複数の場所でコンパイルされたプログラム(パッケージでは普通のことである)を分析する場合は、--srcdirを複数回使えばよい。
+          hpcツールは、アプリケーションをビルドした場所の最上位ディレクトリに居て、その同じ最上位ディレクトリに<filename>.tix</filename>ファイルがあることを前提とする。別のディレクトリに対して<literal>hpc</literal>を使うには<option>--srcdir</option>フラグを使うことができる。また、複数の場所でコンパイルされたプログラム(パッケージでは普通のことである)を分析する場合は、<option>--srcdir</option>を複数回使えばよい。
 	</para>
 
 	<para>
@@ -1009,7 +1068,7 @@ Others:
      </para>
 
        <sect3><title>hpc report</title>
-		<para>hpc reportは、網羅率のテキスト形式の報告書を与える。デフォルトで、includeやexcludeが使われない限り、報告書を生成する上ですべてのモジュールとパッケージが考慮に入る。--per-moduleフラグが使われない限り、報告書は要約である。--xml-outputオプションは、hpcを使って網羅率を収集するツールのためにある。
+		<para><literal>hpc report</literal>は、網羅率のテキスト形式の報告書を与える。デフォルトで、includeやexcludeが使われない限り、報告書を生成する上ですべてのモジュールとパッケージが考慮に入る。<option>--per-module</option>フラグが使われない限り、報告書は要約である。<option>--xml-output</option>オプションは、hpcを使って網羅率を収集するツールのためにある。
 		</para>
 <screen>
 $ hpc help report
@@ -1029,7 +1088,7 @@ Options:
 </screen>
        </sect3>
        <sect3><title>hpc markup</title>
-		<para>hpc markupはソースファイルをマークアップして色付きhtmlにする。
+		<para><literal>hpc markup</literal>はソースファイルをマークアップして色付きhtmlにする。
 		</para>
 <screen>
 $ hpc help markup
@@ -1050,7 +1109,7 @@ Options:
 
        </sect3>
        <sect3><title>hpc sum</title>
-		<para>hpc sumは任意の個数の.tixファイルを足し合わせて、単一の.tixファイルにする。hpc sumは元の.tixファイルを変更せず、新しい.tixファイルを作る。</para>
+		<para><literal>hpc sum</literal>は任意の個数の<filename>.tix</filename>ファイルを足し合わせて、単一の<filename>.tix</filename>ファイルにする。<literal>hpc sum</literal>は元の<filename>.tix</filename>ファイルを変更せず、新しい<filename>.tix</filename>ファイルを作る。</para>
 <screen>
 $ hpc help sum
 Usage: hpc sum [OPTION] .. &lt;TIX_FILE&gt; [&lt;TIX_FILE&gt; [&lt;TIX_FILE&gt; ..]]
@@ -1065,7 +1124,7 @@ Options:
 </screen>
        </sect3>
        <sect3><title>hpc combine</title>
-		<para>hpc combineはhpcのスイスアーミーナイフである。.tixファイルの差(difference)をとること、ある.tixファイルから別の.tixファイルを引く(subtract)こと、二つの.tixファイルを足す(add)ことができる。hpc combineは元の.tixファイルを変更せず、新しい.tixファイルを生成する。
+		<para><literal>hpc combine</literal>は<literal>hpc</literal>のスイスアーミーナイフである。<filename>.tix</filename>ファイルの差(difference)をとること、ある<filename>.tix</filename>ファイルから別の<filename>.tix</filename>ファイルを引く(subtract)こと、二つの<filename>.tix</filename>ファイルを足す(add)ことができる。hpc combineは元の<filename>.tix</filename>ファイルを変更せず、新しい<filename>.tix</filename>ファイルを生成する。
 		</para>
 <screen>
 $ hpc help combine
@@ -1083,7 +1142,7 @@ Options:
 </screen>
        </sect3>
        <sect3><title>hpc map</title>
-		<para>hpc mapは.tixファイルを反転(invert)したり零化(zero)したりする。hpc mapは元の.tixファイルを変更せず、新しい.tixファイルを生成する。
+		<para>hpc mapは<filename>.tix</filename>ファイルを反転(invert)したり零化(zero)したりする。hpc mapは元の<filename>.tix</filename>ファイルを変更せず、新しい<filename>.tix</filename>ファイルを生成する。
 		</para>
 <screen>
 $ hpc help map
@@ -1132,7 +1191,7 @@ Options:
      </sect2>
      <sect2><title>Haskell Program Coverageの注意点と短所</title>
 	  <para>
-                HPCは.tixファイルをロックしようとしないので、同じディレクトリでバイナリを並行に実行すると競合条件が現れるだろう。バイナリの名前を変更する以外に、生成される.tixファイルの名前を変えるすべはない。HPCはGHCiでは動作しない。
+                HPCは<filename>.tix</filename>ファイルをロックしようとしないので、同じディレクトリでバイナリを並行に実行すると競合条件が現れるだろう。バイナリの名前を変更する以外に、生成される<filename>.tix</filename>ファイルの名前を変えるすべはない。HPCはGHCiでは動作しない。
   	  </para>
     </sect2>
   </sect1>
