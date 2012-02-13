@@ -14,7 +14,7 @@ runghc [runghc flags] [GHC flags] module [program args]
 </screen>
     <para>runghcのフラグは、プログラムを走らせるのにどのGHCを使うかをrunghcに伝える<literal>-f /path/to/ghc</literal>と、使い方の情報を印字する<literal>--help</literal>である。これが与えられなかった場合、runghcはシステムの探索パスにあるディレクトリからGHCを探す。</para>
 
-    <para>runghcは<literal>[runghc flags]</literal>と<literal>[GHC flags]</literal>と<literal>[program args]</literal>の境界がどこかを推測しようとするが、間違った場合には<literal>--</literal>フラグを使うことができる。例えば、<literal>runghc -- -fglasgow-exts Foo</literal>とすれば、runghcは、<literal>glasgow-exts</literal>をGHCのパスとして使おうとすることなく、このフラグをGHCに渡す。GHCのフラグがダッシュで始まっていない場合、それに<literal>--ghc-arg=</literal>を前置する必要がある。そうしなければ、runghcはそれを走らせるべきプログラムの名前だと考える。次のような場合である。<literal>runghc -package-conf --ghc-arg=foo.conf Main.hs</literal></para>
+    <para>runghcは<literal>[runghc flags]</literal>と<literal>[GHC flags]</literal>と<literal>[program args]</literal>の境界がどこかを推測しようとするが、間違った場合には<literal>--</literal>フラグを使うことができる。例えば、<literal>runghc -- -fwarn-unused-bindings Foo</literal>とすれば、runghcは、<literal>warn-unused-bindings</literal>をGHCのパスとして使おうとすることなく、このフラグをGHCに渡す。GHCのフラグがダッシュで始まっていない場合、それに<literal>--ghc-arg=</literal>を前置する必要がある。そうしなければ、runghcはそれを走らせるべきプログラムの名前だと考える。次のような場合である。<literal>runghc -package-conf --ghc-arg=foo.conf Main.hs</literal></para>
 
   </sect1>
 

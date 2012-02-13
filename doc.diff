@@ -1,17 +1,3 @@
-diff -urd 7.2.2-original/runghc.xml original/runghc.xml
---- 7.2.2-original/runghc.xml	2011-11-10 02:10:39.000000000 +0800
-+++ original/runghc.xml	2012-02-02 02:10:32.000000000 +0800
-@@ -26,8 +26,8 @@
-     <literal>[program args]</literal> and
-     <literal>module</literal> are, but you can use a
-     <literal>--</literal> flag if it doesn't get it right. For example,
--    <literal>runghc -- -fglasgow-exts Foo</literal> means runghc
--    won't try to use <literal>glasgow-exts</literal> as the path to GHC,
-+    <literal>runghc -- -fwarn-unused-bindings Foo</literal> means runghc
-+    won't try to use <literal>warn-unused-bindings</literal> as the path to GHC,
-     but instead will pass the flag to GHC. If a GHC flag doesn't start
-     with a dash then you need to prefix it with
-     <literal>--ghc-arg=</literal> or runghc will think that it is the
 diff -urd 7.2.2-original/runtime_control.xml original/runtime_control.xml
 --- 7.2.2-original/runtime_control.xml	2011-11-10 02:10:39.000000000 +0800
 +++ original/runtime_control.xml	2012-02-02 02:10:32.000000000 +0800
