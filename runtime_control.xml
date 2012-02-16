@@ -66,7 +66,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
     <sect3 id="rts-opts-compile-time">
       <title>コンパイル時にRTSオプションを設定する</title>
 
-      <para><literal>-with-rtsopts</literal>フラグ(<xref linkend="options-linker"/>)を使うことで、プログラムのRTSオプションをコンパイル時に設定することができる。例として、<literal>-H128m -K64m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K64m"</literal>付きでリンクすればよい。</para>
+      <para><literal>-with-rtsopts</literal>フラグ(<xref linkend="options-linker"/>)を使うことで、プログラムのRTSオプションをコンパイル時に設定することができる。これのよくある使い方は、デフォルトよりも大きなヒープ/スタックサイズを初期値としてプログラムに与えることである。例えば<literal>-H128m -K64m</literal>を設定するには、<literal>-with-rtsopts="-H128m -K64m"</literal>付きでリンクすればよい。</para>
     </sect3>
 
     <sect3 id="rts-options-environment">
@@ -95,21 +95,11 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
       <indexterm><primary>RTS hooks</primary></indexterm>
       <indexterm><primary>RTS behaviour, changing</primary></indexterm>
 
-      <para>GHCでは、ランタイムシステムから呼ばれるフックをコンパイル時に含めることで、任意のプログラムのRTS設定をある程度制御することができる。RTSにはこれら全てのフックのスタブ定義が含まれているが、自分の版を書いてGHCのコマンド行からリンクすることで、デフォルトと異なるものを使える。</para>
+      <para>GHCでは、ランタイムシステムから呼ばれるフックをコンパイル時に含めることで、任意のプログラムのRTS設定の一部をある程度制御することができる。RTSにはこれらのフックのスタブ定義が含まれているが、自分の版を書いてGHCのコマンド行からリンクすることで、デフォルトと異なるものを使える。</para>
 
       <para>DLLリンクの気まぐれのせいで、これらのフックはWindowsでプログラムが動的リンクでビルドされるときには働かない。</para>
 
-      <para><literal>ghc_rts_opts</literal><indexterm><primary><literal>ghc_rts_opts</literal></primary></indexterm>というフックを使うと、特定のプログラムのRTSオプションを恒久的に設定することができる。これは新しい<option>-with-rtsopts</option>というリンカオプションと同じである。よくある使いかたは、プログラムのヒープやスタックをデフォルトより大きくすることである。例えば、<literal>-H128m -K1m</literal>を設定するには、まず以下の定義をCソースファイルに置く。</para>
-
-  <programlisting>
-  char *ghc_rts_opts = "-H128m -K1m";
-  </programlisting>
-
-      <para>このCファイルをコンパイルし、できたオブジェクトファイルを、Haskellプログラムをリンクするときのコマンド行に加えれば良い。</para>
-
-      <para>これらのフラグは、<literal>GHCRTS</literal>環境変数やコマンド行のフラグよりも先に解釈される。</para>
-
-      <para>ランタイムシステムがどうしようもなくなったとき(例えばスタックオーバーフロー)に表示される文言を変更することもできる。このためのフックは以下である。</para>
+      <para>ランタイムシステムがどうしようもなくなったとき(例えばスタックオーバーフロー)に表示される文言を変更することができる。このためのフックは以下である。</para>
 
       <variablelist>
 
@@ -143,8 +133,6 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           </listitem>
         </varlistentry>
       </variablelist>
-
-      <para>これらのフックの使いかたの例としては、GHCソースツリーの<filename>ghc/compiler/parser/hschooks.c</filename>にあるGHC自身のものを見よ。</para>
     </sect3>
   </sect2>
 
@@ -304,15 +292,17 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
       <varlistentry>
 	<term>
-          <option>-H</option><replaceable>size</replaceable>
+          <option>-H</option><optional><replaceable>size</replaceable></optional>
           <indexterm><primary><option>-H</option></primary><secondary>RTS option</secondary></indexterm>
           <indexterm><primary>heap size, suggested</primary></indexterm>
         </term>
 	<listitem>
-          <para>&lsqb;デフォルト: 0&rsqb; このオプションはガベッジコレクタに「推奨されるヒープの大きさ」を提示する。プログラムのメモリ使用量が増加し、性能を保つためにヒープの大きさを増す必要が発生するまでは、ガベッジコレクタは指定された大きさの程度のメモリを使う。</para>
+          <para>&lsqb;デフォルト: 0&rsqb; このオプションはガベッジコレクタに「推奨されるヒープの大きさ」を提示する。<option>-H<replaceable>size</replaceable></option>は可変の<option>-A</option>オプションだと思うと良い。これは次のように述べる。私は少なくとも<replaceable>size</replaceable>バイトを使いたいので、残ったものは全部<option>-A</option>を増やすのに使え。</para>
+          
+          <para>このオプションはヒープの大きさに<emphasis>制限</emphasis>を加えるものではない。ヒープは通常同様に与えられた大きさを超えて成長し得る。</para>
 
-          <para>デフォルトでは、ヒープは小さい状態から開始し、必要に応じて伸長・収縮する。これは性能に悪影響を及ぼすので、メモリが潤沢にあるなら、<option>-H</option><replaceable>size</replaceable>に大きな値を指定すると良い。GCの性能を向上させるには、通常、<option>-A</option><replaceable>size</replaceable>よりも<option>-H</option><replaceable>size</replaceable>を使った方が良い。</para>
-	</listitem>
+          <para><replaceable>size</replaceable>を省略すると、ガベッジコレクタは前回のGC時におけるヒープの大きさを<replaceable>size</replaceable>として取る。これは、プログラムの全体的なメモリ要求を増やさずに、より大きな<option>-A</option>の値を許す効果がある。長生きするデータを大量に作成するプログラムなど、デフォルトの小さな<option>-A</option>の値が適していないときに使える。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -414,6 +404,10 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
       <varlistentry>
         <term>
+          <option>-T</option>
+          <indexterm><primary><option>-T</option></primary><secondary>RTS option</secondary></indexterm>
+        </term>
+        <term>
           <option>-t</option><optional><replaceable>file</replaceable></optional>
           <indexterm><primary><option>-t</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
@@ -430,9 +424,13 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary><option>--machine-readable</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-	  <para>これらのオプションはランタイムシステムの統計情報を生成する。プログラムを実行するのに使った時間、ガベッジコレクタで使った時間、確保されたメモリの量、ヒープの最大サイズ、といったものである。この三種類のオプションは、詳細さの度合いが異なる。<option>-t</option>は、GHCの<option>-Rghc-timing</option>オプションと同じ形式で一行だけの出力を生成する。<option>-s</option>はプログラムの最後にもっと詳細なまとめを生成し、<option>-S</option>はさらにガベッジコレクション一回一回について情報を生成する。</para>
+	  <para>これらのオプションはランタイムシステムの統計情報を生成する。プログラムを実行するのに使った時間、ガベッジコレクタで使った時間、確保されたメモリの量、ヒープの最大サイズ、といったものである。この三種類のオプションは、詳細さの度合いが異なる。<option>-T</option>はデータを収集するものの出力を生成しない。<option>-t</option>はGHCの<option>-Rghc-timing</option>オプションと同じ形式で一行だけの出力を生成する。<option>-s</option>はプログラムの最後にもっと詳細なまとめを生成しする。<option>-S</option>はさらにガベッジコレクション一回一回について情報を生成する。</para>
 
           <para>出力内容は<replaceable>file</replaceable>に置かれる。<replaceable>file</replaceable>が省略された場合、出力は<constant>stderr</constant>に送られる。</para>
+
+    <para>
+        <literal>-T</literal>フラグを使った場合、統計にアクセスするには<ulink url="&libraryBaseLocation;/GHC-Stats.html">GHC.Stats</ulink>を使う。
+    </para>
 
     <para>
         <literal>-t</literal>フラグを使った場合、プログラムの終了時、次のようなものを見ることになるだろう。
@@ -625,7 +623,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
               option</secondary></indexterm>
         </term>
         <listitem>
-          <para>基本的なヒーププロファイルを、<literal><replaceable>prog</replaceable>.hp</literal>というファイルに生成する。ヒーププロファイルのグラフを作成するには、<command>hp2ps</command>(<xref linkend="hp2ps" />を見よ)を使えばよい。この基本的なヒーププロファイルは、データ構築子ごとに分類され、その他の種類のクロージャは<literal>FUN</literal>や<literal>THUNK</literal>といった広い範疇ごとにまとめられている。より詳細なプロファイルを得るには、完全なプロファイルサポート(<xref linkend="profiling"/>)を使えばよい。</para>
+          <para>(<option>-h</option>に短縮可。) 基本的なヒーププロファイルを、<literal><replaceable>prog</replaceable>.hp</literal>というファイルに生成する。ヒーププロファイルのグラフを作成するには、<command>hp2ps</command>(<xref linkend="hp2ps" />を見よ)を使えばよい。この基本的なヒーププロファイルは、データ構築子ごとに分類され、その他の種類のクロージャは<literal>FUN</literal>や<literal>THUNK</literal>といった広い範疇ごとにまとめられている。より詳細なプロファイルを得るには、完全なプロファイルサポート(<xref linkend="profiling"/>)を使えばよい。</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -643,7 +641,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
     <itemizedlist>
       <listitem>
-        <para>バイナリ形式でファイルに記録し、後でいろいろなツールによって分析できるようにする。<ulink url="http://hackage.haskell.org/package/ThreadScope">ThreadScope</ulink><indexterm><primary>ThreadScope</primary></indexterm>はそのようなツールの一つであり、イベント記録を解釈して、プログラムの視覚的な並列実行プロファイルを作成する。
+        <para>バイナリ形式でファイルに記録し、後でいろいろなツールによって分析できるようにする。<ulink url="http://www.haskell.org/haskellwiki/ThreadScope">ThreadScope</ulink><indexterm><primary>ThreadScope</primary></indexterm>はそのようなツールの一つであり、イベント記録を解釈して、プログラムの視覚的な並列実行プロファイルを作成する。
         </para>
       </listitem>
       <listitem>
@@ -659,10 +657,41 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary><option>-l</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
         <listitem>
-          <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。ここで、<replaceable>flags</replaceable>は、どの種類のイベントを記録するかを示す文字の零個以上の並びである。現在、対応している型はひとつだけである。すなわち、<literal>-ls</literal>でスケジューラのイベントを記録する。
+          <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。<replaceable>flags</replaceable>が指定されなかった場合、ThreadScopeなどのツールに適したデフォルトのイベント集合を記録する。
           </para>
 
-          <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>show-ghc-events</literal>というツールが使える。
+          <para>特殊な利用状況では、どのイベントを含むかをもっと細かく制御したいかもしれない。<replaceable>flags</replaceable>は、どの種類のイベントを記録するかを意味する文字を零個以上並べたものである。現在、有効/無効にできるイベントの種類は四つである。
+            <simplelist>
+              <member>
+                <option>s</option> &#8212; スケジューラのイベント、スレッドの作成、開始/停止のイベントを含む
+              </member>
+              <member>
+                <option>g</option> &#8212; GCのイベント、GCの開始/停止を含む
+              </member>
+              <member>
+                <option>p</option> &#8212; 並列スパーク(標本抽出)
+              </member>
+              <member>
+                <option>f</option> &#8212; 並列スパーク(完全に正確)
+              </member>
+            </simplelist>
+          </para>
+
+          <para>スパークのイベントには二つのモードがある。標本抽出と完全に正確である。個々のスパークの生涯にはいろいろなイベントがある。通常は作成と実行だけだが、もっと例外的なものもあり得る。標本抽出モードでは、短い間隔で、それぞれのスパークイベントの数が標本抽出される。完全に正確モードでは、全てのスパークが個々に記録される。後者の方が実行時のオーバーヘッドが高く、デフォルトでは有効になっていない。
+          </para>
+
+          <para>初期状態で有効なイベントの種類は「s」「g」「p」である。これに加えて、特定の種類を無効にしたり、全ての種類を一度に有効/無効にしたりできる。
+            <simplelist>
+              <member>
+                <option>a</option> &#8212; 上で挙げた全ての種類のイベントを有効にする
+              </member>
+              <member>
+                <option>-<replaceable>x</replaceable></option> &#8212; 与えられた種類のイベントを無効にする。上で挙げた種類をどれか指定するか、<option>-a</option>なら全てのイベントになる。
+              </member>
+            </simplelist>
+            例えば、<option>-l-ag</option>はGCイベント(<option>g</option>)を除いて全てのイベント(<option>-a</option>)を無効にする。</para>
+
+          <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>ghc-events-show</literal>というツールが使える。
           </para>
         </listitem>
       </varlistentry>
@@ -739,18 +768,33 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary><option>-xc</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-          <para>(プログラムがプロファイルを取れるようにコンパイルしてある場合のみ利用可能) プログラム中で例外が発生したとき、このオプションが指定されていると、現在のコスト集約点スタックが<literal>stderr</literal>に出力される。</para>
+          <para>(プログラムがプロファイルを取れるようにコンパイルしてある場合のみ利用可能) プログラム中で例外が発生したとき、このオプションが指定されていると、スタックトレースが<literal>stderr</literal>に出力される。</para>
 
-          <para>これは特にデバッグ時に有用である。プログラムが<literal>head []</literal>エラーを起こすが、コードのどの部分が原因か分からないとき、<literal>-prof -auto-all</literal>を付けてコンパイルし、<literal>+RTS -xc -RTS</literal>を付けて実行すれば、エラーが発生した地点の呼び出しスタックが正確に分かる。</para>
+          <para>これは特にデバッグ時に有用である。プログラムが<literal>head []</literal>エラーを起こすが、コードのどの部分が原因か分からないとき、<literal>-prof -fprof-auto</literal>を付けてコンパイルし、<literal>+RTS -xc -RTS</literal>を付けて実行すれば、エラーが発生した地点の呼び出しスタックが正確に分かる。</para>
 
-          <para>発生した例外一つにつき一行が出力される。(プログラムは、実行を通して、例外を複数回発生させたり捕捉したりし得る)。各行は以下の形を取る。</para>
+          <para>出力には、プログラムで発生した例外それぞれ(プログラムは、実行を通して、例外を複数回発生させたり捕捉したりし得る)につき一つの報告を含む。個々の報告は以下のようなものである。</para>
 
 <screen>
-&lt; cc<subscript>1</subscript>, ..., cc<subscript>n</subscript> &gt;
+*** Exception raised (reporting due to +RTS -xc), stack trace:
+  GHC.List.CAF
+  --> evaluated by: Main.polynomial.table_search,
+  called from Main.polynomial.theta_index,
+  called from Main.polynomial,
+  called from Main.zonal_pressure,
+  called from Main.make_pressure.p,
+  called from Main.make_pressure,
+  called from Main.compute_initial_state.p,
+  called from Main.compute_initial_state,
+  called from Main.CAF
+  ...
 </screen>
-          <para>それぞれの<literal>cc</literal><subscript>i</subscript>はプログラム中のコスト集約点(<xref linkend="cost-centres"/>を見よ)であり、この列は例外が発生した地点での「呼び出しスタック」を表している。最も右にあるのが最も外側の関数である。</para>
+          <para>スタックトレースはしばしば、<literal>GHC.List.CAF</literal>のような役に立たないものから始まる。これはGHCの最適化器が例外を最上位に移した痕跡である。これに対してプロファイルシステムはコスト集約点「CAF」を割り当てた。しかし<literal>+RTS -xc</literal>は単に現在のスタックを表示するだけでなく、より深く見てそのCAFが評価された時点のスタックを報告する。CAFでないスタックが見つかるまでさらにスタックを報告するかもしれない。上の例では、次のスタック(<literal>--> evaluated by</literal>の後)が、プログラムが<literal>head []</literal>を評価したときに何をしていたかについて、沢山の情報を含んでいる。</para>
+ 
+          <para>実装の詳細はさておき、スタック中の関数名は願わくばバグを見つけだすのに十分な手掛りをあなたに与えるだろう。</para>
 
-	</listitem>
+          <para>呼び出しスタックを見る別の方法については、<literal>Debug.Trace</literal>モジュールの<literal>traceStack</literal>関数も見よ。
+          </para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -766,7 +810,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 
   </sect2>
 
-  <sect2>
+  <sect2 id="ghc-info">
     <title>RTSに関する情報を取得する</title>
 
     <indexterm><primary>RTS</primary></indexterm>
@@ -865,7 +909,7 @@ $ ./a.out +RTS --info
       <varlistentry>
         <term><literal>Compiler unregistered(訳注: unregisteredでなくunregisterisedが正しいものと思われる)</literal></term>
         <listitem>
-          <para>このプログラムは「非レジスタ化」版のGHC(すなわち、通常未対応のプラットフォームであるために、プラットフォーム固有の最適化なしでコンパイルされたGHC)によってコンパイルされたか？実験的なGHCのビルドを使っているのでない限り、この値は通常noである。</para>
+          <para>このプログラムは<link linkend="unreg">「非レジスタ化」</link>版のGHC(すなわち、通常未対応のプラットフォームであるために、プラットフォーム固有の最適化なしでコンパイルされたGHC)によってコンパイルされたか？実験的なGHCのビルドを使っているのでない限り、この値は通常noである。</para>
         </listitem>
       </varlistentry>
 
