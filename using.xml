@@ -539,7 +539,7 @@ ghc -c Foo.hs</screen>
 
       <para>これはHaskellソースファイル<filename>Foo.hs</filename>をコンパイルしてオブジェクトファイル<filename>Foo.o</filename>を生成する。</para>
 
-      <para>注意: Haskellコンパイラが実際に出力するのが何かはネイティブコード生成器<indexterm><primary>native-code generator</primary></indexterm>が使われている(アセンブリ言語を出力する)かそうでない(Cを出力する)かによる。詳しくは、<xref linkend="options-codegen"/>を見よ。</para>
+      <para>注意: Haskellコンパイラが実際に出力するのが何かはバックエンドのコード生成器が何かによる。詳しくは、<xref linkend="code-generators"/>を見よ。</para>
 
       <para>注意: Cプリプロセスは省略可能であり、<option>-cpp</option><indexterm><primary><option>-cpp</option></primary></indexterm>フラグによって有効になる。詳しくは<xref linkend="c-pre-processor"/>を見よ。</para>
 
@@ -1254,6 +1254,26 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
+            <option>-fignore-interface-pragmas</option>
+	    <indexterm><primary><option>-fignore-interface-pragmas</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para>インタフェースファイルを読むときに必須でない情報を全て無視するようにGHCに指示する。つまり、仮に<filename>M.hi</filename>に関数の展開候補や正格性情報があったとしても、GHCはその情報を無視する。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fliberate-case</option>
+            <indexterm><primary><option>-fliberate-case</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>liberate-case変換を有効にする。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
             <option>-fno-cse</option>
             <indexterm><primary><option>-fno-cse</option></primary></indexterm>
           </term>
@@ -1306,21 +1326,44 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-fspec-constr</option>
-            <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
+            <option>-fno-state-hack</option>
+            <indexterm><primary><option>-fno-state-hack</option></primary></indexterm>
           </term>
 	  <listitem>
-	    <para>呼び出しパターンの特殊化(call-pattern specialization)を有効にする。</para>
+	    <para><literal>State#</literal>トークンを持つラムダを、単一進入であり、したがってその中に物をインライン化しても良いとみなす「stateハック」を無効にする。これはIOおよびSTモナドのコードの性能を向上させ得るが、共有を減らす危険を冒している。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
 	  <term>
-            <option>-fliberate-case</option>
-            <indexterm><primary><option>-fliberate-case</option></primary></indexterm>
+            <option>-fpedantic-bottoms</option>
+            <indexterm><primary><option>-fpedantic-bottoms</option></primary></indexterm>
           </term>
 	  <listitem>
-	    <para>liberate-case変換を有効にする。</para>
+	    <para>GHCがボトムをより精密に扱うようにする(しかし、<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。このようなイータ展開は性能には良いが、部分適用の結果に対して<literal>seq</literal>を使っているなら悪いものになる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fomit-interface-pragmas</option>
+	    <indexterm><primary><option>-fomit-interface-pragmas</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>コンパイル中のモジュール(Mとしよう)のインタフェースファイルにおいて、必須でない情報を全て省略するようにGHCに指示する。これによって、Mをインポートするモジュールからは、Mがエクスポートする関数の<emphasis>型</emphasis>しか見えず、展開候補や正格性情報などが見えなくなる。よって、例えば、Mからエクスポートされた関数が、それをインポートするモジュールでインライン化されるということがなくなる。これによる利点は、Mをインポートするモジュールを再コンパイルしなければならない頻度が減るということである。(Mのエクスポート物の型が変わった場合だけ再コンパイルすればよく、実装が変わっただけならしなくてよい)
+	      </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fsimpl-tick-factor=<replaceable>n</replaceable></option>
+            <indexterm><primary><option>-fsimpl-tick-factor</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>GHCの最適化器は、停止しない書き換え規則(<xref linkend="rewrite-rules"/>)を書いたとき、または(もうすこし嫌なことに)データ型を通して再帰を組み上げた場合(<xref linkend="bugs-ghc"/>)に発散する。コンパイラが無限ループに陥るのを避けるため、最適化器は「tickの回数」を保持し、この回数が超過したときにはインライン化と書き換え規則の適用をやめる。大きいプログラムが多くのtickを使えるように、この限界はプログラムの大きさの定数倍になる。<option>-fsimpl-tick-factor</option>はこの定数を変えられるようにする。デフォルトは100である。100より大きな数はより沢山のtickを与え、100より小さい数はより少ないtickを与える。</para>
+            <para>tickの数が尽きると、GHCはそれまでに実行した単純化器の歩みを要約する。<option>-fddump-simpl-stats</option>を使うとずっと詳細な一覧を生成することができる。通常これでループをかなり精密に同定することができる。いくつかの数がとても大きくなるからである。
+	      </para>
 	  </listitem>
 	</varlistentry>
 
@@ -1336,22 +1379,11 @@ f "2"    = 2
 
 	<varlistentry>
 	  <term>
-            <option>-fomit-interface-pragmas</option>
-	    <indexterm><primary><option>-fomit-interface-pragmas</option></primary></indexterm>
+            <option>-fspec-constr</option>
+            <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
           </term>
 	  <listitem>
-	    <para>コンパイル中のモジュール(Mとしよう)のインタフェースファイルにおいて、本質的でない情報を全て省略するようにGHCに指示する。これによって、Mをインポートするモジュールからは、Mがエクスポートする関数の<emphasis>型</emphasis>しか見えず、展開候補や正格性情報などが見えなくなる。よって、例えば、Mからエクスポートされた関数が、それをインポートするモジュールでインライン化されるということがなくなる。これによる利点は、Mをインポートするモジュールを再コンパイルしなければならない頻度が減るということである。(Mのエクスポート物の型が変わった場合だけ再コンパイルすればよく、実装が変わっただけならしなくてよい)
-	      </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-fignore-interface-pragmas</option>
-	    <indexterm><primary><option>-fignore-interface-pragmas</option></primary></indexterm>
-          </term>
-	  <listitem>
-            <para>インタフェースファイルを読むときに本質的でない情報を全て無視するようにGHCに指示する。つまり、仮に<filename>M.hi</filename>に関数の展開候補や正格性情報があったとしても、GHCはその情報を無視する。</para>
+	    <para>呼び出しパターンの特殊化(call-pattern specialization)を有効にする。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1365,7 +1397,8 @@ f "2"    = 2
 	  <listitem>
             <para>このオプションは正格と印の付けられた(つまり「!」)構築子フィールドを可能なら全て非ボックス化、つまりアンパックする。これは全ての正格な構築子フィールドに<literal>UNPACK</literal>プラグマを付けるのと同等である。(<xref linkend="unpack-pragma"/>を見よ)</para>
 
-            <para>このオプションは少々大槌を振り回す感じがある。場合によっては状況を悪化させかねない。<literal>UNPACK</literal>を使ってフィールドを選択的に非ボックス化する方が良いかもしれない。</para>
+            <para>このオプションは少々大槌を振り回す感じがある。場合によっては状況を悪化させかねない。<literal>UNPACK</literal>を使ってフィールドを選択的に非ボックス化する方が良いかもしれない。もう一つの選択肢は、<option>-funbox-strict-fields</option>を使ってデフォルトで非ボックス化を有効にしつつ、特定の構築子フィールドについては<literal>NOUNPACK</literal>プラグマを使って無効にすることである(<xref linkend="nounpack-pragma"/>を見よ)。
+            </para>
 	  </listitem>
 	</varlistentry>
 
@@ -1462,7 +1495,7 @@ f "2"    = 2
     <sect2 id="parallel-options">
       <title>SMP並列性のためのRTSオプション</title>
 
-      <para>プログラムを複数のCPU上で走らせるには、RTSの<option>-N</option>オプションを使う。</para>
+      <para>プログラムを複数のCPU上で走らせるには二つの方法がある。プログラムから<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶか、RTSの<option>-N</option>オプションを使う。</para>
 
       <variablelist>
 	<varlistentry>
@@ -1478,7 +1511,8 @@ f "2"    = 2
 
             <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
 
-            <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.numCapabilities</literal>でHaskellプログラムから得られる。</para>
+            <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.getNumCapabilities</literal>でHaskellプログラムから得られ、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで実行中に変更することができる。注意: 現在の実装では、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで<option>-N</option>の値を<emphasis>増やす</emphasis>ことができるのみで、減らすことはできない。
+            </para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
@@ -1531,9 +1565,17 @@ f "2"    = 2
       <varlistentry>
 	<term><option>-msse2</option>:</term>
 	<listitem>
-          <para>(x86のみ、GHC 7.0.1より追加) ネイティブコード生成器を使っているとき、浮動小数点演算の実装にSSE2のレジスタと命令セットを用いる。これは浮動小数点性能の相当な向上をもたらすが、出来たコードはSSE2対応のプロセッサ(Intel Pentium 4以降またはAMD Athlon 64以降)でしか走らない。
+          <para>(x86のみ、GHC 7.0.1より追加) <link linkend="native-code-gen">ネイティブコード生成器</link>を使っているとき、浮動小数点演算の実装にSSE2のレジスタと命令セットを用いる。これは浮動小数点性能の相当な向上をもたらすが、出来たコードはSSE2対応のプロセッサ(Intel Pentium 4以降またはAMD Athlon 64以降)でしか走らない。<link linkend="llvm-code-gen">LLVMバックエンド</link>も、あなたのプロセッサが対応しているならSSE2を使うが、自動的にこれを検出するのでフラグは必要ない。
           </para>
           <para>x86-64プラットフォームでは、無条件にSSE2が使われる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term><option>-msse4.2</option>:</term>
+	<listitem>
+          <para>(x86のみ、GHC 7.4.1より追加) <link linkend="native-code-gen">ネイティブコード生成器</link>を使っているとき、浮動小数点演算の実装にSSE4.2の命令セットを用いる。出来たコードはSSE4.2対応のプロセッサ(Intel Core i7以降)でしか走らない。<link linkend="llvm-code-gen">LLVMバックエンド</link>も、あなたのプロセッサが対応しているならSSE4.2を使うが、自動的にこれを検出するのでフラグは必要ない。
+          </para>
         </listitem>
       </varlistentry>
 
