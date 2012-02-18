@@ -192,13 +192,23 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term>
+            <option>-dumpdir</option>  <replaceable>dir</replaceable>
+            <indexterm><primary><option>-dumpdir</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>全てのdumpファイルの出力先を<replaceable>dir</replaceable>に変更する。dumpファイルは、<literal>-ddump-to-file</literal>が他の<literal>-ddump-*</literal>フラグと共に使われたときに生成される。</para>
+	  </listitem>
+	</varlistentry>
+
         <varlistentry>
           <term>
             <option>-outputdir</option> <replaceable>dir</replaceable>
             <indexterm><primary><option>-outputdir</option></primary></indexterm>
           </term>
           <listitem>
-            <para><option>-outputdir</option>オプションは<option>-odir</option>、<option>-hidir</option>、<option>-stubdir</option>の組み合わせの略記である。
+            <para><option>-outputdir</option>オプションは<option>-odir</option>、<option>-hidir</option>、<option>-stubdir</option>、<option>-dumpdir</option>の組み合わせの略記である。
             </para>
           </listitem>
         </varlistentry>
@@ -257,7 +267,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
             <indexterm><primary><option>-keep-hc-files</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをCを介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: 非レジスタ化コンパイラによってしか<literal>.hc</literal>ファイルは生成されない。)</para>
+            <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルを<link linkend="c-code-gen">C</link>を介して行うとき、中間の<literal>.hc</literal>ファイルを消さない。(注意: <link linkend="unreg">非レジスタ化</link>コンパイラによってしか<literal>.hc</literal>ファイルは生成されない。)</para>
 	  </listitem>
 	</varlistentry>
 
@@ -269,7 +279,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
             <indexterm><primary><option>-keep-llvm-files</option></primary></indexterm>
           </term>
 	  <listitem>
-	    <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルをLLVMを介して行うに際して、中間の<literal>.ll</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.ll</literal>ファイルは生成されない。生成されるようにするのに<option>-fllvm</option>を使う必要があるかもしれない)</para>
+	    <para><literal>.hs</literal>から<literal>.o</literal>へのコンパイルを<link linkend="llvm-code-gen">LLVM</link>を介して行うに際して、中間の<literal>.ll</literal>ファイルを消さない。(注意: ネイティブコード生成器が使われているときは<literal>.ll</literal>ファイルは生成されない。生成されるようにするのに<option>-fllvm</option>を使う必要があるかもしれない)</para>
 	  </listitem>
 	</varlistentry>
 
