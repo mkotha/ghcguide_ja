@@ -1,14 +1,3 @@
-diff -urd 7.2.2-original/ug-book.xml original/ug-book.xml
---- 7.2.2-original/ug-book.xml	2011-11-29 17:45:28.000000000 +0800
-+++ original/ug-book.xml	2012-02-03 18:09:44.000000000 +0800
-@@ -1,6 +1,6 @@
- <?xml version="1.0" encoding="iso-8859-1"?>
- <bookinfo>
--<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.2.2</title>
-+<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.4.1</title>
- <author><othername>The GHC Team</othername></author>
- <address>
- <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
 diff -urd 7.2.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.2.2-original/ug-ent.xml	2011-11-29 17:45:28.000000000 +0800
 +++ original/ug-ent.xml	2012-02-03 18:09:44.000000000 +0800
