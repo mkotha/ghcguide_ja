@@ -93,7 +93,7 @@
       <varlistentry>
 	<term>LLVMを介してコンパイルする</term>
 	<listitem>
-		<para>LLVMのコード生成器は、ネイティブコード生成器やCコード生成器と比べてずっと良いコードを生成することがある。これは普遍的なものではなく、コードに依存する。激しく数値演算するコードは、LLVM経由でコンパイルしたときに最大の改善を見せるようである。</para>
+		<para><link linkend="llvm-code-gen">LLVMコード生成器</link>は、<link linkend="native-code-gen">ネイティブコード生成器</link>と比べてずっと良いコードを生成することがある。これは普遍的なものではなく、コードに依存する。激しく数値演算するコードは、LLVM経由でコンパイルしたときに最大の改善を見せるようである。また、<option>-optlo</option>および<option>-optlc</option>フラグを使って特定のフラグをLLVMに渡すのを実験してみることもできる。ただし、これらのフラグを設定するとGHCは通常のフラグをLLVM最適化器とコンパイラに渡さなくなるのに注意。</para>
 	</listitem>
       </varlistentry>
 

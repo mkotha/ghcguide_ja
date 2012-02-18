@@ -1,27 +1,3 @@
-diff -urd 7.2.2-original/sooner.xml original/sooner.xml
---- 7.2.2-original/sooner.xml	2011-11-10 02:10:39.000000000 +0800
-+++ original/sooner.xml	2012-02-02 02:10:32.000000000 +0800
-@@ -154,11 +154,15 @@
-       <varlistentry>
- 	<term>Compile via LLVM:</term>
- 	<listitem>
--		<para>The LLVM code generator can sometimes do a far better job
--			    at producing fast code then either the native code generator
--					or the C code generator. This is not universal and depends
--					on the code. Numeric heavy code seems to show the best
--					improvement when compiled via LLVM.</para>
-+		<para>The <link linkend="llvm-code-gen">LLVM code generator</link> can
-+			sometimes do a far better job at producing fast code than the <link
-+				linkend="native-code-gen">native code generator</link>. This is not
-+			universal and depends on the code. Numeric heavy code seems to show
-+			the best improvement when compiled via LLVM. You can also experiment
-+			with passing specific flags to LLVM with the <option>-optlo</option>
-+			and <option>-optlc</option> flags.  Be careful though as setting these
-+			flags stops GHC from setting its usual flags for the LLVM optimiser
-+			and compiler.</para>
- 	</listitem>
-       </varlistentry>
- 
 diff -urd 7.2.2-original/ug-book.xml original/ug-book.xml
 --- 7.2.2-original/ug-book.xml	2011-11-29 17:45:28.000000000 +0800
 +++ original/ug-book.xml	2012-02-03 18:09:44.000000000 +0800
