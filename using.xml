@@ -1511,7 +1511,7 @@ f "2"    = 2
 
             <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
 
-            <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.getNumCapabilities</literal>でHaskellプログラムから得られ、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで実行中に変更することができる。注意: 現在の実装では、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで<option>-N</option>の値を<emphasis>増やす</emphasis>ことができるのみで、減らすことはできない。
+            <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.getNumCapabilities</literal>(訳注: 実際にはControl.Concurrentをインポートすることが推奨されるようだ)でHaskellプログラムから得られ、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで実行中に変更することができる。注意: 現在の実装では、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで<option>-N</option>の値を<emphasis>増やす</emphasis>ことができるのみで、減らすことはできない。
             </para>
 	  </listitem>
 	</varlistentry>
@@ -1534,7 +1534,7 @@ f "2"    = 2
           option</secondary></indexterm>
 	  <listitem>
             <para>負荷分散のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。移住はスレッドにしか適用されないことに注意。<literal>par</literal>によって作られたスパークは、別途work-stealingによって負荷分散される。</para>
-            <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
+            <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>(訳注: 実際にはControl.Concurrentをインポートすることが推奨されるようだ)を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
           </listitem>
         </varlistentry>
        </variablelist>
