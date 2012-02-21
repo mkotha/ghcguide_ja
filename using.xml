@@ -1534,7 +1534,7 @@ f "2"    = 2
           option</secondary></indexterm>
 	  <listitem>
             <para>負荷分散のための自動移住を無効にする。通常ランタイムは、暇なCPUを活用するため、CPUをまたいでスレッドをスケジュールしようとする。このオプションはこの振る舞いを無効にするものである。移住はスレッドにしか適用されないことに注意。<literal>par</literal>によって作られたスパークは、別途work-stealingによって負荷分散される。</para>
-            <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>(訳注: 実際にはControl.Concurrentをインポートすることが推奨されるようだ)を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
+            <para>このオプションが役に立つのは、おそらく、並行プログラムで、<literal>GHC.Conc.forkOnIO</literal>(訳注: 実際にはControl.Concurrent.forkOnを使うことが推奨される)を使ってスレッドを明示的にCPUにスケジュールする場合だけだろう。</para>
           </listitem>
         </varlistentry>
        </variablelist>
