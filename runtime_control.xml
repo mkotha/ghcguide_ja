@@ -660,27 +660,27 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <para>イベントをバイナリ形式で<filename><replaceable>program</replaceable>.eventlog</filename>というファイルに記録する。<replaceable>flags</replaceable>が指定されなかった場合、ThreadScopeなどのツールに適したデフォルトのイベント集合を記録する。
           </para>
 
-          <para>特殊な利用状況では、どのイベントを含むかをもっと細かく制御したいかもしれない。<replaceable>flags</replaceable>は、どの種類のイベントを記録するかを意味する文字を零個以上並べたものである。現在、有効/無効にできるイベントの種類は四つである。
+          <para>特殊な利用状況では、どのイベントを含むかをもっと細かく制御したいかもしれない。<replaceable>flags</replaceable>は、どの種類のイベントを記録するかを意味する文字を零個以上並べたものである。現在、有効/無効にできるイベントの種類は以下である。
             <simplelist>
               <member>
-                <option>s</option> &#8212; スケジューラのイベント、スレッドの作成、開始/停止のイベントを含む
+                <option>s</option> &#8212; スケジューラのイベント、スレッドの作成、開始/停止のイベントを含む。デフォルトで有効。
               </member>
               <member>
-                <option>g</option> &#8212; GCのイベント、GCの開始/停止を含む
+                <option>g</option> &#8212; GCのイベント、GCの開始/停止を含む。デフォルトで有効。
               </member>
               <member>
-                <option>p</option> &#8212; 並列スパーク(標本抽出)
+                <option>p</option> &#8212; 並列スパーク(標本抽出)。デフォルトで有効。
               </member>
               <member>
-                <option>f</option> &#8212; 並列スパーク(完全に正確)
+                <option>f</option> &#8212; 並列スパーク(完全に正確)。デフォルトで無効。
+              </member>
+              <member>
+                <option>u</option> &#8212; ユーザイベント。<literal>Debug.Trace.traceEvent</literal>などの関数を使ってHaskellコードから出力されるイベントである。デフォルトで有効。
               </member>
             </simplelist>
           </para>
 
-          <para>スパークのイベントには二つのモードがある。標本抽出と完全に正確である。個々のスパークの生涯にはいろいろなイベントがある。通常は作成と実行だけだが、もっと例外的なものもあり得る。標本抽出モードでは、短い間隔で、それぞれのスパークイベントの数が標本抽出される。完全に正確モードでは、全てのスパークが個々に記録される。後者の方が実行時のオーバーヘッドが高く、デフォルトでは有効になっていない。
-          </para>
-
-          <para>初期状態で有効なイベントの種類は「s」「g」「p」である。これに加えて、特定の種類を無効にしたり、全ての種類を一度に有効/無効にしたりできる。
+          <para>特定の種類を無効にしたり、全ての種類を一度に有効/無効にしたりすることができる。
             <simplelist>
               <member>
                 <option>a</option> &#8212; 上で挙げた全ての種類のイベントを有効にする
@@ -691,7 +691,10 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
             </simplelist>
             例えば、<option>-l-ag</option>はGCイベント(<option>g</option>)を除いて全てのイベント(<option>-a</option>)を無効にする。</para>
 
-          <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>ghc-events-show</literal>というツールが使える。
+          <para>スパークのイベントには二つのモードがある。標本抽出と完全に正確である。個々のスパークの生涯にはいろいろなイベントがある。通常は作成と実行だけだが、もっと例外的なものもあり得る。標本抽出モードでは、短い間隔で、それぞれのスパークイベントの数が標本抽出される。完全に正確モードでは、全てのスパークが個々に記録される。後者の方が実行時のオーバーヘッドが高く、デフォルトでは有効になっていない。
+          </para>
+
+          <para>記録ファイルの形式はGHCに付属する<filename>EventLogFormat.h</filename>に記述されており、Haskellでは<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>ライブラリを使うことでパースできる。<literal>.eventlog</literal>ファイルの内容をテキストとしてダンプするには、<ulink url="http://hackage.haskell.org/package/ghc-events">ghc-events</ulink>パッケージに付属している<literal>ghc-events show</literal>というツールが使える。
           </para>
         </listitem>
       </varlistentry>

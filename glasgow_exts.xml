@@ -1533,7 +1533,7 @@ NilSet :: Set a
 ConsSet :: Eq a => a -> Set a -> Set a
 </programlisting>
 
-<para>GHCではこの機能は<literal>DatatypeContexts</literal>という名前の拡張であり、デフォルトで有効になっている。</para>
+<para>これはまずい機能だと広く考えられており、言語から削除される予定である。GHCでは、この機能は<literal>DatatypeContexts</literal>という非推奨の拡張で制御される。</para>
 </sect2>
 
 <sect2 id="infix-tycons">
@@ -6559,7 +6559,7 @@ RULES機構は、良く使われるリスト関数についての融合変換(�
 <listitem>
 
 <para>
-<literal>Int</literal>および<literal>Char</literal>についての列挙(例えば<literal>['a'..'z']</literal>)。
+<literal>Int</literal>および<literal>Integer</literal>および<literal>Char</literal>についての列挙(例えば<literal>['a'..'z']</literal>)。
 </para>
 </listitem>
 <listitem>

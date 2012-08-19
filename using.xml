@@ -704,7 +704,7 @@ ghc -c Foo.hs</screen>
 	<term><option>-Wall</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-Wall</option></primary></indexterm>
-          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-uni-patterns</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-unrecognised-pragmas</option>、<option>-fwarn-auto-orphans</option>、<option>-fwarn-implicit-prelude</option>である。</para>
+          <para>疑わしいコードであることを示し得る全ての警告オプションを有効にする。<option>-Wall</option>で有効に<emphasis>されない</emphasis>警告は、<option>-fwarn-tabs</option>、<option>-fwarn-incomplete-uni-patterns</option>、<option>-fwarn-incomplete-record-updates</option>、<option>-fwarn-monomorphism-restriction</option>、<option>-fwarn-auto-orphans</option>、<option>-fwarn-implicit-prelude</option>、<option>-fwarn-missing-local-sigs</option>、<option>-fwarn-missing-import-lists</option>である。</para>
 	</listitem>
       </varlistentry>
 
@@ -1446,6 +1446,20 @@ f "2"    = 2
 
     <para>GHCはデフォルトでConcurrent Haskellをサポートしていて、特別なオプションが必要だったリ、特別な方法でコンパイルされたライブラリが必要だったりはしない。Concurrent Haskellのサポートライブラリにアクセスするには、単に<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>をインポートすれば良い。Concurrent Haskellについてのさらなる情報はこのモジュールの付属文書にある。</para>
 
+    <para>任意選択で、プログラムを<option>-threaded</option>オプション(<xref linkend="options-linker" />)付きでリンクすることができる。これには以下の二つの利点がある。
+
+          <!-- 訳注: phases.xmlに複製あり -->
+          <itemizedlist>
+            <listitem>
+              <para>RTSオプション<option>-N</option><indexterm><primary><option>-N<replaceable>x</replaceable></option></primary><secondary>RTS option</secondary></indexterm>を使うことを可能にする。これはプログラムをマルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>あるいはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械上でスレッドを並列<indexterm><primary>parallelism</primary></indexterm>に動作させられるようにする。<xref linkend="using-smp" />を見よ。</para>
+            </listitem>
+            <listitem>
+              <para>あるスレッドが多言語呼び出しを行なったとき、(その呼び出しが<literal>unsafe</literal>と標示されていなければ)その呼び出しの実行中にプログラム中の他のHaskellスレッドが走り続ける。さらに、<literal>foreign export</literal>されたHaskell関数が複数のOSスレッドから同時に呼ばれても良い。<xref linkend="ffi-threads" />を見よ。</para>
+            </listitem>
+          </itemizedlist>
+    </para>
+
+
     <para>以下のRTSオプションがConcurrent Haskellプログラムの振る舞いに影響する。<indexterm><primary>RTS options, concurrent</primary></indexterm></para>
 
     <variablelist>
@@ -1508,8 +1522,6 @@ f "2"    = 2
             <para>マシンの全てのプロセッサを使う時には注意すること。もし他のプログラムがプロセッサをいくつか使っているなら、これによってパフォーマンスを改善するどころか悪影響になることがある。</para>
 
             <para><option>-N</option>を設定することには、並列ガベッジコレクタを有効にするという効果もある(<xref linkend="rts-options-gc"/>を見よ)。</para>
-
-            <para>プログラムが開始した後にこの値を変更する方法は(今のところ)ない。</para>
 
             <para>現在の<option>-N</option>オプションの値は、<literal>GHC.Conc.getNumCapabilities</literal>(訳注: 実際にはControl.Concurrentをインポートすることが推奨されるようだ)でHaskellプログラムから得られ、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで実行中に変更することができる。注意: 現在の実装では、<literal>GHC.Conc.setNumCapabilities</literal>を呼ぶことで<option>-N</option>の値を<emphasis>増やす</emphasis>ことができるのみで、減らすことはできない。
             </para>
