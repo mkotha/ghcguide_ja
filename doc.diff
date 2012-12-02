@@ -10471,16 +10471,3 @@ diff -urd 7.4.2-original/using.xml original/using.xml
  
      </variablelist>
  
-diff -urd 7.4.2-original/what_glasgow_exts_does.gen.xml original/what_glasgow_exts_does.gen.xml
---- 7.4.2-original/what_glasgow_exts_does.gen.xml	2012-08-15 20:41:12.000000000 +0900
-+++ original/what_glasgow_exts_does.gen.xml	2012-09-07 23:25:57.000000000 +0900
-@@ -24,7 +24,8 @@
- <option>-XLiberalTypeSynonyms</option>,
- <option>-XRankNTypes</option>,
- <option>-XTypeOperators</option>,
--<option>-XDoRec</option>,
-+<option>-XExplicitNamespaces</option>,
-+<option>-XRecursiveDo</option>,
- <option>-XParallelListComp</option>,
- <option>-XEmptyDataDecls</option>,
- <option>-XKindSignatures</option>,
