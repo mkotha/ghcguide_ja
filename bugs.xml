@@ -65,13 +65,26 @@ main = do args &lt;- getArgs
   <sect3 id="infelicities-exprs-pats">
       <title>式とパターン</title>
 
-	<para>今のところなし。</para>
+    <para>デフォルトのモードでは、GHCはある種のプログラムの定義され度合いを本来よりも僅かに大きくする。例として以下を考えよ。
+    <programlisting>
+f :: [a] -> b -> b
+f [] = error "urk"
+f (x:xs) = \v -> v
+
+main = print (f [] `seq` True)
+    </programlisting>
+これは<literal>error</literal>を呼ぶべきだが、実際には<literal>True</literal>を表示する。理由: GHCは<literal>f</literal>を以下のようにη展開する。
+    <programlisting>
+f :: [a] -> b -> b
+f []     v = error "urk"
+f (x:xs) v = v
+    </programlisting>
+大部分のプログラムについては、これは僅かだが有意に効率を改善する。これが害になるようなプログラムは少ない。この偽の「最適化」を無効にするには<option>-fpedantic-bottoms</option>を使う。</para>
+
     </sect3>
 
     <sect3 id="infelicities-decls">
       <title>宣言と束縛</title>
-
-      <para>GHCの型検査器はデフォルトで全てのパターン束縛を単相的にする。この振る舞いは<option>-XNoMonoPatBinds</option>で無効にできる。<xref linkend="options-language"/>を見よ。</para>
 
       <para>データ型の文脈は、次の版の言語標準では取り除かれることが決まったので、デフォルトモードにおいてGHCはこれを受け付けない。この振る舞いは<option>DatatypeContexts</option>拡張で制御できる。<xref linkend="datatype-contexts" />を見よ。</para>
     </sect3>
@@ -104,6 +117,47 @@ main = do args &lt;- getArgs
                 </listitem>
               </itemizedlist>
             </para>
+	    </listitem>
+	  </varlistentry>
+
+	<varlistentry>
+	  <term>Bitsのスーパークラス</term>
+	  <listitem>
+	    <para><literal>Bits</literal>クラスはスーパークラスとして<literal>Num</literal>を持たない。従って<literal>bit</literal>、<literal>testBit</literal>、<literal>popCount</literal>のデフォルトメソッドを持たない。
+            </para>
+
+	    <para>以下のようにすることで、Haskell2010とGHCの両方で動くコードを作ることができる。
+              <itemizedlist>
+                <listitem>
+                  <para>型を<literal>Bits</literal>のインスタンスにするときは常に<literal>Num</literal>のインスタンスにもする。
+                  </para>
+                </listitem>
+                <listitem>
+                  <para><literal>Bits t</literal>制約を持つ関数、インスタンス、クラスを与えるときは常に、<literal>Num t</literal>制約も持たせる。
+                  </para>
+                </listitem>
+                <listitem>
+                  <para><literal>Bits</literal>のインスタンスでは、常に<literal>bit</literal>、<literal>testBit</literal>、<literal>popCount</literal>の各メソッドを定義する。
+                  </para>
+                </listitem>
+              </itemizedlist>
+            </para>
+	    </listitem>
+	  </varlistentry>
+
+	<varlistentry>
+	  <term>追加のインスタンス</term>
+	  <listitem>
+	    <para>
+              以下のインスタンスが追加で定義される。
+            </para>
+<programlisting>
+instance Functor ((->) r)
+instance Monad ((->) r)
+instance Functor ((,) a)
+instance Functor (Either a)
+instance Monad (Either e)
+</programlisting>
 	    </listitem>
 	  </varlistentry>
 
@@ -284,7 +338,10 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
       </listitem>
 
       <listitem>
-        <para>「存在型を持つレコード」の拡張(<xref linkend="existential-records"/>を参照)を使う場合、モジュールの分割コンパイルが壊れている。回避方法としては、毎回cleanして<option>--make</option>付きでビルドするか、6.7開発スナップショットを使うという方法しかない。詳細は<ulink url="http://hackage.haskell.org/trac/ghc/ticket/933">trac bug #933</ulink>を見よ。</para>
+        <para>32ビットのx86プラットフォームでネイティブコード生成器を使う場合、<option>-fexcess-precision</option><indexterm><primary><option>-fexcess-precision</option></primary></indexterm>オプションが常に有効になる。これにより、プログラムのコンパイルのされかた(例えば最適化設定)に依存して、ある種の浮動小数点演算が、32ビットや64ビットが意図されているにもかかわらず80ビットで為される。この結果、浮動小数点演算は非決定的になる。最適化が有効だと浮動小数点の結果が異なることがある。最悪の場合、参照透明性が守られない。<literal>let x = E1 in E2</literal>が<literal>E2[E1/x]</literal>とは異なる値に評価され得るからである。</para>
+
+        <para>回避策の一つに<option>-msse2</option><indexterm><primary><option>-msse2</option></primary></indexterm>オプション(<xref linkend="options-platform"/>)を使うというものがある。これはx87命令セットの代わりにSSE2命令セットを使ってコードを生成する。SSE2は全ての浮動小数点演算を正しい精度で行なうので、決定的な結果を与える。ただし、これはSSE2に対応したプロセッサ(Intel Pentium 4またはAMD Athlon 64以降)においてのみ動作することに注意。このため、このオプションはデフォルトで有効になっていない。GHC付属のライブラリはおそらくこのオプションなしでビルドされている(あなたが自分でビルドしたのでないかぎり)。
+        </para>
       </listitem>
 
     </itemizedlist>
