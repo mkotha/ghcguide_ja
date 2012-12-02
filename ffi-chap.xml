@@ -80,6 +80,44 @@ foreign import ccall interruptible
 
           システムコールが成功裏に割り込まれると、それはHaskellに返り、そこで例外が発生する。<literal>interruptible</literal>を使う場合には、この他言語関数<!-- 訳注: システムコールの間違いか-->の呼び出し元が、呼び出しが割り込まれた結果を正しく扱えるようになっているかどうか特に注意すること。Unixでは<literal>EINTR</literal>を常に検査するのは良い習慣であるが、Windowsでは通常は<literal>ERROR_OPERATION_ABORTED</literal>に対処することが必要でない。</para>
       </sect2>
+
+      <sect2 id="ffi-capi">
+        <title>呼び出し規約CAPI</title>
+        <para>拡張<literal>CAPI</literal>は、foreign宣言中で<literal>capi</literal>という呼び出し規約を使うことを可能にする。例えば、
+
+<programlisting>
+foreign import capi "header.h f" f :: CInt -> IO CInt
+</programlisting>
+
+          プラットフォームのABIに従って<literal>f</literal>への呼び出しを生成する代わりに、ここでは<literal>header.h</literal>で定義されたCのAPIを使って<literal>f</literal>を呼ぶ。これにより、<literal>f</literal>が正規の関数でなくCPPマクロとして定義されていたとしてもこれを呼ぶことができる。
+        </para>
+
+        <para>
+          <literal>capi</literal>を使うとき、(関数でなく)値をインポートすることができる。例えば、
+
+<programlisting>
+foreign import capi "pi.h value pi" c_pi :: CDouble
+</programlisting>
+
+          は、<literal>pi</literal>が
+<programlisting>
+const double pi = 3.14;
+</programlisting>
+          と定義されていても、
+<programlisting>
+#define pi 3.14
+</programlisting>
+          と定義されていても動作する。
+        </para>
+
+        <para>Haskellの型に対応するCの型をGHCに教えるために、型定義に<literal>CTYPE</literal>プラグマを付けることができる。その型が定義されているヘッダを指定することもできる。構文は次のようになる。
+
+<programlisting>
+data    {-# CTYPE "unistd.h" "useconds_t" #-} T = ...
+newtype {-# CTYPE            "useconds_t" #-} T = ...
+</programlisting>
+        </para>
+      </sect2>
   </sect1>
 
   <sect1 id="ffi-ghc">
