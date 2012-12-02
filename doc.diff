@@ -1,4 +1,3 @@
-originalだけに発見: external_core.xml
 diff -urd 7.4.2-original/ffi-chap.xml original/ffi-chap.xml
 --- 7.4.2-original/ffi-chap.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/ffi-chap.xml	2012-09-05 02:10:15.000000000 +0900
@@ -7284,36 +7283,9 @@ diff -urd 7.4.2-original/ug-book.xml original/ug-book.xml
  <author><othername>The GHC Team</othername></author>
  <address>
  <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
-@@ -17,6 +17,7 @@
- &lang-features;
- &ffi-chap;
- &extending-ghc;
-+&external-core;
- &wrong;
- &utils;
- &win32-dll;
-diff -urd 7.4.2-original/ug-book.xml.in original/ug-book.xml.in
---- 7.4.2-original/ug-book.xml.in	2012-06-07 02:10:25.000000000 +0900
-+++ original/ug-book.xml.in	2012-09-05 02:10:15.000000000 +0900
-@@ -17,6 +17,7 @@
- &lang-features;
- &ffi-chap;
- &extending-ghc;
-+&external-core;
- &wrong;
- &utils;
- &win32-dll;
 diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.4.2-original/ug-ent.xml	2012-08-15 19:53:57.000000000 +0900
 +++ original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
-@@ -15,6 +12,7 @@
- <!ENTITY sooner         SYSTEM "sooner.xml" >
- <!ENTITY lang-features  SYSTEM "lang.xml" >
- <!ENTITY glasgowexts    SYSTEM "glasgow_exts.xml" >
-+<!ENTITY external-core  SYSTEM "external_core.xml" >
- <!ENTITY packages       SYSTEM "packages.xml" >
- <!ENTITY parallel       SYSTEM "parallel.xml" >
- <!ENTITY safehaskell    SYSTEM "safe_haskell.xml" >
 @@ -28,6 +26,7 @@
  <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
  <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
@@ -7324,7 +7296,7 @@ diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
 +<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.0">
 +<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
 +<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
-+<!ENTITY arw "-&gt;">
+ <!ENTITY arw "-&gt;">
 diff -urd 7.4.2-original/using.xml original/using.xml
 --- 7.4.2-original/using.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/using.xml	2012-09-05 02:10:15.000000000 +0900

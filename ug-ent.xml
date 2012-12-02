@@ -12,6 +12,7 @@
 <!ENTITY sooner         SYSTEM "sooner.xml" >
 <!ENTITY lang-features  SYSTEM "lang.xml" >
 <!ENTITY glasgowexts    SYSTEM "glasgow_exts.xml" >
+<!ENTITY external-core  SYSTEM "external_core.xml" >
 <!ENTITY packages       SYSTEM "packages.xml" >
 <!ENTITY parallel       SYSTEM "parallel.xml" >
 <!ENTITY safehaskell    SYSTEM "safe_haskell.xml" >
@@ -30,3 +31,4 @@
 <!ENTITY libraryBaseLocation    "http://www.haskell.org/ghc/docs/latest/html/libraries/base-4.5.1.0">
 <!ENTITY libraryCabalLocation   "http://www.haskell.org/ghc/docs/latest/html/libraries/Cabal-1.14.0">
 <!ENTITY libraryGhcPrimLocation "http://www.haskell.org/ghc/docs/latest/html/libraries/ghc-prim-0.2.0.0">
+<!ENTITY arw "-&gt;">
