@@ -1,8 +1,3 @@
-7.4.2-originalだけに発見: 7.2.1-notes.xml
-7.4.2-originalだけに発見: 7.2.2-notes.xml
-7.4.2-originalだけに発見: 7.4.1-notes.xml
-7.4.2-originalだけに発見: 7.4.2-notes.xml
-originalだけに発見: 7.6.1-notes.xml
 diff -urd 7.4.2-original/bugs.xml original/bugs.xml
 --- 7.4.2-original/bugs.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/bugs.xml	2012-09-05 02:10:15.000000000 +0900
@@ -7227,17 +7222,6 @@ diff -urd 7.4.2-original/intro.xml original/intro.xml
  	  </para>
  
  	  <para>Unstable snapshot releases are named
-@@ -346,10 +352,7 @@
-   </sect1>
- 
- 
--&oldrelnotes1;
--&oldrelnotes2;
- &relnotes1;
--&relnotes2;
- 
- </chapter>
- 
 diff -urd 7.4.2-original/packages.xml original/packages.xml
 --- 7.4.2-original/packages.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/packages.xml	2012-09-05 02:10:15.000000000 +0900
@@ -7466,18 +7450,6 @@ diff -urd 7.4.2-original/ug-book.xml.in original/ug-book.xml.in
 diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.4.2-original/ug-ent.xml	2012-08-15 19:53:57.000000000 +0900
 +++ original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
-@@ -3,10 +3,7 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY oldrelnotes1   SYSTEM "7.2.1-notes.xml" >
--<!ENTITY oldrelnotes2   SYSTEM "7.2.2-notes.xml" >
--<!ENTITY relnotes1      SYSTEM "7.4.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.4.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
 @@ -15,6 +12,7 @@
  <!ENTITY sooner         SYSTEM "sooner.xml" >
  <!ENTITY lang-features  SYSTEM "lang.xml" >
@@ -7496,34 +7468,6 @@ diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
 +<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.0">
 +<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
 +<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
-+<!ENTITY arw "-&gt;">
-diff -urd 7.4.2-original/ug-ent.xml.in original/ug-ent.xml.in
---- 7.4.2-original/ug-ent.xml.in	2012-06-07 02:10:25.000000000 +0900
-+++ original/ug-ent.xml.in	2012-09-05 02:10:15.000000000 +0900
-@@ -3,10 +3,7 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY oldrelnotes1   SYSTEM "7.2.1-notes.xml" >
--<!ENTITY oldrelnotes2   SYSTEM "7.2.2-notes.xml" >
--<!ENTITY relnotes1      SYSTEM "7.4.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.4.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
-@@ -15,6 +12,7 @@
- <!ENTITY sooner         SYSTEM "sooner.xml" >
- <!ENTITY lang-features  SYSTEM "lang.xml" >
- <!ENTITY glasgowexts    SYSTEM "glasgow_exts.xml" >
-+<!ENTITY external-core  SYSTEM "external_core.xml" >
- <!ENTITY packages       SYSTEM "packages.xml" >
- <!ENTITY parallel       SYSTEM "parallel.xml" >
- <!ENTITY safehaskell    SYSTEM "safe_haskell.xml" >
-@@ -31,3 +29,4 @@
- <!ENTITY libraryBaseLocation    "../libraries/base-@LIBRARY_base_VERSION@">
- <!ENTITY libraryCabalLocation   "../libraries/Cabal-@LIBRARY_Cabal_VERSION@">
- <!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-@LIBRARY_ghc_prim_VERSION@">
 +<!ENTITY arw "-&gt;">
 diff -urd 7.4.2-original/using.xml original/using.xml
 --- 7.4.2-original/using.xml	2012-06-07 02:10:25.000000000 +0900

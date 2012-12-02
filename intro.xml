@@ -231,10 +231,7 @@
     <para>あなたの手元のGHCのバージョン番号は、<literal>ghc</literal>を<literal>--version</literal>フラグ(<xref linkend="options-help"/>を見よ)つきで起動することで知ることができる。</para>
   </sect1>
 
-&oldrelnotes1;
-&oldrelnotes2;
 &relnotes1;
-&relnotes2;
 
 </chapter>
 
