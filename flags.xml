@@ -477,19 +477,13 @@
 	    <row>
 	      <entry><option>-ignore-dot-ghci</option></entry>
 	      <entry><filename>.ghci</filename>ファイルを読むのを無効にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-ghci-script</option></entry>
 	      <entry>与えられた<filename>.ghci</filename>を追加で読む</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-read-dot-ghci</option></entry>
-	      <entry><filename>.ghci</filename>ファイルを読むのを有効にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
@@ -522,6 +516,12 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
+          <row>
+            <entry><option>-interactive-print</option></entry>
+            <entry><link linkend="ghci-interactive-print">GHCiで評価された式を表示するための関数を選ぶ</link></entry>
+            <entry>動</entry>
+            <entry>-</entry>
+          </row>
 	    <row>
 	      <entry><option>-fno-implicit-import-qualified</option></entry>
 	      <entry><link linkend="ghci-import-qualified">GHCiで、あらゆるものが暗黙にimport qualifiedされるのを無効にする</link></entry>
@@ -581,14 +581,38 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-package-conf</option> <replaceable>file</replaceable></entry>
-	      <entry><replaceable>file</replaceable>から追加でパッケージをロードする</entry>
+	      <entry><option>-package-db</option> <replaceable>file</replaceable></entry>
+	      <entry><replaceable>file</replaceable>をパッケージDBスタックに追加する。</entry>
 	      <entry>静/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-no-user-package-conf</option></entry>
-	      <entry>ユーザのパッケージ設定ファイルをロードしない</entry>
+            <entry><option>-clear-package-db</option></entry>
+            <entry>パッケージDBスタックを空にする。</entry>
+            <entry>静</entry>
+            <entry>-</entry>
+          </row>
+          <row>
+            <entry><option>-no-global-package-db</option></entry>
+            <entry>グローバルパッケージDBをスタックから取り除く。</entry>
+            <entry>静</entry>
+            <entry>-</entry>
+          </row>
+          <row>
+            <entry><option>-global-package-db</option></entry>
+            <entry>グローバルパッケージDBをスタックに加える。</entry>
+            <entry>静</entry>
+            <entry>-</entry>
+          </row>
+          <row>
+            <entry><option>-no-user-package-db</option></entry>
+            <entry>ユーザのパッケージDBをスタックから取り除く。</entry>
+            <entry>静</entry>
+            <entry>-</entry>
+          </row>
+          <row>
+            <entry><option>-user-package-db</option></entry>
+            <entry>ユーザのパッケージDBをスタックに加える。</entry>
 	      <entry>静/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
@@ -784,13 +808,13 @@
 	    </row>
         <row>
           <entry><option>-XDataKinds</option></entry>
-          <entry><link linkend="kind-polymorphism-and-promotion">データ型の昇格</link>を有効にする。</entry>
+          <entry><link linkend="promotion">データ型の昇格</link>を有効にする。</entry>
           <entry>動</entry>
           <entry><option>-XNoDataKinds</option></entry>
         </row>
 	    <row>
 	      <entry><option>-XPolyKinds</option></entry>
-	      <entry><link linkend="kind-polymorphism-and-promotion">種多相</link>を有効にする。</entry>
+	      <entry><link linkend="kind-polymorphism">種多相</link>を有効にする。<option>-XKindSignatures</option>も有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoPolyKinds</option></entry>
 	    </row>
@@ -947,14 +971,14 @@
 	      <entry><option>-XNoTypeOperators</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XDoRec</option></entry>
-	      <entry><link linkend="recursive-do-notation">再帰的do記法</link>を有効にする。</entry>
+            <entry><option>-XExplicitNamespaces</option></entry>
+            <entry>インポートリストとエクスポートリストにおいて実体の名前空間を<literal>type</literal>キーワードを用いて指定するのを有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoDoRec</option></entry>
+            <entry><option>-XNoExplicitNamespaces</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecursiveDo</option></entry>
-	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。これは非推奨である。代わりに<link linkend="recursive-do-notation">再帰的do記法</link>を使ってほしい。</entry>
+	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
@@ -1061,6 +1085,18 @@
 	      <entry><option>-XNoPackageImports</option></entry>
 	    </row>
 	    <row>
+            <entry><option>-XLambdaCase</option></entry>
+            <entry><link linkend="lambda-case">lambda-case式</link>を有効にする。</entry>
+            <entry>動</entry>
+            <entry><option>-XNoLambdaCase</option></entry>
+          </row>
+          <row>
+            <entry><option>-XMultiWayIf</option></entry>
+            <entry><link linkend="multi-way-if">多選択肢のif式</link>を有効にする。</entry>
+            <entry>動</entry>
+            <entry><option>-XNoMultiWayIf</option></entry>
+          </row>
+          <row>
 	      <entry><option>-XSafe</option></entry>
         <entry><link linkend="safe-haskell">Safe Haskell</link>のSafeモードを有効にする。</entry>
 	      <entry>動</entry>
@@ -1136,17 +1172,17 @@
 	    <entry>-Werror</entry>
 	  </row>
 	  <row>
-	    <entry><option>-fwarn-unrecognised-pragmas</option></entry>
-	    <entry>GHCが認識できないプラグマが使われているときに警告する</entry>
+            <entry><option>-fdefer-type-errors</option></entry>
+            <entry>型エラーを可能な限り実行時まで遅らせる。</entry>
 	    <entry>動</entry>
-	    <entry><option>-fno-warn-unrecognised-pragmas</option></entry>
+            <entry><option>-fno-defer-type-errors</option></entry>
 	  </row>
 
 	  <row>
-	    <entry><option>-fwarn-warnings-deprecations</option></entry>
-	    <entry>WARNINGおよびDEPRECATEDプラグマの付いた関数・型が使われているときに警告する</entry>
+            <entry><option>-fhelpful-errors</option></entry>
+            <entry>綴りの誤っている名前について忠告する。</entry>
 	    <entry>動</entry>
-	    <entry><option>-fno-warn-warnings-deprecations</option></entry>
+            <entry><option>-fno-helpful-errors</option></entry>
 	  </row>
 
 	  <row>
@@ -1247,6 +1283,13 @@
 	  </row>
 
 	  <row>
+            <entry><option>-fwarn-monomorphism-restriction</option></entry>
+            <entry>単相性制限が適用されたときに警告する</entry>
+            <entry>動</entry>
+            <entry><option>-fno-warn-monomorphism-restriction</option></entry>
+          </row>
+
+          <row>
 	    <entry><option>-fwarn-name-shadowing</option></entry>
 	    <entry>名前の隠蔽があれば警告する</entry>
 	    <entry>動</entry>
@@ -1254,10 +1297,10 @@
 	  </row>
 
 	  <row>
-	    <entry><option>-fwarn-orphans</option></entry>
+            <entry><option>-fwarn-orphans, -fwarn-auto-orphans</option></entry>
 	    <entry>モジュールに<link linkend="orphan-modules">孤立したインスタンス宣言や書き換え規則</link>があるときに警告する</entry>
 	    <entry>動</entry>
-	    <entry><option>-fno-warn-orphans</option></entry>
+            <entry><option>-fno-warn-orphans, -fno-warn-auto-orphans</option></entry>
 	  </row>
 
 	  <row>
@@ -1282,10 +1325,10 @@
 	  </row>
 
 	  <row>
-	    <entry><option>-fwarn-monomorphism-restriction</option></entry>
-	    <entry>単相性限定が適用された時に警告する</entry>
+	    <entry><option>-fwarn-unrecognised-pragmas</option></entry>
+	    <entry>GHCが認識できないプラグマが使われているときに警告する</entry>
 	    <entry>動</entry>
-	    <entry><option>-fno-warn-monomorphism-restriction</option></entry>
+	    <entry><option>-fno-warn-unrecognised-pragmas</option></entry>
 	  </row>
 
 	  <row>
@@ -1335,6 +1378,13 @@
        <entry>コンパイルしているモジュールがsafeと見なされる場合に警告する。安全性推論を使う場合に、モジュールが安全かどうかを確認するために使うべきである。</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-safe</option></entry>
+	  </row>
+
+	  <row>
+	    <entry><option>-fwarn-warnings-deprecations</option></entry>
+	    <entry>WARNINGおよびDEPRECATEDプラグマの付いた関数・型が使われているときに警告する</entry>
+	    <entry>動</entry>
+	    <entry><option>-fno-warn-warnings-deprecations</option></entry>
 	  </row>
 
 	  </tbody>
@@ -1441,6 +1491,20 @@
  	    </row>
 
 	    <row>
+            <entry><option>-fvectorise</option></entry>
+            <entry>入れ子データ並列のベクトル化を有効にする</entry>
+            <entry>動</entry>
+            <entry><option>-fno-vectorise</option></entry>
+          </row>
+
+          <row>
+            <entry><option>-favoid-vect</option></entry>
+            <entry>ベクトル化回避を有効にする(実験的)</entry>
+            <entry>動</entry>
+            <entry><option>-fno-avoid-vect</option></entry>
+          </row>
+
+          <row>
 	      <entry><option>-fexcess-precision</option></entry>
 	      <entry>中間値の精度超過を有効にする</entry>
 	      <entry>動</entry>
@@ -2577,19 +2641,19 @@
 	    <row>
 	      <entry><option>-dppr-user-length</option></entry>
 	      <entry>エラーメッセージで表示する式の深さを設定する</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-dppr-colsNNN</option></entry>
 	      <entry>デバッグ出力の幅を設定する。例えば<option>-dppr-cols200</option></entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-dppr-case-as-let</option></entry>
 	      <entry>選択肢が一つのcase式を正格なletとして表示する。</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
