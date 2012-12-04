@@ -676,6 +676,44 @@ def = toEnum 0
    <para>
     この変更の理由は、これによって<literal>IO a</literal>の動作が<literal>IO ()</literal>にデフォルト化されるので、ghciがこれらを走らせたときに結果を表示する必要がなくなることである。これは<literal>printf</literal>の場合に特に重要である。<literal>printf</literal>には<literal>IO a</literal>を返すインスタンスがあるが、これが返せるのは<literal>undefined</literal>だけである。(インスタンスがこの型なのは、printfがクラスシステムの拡張を必要としないようにである)。このため、もし型が<literal>Integer</literal>にデフォルト化されるなら、ghciはprintfを実行する時にエラーを発生させることになる。</para>
     </sect2>
+   <sect2 id="ghci-interactive-print">
+     <title>デフォルト以外の対話表示関数を使う</title>
+     <para>[<emphasis role="bold">バージョン7.6.1の新機能</emphasis>]
+        デフォルトでは、GHCiはプロンプトに入力された式の結果を関数<literal>System.IO.print</literal>を使って表示する。これの型シグネチャは<literal>Show a => a -> IO ()</literal>であり、値を<literal>show</literal>で<literal>String</literal>に変換することで動作する。
+     </para>
+     <para>ある種の状況では、これは理想的でない。たとえば出力が長い場合や、非ascii文字のある文字列を含んでいる場合である。
+     </para>
+     <para>フラグ<literal>-interactive-print</literal>を使うと、何らかの制約<literal>C</literal>について<literal>C a => a -> IO ()</literal>という型を持つ任意の関数を、評価された式を表示するための関数として指定することができるようになる。その関数はロードされているモジュールのいずれか、あるいは登録済みモジュールのいずれかにあれば良い。
+     </para>
+     <para>例として、以下の特別な表示モジュールがあるとしよう。
+       <programlisting>
+	 module SpecPrinter where
+	 import System.IO
+
+	 sprint a = putStrLn $ show a ++ "!"
+       </programlisting>
+       関数<literal>sprint</literal>は表示された値の最後に感嘆符を付ける。次のコマンドでGHCiを走らせると、
+       <programlisting>
+	 ghci -interactive-print=SpecPrinter.sprinter SpecPrinter
+       </programlisting>
+       対話セッションが開始され、そこでは値が<literal>sprint</literal>で表示される。
+       <programlisting>
+	 *SpecPrinter> [1,2,3]
+	 [1,2,3]!
+	 *SpecPrinter> 42
+	 42!
+       </programlisting>
+     </para>
+     <para>デフォルト以外の表示関数は、例えば、木構造や入れ子の構造をより読み易く表示するために使うことができる。
+     </para>
+     <para>
+       <literal>-interactive-print</literal>フラグは、GHCを<literal>-eモード</literal>で走らせるときにも使える。
+       <programlisting>
+	 % ghc -e "[1,2,3]" -interactive-print=SpecPrinter.sprint SpecPrinter
+	 [1,2,3]!
+       </programlisting>
+     </para>
+   </sect2>
   </sect1>
 
   <sect1 id="ghci-debugger">
@@ -1715,6 +1753,19 @@ bar
 
       <varlistentry>
 	<term>
+          <literal>:seti</literal> <optional><replaceable>option</replaceable>...</optional>
+          <indexterm><primary><literal>:seti</literal></primary></indexterm>
+        </term>
+	<listitem>
+          <para><literal>:set</literal>と似ているが、<literal>:seti</literal>で設定されたオプションはプロンプトに入力された式とコマンドにのみ影響し、<literal>:load</literal>でロードされたモジュールには影響しない(対照的に、<literal>:set</literal>で設定されたオプションはあらゆるところで適用される)。<xref linkend="ghci-interactive-options" />を見よ。
+          </para>
+          <para>引数を与えなかった場合、プロンプトに入力される式とコマンドに適用されるオプションの集合を表示する。
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+	<term>
           <literal>:show bindings</literal>
           <indexterm><primary><literal>:show bindings</literal></primary></indexterm>
         </term>
@@ -1868,8 +1919,9 @@ bar
   </sect1>
 
   <sect1 id="ghci-set">
-    <title><literal>:set</literal>コマンド</title>
+    <title><literal>:set</literal>と<literal>:seti</literal>コマンド</title>
     <indexterm><primary><literal>:set</literal></primary></indexterm>
+    <indexterm><primary><literal>:seti</literal></primary></indexterm>
 
     <para><literal>:set</literal>コマンドでは二系統のオプションを設定できる。「<literal>+</literal>」で始まるGHCiオプションと「-」で始まる「コマンド行」オプションである。</para>
 
@@ -1952,7 +2004,43 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
       <para>ある種の静的なオプション(特に、<option>-package</option>、<option>-I</option>、<option>-i</option>、<option>-l</option>)も使えるが、次に再ロードするまで効果を発揮しないものもある。</para>
       <indexterm><primary>static</primary><secondary>options</secondary></indexterm>
     </sect2>
+
+    <sect2 id="ghci-interactive-options">
+      <title>対話的評価についてのみのオプションを設定する</title>
+
+      <para>実際にはGHCiはオプションの集合を二つ保持する。モジュールをロードする際に適用されるものと、プロンプトに式やコマンドが入力されたときに適用されるものである。<literal>:set</literal>コマンドは両方を変更するが、<literal>:seti</literal>("set interactive"の略)というコマンドもあって、これは後者にのみ影響する。
+      </para>
+
+      <para>この二つのオプションの集合は<literal>:set</literal>と<literal>:seti</literal>を引数なしで使うことでそれぞれ確認できる。例えば、まっさらなGHCiセッションでは次のようなものを目にするかもしれない。
+      </para>
+
+<screen>
+Prelude> :seti
+base language is: Haskell2010
+with the following modifiers:
+  -XNoDatatypeContexts
+  -XNondecreasingIndentation
+  -XExtendedDefaultRules
+GHCi-specific dynamic flag settings:
+other dynamic, non-language, flag settings:
+  -fimplicit-import-qualified
+warning settings:
+</screen>
+
+      <para><option>-XExtendedDefaultRules</option>が有効になっていることに注意。これは、プロンプトに入力された式に特別なデフォルト規則(<xref linkend="extended-default-rules" />を見よ)を適用しているからである。
+      </para>
+
+      <para>プロンプトに入力される式についてのみ言語オプションを変え、ロードされるモジュールにはそのオプションを適用しないでおくのが便利なことがよくある。良い例の一つが以下である。
+<screen>
+:seti -XNoMonomorphismRestriction
+</screen><option>-XNoMonomorphismRestriction</option>がロードされるモジュールにも適用されるのは望ましくないだろう。コンパイルエラーを引き起すかもしれないが、もっとよくあるのは、フラグが変わったのでモジュールの再コンパイルが必要だとGHCが判断することで、無駄な再コンパイルが発生することである。
+      </para>
+
+      <para>従って、<literal>.ghci</literal>ファイルで言語オプションを設定するときは、本当にGHCiにロードするモジュール全てにそれを適用したいのでない限り、<literal>:set</literal>でなく<literal>:seti</literal>を使うのが良い習慣である。
+      </para>
+    </sect2>
   </sect1>
+
   <sect1 id="ghci-dot-files">
     <title><filename>.ghci</filename>ファイル</title>
     <indexterm><primary><filename>.ghci</filename></primary><secondary>file</secondary>
@@ -1977,7 +2065,9 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
     </listitem>
    </orderedlist>
 
-    <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。また、<filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトが多引数の型クラスとスコープのある型変数ととCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
+    <para><filename>ghci.conf</filename>ファイルは、あなたのお気に入りのオプション(例えば<literal>:set +s</literal>)を有効にしたり、便利なマクロを定義したりするのに適している。注意: このファイルで言語オプションを設定する場合、通常は<literal>:set</literal>でなく <literal>:seti</literal>を使う方が良い(<xref linkend="ghci-interactive-options" />を見よ)。</para>
+
+    <para><filename>.ghci</filename>をHaskellプロジェクトのディレクトリに置いて、プロジェクトで使われるオプションを設定するようにしておくと、GHCiを立ち上げるたびにそれを打ち込まなくて済むので便利である。例えば、プロジェクトが多引数の型クラスとスコープのある型変数ととCPPを使い、ソースファイルがA、B、Cという三つのサブディレクトリに置かれているなら、次の数行を<filename>.ghci</filename>に置くことができる。</para>
 
 <screen>
 :set -XMultiParamTypeClasses -XScopedTypeVariables -cpp
@@ -1994,6 +2084,8 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
 
     <para>あなたの<filename>.ghci</filename>にこのマクロを置いておけば、<literal>:source file</literal>とすることで<literal>file</literal>からGHCiコマンドを読み込むことができる。Haskell wikiのページ<ulink url="http://haskell.org/haskellwiki/GHC/GHCi">GHC/GHCi</ulink>では、<filename>.ghci</filename>についてのその他の助言を読むことが(そしてもちろん、追加することも)できる。</para>
 
+	<para>加えて、標準のファイルの後には<literal>-ghci-script</literal>フラグで指定されたファイルが全て読まれる。これによってデフォルト以外の.ghciファイルを使うことができる。</para>
+
     <para>開始時ファイルが読まれるかどうかを制御する二つのコマンド行オプションがある。</para>
 
     <variablelist>
@@ -2008,16 +2100,14 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
       </varlistentry>
       <varlistentry>
 	<term>
-          <option>-read-dot-ghci</option>
-          <indexterm><primary><option>-read-dot-ghci</option></primary></indexterm>
+         <option>-ghci-script</option>
+         <indexterm><primary><option>-ghci-script</option></primary></indexterm>
         </term>
 	<listitem>
-          <para><filename>.ghci</filename>その他の開始時ファイル(上記)を読む。通常これがデフォルトであるが、<option>-read-dot-ghci</option>は前に指定された<option>-ignore-dot-ghci</option>を上書きするのに使うことができる。</para>
+	  <para>通常の開始ファイルの後に指定されたファイルを読む。繰り返すことで複数の入力を指定できる。</para>
 	</listitem>
       </varlistentry>
     </variablelist>
-
-    <para><option>-ghci-script</option>オプションを使うと、別に<filename>.ghci</filename>を追加することができる。これらは通常の<filename>.ghci</filename>の後にロードされる。</para>
 
   </sect1>
 
