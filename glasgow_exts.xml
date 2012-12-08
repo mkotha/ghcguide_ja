@@ -575,103 +575,147 @@ f ((view -> B, p3), p4) = e2
 </title>
 
 <para>
-Haskell 98のdo記法では、<emphasis>再帰的な束縛</emphasis>が許されない。すなわち、do式中で束縛された変数は、テキスト中でそれより後ろのコードブロックからのみ可視である。これに対して、let式では、束縛変数がその束縛グループ全体から可視である。do記法でも再帰的束縛ができると恩恵を被る応用がいくつかあると分かった。これに必要な構文的なサポートが<option>-XDoRec</option>によって提供される。</para>
+Haskell 98のdo記法では、<emphasis>再帰的な束縛</emphasis>が許されない。すなわち、do式中で束縛された変数は、テキスト中でそれより後ろのコードブロックからのみ可視である。let式と比較せよ。let式では、束縛変数がその束縛グループ全体から可視である。</para>
+
+<para>全てではないが色々なモナドに関して、do内でのこのような再帰的束縛が実際に意味のあることだということが分かった。特に、この意味での再帰は、使われているモナドについての不動点演算子を要求する。これは<literal>Control.Monad.Fix</literal>で次のように定義されている<literal>MonadFix</literal>クラスの<literal>mfix</literal>メソッドによって表現される。
+<programlisting>
+class Monad m => MonadFix m where
+   mfix :: (a -> m a) -> m a
+</programlisting>
+Haskellの<literal>Maybe</literal>、<literal>[]</literal> (リスト)、<literal>ST</literal> (正確版と遅延版の両方)、<literal>IO</literal>や他の多くのモナドは<literal>MonadFix</literal>インスタンスを持つ。一方、シグネチャ<literal>(a -> r) -> r</literal>を持つ継続モナドはこのインスタンスを持たない。
+</para>
+<para><literal>MonadFix</literal>に属するモナドについては、再帰的束縛を許すようなdo記法の拡張をGHCが提供する。<option>-XRecursiveDo</option> (言語プラグマ: <literal>RecursiveDo</literal>)がキーワード<literal>mdo</literal>と<literal>rec</literal>を含む必要な構文的サポートを提供する。この二つのキーワードはそれぞれ高水準・低水準の記法に使う。<literal>do</literal>式内の束縛とは異なり、<literal>mdo</literal>や<literal>rec</literal>によって導入される束縛は、ちょうど通常のlet式と同様に再帰的に定義される。<literal>mdo</literal>キーワードにちなんで、この記法を<emphasis>mdo記法</emphasis>とも呼ぶ。
+</para>
+
 <para>
 以下は(人為的だが)単純な例である。
 <programlisting>
-{-# LANGUAGE DoRec #-}
+{-# LANGUAGE RecursiveDo #-}
+justOnes = mdo { xs &lt;- Just (1:xs)
+               ; return (map negate xs) }
+</programlisting>
+あるいは、以下も同等である
+<programlisting>
+{-# LANGUAGE RecursiveDo #-}
 justOnes = do { rec { xs &lt;- Just (1:xs) }
               ; return (map negate xs) }
 </programlisting>
 推測できるだろうが、<literal>justOnes</literal>は<literal>Just [-1,-1,-1,...</literal>に評価される。
 </para>
 
-<para>再帰的do記法の動機と背景は、<ulink url="http://citeseer.ist.psu.edu/erk02recursive.html">A recursive do for Haskell</ulink>, by Levent Erkok, John Launchbury, Haskell Workshop 2002, pages: 29-37. Pittsburgh, Pennsylvaniaに記されている。モナドの値再帰の背後にある理論については、Erkokのthesisである<ulink url="http://sites.google.com/site/leventerkok/erkok-thesis.pdf">Value Recursion in Monadic Computations</ulink>がさらなる説明を与えている。ただし、GHCの使う構文はこれらの文書にあるものと異なっていることに注意。
+<para>GHCにおけるmdo記法の実装は論文<ulink url="https://sites.google.com/site/leventerkok/recdo.pdf">A recursive do for Haskell</ulink>に記述されている元々の翻訳規則に良く則っている。この論文は<ulink url="http://sites.google.com/site/leventerkok/erkok-thesis.pdf">Value Recursion in Monadic Computations</ulink>という仕事を基礎としている。さらに、GHCは前者の論文に記述されている構文を拡張し、<literal>rec</literal>キーワードで示される低水準の構文を導入する。これを次に述べる。
 </para>
 
 <sect3>
-<title>再帰的do記法についての詳細</title>
-<para>再帰的do記法は、<option>-XDoRec</option>フラグか、同等の言語プラグマである<option>DoRec</option>を使って有効にする。すると、一つの新しいキーワード「<literal>rec</literal>」が導入される。これは、相互再帰的なモナド文の集りをまとめて、一つの文を作るものである。</para>
+<title>再帰的束縛グループ</title>
+<para>
+フラグ<option>-XRecursiveDo</option>は、<literal>rec</literal>という新しいキーワードを導入する。これは、相互再帰的なモナド文の集りをまとめて、一つの文を作るものである。</para>
 <para><literal>let</literal>文と同様に、<literal>rec</literal>で束縛された変数はその<literal>rec</literal>グループの全体と、その<literal>rec</literal>の下で可視である。例として、次の二つを比較せよ。
 <programlisting>
-do { a &lt;- getChar              do { a &lt;- getChar
-   ; let { r1 = f a r2	           ; rec { r1 &lt;- f a r2	
-         ; r2 = g r1 }	                 ; r2 &lt;- g r1 }	
-   ; return (r1 ++ r2) }          ; return (r1 ++ r2) }
+    do { a &lt;- getChar            do { a &lt;- getChar
+       ; let { r1 = f a r2          ; rec { r1 &lt;- f a r2
+       ;     ; r2 = g r1 }          ;     ; r2 &lt;- g r1 }
+       ; return (r1 ++ r2) }        ; return (r1 ++ r2) }
 </programlisting>
 どちらの場合でも、<literal>r1</literal>と<literal>r2</literal>は<literal>let</literal>や<literal>rec</literal>のブロック全体と、それ以降の文の中で使える。違いは、<literal>let</literal>が非モナド的であるのに対して、<literal>rec</literal>はモナド的であることだ。(周知のように、Haskellにおいて<literal>let</literal>とは実際には<literal>letrec</literal>のことである)
 </para>
 <para>
-<literal>rec</literal>の静的および動的な意味は以下のように述べることができる。
-<itemizedlist>
-<listitem><para>
-まず、let束縛と同様に、<literal>rec</literal>は再帰的な極小のまとまりに分割(segmentation)される。
-<programlisting>
-rec { a &lt;- getChar      ===>     a &lt;- getChar
-    ; b &lt;- f a c                 rec { b &lt;- f a c
-    ; c &lt;- f b a                     ; c &lt;- f b a }
-    ; putChar c }                putChar c
-</programlisting>
-分割の詳細は<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>の3.2節に記述がある。分割によってよりよい多相性が得られ、再帰的な「結び目」の大きさが軽減される。さらに、この論文にあるように、意味論的な影響もある(当該モナドがright-shrinking則を満たしている場合を除く)。
-</para></listitem>
-<listitem><para>
-次に、<literal>Control.Monad.Fix.mfix</literal>の呼び出しを使って、こうしてできたそれぞれの<literal>rec</literal>が脱糖(desugar)される。例えば、前の例の<literal>rec</literal>グループはこのように脱糖される。
+    <literal>rec</literal>の意味論はかなり単純である。GHCが<literal>rec</literal>グループを見付けると、それの束縛変数の集合を計算し、<literal>mfix</literal>への呼び出しを適切に導入する。<literal>mfix</literal>は基礎となるモナド的な値再帰演算子であり、<literal>MonadFix</literal>クラスに所属する。例を挙げる。
 <programlisting>
 rec { b &lt;- f a c     ===>    (b,c) &lt;- mfix (\~(b,c) -> do { b &lt;- f a c
     ; c &lt;- f b a }                                        ; c &lt;- f b a
                                                           ; return (b,c) })
 </programlisting>
-一般に、<literal>rec <replaceable>ss</replaceable></literal>という文は、脱糖されて次のような文になる。
+通常通り、<literal>b</literal>、<literal>c</literal>等のメタ変数は任意のパターンであって良い。一般に、<literal>rec <replaceable>ss</replaceable></literal>という文は、脱糖されて次のような文になる。
 <programlisting>
 <replaceable>vs</replaceable> &lt;- mfix (\~<replaceable>vs</replaceable> -&gt; do { <replaceable>ss</replaceable>; return <replaceable>vs</replaceable> })
 </programlisting>
 ただし、<replaceable>vs</replaceable>は<replaceable>ss</replaceable>によって束縛される変数群からなるタプルである。
-</para><para>
-元々の<literal>rec</literal>は、この脱糖された形とまったく同じように型検査される。つまり、例えば、変数群<replaceable>vs</replaceable>はラムダによって束縛されているので、<literal>rec</literal>に続く文においてすべて単相的になる。
 </para>
-<para>
-関数<literal>mfix</literal>は、<literal>Control.Monad.Fix</literal>の<literal>MonadFix</literal>で次のように定義されている。
-<programlisting>
-class Monad m => MonadFix m where
-   mfix :: (a -> m a) -> m a
-</programlisting>
-</para>
-</listitem>
-</itemizedlist>
-</para>
-<para>
-再帰的do記法を使うにあたって、他にもいくつか重要な点がある。
-<itemizedlist>
-<listitem><para>
-これは<literal>-XDoRec</literal>フラグで有効になる。
-</para></listitem>
-
-<listitem><para>
-あるモナドに再帰的な束縛を使う必要があるなら、そのモナドは<literal>MonadFix</literal>クラスのインスタンスとして宣言されていなければならない。
-</para></listitem>
-<listitem><para>
-
-次の<literal>MonadFix</literal>インスタンスは自動的に提供される。List, Maybe, IO。さらに、Control.Monad.STとControl.Monad.ST.Lazyモジュールは、Haskellの(それぞれ正格と遅延の)内部的な状態モナドについてのMonadFixインスタンスを提供する。
-</para></listitem>
-
-<listitem><para>
-<literal>let</literal>束縛や<literal>where</literal>束縛と同様に、一つの<literal>rec</literal>の中での名前の覆い隠しは許されない。つまり、一つの<literal>rec</literal>で束縛される名前は全て異なっていなければならない(論文の3.3節)。
-</para></listitem>
-
-<listitem><para>
-これは構文の再束縛(<xref linkend="rebindable-syntax"/>)に対応している。
- </para></listitem>
-</itemizedlist>
+<para><literal>rec</literal>ブロックの翻訳過程は、<literal>mfix</literal>への呼び出しをラップしているに過ぎないことに特に注意せよ。束縛についてのその他の分析はなされない。これは次に述べる<literal>mdo</literal>記法の役割である。
 </para>
 </sect3>
 
-<sect3 id="mdo-notation"> <title>mdo記法 (廃止予定)</title>
+<sect3>
+<title>mdo記法</title>
+
+<para><literal>rec</literal>ブロックは、再帰的な結び目を正確にどこに作るのかをコンパイラに指示する。しかし、結び目の位置決めがかなり繊細な問題になることが分かった。特に、結び目は可能な限り小さいグループを包んで欲しい。この過程は分割(segmentation)と呼ばれ、<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>の3.2節に詳細な記述がある。分割によってよりよい多相性が得られ、再帰的な結び目の大きさが軽減される。最も重要なのは、これがモナド的再帰のいわゆる<emphasis>right-shrinking</emphasis>公理が持つ本質的な問題が引き起こす不必要な干渉を避ける点である。短かく言うと、意味のあるモナドの大部分(IO、正格Stateなど)はこの公理を満たす再帰演算子を<emphasis>持たない</emphasis>ため、分割を行なわないと不要な干渉が発生し、最終的な翻訳結果の停止性を変えることがある。(詳細は<ulink url="http://sites.google.com/site/leventerkok/erkok-thesis.pdf">Value Recursion in Monadic Computations</ulink>の3.1および7.2.2節にある)
+</para>
+
+<para><literal>mdo</literal>記法は、<literal>rec</literal>ブロックをコードに明示的に置くという負担を取り除く。文で束縛された変数がそれ以降の文からのみ可視になる通常の<literal>do</literal>式と異なり、<literal>mdo</literal>式で束縛された変数はその式の全ての文から可視である。コンパイラは相互再帰する文からなる最小の分割単位を自動的に発見し、ユーザがその周りを<literal>rec</literal>修飾子で囲んだかのように扱う。
+</para>
+
+<para>この定義は構文的である。
+</para>
+<itemizedlist>
+   <listitem>
+       <para>生成子<replaceable>g</replaceable>が、字句的にそれより後にある生成子<replaceable>g'</replaceable>に<emphasis>依存する</emphasis>のは、以下の場合である。
+       </para>
+       <itemizedlist>
+         <listitem>
+           <para><replaceable>g</replaceable>によって使われる変数を<replaceable>g'</replaceable>が定義する、または
+           </para>
+         </listitem>
+         <listitem>
+           <para>
+           <replaceable>g'</replaceable>が字句的に<replaceable>g</replaceable>と<replaceable>g''</replaceable>の間に現れる。ここで<replaceable>g</replaceable>は<replaceable>g''</replaceable>に依存しているものとする。
+           </para>
+         </listitem>
+       </itemizedlist>
+   </listitem>
+   <listitem>
+       <para>与えられた<literal>mdo</literal>式の<emphasis>分割単位(segment)</emphasis>とは、生成子の列であって、その列内のいかなる生成子も列外の生成子に依存しないような最小の列である。特別な場合として、<literal>mdo</literal>式の最後の式は、生成子ではないにもかかわらず、単独で分割単位を構成するとみなされる。
+       </para>
+   </listitem>
+ </itemizedlist>
+<para>この意味での分割単位は<emphasis>強連結成分</emphasis>の解析に関係しているが、分割単位は並び換えることができず、連続していなければならないという点が違いである。
+</para>
+
+<para><literal>mdo</literal>式の例と、それの<literal>rec</literal>ブロックへの翻訳を示す。
+<programlisting>
+mdo { a &lt;- getChar      ===> do { a &lt;- getChar
+    ; b &lt;- f a c                ; rec { b &lt;- f a c
+    ; c &lt;- f b a                ;     ; c &lt;- f b a }
+    ; z &lt;- h a b                ; z &lt;- h a b
+    ; d &lt;- g d e                ; rec { d &lt;- g d e
+    ; e &lt;- g a z                ;     ; e &lt;- g a z }
+    ; putChar c }               ; putChar c }
+</programlisting>
+与えられた<literal>mdo</literal>式が複数の<literal>rec</literal>ブロックを作ることがあるのに注意。再帰的な依存関係がない場合、<literal>mdo</literal>は<literal>rec</literal>ブロックを一つも導入しない。この場合、予想される通り、<literal>mdo</literal>式は<literal>do</literal>式と全く同じである。
+</para>
+
+<para>要約すると、<literal>mdo</literal>式を与えられたとき、GHCはまず分割を行ない、最小の再帰グループを包む<literal>rec</literal>を導入する、次に、結果として生成された<literal>rec</literal>がそれぞれ、前の節で記述したように<literal>Control.Monad.Fix.mfix</literal>への呼び出しを使って脱糖される。最初の<literal>mdo</literal>式は、この脱糖済みのコードと全く同様に型検査される。
+</para>
 
 <para>
-GHCは、<ulink url="http://sites.google.com/site/leventerkok/">A recursive do for Haskell</ulink>に記述されている通りの<literal>mdo</literal>キーワードを有効にする<option>-XRecursiveDo</option>フラグをサポートしていたが、これは現在非推奨である。<literal>mdo { Q; e }</literal>の代わりに<literal>do { rec Q; e }</literal>と書いてほしい。
-</para>
-<para>
-歴史的な参考事項: mdo記法の古い実装(および既存の文書の大部分)は、ライブラリとクラスの名として<literal>MonadRec</literal>を使っていたが、GHCはこの名前をサポートしない。
+再帰的do記法を使うにあたって、他にもいくつか重要な点がある。
+<itemizedlist>
+    <listitem>
+        <para>
+            これは<literal>-XRecursiveDo</literal>フラグまたは<literal>LANGUAGE RecursiveDo</literal>プラグマで有効になる。(同じフラグが、<literal>mdo</literal>記法と<literal>do</literal>記法内の<literal>rec</literal>の使用の両方を有効にする)
+        </para>
+    </listitem>
+    <listitem>
+        <para>
+            <literal>rec</literal>ブロックは<literal>mdo</literal>式の中でも使うことができ、単一の文として扱われる。ただし、一つの式では<literal>mdo</literal>か<literal>rec</literal>ブロックのどちらかを使うのが良いスタイルである。
+        </para>
+    </listitem>
+    <listitem>
+        <para>
+            あるモナドに再帰的な束縛を使う必要があるなら、そのモナドは<literal>MonadFix</literal>クラスのインスタンスとして宣言されていなければならない。
+        </para>
+    </listitem>
+    <listitem>
+        <para>
+            次の<literal>MonadFix</literal>インスタンスは自動的に提供される。List, Maybe, IO。さらに、Control.Monad.STとControl.Monad.ST.Lazyモジュールは、Haskellの(それぞれ正格と遅延の)内部的な状態モナドについてのMonadFixインスタンスを提供する。
+        </para>
+    </listitem>
+    <listitem>
+        <para>
+            <literal>let</literal>束縛や<literal>where</literal>束縛と同様に、一つの<literal>rec</literal>の中での名前の覆い隠しは許されない。つまり、一つの<literal>rec</literal>で束縛される名前は全て異なっていなければならない(そうでなければGHCが文句を言う)。
+        </para>
+    </listitem>
+</itemizedlist>
 </para>
 </sect3>
 
@@ -1020,7 +1064,7 @@ mzip         Control.Monad.Zip      forall a b. m a -&gt; m b -&gt; m (a,b)
 		<para>条件分岐(例えば、 "<literal>if</literal> e1 <literal>then</literal> e2 <literal>else</literal> e3")は"<literal>ifThenElse</literal> e1 e2 e3"を意味する。ただし<literal>case</literal>式は影響を受けない。</para></listitem>
 
 	      <listitem>
-	  <para>do記法の変換時にはとにかくスコープにある<literal>(>>=)</literal>、<literal>(>>)</literal>、<literal>fail</literal>が使われる。リスト内包表記、mdo(<xref linkend="mdo-notation"/>)、並行配列内包表記は影響を受けない。</para></listitem>
+	  <para>do記法の変換時にはとにかくスコープにある<literal>(>>=)</literal>、<literal>(>>)</literal>、<literal>fail</literal>が使われる。リスト内包表記、mdo(<xref linkend="recursive-do-notation"/>)、並行配列内包表記は影響を受けない。</para></listitem>
 
 	      <listitem>
                 <para>アロー記法(<xref linkend="arrow-notation"/>を見よ)では、とにかくスコープにある<literal>arr</literal>、<literal>(>>>)</literal>、<literal>first</literal>、<literal>app</literal>、<literal>(|||)</literal>、<literal>loop</literal>の各関数が使われる。ただし、他の構文要素の場合と異なり、これらの関数の型はPreludeのものとかなり良く近似していなければならない。詳細は固まっていので、もしこれを使いたいなら、声を掛けてほしい。
@@ -1098,6 +1142,47 @@ fromInteger :: Integer -> Bool -> Bool
 は、変わらず非ボックス化単項タプルの構築子を意味する。
 </para>
 
+</sect2>
+
+<sect2 id="lambda-case">
+<title>ラムダcase</title>
+<para>
+<option>-XLambdaCase</option>フラグは以下の形の式を有効にする。
+<programlisting>
+  \case { p1 -> e1; ...; pN -> eN }
+</programlisting>
+これは以下と同等である。
+<programlisting>
+  \freshName -> case freshName of { p1 -> e1; ...; pN -> eN }
+</programlisting>
+<literal>\case</literal>はレイアウトを開始するので、以下のように書けることに注意。
+<programlisting>
+  \case
+    p1 -> e1
+    ...
+    pN -> eN
+</programlisting>
+</para>
+</sect2>
+
+<sect2 id="multi-way-if">
+<title>多選択肢のif式</title>
+<para>
+<option>-XMultiWayIf</option>フラグを使うと、GHCは以下のように複数の選択肢を持つ条件式を受け付ける。
+<programlisting>
+  if | guard1 -> expr1
+     | ...
+     | guardN -> exprN
+</programlisting>
+これは、だいたい次のものと同等である。
+<programlisting>
+  case () of
+    _ | guard1 -> expr1
+    ...
+    _ | guardN -> exprN
+</programlisting>
+ただし、多選択肢のif式はレイアウトに変更を加えない。
+</para>
 </sect2>
 
 <sect2 id="disambiguate-fields">
@@ -1435,15 +1520,6 @@ import safe qualified Network.Socket as NS
 	</term>
 	<listitem><para>
 	<option>-XTemplateHaskell</option>によって盗まれる。
-	  </para></listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-	  <literal>'<replaceable>varid</replaceable></literal>
-	</term>
-	<listitem><para>
-	<option>-XTemplateHaskell</option>と<option>-XPolyKinds</option>によって盗まれる。
 	  </para></listitem>
       </varlistentry>
 
