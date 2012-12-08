@@ -2251,6 +2251,15 @@ data Counter a where
 </programlisting>
 前と同じように、ここで生成される選択関数は唯一つ、<literal>tag</literal>についてものである。ただし、パターン照合とレコード構築では、相変わらず全てのフィールド名を使うことができる。
 </para></listitem>
+
+<listitem><para>
+GADT様式のデータ型宣言では、データ構築子が中置であるかを指定する自明な方法が存在しない。これはその型に<literal>Show</literal>を自動導出する際に問題になる。(中置で宣言されたデータ構築子は<literal>show</literal>によって中置で表示される。)そこでGHCは以下の設計を実装している。GADT様式で宣言されたデータ構築子が<literal>Show</literal>によって中置で表示されるのは、(a)演算子記号であり、(b)引数を二つ取り、(c)プログラマによって与えられた結合性宣言を持つ、場合、かつそれに限る。例を挙げる。
+<programlisting>
+   infix 6 (:--:) 
+   data T a where
+     (:--:) :: Int -> Bool -> T Int
+</programlisting>
+</para></listitem>
 </itemizedlist></para>
 
  </sect2>
