@@ -124,7 +124,7 @@
 非ボックス化タプルが使われるのは、関数が複数の値を返す必要があり、なおかつ、通常のタプルを使ったときのようなヒープ確保を避けたい場合である。非ボックス化タプルが返されるとき、要素がレジスタかスタックに直接置かれる。非ボックス化タプルそれ自体は複合物としての表現を持たない。<literal>primops.txt.pp</literal>に載っているプリミティブ演算の多くが非ボックス化タプルを返す。特に、<literal>IO</literal>モナドおよび<literal>ST</literal>モナドでは、操作の連結に際して不要なメモリ確保をしなくても済むようにするために非ボックス化タプルが使われている。</para>
 
 <para>
-非ボックス化タプルの使用に際しては、かなり厳しい規則が存在する。
+非ボックス化タプルの使用に際しては、いくつか規則が存在する。
 <itemizedlist>
 <listitem>
 
@@ -134,32 +134,6 @@
 </para>
 </listitem>
 <listitem>
-
-<para>
-非ボックス化タプル型の変数は存在し得ない。構築子や関数の引数が非ボックス化タプル型の引数を取ることはできない。以下の例は全て不正である。
-<programlisting>
-  data Foo = Foo (# Int, Int #)
-
-  f :: (# Int, Int #) -&#62; (# Int, Int #)
-  f x = x
-
-  g :: (# Int, Int #) -&#62; Int
-  g (# a,b #) = a
-
-  h x = let y = (# x,x #) in ...
-</programlisting>
-</para>
-</listitem>
-<listitem>
-<para>
-非ボックス化タプルはネストできない。よってこれは許されない。
-<programlisting>
-f :: (# Int, (# Int, Int #), Bool #)
-</programlisting>
-</para>
-</listitem>
-</itemizedlist>
-</para>
 <para>
 非ボックス化タプルの典型的な使いかたは、単純に複数の値を返し、その複数の結果を<literal>case</literal>式で束縛するというものである。
 <programlisting>
@@ -178,6 +152,10 @@ f :: (# Int, (# Int, Int #), Bool #)
         in ..body..
 </programlisting>
 実際、束縛は再帰的であっても良い。
+</para>
+</listitem>
+</itemizedlist>
+
 </para>
 
 </sect2>
