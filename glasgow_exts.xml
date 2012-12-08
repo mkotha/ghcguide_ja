@@ -2457,7 +2457,7 @@ GHCはこれを拡張し、新たにいくつかのクラスが自動的に導�
 <para><literal>Typeable</literal>のインスタンスは、データ型の型パラメタの数が七個以下で、その全てが種<literal>*</literal>を持っているときのみ自動導出できる。これは、<literal>Typeable</literal>クラスが<ulink url="http://research.microsoft.com/%7Esimonpj/papers/hmap/gmap2.ps">Scrap More Boilerplate: Reflection, Zips, and Generalised Casts</ulink>で述べられている形を使って導出されているからである。(この論文の7.4節では、使われる複数の<literal>Typeable</literal>について述べられているが、ライブラリが提供するのは<literal>Typeable1</literal>から<literal>Typeable7</literal>までだけである)。この条件を満たさない場合、プログラマは、そのデータ構築子に合った種を持つ<literal>TypeableX</literal>を書き、そのデータ型についてのインスタンスを手で書くことができる。</para>
 </listitem>
 
-<listitem><para><option>-XDeriveGeneric</option>を使うと、<literal>Generic</literal>クラスのインスタンスを自動導出できる。このクラスは<literal>GHC.Generics</literal>で定義されている。<xref linkend="generic-programming"/>にあるように、これらを使って総称的な関数を定義することができる。</para></listitem>
+<listitem><para><option>-XDeriveGeneric</option>を使うと、<literal>Generic</literal>および<literal>Generic1</literal>クラスのインスタンスを自動導出できる。これらのクラスは<literal>GHC.Generics</literal>で定義されている。<xref linkend="generic-programming"/>にあるように、これらを使って総称的な関数を定義することができる。</para></listitem>
 
 <listitem><para><option>-XDeriveFunctor</option>を使うと、<literal>Functor</literal>クラスのインスタンスを自動導出できる。このクラスは<literal>GHC.Base</literal>で定義されている。</para></listitem>
 

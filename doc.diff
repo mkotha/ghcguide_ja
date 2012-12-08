@@ -1,15 +1,3 @@
-@@ -3239,8 +3357,9 @@
- </listitem>
- 
- <listitem><para> With <option>-XDeriveGeneric</option>, you can derive
--instances of  the class <literal>Generic</literal>, defined in
--<literal>GHC.Generics</literal>. You can use these to define generic functions,
-+instances of the classes <literal>Generic</literal> and
-+<literal>Generic1</literal>, defined in <literal>GHC.Generics</literal>.
-+You can use these to define generic functions,
- as described in <xref linkend="generic-programming"/>.
- </para></listitem>
- 
 @@ -3958,46 +4077,37 @@
  and the <literal>a1 ... an</literal> are distinct type variables.
  GHC relaxes these rules in two ways.
