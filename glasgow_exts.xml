@@ -3721,40 +3721,15 @@ instance Show v => Show (GMap () v) where ...
 
 </sect1>
 
-<sect1 id="kind-polymorphism-and-promotion">
-<title>種多相と昇格</title>
-
-<para>
-標準のHaskellには豊かな型言語が備わっている。型は式を分類し、多くのよくあるプログラミング上の間違いを避けるのに役立つ。一方で、Haskellの種言語(訳注: kind language; 型の型の言語)は比較的単純であり、持ち上げられた型(種<literal>*</literal>)と型構築子(たとえば種<literal>* -> * -> *</literal>)と持ち上げられていない型(<xref linkend="glasgow-unboxed"/>)を区別するのみである。特に型族(<xref linkend="type-families"/>)やGADT(<xref linkend="gadt"/>)などの高度な型システムの機能を使う場合、この単純な種システムでは不十分であり、単純な間違いを防ぐことができない。例として、型水準の自然数と、長さによって添字付けられたベクトルを考えよ。
-<programlisting>
-data Ze
-data Su n
-
-data Vec :: * -> * -> * where
-  Nil  :: Vec a Ze
-  Cons :: a -> Vec a n -> Vec a (Su n)
-</programlisting>
-<literal>Vec</literal>の種は<literal>* -> * -> *</literal>である。これば、例えば<literal>Vec Int Char</literal>が種の正しい型であることを意味する。長さによって添字付けられたベクトルを定義するときにこれを意図している訳ではないにもかかわらずである。
-</para>
-
-<para>
-<option>-XPolyKinds</option>および<option>-XDataKinds</option>フラグによって、より豊かな種言語の利用が可能になる。<option>-XPolyKinds</option>は種多相を有効にし、<option>-XDataKinds</option>はデータ型の昇格を通してユーザが種を定義することを可能にする。<option>-XDataKinds</option>を使うと、上の例は次のように書き直せる。
-<programlisting>
-data Nat = Ze | Su Nat
-
-data Vec :: * -> Nat -> * where
-  Nil  :: Vec a Ze
-  Cons :: a -> Vec a n -> Vec a (Su n)
-</programlisting>
-この改善された<literal>Vec</literal>の種のもとでは、<literal>Vec Int Char</literal>のようなものは今や種が間違っており、GHCはエラーを報告するだろう。
-</para>
-
-<para>
-この節では、この新しい種システムの使い型の例を少し示す。この拡張はTLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。
-</para>
-
-<sect2 id="kind-polymorphism">
+<sect1 id="kind-polymorphism">
 <title>種多相</title>
+
+<para>
+この節では、<emphasis>種多相性</emphasis>と、<option>-XPolyKinds</option>によって有効になる拡張について記述する。これはTLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。
+</para>
+
+<sect2> <title>種多相の概観</title>
+
 <para>
 現在、Typeableの実装にはコードの重複が沢山ある(<xref linkend="deriving-typeable"/>)。
 <programlisting>
@@ -3783,31 +3758,114 @@ instance Typeable []   where typeOf _ = TypeRep
 データ型<literal>Proxy</literal>は<literal>forall k. k -> *</literal>という種を持っていることに注意(GHCによって推論される)。またこの新しい<literal>Typeable</literal>クラスの種は<literal>forall k. k -> Constraint</literal>である。
 </para>
 
-<para>
-現在の実装にはいくつか制約がある。
-<itemizedlist>
- <listitem><para>種に関して抽象化したり、種変数に言及することは(まだ)できない。よって以下のものは全て拒絶される。
-<programlisting>
-data D1 (t :: k)
-
-data D2 :: k -> *
-
-data D3 (k :: BOX)
-</programlisting></para>
- </listitem>
- <listitem><para>型族の戻り種は常にデフォルトの<literal>*</literal>が使われる。よって以下のものは拒絶される。
-<programlisting>
-type family F a
-type instance F Int = Maybe
-</programlisting></para>
- </listitem>
-</itemizedlist>
-</para>
-
 </sect2>
 
-<sect2 id="promotion">
+<sect2> <title>概観</title>
+ 
+<para>一般的に言って、<option>-XPolyKinds</option>の下では、GHCは装飾のないものについて可能な限り多相的な種を推論する。例えば、
+
+<programlisting>
+data T m a = MkT (m a)
+-- GHCが推論する種は T :: forall k. (k -> *) -> k -> *
+</programlisting>
+項の世界と同様に、シグネチャを使うことで多相性に制限を加えることができる
+(<option>-XPolyKinds</option>は<option>-XKindSignatures</option>も有効にする)
+<programlisting>
+data T m (a :: *) = MkT (m a)
+-- GHCが推論する種は T :: (* -> *) -> * -> * になる
+</programlisting>
+種変数についての"forall"はない。代わりに、種シグネチャでは単に種変数に言及することができる。次のように。
+<programlisting>
+data T (m :: k -> *) a = MkT (m a)
+-- GHCが推論する種は T :: forall k. (k -> *) -> k -> * になる
+</programlisting>
+</para>
+</sect2>
+
+<sect2> <title>多相種再帰と完全な種シグネチャ</title>
+
+<para>
+型推論の場合と同様に、再帰的な型についての種推論は<emphasis>単相</emphasis>再帰しか扱えない。以下の(人為的な)例を考えよ。
+<programlisting>
+data T m a = MkT (m a) (T Maybe (m a))
+-- GHCが推論する種は T :: (* -> *) -> * -> *
+</programlisting>
+<literal>T</literal>が再帰的に使われることによって、第二引数の種が<literal>*</literal>に固定されている。しかし、型推論の場合と同様に、<literal>T</literal>に<emphasis>完全な種シグネチャ</emphasis>を付けることで多相再帰を実現できる。データ型に完全な種シグネチャを与えるには、次のようにGADT様式の宣言を使い、明示的な種シグネチャを付ける。
+<programlisting>
+data T :: (k -> *) -> k -> * where
+  MkT :: m a -> T Maybe (m a) -> T m a
+</programlisting>
+このユーザ指定の完全な種シグネチャが<literal>T</literal>について多相的な種を指定しており、再帰的なものを含めた<literal>T</literal>の呼び出し全てに利用される。特に、<literal>T</literal>の再帰呼び出しは種<literal>*</literal>においてである。
+</para>
+
+<para>
+型構築子の「ユーザ指定の完全な種シグネチャ」とみなされるのは正確に何か？以下のものである。
+ <itemizedlist>
+<listitem><para>
+ヘッダに明示的な「<literal>::</literal>」を含むGADT様式のデータ型宣言
+ <programlisting>
+data T1 :: (k -> *) -> k -> *       where ...   -- 可  T1 :: forall k. (k->*) -> k -> *
+data T2 (a :: k -> *) :: k -> *     where ...   -- 可  T2 :: forall k. (k->*) -> k -> *
+data T3 (a :: k -> *) (b :: k) :: * where ...   -- 可  T3 :: forall k. (k->*) -> k -> *
+data T4 a (b :: k)             :: * where ...   -- 可  T4 :: forall k. * -> k -> *
+
+data T5 a b                         where ...   -- 非  種は推論されない
+data T4 (a :: k -> *) (b :: k)      where ...   -- 非  種は推論されない
+</programlisting>
+「<literal>::</literal>」を置くのはどこでもいいが、どこかには置かなければならない。Haskell98様式のデータ型宣言を使って完全な種シグネチャを与えることはできない。GADT構文を使う必要がある。
+</para></listitem>
+ 
+<listitem><para>
+型族やデータ族宣言は、<emphasis>常に</emphasis>ユーザ指定の完全な種シグネチャを持つ。「<literal>::</literal>」は必要ない。
+ <programlisting>
+data family D1 a           	-- D1 :: * -> *
+data family D2 (a :: k)    	-- D2 :: forall k. k -> *
+data family D3 (a :: k) :: *    -- D3 :: forall k. k -> *
+type family S1 a :: k -> *      -- S1 :: forall k. * -> k -> *
+</programlisting>
+</para></listitem>
+ </itemizedlist>
+ユーザ指定の完全な種シグネチャにおいて、「<literal>::</literal>」の左側の装飾のない型変数はすべて種「<literal>*</literal>」を持つとみなされる。種多相性が必要なら種変数を指定しなければならない。
+ </para>
+
+</sect2>
+</sect1>
+
+<sect1 id="promotion">
 <title>データ型の昇格</title>
+
+<para>
+この節では<emphasis>データ型の昇格</emphasis>を記述する。これは、型多相性を補う型システムへの拡張である。これは<option>-XDataKinds</option>によって有効になり、TLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。</para>
+
+<sect2> <title>動機</title>
+
+<para>
+標準のHaskellには豊かな型言語が備わっている。型は式を分類し、多くのよくあるプログラミング上の間違いを避けるのに役立つ。一方で、Haskellの種言語(訳注: kind language; 型の型の言語)は比較的単純であり、持ち上げられた型(種<literal>*</literal>)と型構築子(たとえば種<literal>* -> * -> *</literal>)と持ち上げられていない型(<xref linkend="glasgow-unboxed"/>)を区別するのみである。特に型族(<xref linkend="type-families"/>)やGADT(<xref linkend="gadt"/>)などの高度な型システムの機能を使う場合、この単純な種システムでは不十分であり、単純な間違いを防ぐことができない。例として、型水準の自然数と、長さによって添字付けられたベクトルを考えよ。
+<programlisting>
+data Ze
+data Su n
+
+data Vec :: * -> * -> * where
+  Nil  :: Vec a Ze
+  Cons :: a -> Vec a n -> Vec a (Su n)
+</programlisting>
+<literal>Vec</literal>の種は<literal>* -> * -> *</literal>である。これば、例えば<literal>Vec Int Char</literal>が種の正しい型であることを意味する。長さによって添字付けられたベクトルを定義するときにこれを意図している訳ではないにもかかわらずである。
+</para>
+
+<para>
+<option>-XDataKinds</option>を使うと、上の例は次のように書き直せる。
+<programlisting>
+data Nat = Ze | Su Nat
+
+data Vec :: * -> Nat -> * where
+  Nil  :: Vec a Ze
+  Cons :: a -> Vec a n -> Vec a (Su n)
+</programlisting>
+この改善された<literal>Vec</literal>の種のもとでは、<literal>Vec Int Char</literal>のようなものは今や種が間違っており、GHCはエラーを報告するだろう。
+</para>
+</sect2>
+
+<sect2><title>概観</title>
 <para>
 <option>-XDataKinds</option>を使うと、GHCは全ての適したデータ型を種へと昇格させ、その(値)構築子を型構築子へと昇格させる。以下の型は、
 <programlisting>
@@ -3836,7 +3894,7 @@ Sum k1 k2 :: BOX
 L :: k1 -> Sum k1 k2
 R :: k2 -> Sum k1 k2
 </programlisting>
-例えば<literal>List</literal>が<literal>BOX -> BOX</literal>という種を得ないことに注意。種はそれ以上区別されないからである。全ての種は<literal>BOX</literal>というソートを持つ。
+ここで、<literal>BOX</literal>は種を分類する(唯一の)ソートである。例えば<literal>List</literal>が<literal>BOX -> BOX</literal>という種を得ないことに注意。種はそれ以上区別されないからである。全ての種は<literal>BOX</literal>というソートを持つ。
 </para>
 
 <para>
@@ -3845,10 +3903,13 @@ R :: k2 -> Sum k1 k2
  <listitem><para>我々は<literal>* -> ... -> * -> *</literal>という形の種を持つデータ型しか昇格させない。特に、<literal>data Fix f = In (f (Fix f))</literal>のような高階の種を持つデータ型や、<literal>Vec :: * -> Nat -> *</literal>のように昇格後の型が関わっている種を持つデータ型を昇格させることはしない。</para></listitem>
  <listitem><para>構築子が種多相であったり、制約が関わっていたり、存在量化を使っていたりするデータ型は昇格させない。
  </para></listitem>
+ <listitem><para>データ族インスタンス(<xref linkend="data-families"/>)は昇格させない。
+ </para></listitem>
 </itemizedlist>
 </para>
+</sect2>
 
-<sect3 id="promotion-syntax">
+<sect2 id="promotion-syntax">
 <title>型と構築子の区別</title>
 <para>
 昇格があると、構築子と型が同じ名前空間を共有するので、型名が曖昧になることがある。
@@ -3867,9 +3928,10 @@ type T2 = 'P    -- 昇格した2
 </programlisting>
 昇格したデータ型は名前の付いた種を生み出すことに注意。これらが曖昧になることはないので、種名に引用符を付けることは認めていない。
 </para>
-</sect3>
+<para>Template Haskell(<xref linkend="th-syntax"/>)の場合と同様に、二文字目が一重引用符であるようなデータ構築子や型構築子を引用する方法はない。</para>
+</sect2>
 
-<sect3 id="promoted-lists-and-tuples">
+<sect2 id="promoted-lists-and-tuples">
 <title>昇格したリスト型とタプル型</title>
 <para>
 Haskellのリストおよびタプル型は言語レベルで種へと昇格されており、引用符を前置する必要があるものの型水準でも同じ便利な記法が使える。
@@ -3883,14 +3945,42 @@ data Tuple :: (*,*) -> * where
 </programlisting>
 これは<option>-XTypeOperators</option>を必要とすることに注意。
 </para>
-</sect3>
-
 </sect2>
 
-<sect2 id="kind-polymorphism-limitations">
-<title>現在の実装の欠点</title>
+<sect2 id="promoted-literals">
+<title>昇格したリテラル</title>
+<para>数値リテラルと文字列リテラルは型水準に昇格され、定義済みの大量の型水準の定数へのアクセスを容易にする。数値リテラルの種は<literal>Nat</literal>であり、文字列リテラルの種は<literal>Symbol</literal>である。これらの種は<literal>GHC.TypeLits</literal>モジュールで定義されている。
+</para>
+
 <para>
-GHC 7.4のリリースに際しては、我々は新しい種多相的なcoreが既存のあらゆる(種多相を使っていない)プログラムを扱えるようにすることに焦点を置いた。<option>-XPolyKinds</option>に関して既に多くものが正しく動作するが、動かないものもあることを予想している。もし困難に陥ったら、どうか<link linkend="bug-reporting">バグ報告</link>をしてほしい！
+低水準の関数に安全なインタフェースを与えるために型水準の数値リテラルを使う例を示す。
+<programlisting>
+import GHC.TypeLits
+import Data.Word
+import Foreign
+
+newtype ArrPtr (n :: Nat) a = ArrPtr (Ptr a)
+
+clearPage :: ArrPtr 4096 Word8 -> IO ()
+clearPage (ArrPtr p) = ...
+</programlisting>
+</para>
+
+<para>
+単純なレコード操作をシミュレートするために型水準の文字列リテラルを使う例を示す。
+<programlisting>
+data Label (l :: Symbol) = Get
+
+class Has a l b | a l -> b where
+  from :: a -> Label l -> b
+
+data Point = Point Int Int deriving Show
+
+instance Has Point "x" Int where from (Point x _) _ = x
+instance Has Point "y" Int where from (Point _ y) _ = y
+
+example = from (Point 1 2) (Get :: Label "x")
+</programlisting>
 </para>
 </sect2>
 
