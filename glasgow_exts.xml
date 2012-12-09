@@ -5064,6 +5064,73 @@ Haskell 98ではこれは不正であるが、Jonesの様式の元では、ま�
 </sect1>
 <!-- ==================== End of type system extensions =================  -->
 
+<sect1 id="defer-type-errors">
+<title>型エラーを実行時まで遅らせる</title>
+  <para>開発中、コードに型エラーがあるにもかかわらずコンパイルが成功できるようにするのが望ましいことがある。次の例を考えよ。
+<programlisting>
+module Main where
+
+a :: Int
+a = 'a'
+
+main = print "b"
+</programlisting>
+<literal>a</literal>の型は間違っているが、最終的には使われていないので、<literal>main</literal>のことしか気にしないなら、<literal>a</literal>についての問題を無視できると便利かもしれない。
+  </para>
+  <para>さらなる動機付けと詳細については、<ulink
+      url="http://hackage.haskell.org/trac/ghc/wiki/DeferErrorsToRuntime">HaskellWiki</ulink>のページか、<ulink
+      url="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/">原論文</ulink>を見よ。
+  </para>
+
+<sect2><title>型エラーの遅延を有効にする</title>
+  <para><literal>-fdefer-type-errors</literal>フラグは、型エラーを実行時まで遅らせるかどうかを制御する。型エラーはなお警告として出力されるが、コンパイルを止めることはない。
+  </para>
+  <para>実行時、型エラーのある項を評価する必要が発生すると、そのエラーは実行時例外へと変換される。実行中、型エラーは可能な限り遅らされるが、不正な型変換(coercion)は決して実行されないことに注意。これは、最終的に正しい型を持つ値を生成するような場合でも同様である。例として、以下のコードが与えられたとする。
+<programlisting>
+x :: Int
+x = 0
+
+y :: Char
+y = x
+
+z :: Int
+z = y
+</programlisting>
+    <literal>x</literal>を評価すると、実行時型エラーが発生する。
+  </para>
+</sect2>
+<sect2><title>GHCiで型エラーを遅らせる</title>
+  <para><literal>-fdefer-type-errors</literal>フラグはGHCiでも動作するが、例外が一つある。プロンプトに入力された「裸の」式については、型エラーは遅らせられない。よって、例えば
+<programlisting>
+Prelude> fst (True, 1 == 'a')
+
+&lt;interactive&gt;:2:12:
+    No instance for (Num Char) arising from the literal `1'
+    Possible fix: add an instance declaration for (Num Char)
+    In the first argument of `(==)', namely `1'
+    In the expression: 1 == 'a'
+    In the first argument of `fst', namely `(True, 1 == 'a')'
+</programlisting>
+こうなっていなければ、<literal>reverse True</literal>のような単純な型エラーのある式をプロンプトに入力したようなよくある場合に、警告がまず表示され、次にすぐさま式が評価されて型エラーが表示されることになる。
+  </para>
+  <para>
+    この例外は文には適用されない。以下の例がこれを実演する。
+<programlisting>
+Prelude> let x = (True, 1 == 'a')
+
+&lt;interactive&gt;:3:16: Warning:
+    No instance for (Num Char) arising from the literal `1'
+    Possible fix: add an instance declaration for (Num Char)
+    In the first argument of `(==)', namely `1'
+    In the expression: 1 == 'a'
+    In the expression: (True, 1 == 'a')
+Prelude> fst x
+True
+</programlisting>
+  </para>
+</sect2>
+</sect1>
+
 <!-- ====================== TEMPLATE HASKELL =======================  -->
 
 <sect1 id="template-haskell">
