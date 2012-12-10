@@ -238,28 +238,68 @@ _ZCMain_main_closure
 
     <para>GHCは、起動すると、これらの二つのパッケージデータベースの内容を読み、既知のパッケージの一覧を作り上げる。パッケージの一覧表を見るには、GHCを<option>-v</option>フラグ付きで走らせれば良い。</para>
 
-    <para>パッケージデータベースには重複があっても良い。例えば、ユーザデータベースにあるパッケージは大域的データベースにある同名同バージョンのものより優先される(それを<emphasis>覆い隠す</emphasis>)。</para>
+    <para>パッケージデータベースには重複があっても良く、スタック構造で配置される。スタックの一番上に近いパッケージは下のものより優先される(それを<emphasis>覆い隠す</emphasis>)。デフォルトでは、スタックには大域データベースとユーザのパッケージデータベースがこの順であるだけである。</para>
 
-    <para>どのパッケージデータベースをロードするかを制御するには、以下のオプションを使えば良い。</para>
+    <para>GHCのパッケージデータベースのスタックを制御するには、以下のオプションを使えば良い。</para>
 
     <variablelist>
       <varlistentry>
         <term>
-          <option>-package-conf <replaceable>file</replaceable></option>
-          <indexterm><primary><option>-package-conf</option></primary></indexterm>
+          <option>-package-db <replaceable>file</replaceable></option>
+          <indexterm><primary><option>-package-db</option></primary></indexterm>
         </term>
         <listitem>
-          <para>システムのデフォルトとユーザ固有のファイルに加えて、パッケージ設定ファイル<replaceable>file</replaceable>を読む。この方法で読まれるファイルにあるパッケージは大域的・ユーザ固有のデータベースよりも優先される。</para>
+          <para>パッケージデータベース<replaceable>file</replaceable>を現在のスタックの一番上に置く。この方法で読まれるデータベースにあるパッケージは、スタックに最初からあったものや以前に指定されたパッケージよりも優先される。</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-        <term><option>-no-user-package-conf</option>
-          <indexterm><primary><option>-no-user-package-conf</option></primary>
+        <term><option>-no-global-package-db</option>
+          <indexterm><primary><option>-no-global-package-db</option></primary>
           </indexterm>
         </term>
         <listitem>
-          <para>ユーザ固有のパッケージデータベースをロードしない。</para>
+          <para>パッケージデータベースのスタックから大域パッケージデータベースを取り除く。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-no-user-package-db</option>
+          <indexterm><primary><option>-no-user-package-db</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+          <para>ユーザ固有のパッケージデータベースを初期スタックにロードしない。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-clear-package-db</option>
+          <indexterm><primary><option>-clear-package-db</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+            <para>現在のパッケージデータベーススタックを空にする。このオプションは、以前に指定されたパッケージデータベースを(<literal>GHC_PACKAGE_PATH</literal>環境変数から読まれたものも含めて)全てパッケージデータベーススタックから取り除く。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-global-package-db</option>
+          <indexterm><primary><option>-global-package-db</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+          <para>現在のスタックの一番上に大域パッケージデータベースを加える。このオプションは、<literal>-no-global-package-db</literal>の後に使うことで、スタック内で大域パッケージデータベースがロードされるべき位置を指定することができる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-user-package-db</option>
+          <indexterm><primary><option>-user-package-db</option></primary>
+          </indexterm>
+        </term>
+        <listitem>
+          <para>現在のスタックの一番上にユーザのパッケージデータベースを加える。このオプションは、<literal>-no-user-package-db</literal>の後に使うことで、スタック内でユーザのパッケージデータベースがロードされるべき位置を指定することができる。</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -271,7 +311,7 @@ _ZCMain_main_closure
       <indexterm><primary><literal>GHC_PACKAGE_PATH</literal></primary></indexterm>
       <para><literal>GHC_PACKAGE_PATH</literal>環境変数に<literal>:</literal>区切り(Windowsでは<literal>;</literal>区切り)でパッケージデータベースファイルを並べて指定することができる。この一覧はGHCとghc-pkgが使う。このとき、一覧に先に現れるデータベースが後のものより優先される。これは<literal>PATH</literal>環境変数の挙動に倣ったものである。この一覧が左から順に探索されると考えると良い。</para>
 
-      <para><literal>GHC_PACKAGE_PATH</literal>が区切り子で終わるなら、デフォルトのユーザ・システムのパッケージデータベースがこの順で付け加えられる。例えば、通常のパッケージにあなた自身のデータベースを付け加えるには、次のようにすると良い。(Unixの例)
+      <para><literal>GHC_PACKAGE_PATH</literal>が区切り子で終わるなら、デフォルトのパッケージデータベーススタック(つまり、ユーザのパッケージデータベースと大域パッケージデータベースがこの順で)付け加えられる。例えば、通常のパッケージにあなた自身のデータベースを付け加えるには、次のようにすると良い。(Unixの例)
 <screen>
 $ export GHC_PACKAGE_PATH=$HOME/.my-ghc-packages.conf:</screen>
         (Windowsでは<literal>:</literal>の代わりに<literal>;</literal>を使うこと)</para>
@@ -359,11 +399,11 @@ haskell98-1.0.1.0
     <indexterm><primary>packages</primary>
       <secondary>management</secondary></indexterm>
  
-    <para><literal>ghc-pkg</literal>ツールは、パッケージデータベースの情報を取得したり、これに変更を加えたりするためのものである。どんなパッケージデータベースが使われているか見るには、<literal>ghc-pkg&nbsp;list</literal>とすれば良い。<literal>ghc-pkg</literal>が知っているパッケージデータベースのスタックは、<literal>GHC_PACKAGE_PATH</literal>環境変数(<xref linkend="ghc-package-path"/>を見よ)を使うか、<literal>ghc-pkg</literal>のコマンド行から<literal>--package-conf</literal>を使うことで変更できる。</para>
+    <para><literal>ghc-pkg</literal>ツールは、パッケージデータベースの情報を取得したり、これに変更を加えたりするためのものである。どんなパッケージデータベースが使われているか見るには、<literal>ghc-pkg&nbsp;list</literal>とすれば良い。<literal>ghc-pkg</literal>が知っているパッケージデータベースのスタックは、<literal>GHC_PACKAGE_PATH</literal>環境変数(<xref linkend="ghc-package-path"/>を見よ)を使うか、<literal>ghc-pkg</literal>のコマンド行から<literal>--package-db</literal>を使うことで変更できる。</para>
 
-    <para>データベースを変更するとき、<literal>ghc-pkg</literal>はデフォルトで大域的データベースを変更する。<option>--user</option>を指定すればユーザデータベースが操作される。また、<option>--package-conf</option>を使ってまったく別のデータベースを操作させることもできる。これらのオプションが複数与えられたときは、もっとも右にあるものが対象のデータベースとして使われる。</para>
+    <para>データベースを変更するとき、<literal>ghc-pkg</literal>はデフォルトで大域的データベースを変更する。<option>--user</option>を指定すればユーザデータベースが操作される。また、<option>--package-db</option>を使ってまったく別のデータベースを操作させることもできる。これらのオプションが複数与えられたときは、もっとも右にあるものが対象のデータベースとして使われる。</para>
 
-   <para>パッケージデータベースに問い合わせを行うコマンド(list、latest、describe、find、dot)は、フラグ<option>--user</option>、<option>--global</option>、<option>--package-conf</option>によって指定されるデータベースの列に対して動作する。これらのフラグが一つも与えられなかった場合、デフォルトは<option>--global</option> <option>--user</option>である。</para>
+   <para>パッケージデータベースに問い合わせを行うコマンド(list、latest、describe、find、dot)は、フラグ<option>--user</option>、<option>--global</option>、<option>--package-db</option>によって指定されるデータベースの列に対して動作する。これらのフラグが一つも与えられなかった場合、デフォルトは<option>--global</option> <option>--user</option>である。</para>
 
     <para><literal>GHC_PACKAGE_PATH</literal>環境変数が設定されていて、その値の最後が区切り子(Unixでは<literal>:</literal>、Windowsでは<literal>;</literal>)でないとき、最後のデータベースが大域データベースとみなされ、<literal>ghc-pkg</literal>はデフォルトでこれを変更する。このようになっているのは、<literal>GHC_PACKAGE_PATH</literal>を使って仮想的なパッケージ環境を構築し、そこでは他に何も指定することなくCabalパッケージをインストールできるようにすることが可能であるように、である。</para>
 
@@ -551,12 +591,12 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
           </indexterm>
         </term>
         <term>
-          <option>-package-conf</option> <replaceable>file</replaceable>
-          <indexterm><primary><option>-package-conf</option></primary>
+          <option>-package-db</option> <replaceable>file</replaceable>
+          <indexterm><primary><option>-package-db</option></primary>
           </indexterm>
         </term>
         <listitem>
-          <para><replaceable>file</replaceable>をパッケージデータベースのスタックに加える。さらに、後続のオプションに上書きされない限り、<literal>register</literal>、<literal>unregister</literal>、<literal>expose</literal>、<literal>hide</literal>コマンドが変更するデータベースは<replaceable>file</replaceable>になる。これを上書きし得るのは、<option>--package-conf</option>、<option>--user</option>、<option>--global</option>である。</para>
+          <para><replaceable>file</replaceable>をパッケージデータベースのスタックに加える。さらに、後続のオプションに上書きされない限り、<literal>register</literal>、<literal>unregister</literal>、<literal>expose</literal>、<literal>hide</literal>コマンドが変更するデータベースは<replaceable>file</replaceable>になる。これを上書きし得るのは、<option>--package-db</option>、<option>--user</option>、<option>--global</option>である。</para>
         </listitem>
       </varlistentry>
 
