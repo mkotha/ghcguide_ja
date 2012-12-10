@@ -1,15 +1,3 @@
-diff -urd 7.4.2-original/runghc.xml original/runghc.xml
---- 7.4.2-original/runghc.xml	2012-06-07 02:10:25.000000000 +0900
-+++ original/runghc.xml	2012-09-05 02:10:15.000000000 +0900
-@@ -32,7 +32,7 @@
-     with a dash then you need to prefix it with
-     <literal>--ghc-arg=</literal> or runghc will think that it is the
-     program to run, e.g.
--    <literal>runghc -package-conf --ghc-arg=foo.conf Main.hs</literal>.
-+    <literal>runghc -package-db --ghc-arg=foo.conf Main.hs</literal>.
-     </para>
- 
-   </sect1>
 diff -urd 7.4.2-original/safe_haskell.xml original/safe_haskell.xml
 --- 7.4.2-original/safe_haskell.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/safe_haskell.xml	2012-09-05 02:10:15.000000000 +0900
