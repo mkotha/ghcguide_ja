@@ -1,17 +1,3 @@
-diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
---- 7.4.2-original/ug-ent.xml	2012-08-15 19:53:57.000000000 +0900
-+++ original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
-@@ -28,6 +26,7 @@
- <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
- <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
- <!ENTITY what_glasgow_exts_does SYSTEM "what_glasgow_exts_does.gen.xml">
--<!ENTITY libraryBaseLocation    "../libraries/base-4.5.1.0">
--<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.14.0">
--<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.2.0.0">
-+<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.0">
-+<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
-+<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
- <!ENTITY arw "-&gt;">
 diff -urd 7.4.2-original/using.xml original/using.xml
 --- 7.4.2-original/using.xml	2012-06-07 02:10:25.000000000 +0900
 +++ original/using.xml	2012-09-05 02:10:15.000000000 +0900
