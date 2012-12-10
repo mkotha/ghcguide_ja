@@ -204,7 +204,7 @@
       <varlistentry>
         <term>安定版スナップショット</term>
         <listitem>
-          <para>現在の安定版ブランチのスナップショットリリースを<ulink url="http://www.haskell.org/ghc/dist/stable/dist/">ダウンロード可能に</ulink>することがあるかもしれない。また、最新のソースは<ulink url="http://hackage.haskell.org/trac/ghc/wiki/DarcsRepositories">darcsリポジトリ</ulink>から入手可能である。</para>
+          <para>現在の安定版ブランチのスナップショットリリースを<ulink url="http://www.haskell.org/ghc/dist/stable/dist/">ダウンロード可能に</ulink>することがあるかもしれない。また、最新のソースは<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Repositories">gitリポジトリ</ulink>から入手可能である。</para>
 
           <para>安定版スナップショットリリースは<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z</replaceable>.YYYYMMDD</literal>と名付けられる。ただし、<literal>YYYYMMDD</literal>はスナップショットのビルドに使われたソースの日付であり、<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z+1</replaceable></literal>がそのブランチで次に行われるべきリリースである。例えば、<literal>6.8.1.20040225</literal>なら、<literal>6.8.2</literal>の開発中における<literal>6.8</literal>ブランチのスナップショットになる。</para>
 
@@ -215,7 +215,7 @@
       <varlistentry>
 	<term>不安定版スナップショット</term>
 	<listitem>
-          <para>HEADのスナップショットリリースを<ulink url="http://www.haskell.org/ghc/dist/stable/dist/">ダウンロード可能に</ulink>することがあるかもしれない。また、最新のソースは<ulink url="http://hackage.haskell.org/trac/ghc/wiki/DarcsRepositories">darcsリポジトリ</ulink>から入手可能である。</para>
+          <para>HEADのスナップショットリリースを<ulink url="http://www.haskell.org/ghc/dist/stable/dist/">ダウンロード可能に</ulink>することがあるかもしれない。また、最新のソースは<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Repositories">gitリポジトリ</ulink>から入手可能である。</para>
 
           <para>不安定版スナップショットリリースは<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.YYYYMMDD</literal>と名付けられる。ただし、<literal>YYYYMMDD</literal>はスナップショットのビルドに使われたソースの日付である。例えば、<literal>6.7.20040225</literal>なら、<literal>6.8</literal>ブランチを作る前のHEADのスナップショットになる。</para>
 
