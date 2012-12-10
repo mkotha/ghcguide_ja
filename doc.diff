@@ -1,26 +1,3 @@
-diff -urd 7.4.2-original/safe_haskell.xml original/safe_haskell.xml
---- 7.4.2-original/safe_haskell.xml	2012-06-07 02:10:25.000000000 +0900
-+++ original/safe_haskell.xml	2012-09-05 02:10:15.000000000 +0900
-@@ -156,7 +156,7 @@
-         <listitem>The design also relies on the Danger module not being able
-           to access the <literal>UnsafeRIO</literal> constructor.
-           Unfortunately Template Haskell can be used to subvert module
--          boundaries and so could be used gain access to this constructor.
-+          boundaries and so could be used to gain access to this constructor.
-         </listitem>
-         <listitem>There is no way to place restrictions on the modules that
-           the untrusted Danger module can import. This gives the author of
-diff -urd 7.4.2-original/ug-book.xml original/ug-book.xml
---- 7.4.2-original/ug-book.xml	2012-08-15 19:53:57.000000000 +0900
-+++ original/ug-book.xml	2012-09-07 21:57:20.000000000 +0900
-@@ -1,6 +1,6 @@
- <?xml version="1.0" encoding="iso-8859-1"?>
- <bookinfo>
--<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.4.2</title>
-+<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.6.1</title>
- <author><othername>The GHC Team</othername></author>
- <address>
- <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
 diff -urd 7.4.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.4.2-original/ug-ent.xml	2012-08-15 19:53:57.000000000 +0900
 +++ original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
