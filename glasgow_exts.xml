@@ -7167,7 +7167,7 @@ data (:*:) f g p = f p :*: g p
 </para>
 
 <para>
-<literal>Generic</literal>クラスは、ユーザ定義のデータ型と、それの積和形(sum-of-products)の内部表現との間の仲介を行なう。
+<literal>Generic</literal>クラスおよび<literal>Generic1</literal>クラスは、ユーザ定義のデータ型と、それの積和形(sum-of-products)の内部表現との間の仲介を行なう。
 
 <programlisting>
 class Generic a where
@@ -7177,9 +7177,15 @@ class Generic a where
   from  :: a -> (Rep a) x
   -- 表現をデータ型に変換する
   to    :: (Rep a) x -> a
+
+class Generic1 f where
+  type Rep1 f :: * -> *
+
+  from1  :: f a -> Rep1 f a
+  to1    :: Rep1 f a -> f a
 </programlisting>
 
-総称的なインスタンスを自動的に定義するにはこのクラスのインスタンスが必要であり、これは<option>-XDeriveGeneric</option> (<xref linkend="deriving-typeable"/>)を付けるとGHCによって自動導出できる。</para>
+<literal>Generic1</literal>は、 <literal>map</literal>のように型コンテナについてのみ定義できる関数に使われる。総称的なインスタンスを自動的に定義するにはこれらのクラスのインスタンスが必要であり、これは<option>-XDeriveGeneric</option> (<xref linkend="deriving-typeable"/>)を付けるとGHCによって自動導出できる。</para>
 
 <para>
 例えば、木のユーザ定義データ型<literal>data UserTree a = Node a (UserTree a) (UserTree a) | Leaf</literal>は以下の表現を得る。
@@ -7190,7 +7196,7 @@ instance Generic (UserTree a) where
   type Rep (UserTree a) =
     M1 D D1UserTree (
           M1 C C1_0UserTree (
-                M1 S NoSelector (K1 P a)
+                M1 S NoSelector (K1 R a)
             :*: M1 S NoSelector (K1 R (UserTree a))
             :*: M1 S NoSelector (K1 R (UserTree a)))
       :+: M1 C C1_1UserTree U1)
@@ -7271,16 +7277,15 @@ class Serialize a where
 instance (Serialize a) => Serialize (UserTree a)
 </programlisting>
 
-すると<literal>put</literal>のデフォルトメソッド(これは直列化の総称実装に対応する)が使われる。
+すると<literal>put</literal>のデフォルトメソッド(これは直列化の総称実装に対応する)が使われる。もっと多くの総称関数の例がHackageの<ulink url="http://hackage.haskell.org/package/generic-deriving">generic-deriving</ulink>パッケージにあるので参照して欲しい。
 </para>
 </sect2>
-
 
 <sect2>
 <title>さらなる情報</title>
 
 <para>
-さらなる詳細については、<ulink url="http://www.haskell.org/haskellwiki/Generics">HaskellWikiのページ</ulink>か以下の元論文を参照せよ。
+さらなる詳細については、<ulink url="http://www.haskell.org/haskellwiki/GHC.Generics">HaskellWikiのページ</ulink>か以下の元論文を参照せよ。
 </para>
 
 <itemizedlist>
@@ -7295,7 +7300,6 @@ Jose Pedro Magalhaes, Atze Dijkstra, Johan Jeuring, and Andres Loeh.
 </listitem>
 </itemizedlist>
 
-<emphasis>注意</emphasis>: GHCにおける現在の総称プログラミングサポートは準備段階のものである。特に、<literal>Generic</literal>のインスタンスを自動導出することしか許されていない。<literal>Generic1</literal>の自動導出への対応(よって、<literal>fmap</literal>などの種<literal>* -> *</literal>の総称関数を可能にすること)はもっと後の段階になる。
 </sect2>
 
 </sect1>
