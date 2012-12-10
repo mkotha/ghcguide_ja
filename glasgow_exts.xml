@@ -5149,7 +5149,7 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 この文書は、GHCにおいてTemplate Haskellがどういう形で実現されているかを述べるものであり、Template Haskellを理解できるほど詳細ではない。<ulink url="http://haskell.org/haskellwiki/Template_Haskell">Wikiページ</ulink>を見よ。
 </para>
 
-    <sect2>
+    <sect2 id="th-syntax">
       <title>構文</title>
 
       <para>Template Haskellには以下に述べる新しい構文要素がある。これらの構文的拡張を有効にするにはフラグ<option>-XTemplateHaskell</option><indexterm><primary><option>-XTemplateHaskell</option></primary></indexterm>を使う必要がある。(<option>-XTemplateHaskell</option>は、<option>-fglasgow-exts</option>を使っていても、もはや自動的に有効にならない)</para>
@@ -5185,7 +5185,8 @@ Template Haskellに関するwikiページが<ulink url="http://www.haskell.org/h
 	      <listitem><para>
 名前は、一つか二つの一重引用符を前置することで、クォートすることができる。
 		  <itemizedlist>
-		    <listitem><para> <literal>'f</literal>の型は<literal>Name</literal>であり、関数<literal>f</literal>を指す。同様に<literal>'C</literal>の型は<literal>Name</literal>であり、データ構築子<literal>C</literal>を指す。一般に、<literal>'</literal><replaceable>thing</replaceable>は<replaceable>thing</replaceable>を式文脈の中で解釈する。
+		    <listitem><para> <literal>'f</literal>の型は<literal>Name</literal>であり、関数<literal>f</literal>を指す。同様に<literal>'C</literal>の型は<literal>Name</literal>であり、データ構築子<literal>C</literal>を指す。一般に、<literal>'</literal><replaceable>thing</replaceable>は<replaceable>thing</replaceable>を式文脈の中で解釈する。</para>
+                    <para>二文字目が一重引用符である名前は、(残念なことに)この方法でクォートすることができない。例えば、<literal>f'7</literal>という名前(これは合法なHaskellの識別子である)の関数があったとして、それをクォートしようとして<literal>'f'7</literal>と書くと、文字リテラル<literal>'f'</literal>の後に数値リテラル<literal>7</literal>が続いたものとしてパースされる。この(珍しい)状況の回避手段は今のところない。
 		     </para></listitem>
 		    <listitem><para> <literal>''T</literal>の型は<literal>Name</literal>であり、型構築子<literal>T</literal>を指す。つまり、<literal>''</literal><replaceable>thing</replaceable>は<replaceable>thing</replaceable>を型文脈の中で解釈する。
 		     </para></listitem>

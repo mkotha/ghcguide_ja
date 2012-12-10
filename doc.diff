@@ -1,33 +1,3 @@
-@@ -6824,7 +7167,7 @@
- Wiki page</ulink>.
- </para>
- 
--    <sect2>
-+    <sect2 id="th-syntax">
-       <title>Syntax</title>
- 
-       <para> Template Haskell has the following new syntactic
-@@ -6884,7 +7227,19 @@
- 		  <itemizedlist>
- 		    <listitem><para> <literal>'f</literal> has type <literal>Name</literal>, and names the function <literal>f</literal>.
- 		  Similarly <literal>'C</literal> has type <literal>Name</literal> and names the data constructor <literal>C</literal>.
--		  In general <literal>'</literal><replaceable>thing</replaceable> interprets <replaceable>thing</replaceable> in an expression context.
-+		  In general <literal>'</literal><replaceable>thing</replaceable> 
-+                  interprets <replaceable>thing</replaceable> in an expression context.</para>
-+                    <para>A name whose second character is a single
-+                    quote (sadly) cannot be quoted in this way,
-+                    because it will be parsed instead as a quoted
-+                    character.  For example, if the function is called
-+                    <literal>f'7</literal> (which is a legal Haskell
-+                    identifier), an attempt to quote it as
-+                    <literal>'f'7</literal> would be parsed as the
-+                    character literal <literal>'f'</literal> followed
-+                    by the numeric literal <literal>7</literal>. There
-+                    is no current escape mechanism in this (unusual)
-+                    situation.
- 		     </para></listitem>
- 		    <listitem><para> <literal>''T</literal> has type <literal>Name</literal>, and names the type constructor  <literal>T</literal>.
- 		  That is, <literal>''</literal><replaceable>thing</replaceable> interprets <replaceable>thing</replaceable> in a type context.
 @@ -9636,8 +9991,9 @@
  </para>
  
