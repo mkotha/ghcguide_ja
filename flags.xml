@@ -978,7 +978,7 @@
 	    </row>
 	    <row>
 	      <entry><option>-XRecursiveDo</option></entry>
-	      <entry><link linkend="mdo-notation">再帰的do(mdo)記法</link>を有効にする。</entry>
+	      <entry><link linkend="recursive-do-notation">再帰的do(mdo)記法</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
