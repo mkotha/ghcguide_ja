@@ -663,7 +663,7 @@ $ cat foo.hspp</screen>
               <para>RTSオプション<option>-N</option><indexterm><primary><option>-N<replaceable>x</replaceable></option></primary><secondary>RTS option</secondary></indexterm>を使うことを可能にする。これはプログラムをマルチプロセッサ<indexterm><primary>multiprocessor</primary></indexterm><indexterm><primary>SMP</primary></indexterm>あるいはマルチコア<indexterm><primary>multicore</primary></indexterm>の機械上でスレッドを並列<indexterm><primary>parallelism</primary></indexterm>に動作させられるようにする。<xref linkend="using-smp" />を見よ。</para>
             </listitem>
             <listitem>
-              <para>あるスレッドが多言語呼び出しを行なったとき、(その呼び出しが<literal>unsafe</literal>と標示されていなければ)その呼び出しの実行中にプログラム中の他のHaskellスレッドが走り続ける。さらに、<literal>foreign export</literal>されたHaskell関数が複数のOSスレッドから同時に呼ばれても良い。<xref linkend="ffi-threads" />を見よ。</para>
+              <para>あるスレッドが他言語呼び出しを行なったとき、(その呼び出しが<literal>unsafe</literal>と標示されていなければ)その呼び出しの実行中にプログラム中の他のHaskellスレッドが走り続ける。さらに、<literal>foreign export</literal>されたHaskell関数が複数のOSスレッドから同時に呼ばれても良い。<xref linkend="ffi-threads" />を見よ。</para>
             </listitem>
           </itemizedlist>
         </listitem>
