@@ -3928,7 +3928,7 @@ type T2 = 'P    -- 昇格した2
 </programlisting>
 昇格したデータ型は名前の付いた種を生み出すことに注意。これらが曖昧になることはないので、種名に引用符を付けることは認めていない。
 </para>
-<para>Template Haskell(<xref linkend="th-syntax"/>)の場合と同様に、二文字目が一重引用符であるようなデータ構築子や型構築子を引用する方法はない。</para>
+<para>Template Haskell(<xref linkend="th-syntax"/>)の場合と同様に、二文字目が一重引用符であるようなデータ構築子や型構築子をクォートする方法はない。</para>
 </sect2>
 
 <sect2 id="promoted-lists-and-tuples">
