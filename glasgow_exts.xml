@@ -7135,7 +7135,7 @@ g x = show x
 <title>総称プログラミング</title>
 
 <para>
-<option>-XDeriveGeneric</option>(<xref linkend="deriving-typeable"/>)と<option>-XDefaultSignatures</option> (<xref linkend="class-default-signatures"/>)を組み合わせることで、データ型について総称的なプログラミングを<literal>GHC.Generics</literal>使って簡単に行なえる。この節は、その方法について極めて短かい概観を与える。</para>
+<option>-XDeriveGeneric</option>(<xref linkend="deriving-typeable"/>)と<option>-XDefaultSignatures</option> (<xref linkend="class-default-signatures"/>)を組み合わせることで、データ型について総称的なプログラミングを<literal>GHC.Generics</literal>を使って簡単に行なえる。この節は、その方法について極めて短かい概観を与える。</para>
 
 <para>
 GHCにおける総称プログラミングでは、ユーザがインスタンスを作成する際にメソッドを指定する必要がないようなクラスを定義することが可能になる。メソッド本体はGHCによって自動的に導出される。これは例えば<literal>Read</literal>や<literal>Show</literal>などの標準クラスの事情に似ているが、ユーザ定義のクラスについでである。</para>
