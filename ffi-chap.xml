@@ -83,7 +83,7 @@ foreign import ccall interruptible
 
       <sect2 id="ffi-capi">
         <title>呼び出し規約CAPI</title>
-        <para>拡張<literal>CAPI</literal>は、foreign宣言中で<literal>capi</literal>という呼び出し規約を使うことを可能にする。例えば、
+        <para>拡張<literal>CApiFFI</literal>は、foreign宣言中で<literal>capi</literal>という呼び出し規約を使うことを可能にする。例えば、
 
 <programlisting>
 foreign import capi "header.h f" f :: CInt -> IO CInt
@@ -263,21 +263,25 @@ typedef enum {
         <para>この場合、まず、Haskellコードが最初に呼ばれる前にランタイムが初期化される必要がある。このため、初期化と脱初期化のためのエントリポイントをCかC++で実装し、ライブラリ内に用意するべきである。例えば以下のように。</para>
 
 <programlisting>
- HsBool mylib_init(void){
-   int argc = ...
-   char *argv[] = ...
+#include &lt;stdlib.h&gt;
+#include "HsFFI.h"
 
-   // Haskellのラインタイムを初期化する
-   hs_init(&amp;argc, &amp;argv);
+HsBool mylib_init(void){
+  int argc = 2;
+  char *argv[] = { "+RTS", "-A32m", NULL };
+  char **pargv = argv;
 
-   // その他の初期化があればここで行ない、
-   // 問題があればfalseを返す
-   return HS_BOOL_TRUE;
- }
+  // Haskellのラインタイムを初期化する
+  hs_init(&amp;argc, &amp;pargv);
 
- void mylib_end(void){
-   hs_exit();
- }
+  // その他の初期化があればここで行ない、
+  // 問題があればfalseを返す
+  return HS_BOOL_TRUE;
+}
+
+void mylib_end(void){
+  hs_exit();
+}
 </programlisting>
 
         <para>この初期化ルーチン<literal>mylib_init</literal>は、通常どおり<literal>hs_init()</literal>を呼んでHaskellランタイムを初期化する。これに対応する脱初期化関数<literal>mylib_end()</literal>は<literal>hs_exit()</literal>を呼んでランタイムを終了させる。</para>
