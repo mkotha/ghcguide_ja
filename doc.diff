@@ -1,0 +1,244 @@
+originalだけに発見: 7.6.2-notes.xml
+diff -urd 7.6.1-original/ffi-chap.xml original/ffi-chap.xml
+--- 7.6.1-original/ffi-chap.xml	2012-09-05 02:10:15.000000000 +0900
++++ original/ffi-chap.xml	2013-01-27 22:21:52.000000000 +0900
+@@ -164,7 +164,7 @@
+       <sect2 id="ffi-capi">
+         <title>The CAPI calling convention</title>
+         <para>
+-          The <literal>CAPI</literal> extension allows a calling
++          The <literal>CApiFFI</literal> extension allows a calling
+           convention of <literal>capi</literal> to be used in foreign
+           declarations, e.g.
+ 
+@@ -446,21 +446,25 @@
+           implemented in C or C++.  For example:</para>
+ 
+ <programlisting>
+- HsBool mylib_init(void){
+-   int argc = ...
+-   char *argv[] = ...
++#include &lt;stdlib.h&gt;
++#include "HsFFI.h"
+ 
+-   // Initialize Haskell runtime
+-   hs_init(&amp;argc, &amp;argv);
++HsBool mylib_init(void){
++  int argc = 2;
++  char *argv[] = { "+RTS", "-A32m", NULL };
++  char **pargv = argv;
+ 
+-   // do any other initialization here and
+-   // return false if there was a problem
+-   return HS_BOOL_TRUE;
+- }
++  // Initialize Haskell runtime
++  hs_init(&amp;argc, &amp;pargv);
+ 
+- void mylib_end(void){
+-   hs_exit();
+- }
++  // do any other initialization here and
++  // return false if there was a problem
++  return HS_BOOL_TRUE;
++}
++
++void mylib_end(void){
++  hs_exit();
++}
+ </programlisting>
+ 
+         <para>The initialisation routine, <literal>mylib_init</literal>, calls
+diff -urd 7.6.1-original/glasgow_exts.xml original/glasgow_exts.xml
+--- 7.6.1-original/glasgow_exts.xml	2012-09-05 02:10:15.000000000 +0900
++++ original/glasgow_exts.xml	2013-01-27 22:21:52.000000000 +0900
+@@ -632,7 +632,7 @@
+ data TypView = Unit
+              | Arrow Typ Typ
+ 
+-view :: Type -> TypeView
++view :: Typ -> TypView
+ 
+ -- additional operations for constructing Typ's ...
+ </programlisting>
+@@ -1999,6 +1999,9 @@
+     available from multiple packages, or is present in both the
+     current package being built and an external package.</para>
+ 
++  <para>The special package name <literal>this</literal> can be used to
++    refer to the current package being built.</para>
++
+   <para>Note: you probably don't need to use this feature, it was
+     added mainly so that we can build backwards-compatible versions of
+     packages when APIs change.  It can lead to fragile dependencies in
+@@ -3726,7 +3729,7 @@
+ applies to the default method only; when defining instances of the
+ <literal>Enum</literal> class, the original type <literal>[a]</literal> of
+ <literal>enum</literal> still applies. When giving an empty instance, however,
+-the default implementation <literal>map to0 genum</literal> is filled-in,
++the default implementation <literal>map to genum</literal> is filled-in,
+ and type-checked with the type
+ <literal>(Generic a, GEnum (Rep a)) => [a]</literal>.
+ </para>
+@@ -5500,8 +5503,9 @@
+  higher-kinded datatypes such as <literal>data Fix f = In (f (Fix f))</literal>,
+  or datatypes whose kinds involve promoted types such as
+  <literal>Vec :: * -> Nat -> *</literal>.</para></listitem>
+- <listitem><para>We do not promote datatypes whose constructors are kind
+- polymorphic, involve constraints, or use existential quantification.
++ <listitem><para>We do not promote data constructors that are kind
++ polymorphic, involve constraints, mention type or data families, or involve types that
++ are not promotable.
+  </para></listitem>
+  <listitem><para>We do not promote data family instances (<xref linkend="data-families"/>).
+  </para></listitem>
+@@ -5556,7 +5560,7 @@
+ <sect2 id="promoted-literals">
+ <title>Promoted Literals</title>
+ <para>
+-Numeric and string literals are prmoted to the type level, giving convenient
++Numeric and string literals are promoted to the type level, giving convenient
+ access to a large number of predefined type-level constants.  Numeric literals
+ are of kind <literal>Nat</literal>, while string literals are of kind
+ <literal>Symbol</literal>.  These kinds are defined in the module
+@@ -5597,6 +5601,46 @@
+ </para>
+ </sect2>
+ 
++<sect2 id="promotion-existentials">
++<title>Promoting existential data constructors</title>
++<para>
++Note that we do promote existential data constructors that are otherwise suitable.
++For example, consider the following:
++<programlisting>
++data Ex :: * where
++  MkEx :: forall a. a -> Ex
++</programlisting>
++Both the type <literal>Ex</literal> and the data constructor <literal>MkEx</literal>
++get promoted, with the polymorphic kind <literal>'MkEx :: forall k. k -> Ex</literal>. 
++Somewhat surprisingly, you can write a type family to extract the member
++of a type-level existential:
++<programlisting>
++type family UnEx (ex :: Ex) :: k
++type instance UnEx (MkEx x) = x
++</programlisting>
++At first blush, <literal>UnEx</literal> seems poorly-kinded. The return kind
++<literal>k</literal> is not mentioned in the arguments, and thus it would seem
++that an instance would have to return a member of <literal>k</literal> 
++<emphasis>for any</emphasis> <literal>k</literal>. However, this is not the
++case. The type family <literal>UnEx</literal> is a kind-indexed type family.
++The return kind <literal>k</literal> is an implicit parameter to <literal>UnEx</literal>.
++The elaborated definitions are as follows:
++<programlisting>
++type family UnEx (k :: BOX) (ex :: Ex) :: k
++type instance UnEx k (MkEx k x) = x
++</programlisting>
++Thus, the instance triggers only when the implicit parameter to <literal>UnEx</literal>
++matches the implicit parameter to <literal>MkEx</literal>. Because <literal>k</literal>
++is actually a parameter to <literal>UnEx</literal>, the kind is not escaping the
++existential, and the above code is valid.
++</para>
++
++<para>
++See also <ulink url="http://hackage.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>.
++</para>
++</sect2>
++
++
+ </sect1>
+ 
+ 
+@@ -7089,7 +7133,7 @@
+ z :: Int
+ z = y
+ </programlisting>
+-    evaluating <literal>x</literal> will result in a runtime type error.
++    evaluating <literal>z</literal> will result in a runtime type error.
+   </para>
+ </sect2>
+ <sect2><title>Deferred type errors in GHCi</title>
+@@ -9511,7 +9555,7 @@
+ rule to fire, even though doing so would duplicate redex.  There is no way that GHC can work out
+ when this is a good idea, so we provide the CONLIKE pragma to declare it, thus:
+ <programlisting>
+-{-# INLINE[1] CONLIKE f #-}
++{-# INLINE CONLIKE [1] f #-}
+ f x = <replaceable>blah</replaceable>
+ </programlisting>
+ CONLIKE is a modifier to an INLINE or NOINLINE pragma.  It specifies that an application
+diff -urd 7.6.1-original/intro.xml original/intro.xml
+--- 7.6.1-original/intro.xml	2012-09-05 02:10:15.000000000 +0900
++++ original/intro.xml	2013-01-27 22:21:52.000000000 +0900
+@@ -353,6 +353,7 @@
+ 
+ 
+ &relnotes1;
++&relnotes2;
+ 
+ </chapter>
+ 
+diff -urd 7.6.1-original/sooner.xml original/sooner.xml
+--- 7.6.1-original/sooner.xml	2012-09-05 02:10:15.000000000 +0900
++++ original/sooner.xml	2013-01-27 22:21:52.000000000 +0900
+@@ -292,14 +292,11 @@
+ 
+ 	  <para>Look for your function in the interface file, then for
+           the third field in the pragma; it should say
+-          <literal>&lowbar;&lowbar;S &lt;string&gt;</literal>.  The
++          <literal>Strictness: &lt;string&gt;</literal>.  The
+           <literal>&lt;string&gt;</literal> gives the strictness of
+-          the function's arguments.  <function>L</function> is lazy
+-          (bad), <function>S</function> and <function>E</function> are
+-          strict (good), <function>P</function> is
+-          &ldquo;primitive&rdquo; (good), <function>U(...)</function>
+-          is strict and &ldquo;unpackable&rdquo; (very good), and
+-          <function>A</function> is absent (very good).</para>
++          the function's arguments: see <ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/Demand">
++          the GHC Commentary</ulink> for a description of the strictness notation.
++          </para>
+ 
+ 	  <para>For an &ldquo;unpackable&rdquo;
+           <function>U(...)</function> argument, the info inside tells
+diff -urd 7.6.1-original/ug-book.xml original/ug-book.xml
+--- 7.6.1-original/ug-book.xml	2012-09-07 21:57:20.000000000 +0900
++++ original/ug-book.xml	2013-02-09 10:49:15.000000000 +0900
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="iso-8859-1"?>
+ <bookinfo>
+-<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.6.1</title>
++<title>The Glorious Glasgow Haskell Compilation System User's Guide, Version 7.6.2</title>
+ <author><othername>The GHC Team</othername></author>
+ <address>
+ <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
+diff -urd 7.6.1-original/ug-ent.xml original/ug-ent.xml
+--- 7.6.1-original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
++++ original/ug-ent.xml	2013-02-09 10:49:15.000000000 +0900
+@@ -4,6 +4,7 @@
+ <!ENTITY license        SYSTEM "license.xml">
+ <!ENTITY intro          SYSTEM "intro.xml" >
+ <!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
++<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
+ <!ENTITY using          SYSTEM "using.xml" >
+ <!ENTITY code-gens      SYSTEM "codegens.xml" >
+ <!ENTITY runtime        SYSTEM "runtime_control.xml" >
+@@ -26,7 +27,7 @@
+ <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
+ <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
+ <!ENTITY what_glasgow_exts_does SYSTEM "what_glasgow_exts_does.gen.xml">
+-<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.0">
++<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.1">
+ <!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
+ <!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
+ <!ENTITY arw "-&gt;">
+diff -urd 7.6.1-original/ug-ent.xml.in original/ug-ent.xml.in
+--- 7.6.1-original/ug-ent.xml.in	2012-09-05 02:10:15.000000000 +0900
++++ original/ug-ent.xml.in	2013-01-27 22:21:52.000000000 +0900
+@@ -4,6 +4,7 @@
+ <!ENTITY license        SYSTEM "license.xml">
+ <!ENTITY intro          SYSTEM "intro.xml" >
+ <!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
++<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
+ <!ENTITY using          SYSTEM "using.xml" >
+ <!ENTITY code-gens      SYSTEM "codegens.xml" >
+ <!ENTITY runtime        SYSTEM "runtime_control.xml" >
+originalだけに発見: users_guide
