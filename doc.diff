@@ -1,4 +1,3 @@
-originalだけに発見: 7.6.2-notes.xml
 diff -urd 7.6.1-original/ffi-chap.xml original/ffi-chap.xml
 --- 7.6.1-original/ffi-chap.xml	2012-09-05 02:10:15.000000000 +0900
 +++ original/ffi-chap.xml	2013-01-27 22:21:52.000000000 +0900
@@ -166,17 +165,6 @@ diff -urd 7.6.1-original/glasgow_exts.xml original/glasgow_exts.xml
  f x = <replaceable>blah</replaceable>
  </programlisting>
  CONLIKE is a modifier to an INLINE or NOINLINE pragma.  It specifies that an application
-diff -urd 7.6.1-original/intro.xml original/intro.xml
---- 7.6.1-original/intro.xml	2012-09-05 02:10:15.000000000 +0900
-+++ original/intro.xml	2013-01-27 22:21:52.000000000 +0900
-@@ -353,6 +353,7 @@
- 
- 
- &relnotes1;
-+&relnotes2;
- 
- </chapter>
- 
 diff -urd 7.6.1-original/sooner.xml original/sooner.xml
 --- 7.6.1-original/sooner.xml	2012-09-05 02:10:15.000000000 +0900
 +++ original/sooner.xml	2013-01-27 22:21:52.000000000 +0900
@@ -213,14 +201,6 @@ diff -urd 7.6.1-original/ug-book.xml original/ug-book.xml
 diff -urd 7.6.1-original/ug-ent.xml original/ug-ent.xml
 --- 7.6.1-original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
 +++ original/ug-ent.xml	2013-02-09 10:49:15.000000000 +0900
-@@ -4,6 +4,7 @@
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
- <!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
 @@ -26,7 +27,7 @@
  <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
  <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
@@ -230,15 +210,3 @@ diff -urd 7.6.1-original/ug-ent.xml original/ug-ent.xml
  <!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
  <!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
  <!ENTITY arw "-&gt;">
-diff -urd 7.6.1-original/ug-ent.xml.in original/ug-ent.xml.in
---- 7.6.1-original/ug-ent.xml.in	2012-09-05 02:10:15.000000000 +0900
-+++ original/ug-ent.xml.in	2013-01-27 22:21:52.000000000 +0900
-@@ -4,6 +4,7 @@
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
- <!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
-originalだけに発見: users_guide
