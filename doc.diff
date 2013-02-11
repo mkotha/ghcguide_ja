@@ -31,15 +31,3 @@ diff -urd 7.6.1-original/ug-book.xml original/ug-book.xml
  <author><othername>The GHC Team</othername></author>
  <address>
  <email>glasgow-haskell-&lcub;bugs,users&rcub;-request@haskell.org</email>
-diff -urd 7.6.1-original/ug-ent.xml original/ug-ent.xml
---- 7.6.1-original/ug-ent.xml	2012-09-07 21:57:20.000000000 +0900
-+++ original/ug-ent.xml	2013-02-09 10:49:15.000000000 +0900
-@@ -26,7 +27,7 @@
- <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
- <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
- <!ENTITY what_glasgow_exts_does SYSTEM "what_glasgow_exts_does.gen.xml">
--<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.0">
-+<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.1">
- <!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
- <!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
- <!ENTITY arw "-&gt;">
