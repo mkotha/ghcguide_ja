@@ -4017,15 +4017,15 @@ type instance UnEx k (MkEx k x) = x
 
 </sect1>
 <sect1 id="equality-constraints">
-  <title>同値性制約</title>
-  <para>型文脈には<literal>t1 ~ t2</literal>という形の同値性制約を含めることができる。これは、<literal>t1</literal>と<literal>t2</literal>の二つの型が同じでなければならないということを示す。型族の存在下では、一般に二つの型が等しいかどうかを局所的に決めることは出来ない。このため、次の例のように、関数のシグネチャの文脈に同値性制約が使われることがある。
+  <title>等式制約</title>
+  <para>型文脈には<literal>t1 ~ t2</literal>という形の等式制約を含めることができる。これは、<literal>t1</literal>と<literal>t2</literal>の二つの型が同じでなければならないということを示す。型族の存在下では、一般に二つの型が等しいかどうかを局所的に決めることは出来ない。このため、次の例のように、関数のシグネチャの文脈に等式制約が使われることがある。
 <programlisting>
 sumCollects :: (Collects c1, Collects c2, Elem c1 ~ Elem c2) => c1 -> c2 -> c2
 </programlisting>
-ここでは、<literal>c1</literal>と<literal>c2</literal>の要素の型が同じであることを要求している。一般に、同値性制約における<literal>t1</literal>と<literal>t2</literal>は任意の単相型であってよい。単相型であるというのは、ランクの高い型が有効になっているかどうかにかかわらず、量化子を含んでいてはならないということである。
+ここでは、<literal>c1</literal>と<literal>c2</literal>の要素の型が同じであることを要求している。一般に、等式制約における<literal>t1</literal>と<literal>t2</literal>は任意の単相型であってよい。単相型であるというのは、ランクの高い型が有効になっているかどうかにかかわらず、量化子を含んでいてはならないということである。
   </para>
   <para>
-同値性制約は、クラスとインスタンスの文脈でも使うことができる。前者によって、関数従属を使うプログラムから、代わりに族シノニムを使うプログラムへの、単純な翻訳が出来るようになる。一般的な考え方として、次のような形のクラス宣言があったとする。
+等式制約は、クラスとインスタンスの文脈でも使うことができる。前者によって、関数従属を使うプログラムから、代わりに族シノニムを使うプログラムへの、単純な翻訳が出来るようになる。一般的な考え方として、次のような形のクラス宣言があったとする。
 <programlisting>
 class C a b | a -> b
 </programlisting>
@@ -4034,7 +4034,7 @@ class C a b | a -> b
 class (F a ~ b) => C a b where
 type F a
 </programlisting>
-つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の同値性で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
+つまり、すべての<literal>a1 .. an -> b</literal>という関数従属性(FD)について、これを<literal>F a1 .. an</literal>というFD型族と<literal>F a1 .. an ~ b</literal>というスーパークラス文脈の等式で表現することで、実質的に関数従属性に名前を与えている。クラスインスタンスでは、FD族の型インスタンスをクラス頭部に沿った形で定義する。この過程でメソッドのシグネチャは影響を受けない。
   </para>
 </sect1>
 
@@ -4050,7 +4050,7 @@ type F a
 			<para><link linkend="implicit-parameters">暗黙パラメタ</link>制約、たとえば<literal>?x::Int</literal> (<option>-XImplicitParams</option>フラグがあれば)</para>
 		</listitem>
 		<listitem>
-			<para><link linkend="equality-constraints">等値制約</link>、たとえば<literal>a ~ Int</literal> (<option>-XTypeFamilies</option>または<option>-XGADTs</option>フラグがあれば)</para>
+			<para><link linkend="equality-constraints">等式制約</link>、たとえば<literal>a ~ Int</literal> (<option>-XTypeFamilies</option>または<option>-XGADTs</option>フラグがあれば)</para>
 		</listitem>
 	</itemizedlist>
 </para>
@@ -4058,7 +4058,7 @@ type F a
 <para><option>-XConstraintKinds</option>フラグを使うと、プログラム内で制約としてより幅広い範囲ものもを受け付けるようになる。正確にいうと、このフラグのもとでは新しい種<literal>Constraint</literal>を持つあらゆる<emphasis>型</emphasis>を制約として使える。以下のものが種<literal>Contraint</literal>を持つ。
 
 	<itemizedlist>
-		<listitem>このフラグなしでも制約として正しいもの全て。すなわち型クラスの完全な適用、暗黙パラメタ制約および等値制約。
+		<listitem>このフラグなしでも制約として正しいもの全て。すなわち型クラスの完全な適用、暗黙パラメタ制約および等式制約。
 		</listitem>
 		<listitem>全ての要素が種<literal>Constraint</literal>を持つようなタプル。よって、たとえば型<literal>(Show a, Ord a)</literal>の種は<literal>Constraint</literal>になる。
 		</listitem>
