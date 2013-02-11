@@ -436,7 +436,7 @@ type Typ
 data TypView = Unit
              | Arrow Typ Typ
 
-view :: Type -> TypeView
+view :: Typ -> TypView
 
 -- さらに、Typを構築するための演算が続く...
 </programlisting>
@@ -1424,6 +1424,8 @@ import "network" Network.Socket
 </programlisting>
 
   <para>こうすると、<literal>network</literal>パッケージ(のいずれかのバージョン)から<literal>Network.Socket</literal>をインポートすることになる。これは、同じモジュールが複数のパッケージから利用できたり、現在ビルド中のパッケージと外部のパッケージの両方にあったりする場合に、インポートの曖昧性を取り除くために使うことができる。</para>
+
+  <para>特別なパッケージ名<literal>this</literal>を使うと、現在ビルド中のパッケージを示すことができる。</para>
 
   <para>注意: おそらく、あなたがこの機能を使う必要はないだろう。この機能は、主に我々がAPIの変更に際して後方互換なパッケージのバージョンをビルドすることができるように追加されたものである。一般的な事例では、この機能を使うと脆い依存が発生しやすい。モジュールはあるパッケージから別のパッケージに移ることがあり、その場合パッケージ修飾されたインポートは壊れるからである。</para>
 </sect2>
@@ -2726,7 +2728,7 @@ Haskell 98は、クラスを宣言する際にデフォルト実装を定義す�
     default enum :: (Generic a, GEnum (Rep a)) => [a]
     enum = map to genum
 </programlisting>
-<literal>default</literal>キーワードを再利用することで、シグネチャがデフォルトメソッドにのみ適用されることを示している。<literal>Enum</literal>クラスのインスタンスを定義する際には、<literal>enum</literal>の元々の型である<literal>[a]</literal>が変わらず適用される。しかし、空のインスタンスを与えた場合には、デフォルト実装である<literal>map to0 genum</literal>が補充され、<literal>(Generic a, GEnum (Rep a)) => [a]</literal>という型で型検査される。</para>
+<literal>default</literal>キーワードを再利用することで、シグネチャがデフォルトメソッドにのみ適用されることを示している。<literal>Enum</literal>クラスのインスタンスを定義する際には、<literal>enum</literal>の元々の型である<literal>[a]</literal>が変わらず適用される。しかし、空のインスタンスを与えた場合には、デフォルト実装である<literal>map to genum</literal>が補充され、<literal>(Generic a, GEnum (Rep a)) => [a]</literal>という型で型検査される。</para>
 
 <para>
 我々は、GHCにおける総称プログラミングを単純にするためにデフォルトシグネチャを使っている(<xref linkend="generic-programming"/>)。
@@ -3901,7 +3903,7 @@ R :: k2 -> Sum k1 k2
 昇格には以下の制約が適用される。
 <itemizedlist>
  <listitem><para>我々は<literal>* -> ... -> * -> *</literal>という形の種を持つデータ型しか昇格させない。特に、<literal>data Fix f = In (f (Fix f))</literal>のような高階の種を持つデータ型や、<literal>Vec :: * -> Nat -> *</literal>のように昇格後の型が関わっている種を持つデータ型を昇格させることはしない。</para></listitem>
- <listitem><para>構築子が種多相であったり、制約が関わっていたり、存在量化を使っていたりするデータ型は昇格させない。
+ <listitem><para>種多相であったり、制約が関わっていたり、型族やデータ族に言及していたり、昇格できない型が関係しているデータ構築子は昇格させない。
  </para></listitem>
  <listitem><para>データ族インスタンス(<xref linkend="data-families"/>)は昇格させない。
  </para></listitem>
@@ -3983,6 +3985,35 @@ example = from (Point 1 2) (Get :: Label "x")
 </programlisting>
 </para>
 </sect2>
+
+<sect2 id="promotion-existentials">
+<title>存在的なデータ構築子を昇格させる</title>
+<para>
+存在的なデータ構築子は、別に禁止される理由がない限り昇格されることに注意せよ。例えば、以下の例を考えよ。
+<programlisting>
+data Ex :: * where
+  MkEx :: forall a. a -> Ex
+</programlisting>
+型<literal>Ex</literal>とデータ構築子<literal>MkEx</literal>の両方が昇格され、多相的な種<literal>'MkEx :: forall k. k -> Ex</literal>が与えられる。少々驚くべきことに、型族を使うことで、型水準の存在的構築子のメンバを取り出すことができる。
+
+<programlisting>
+type family UnEx (ex :: Ex) :: k
+type instance UnEx (MkEx x) = x
+</programlisting>
+
+一見、<literal>UnEx</literal>の種は正しくないように見える。返り型の種である<literal>k</literal>は引数内で言及されておらず、インスタンスは<emphasis>あらゆる</emphasis><literal>k</literal>に対して<literal>k</literal>の要素を返さねばならぬように見える。しかしそうではない。<literal>UnEx</literal>は種の添字が付いた型族である。返り型の種<literal>k</literal>は、<literal>UnEx</literal>への暗黙の引数なのである。この定義をもっと詳しくすると次のようになる。
+<programlisting>
+type family UnEx (k :: BOX) (ex :: Ex) :: k
+type instance UnEx k (MkEx k x) = x
+</programlisting>
+このように、このインスタンスは、<literal>UnEx</literal>の暗黙の引数が<literal>MkEx</literal>の暗黙の引数に合致するときにのみ使われる。<literal>k</literal>は実際には<literal>UnEx</literal>のパラメタであり、存在的構築子から種が漏れている訳ではないので、上のコードは正しい。
+</para>
+
+<para>
+<ulink url="http://hackage.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>も見よ。
+</para>
+</sect2>
+
 
 </sect1>
 <sect1 id="equality-constraints">
@@ -5096,7 +5127,7 @@ y = x
 z :: Int
 z = y
 </programlisting>
-    <literal>x</literal>を評価すると、実行時型エラーが発生する。
+    <literal>z</literal>を評価すると、実行時型エラーが発生する。
   </para>
 </sect2>
 <sect2><title>GHCiで型エラーを遅らせる</title>
@@ -6771,7 +6802,7 @@ f k z xs = let xs = build g
 <para>
 しかし、場合によっては、この方針では慎重すぎることがある。例え簡約基を複製することになっても、規則に発火してもらいたい場合である。これが良案だということをGHCが見つけ出す方法はないので、そのことを宣言するためのCONLIKEプラグマを提供している。次のようにする。
 <programlisting>
-{-# INLINE[1] CONLIKE f #-}
+{-# INLINE CONLIKE [1] f #-}
 f x = <replaceable>blah</replaceable>
 </programlisting>
 CONLIKEは、INLINEまたはNOINLINEプラグマに対する修飾子である。fを一つの引数(一般には、'='記号の左側にある引数の数)に適用することが十分低コストで、複製によって規則が発火するならば複製できる、ということを示す。(「CONLIKE」という名前は"constructor-like"の短縮形である。構築子(constructor)は確実にこの性質を持つので) CONLIKEプラグマはINLINE/NOINLINEの修飾子であるが、これは次のような事情による。すなわち、規則が発火する前に<literal>f</literal>がインライン化されてしまわないことがはっきりしているのでない限り、<literal>f</literal>を規則の左辺と照合するのは実際上意味がないからである。
