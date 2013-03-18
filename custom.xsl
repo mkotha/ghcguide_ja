@@ -452,12 +452,14 @@
         <xsl:apply-templates/>
       </xsl:when>
 
+      <!--
       <xsl:when test="$html.cleanup != 0 and function-available('exsl:node-set')">
         <div class="{name(.)}">
           <xsl:apply-templates select="*[1]" mode="footnote.body.number"/>
           <xsl:apply-templates select="*[position() &gt; 1]"/>
         </div>
       </xsl:when>
+      -->
 
       <xsl:otherwise>
         <xsl:message>
