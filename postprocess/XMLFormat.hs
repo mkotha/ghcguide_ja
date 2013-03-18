@@ -72,7 +72,7 @@ format x = to_str $ fmt 0 x
         close = close_tag x +++ lit "\n"
 
         verbatim_content = lit $ {- cut_indent $ -} to_str raw_content
-        inline_content = lit $ {- remove_white $ -} to_str raw_content
+        inline_content = lit $ remove_white $ to_str raw_content
         raw_content = cmap fmt_inline cont
         block_content = cmap (fmt (level + 1)) cont
         cont = remove_extra_space $ content x
