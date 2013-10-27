@@ -285,7 +285,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
             並列GCにおいて、世代<replaceable>gen</replaceable>とそれより上の世代で負荷分散を使う。<replaceable>gen</replaceable>を省略すると、負荷分散を完全に無効にする。</para>
 
           <para>
-            負荷分散とは、GCの作業を空いているコア間で分配することである。これは、ヒープが大きく、GCの作業を並列化する必要がある場合には良いことである。しかし、並列プログラムの若い世代における短い回収では、これは最悪である。なぜなら、データをCPUのキャッシュから動かすことで、局所性を損うからである。(訳注: 理解できないのでだれか助けて 原文は because it can harm locality by moving data from the cache of the CPU where is it being used to the cache of another CPU.)。実際、並列プログラムでは、<literal>-qb</literal>で負荷分散を完全に無効にした方が良いこともある。
+            負荷分散とは、GCの作業を空いているコア間で分配することである。これは、ヒープが大きく、GCの作業を並列化する必要がある場合には良いことである。しかし、並列プログラムの若い世代における短い回収では、これは最悪である。なぜなら、データを、それが使われているCPUのキャッシュから、別のCPUのキャッシュへと動かすことで、局所性を損うからである。実際、並列プログラムでは、<literal>-qb</literal>で負荷分散を完全に無効にした方が良いこともある。
           </para>
         </listitem>
       </varlistentry>
@@ -806,7 +806,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary><option>-Z</option></primary><secondary>RTS option</secondary></indexterm>
         </term>
 	<listitem>
-          <para>GC時の「update-frame-squeezing」を<emphasis>無効に</emphasis>する。(There's no particularly good reason to turn it off, except to ensure the accuracy of certain data collected regarding thunk entry counts.(訳注: 訳せません。助けて))</para>
+          <para>GC時の「update-frame-squeezing」を<emphasis>無効に</emphasis>する。サンクへの進入回数(entry count)についてのある種のデータを正確に収集したい場合を除いて、これを無効にする理由はあまりない。</para>
 	</listitem>
       </varlistentry>
     </variablelist>
