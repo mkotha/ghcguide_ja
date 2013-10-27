@@ -121,7 +121,6 @@ strong {
 }
 code {
   font-family: monospace;
-  font-size: 90%;
 }
 a {
   text-decoration: underline;
@@ -129,8 +128,14 @@ a {
 a:link {
   color: #040;
 } 
+pre a:link {
+  color: inherit;
+}
 a:visited {
   color: #484;
+}
+pre a:visited {
+  color: inherit;
 }
 
 /* block elements */
@@ -184,4 +189,8 @@ span.hs-keyword {
 
 span.hs-keyglyph, span.hs-layout {
   color: #484;
+}
+
+span.hs-str {
+  color: #a44;
 }
