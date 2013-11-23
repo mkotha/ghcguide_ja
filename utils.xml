@@ -141,7 +141,7 @@ tags:
     <indexterm><primary><command>hsc2hs</command></primary>
     </indexterm>
 
-    <para><command>hsc2hs</command>コマンドを使うと、CコードのHaskellバインディングを書く作業を一部自動化することができる。このコマンドは、特別な構文要素の埋め込まれたHaskellのコードを読み、Cのヘッダから得た情報を使ってこれらの要素を処理し、本当のHaskellファイルを出力する。この特別な構文要素は、CのデータをHaskellからアクセスするにあたって必要なことを扱う。</para>
+    <para><command>hsc2hs</command>コマンドを使うと、CコードのHaskellバインディングを書く作業を一部自動化することができる。このコマンドは、特別な構文要素の埋め込まれたHaskellのコードを読み、Cのヘッダから得た情報を使ってこれらの要素を処理し、本当のHaskellファイルを出力する。この特別な構文要素は、HaskellからCのデータにアクセスするにあたって必要なことを扱う。</para>
 
     <para><command>hsc2hs</command>はCファイルとCヘッダを出力することもある。Cファイルには、プログラムにリンクすべき追加のC関数が置かれ、ヘッダファイルは、そのHaskellモジュールがコンパイルされてできるCコードからincludeされるものである。この二つのファイルは<literal>#def</literal>という構文要素(下記参照)が使われたときに作られる。</para>
 

@@ -698,7 +698,7 @@ test.hs:(5,4)-(6,7):
     <indexterm><primary>warnings</primary></indexterm>
 
 
-    <para>GHCでは、いくつかのオプションを使って、生成する致命的でないエラーメッセージ(警告ともいう)の種類を選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-lazy-unlifted-bindings</option>、<option>-fwarn-wrong-do-bind</option>、<option>-fwarn-unsupported-calling-conventions</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
+    <para>GHCでは、いくつかのオプションを使って、どの種類の致命的でないエラーメッセージ(警告ともいう)を生成するか選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-lazy-unlifted-bindings</option>、<option>-fwarn-wrong-do-bind</option>、<option>-fwarn-unsupported-calling-conventions</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
     <variablelist>
 
       <varlistentry>

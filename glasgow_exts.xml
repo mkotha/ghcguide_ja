@@ -4041,21 +4041,21 @@ type F a
 <sect1 id="constraint-kind">
 <title><literal>Constraint</literal>という種</title>
 
-<para>通常、<emphasis>制約</emphasis>(型中で<literal>=></literal>の左に出現するもの)の構文は極めて強く制限されている。次のものにしかなれない。
+<para>通常、<emphasis>制約</emphasis>(型の中で<literal>=></literal>の左に出現するもの)の構文は極めて強く制限されている。次のものにしかなれない。
 	<itemizedlist>
 		<listitem>
 			<para>クラス制約、たとえば<literal>Show a</literal></para>
 		</listitem>
 		<listitem>
-			<para><link linkend="implicit-parameters">暗黙パラメタ</link>制約、たとえば<literal>?x::Int</literal> (<option>-XImplicitParams</option>フラグがあれば)</para>
+			<para><link linkend="implicit-parameters">暗黙パラメタ</link>制約、たとえば<literal>?x::Int</literal> (<option>-XImplicitParams</option>フラグが必要)</para>
 		</listitem>
 		<listitem>
-			<para><link linkend="equality-constraints">等式制約</link>、たとえば<literal>a ~ Int</literal> (<option>-XTypeFamilies</option>または<option>-XGADTs</option>フラグがあれば)</para>
+			<para><link linkend="equality-constraints">等式制約</link>、たとえば<literal>a ~ Int</literal> (<option>-XTypeFamilies</option>または<option>-XGADTs</option>フラグが必要)</para>
 		</listitem>
 	</itemizedlist>
 </para>
 
-<para><option>-XConstraintKinds</option>フラグを使うと、プログラム内で制約としてより幅広い範囲ものもを受け付けるようになる。正確にいうと、このフラグのもとでは新しい種<literal>Constraint</literal>を持つあらゆる<emphasis>型</emphasis>を制約として使える。以下のものが種<literal>Contraint</literal>を持つ。
+<para><option>-XConstraintKinds</option>フラグを使うと、これより広い範囲ものを制約として受け付けるようになる。正確にいうと、このフラグのもとでは新しい種<literal>Constraint</literal>を持つあらゆる<emphasis>型</emphasis>を制約として使える。以下のものが種<literal>Constraint</literal>を持つ。
 
 	<itemizedlist>
 		<listitem>このフラグなしでも制約として正しいもの全て。すなわち型クラスの完全な適用、暗黙パラメタ制約および等式制約。
@@ -4084,7 +4084,7 @@ foo :: Stringy a => a -> (String, String -> a)
 foo x = (show x, read)
 </programlisting>
 
-<para>現在、標準的な制約とタプルおよびこれら二種類の制約のシノニムのみがインスタンス文脈とスーパークラス文脈で(別のフラグなしで)使用できる。この理由は、もっと一般的な制約を許すと型検査のループを引き起し得るからである。以下の二つのプログラムはそのような例である。
+<para>現在、標準的な制約とタプル、およびこれら二種類の制約のシノニムのみが、インスタンス文脈とスーパークラス文脈で(別のフラグなしで)使用できる。この理由は、もっと一般的な制約を許すと型検査のループを引き起し得るからである。以下の二つのプログラムはそのような例である。
 </para>
 
 <programlisting>
