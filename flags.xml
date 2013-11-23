@@ -2502,13 +2502,13 @@
 	    </row>
 	    <row>
 	      <entry><option>-ddump-rule-firings</option></entry>
-	      <entry>規則(rules)の発火情報を表示</entry>
+	      <entry>規則(rules)の発動情報を表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-ddump-rule-rewrites</option></entry>
-	      <entry>規則(rules)の詳細な発火情報を表示</entry>
+	      <entry>規則(rules)の詳細な発動情報を表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>

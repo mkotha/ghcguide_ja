@@ -119,7 +119,7 @@
                 <indexterm><primary><option>-ddump-rule-firings</option></primary></indexterm>
 	      </term>
 	      <listitem>
-		<para>このモジュールで発火した規則の名前を全て出力する</para>
+		<para>このモジュールで発動した規則の名前を全て出力する</para>
 	      </listitem>
 	    </varlistentry>
 
@@ -129,7 +129,7 @@
                 <indexterm><primary><option>-ddump-rule-rewrites</option></primary></indexterm>
 	      </term>
 	      <listitem>
-		<para>このモジュールで発火した全ての規則に関して詳細な情報を出力する</para>
+		<para>このモジュールで発動した全ての規則に関して詳細な情報を出力する</para>
 	      </listitem>
 	    </varlistentry>
 

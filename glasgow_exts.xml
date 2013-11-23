@@ -6364,15 +6364,15 @@ GHCはインライン化が永遠に続くことがないことを保証する�
 <programlisting>
   {-# SPECIALIZE [0] hammeredLookup :: [(Widget, value)] -> Widget -> value #-}
 </programlisting>
-   これは、段階0(最後の段階)にのみ発火する特殊化規則を生成する。<literal>SPECIALIZE</literal>中に段階制御を指定しなかった場合、段階制御はその関数のインラインプラグマ(あれば)から継承される。例。
+   これは、段階0(最後の段階)にのみ発動する特殊化規則を生成する。<literal>SPECIALIZE</literal>中に段階制御を指定しなかった場合、段階制御はその関数のインラインプラグマ(あれば)から継承される。例。
 <programlisting>
   foo :: Num a => a -> a
   foo = ...blah...
   {-# NOINLINE [0] foo #-}
   {-# SPECIALIZE foo :: Int -> Int #-}
 </programlisting>
-  この<literal>NOINLINE</literal>は、段階0になるまで<literal>foo</literal>をインライン化しないようにGHCに指示する。そしてこの性質は特殊化規則に継承されるので、これも段階0にのみ発火する。</para>
-  <para>特殊化に対して段階制御を使うことの主な理由は、まずコンパイルパイプラインの初期に発火する最適化RULESを書いて、<emphasis>その後で</emphasis>関数の呼び出しを特殊化できるからである。特殊化が行なわれるのが早すぎると最適化RULESが発火しないかもしれない。
+  この<literal>NOINLINE</literal>は、段階0になるまで<literal>foo</literal>をインライン化しないようにGHCに指示する。そしてこの性質は特殊化規則に継承されるので、これも段階0にのみ発動する。</para>
+  <para>特殊化に対して段階制御を使うことの主な理由は、まずコンパイルパイプラインの初期に発動する最適化RULESを書いて、<emphasis>その後で</emphasis>関数の呼び出しを特殊化できるからである。特殊化が行なわれるのが早すぎると最適化RULESが発動しないかもしれない。
   </para>
 </listitem>
 <listitem>
@@ -6579,7 +6579,7 @@ data T = T {-# NOUNPACK #-} !(Int,Int)
 </programlisting>
 </para>
 <para>
-どの規則が発火したかを見るには<option>-ddump-simpl-stats</option>というデバッグフラグを使えばよい。もっと情報が必要な場合は、<option>-ddump-rule-firings</option>によって、個々の規則発火を見ることができるし、<option>-ddump-rule-rewrites</option>なら、書き換えの前と後でコードがどんな風であったかを見ることができる。
+どの規則が発動したかを見るには<option>-ddump-simpl-stats</option>というデバッグフラグを使えばよい。もっと情報が必要な場合は、<option>-ddump-rule-firings</option>によって、個々の規則発動を見ることができるし、<option>-ddump-rule-rewrites</option>なら、書き換えの前と後でコードがどんな風であったかを見ることができる。
 </para>
 
 <sect2>
@@ -6786,10 +6786,10 @@ h z = g True
 g y = y
 </programlisting>
 
-次に<literal>g</literal>が<literal>h</literal>へとインライン化されるが、<literal>f</literal>のRULEが発火する機会はない。GHCが逆にまず<literal>g</literal>を<literal>h</literal>へとインライン化していたら、<literal>f</literal>のRULEが発火する機会はより大きかっただろう。
+次に<literal>g</literal>が<literal>h</literal>へとインライン化されるが、<literal>f</literal>のRULEが発動する機会はない。GHCが逆にまず<literal>g</literal>を<literal>h</literal>へとインライン化していたら、<literal>f</literal>のRULEが発動する機会はより大きかっただろう。
 </para>
 <para>
-振る舞いを予測可能にするには、<literal>f</literal>にNOINLINEプラグマかINLINE[<replaceable>phase</replaceable>]プラグマを使って、RULEに発火の機会があるうちにインライン化されることがないようにすれば良い。
+振る舞いを予測可能にするには、<literal>f</literal>にNOINLINEプラグマかINLINE[<replaceable>phase</replaceable>]プラグマを使って、RULEに発動の機会があるうちにインライン化されることがないようにすれば良い。
 </para>
 <para>
 GHCは、仕事を複製することに関して非常に慎重である。例として次を考えよ。
@@ -6798,14 +6798,14 @@ f k z xs = let xs = build g
            in ...(foldr k z xs)...sum xs...
 {-# RULES "foldr/build" forall k z g. foldr k z (build g) = g k z #-}
 </programlisting>
-<literal>xs</literal>が二回使われているので、GHCはfold/build規則を発火しない。これは正しい動作である。なぜなら、<literal>xs</literal>を計算するのに大量の作業が必要かもしれず、規則が発火したらその作業が複製されるからである。</para>
+<literal>xs</literal>が二回使われているので、GHCはfold/build規則を発動しない。これは正しい動作である。なぜなら、<literal>xs</literal>を計算するのに大量の作業が必要かもしれず、規則が発動したらその作業が複製されるからである。</para>
 <para>
-しかし、場合によっては、この方針では慎重すぎることがある。例え簡約基を複製することになっても、規則に発火してもらいたい場合である。これが良案だということをGHCが見つけ出す方法はないので、そのことを宣言するためのCONLIKEプラグマを提供している。次のようにする。
+しかし、場合によっては、この方針では慎重すぎることがある。例え簡約基を複製することになっても、規則に発動してもらいたい場合である。これが良案だということをGHCが見つけ出す方法はないので、そのことを宣言するためのCONLIKEプラグマを提供している。次のようにする。
 <programlisting>
 {-# INLINE CONLIKE [1] f #-}
 f x = <replaceable>blah</replaceable>
 </programlisting>
-CONLIKEは、INLINEまたはNOINLINEプラグマに対する修飾子である。fを一つの引数(一般には、'='記号の左側にある引数の数)に適用することが十分低コストで、複製によって規則が発火するならば複製できる、ということを示す。(「CONLIKE」という名前は"constructor-like"の短縮形である。構築子(constructor)は確実にこの性質を持つので) CONLIKEプラグマはINLINE/NOINLINEの修飾子であるが、これは次のような事情による。すなわち、規則が発火する前に<literal>f</literal>がインライン化されてしまわないことがはっきりしているのでない限り、<literal>f</literal>を規則の左辺と照合するのは実際上意味がないからである。
+CONLIKEは、INLINEまたはNOINLINEプラグマに対する修飾子である。fを一つの引数(一般には、'='記号の左側にある引数の数)に適用することが十分低コストで、複製によって規則が発動するならば複製できる、ということを示す。(「CONLIKE」という名前は"constructor-like"の短縮形である。構築子(constructor)は確実にこの性質を持つので) CONLIKEプラグマはINLINE/NOINLINEの修飾子であるが、これは次のような事情による。すなわち、規則が発動する前に<literal>f</literal>がインライン化されてしまわないことがはっきりしているのでない限り、<literal>f</literal>を規則の左辺と照合するのは実際上意味がないからである。
 </para>
 </sect2>
 
@@ -7054,7 +7054,7 @@ i2d (I# i) = D# (int2Double# i) -- Glasgowのprim-opを直接使う
 </listitem>
 
 <listitem>
-<para><option>-ddump-rule-firings</option>や<option>-ddump-rule-rewrites</option>を使うと、どの規則が発火したかを極めて詳細に見ることができる。<option>-dppr-debug</option>を加えるとさらに詳細な一覧が得られる。
+<para><option>-ddump-rule-firings</option>や<option>-ddump-rule-rewrites</option>を使うと、どの規則が発動したかを極めて詳細に見ることができる。<option>-dppr-debug</option>を加えるとさらに詳細な一覧が得られる。
 </para>
 </listitem>
 

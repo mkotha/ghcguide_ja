@@ -135,7 +135,7 @@ Safe Haskellの設計は以下の面にわたっている。
     safe language方言では以下の機能に制限が加えられる。
     <itemizedlist>
       <listitem><emphasis>ForeignFunctionInterface</emphasis> &mdash; これは大部分において安全であるが、関数をIOでない型でインポートするforeign import宣言は禁止される。全てのFFIインポートはIOモナドに生息しなければならない。</listitem>
-      <listitem><emphasis>RULES</emphasis> &mdash; 信頼されたコードの振る舞いを予測不可能な形で変更し、意味上の整合性に違反することができるので、機能が制限される。具体的には、<option>-XSafe</option>でコンパイルされたモジュールMで定義されたRULESは全て捨てられる。MがインポートするTrustworthyモジュールで定義されたRULESはなお有効であり、通常通り発火する。</listitem>
+      <listitem><emphasis>RULES</emphasis> &mdash; 信頼されたコードの振る舞いを予測不可能な形で変更し、意味上の整合性に違反することができるので、機能が制限される。具体的には、<option>-XSafe</option>でコンパイルされたモジュールMで定義されたRULESは全て捨てられる。MがインポートするTrustworthyモジュールで定義されたRULESはなお有効であり、通常通り発動する。</listitem>
       <listitem><emphasis>OverlappingInstances</emphasis> &mdash; この拡張は意味上の整合性に違反するために使うことができる。悪意のあるコードは、この信頼されていないモジュールをインポートしているコードの振る舞いを変えるようなインスタンスを再定義できるかもしれない(より特殊性の高いインスタンス宣言を持つことで)からである。<option>-XSafe</option>でコンンパイルされたモジュールMにおいて、この拡張は無効されないが制限を受ける。Mは重複インスタンス宣言を定義できるが、それらはMで定義された別のインスタンス宣言としか重複できない。MをインポートするモジュールNの中、型クラス関数を使う呼び出し地点で、どのインスタンスを使うかの選択肢(つまり重複)があり、最も特殊性の高いインスタンスがM由来の場合、他の全ての選択肢もM由来でなければならない。これについての簡単な考え方は、Safeコンパイルされたモジュールで定義された重複インスタンスに関する<emphasis>同一生成元ポリシー</emphasis>(same origin policy)だと思うことである。</listitem>
 	  <listitem><emphasis>Data.Typeable</emphasis> &mdash; Typeableインスタンスを自動導出(GHCによって<link linkend="deriving-typeable"><option>-XDeriveDataTypeable</option></link>拡張を介して提供されている)されたもののみに制限している。Typeable型クラスの手書きインスタンスは、unasfeに型変換を行うように簡単に悪用できるので、Safe Haskellでは許されていない。</listitem>
     </itemizedlist>
