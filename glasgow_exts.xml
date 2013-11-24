@@ -4062,7 +4062,8 @@ type F a
 		</listitem>
 		<listitem>全ての要素が種<literal>Constraint</literal>を持つようなタプル。よって、たとえば型<literal>(Show a, Ord a)</literal>の種は<literal>Constraint</literal>になる。
 		</listitem>
-		<listitem>形はまだ分かっていないが、ユーザが種<literal>Constraint</literal>を持つとして宣言したもの全て。よって例えば<literal>type Foo (f :: * -> Constraint) = forall b. f b => b -> b</literal>は許される。また次の型族を使った例も許される。
+		<listitem><para>形はまだ分かっていないが、ユーザが種<literal>Constraint</literal>を持つとして宣言したもの全て。よって例えば<literal>type Foo (f :: * -> Constraint) = forall b. f b => b -> b</literal>は許される。また次の型族を使った例も許される。</para>
+
 <programlisting>
 type family Typ a b :: Constraint
 type instance Typ Int  b = Show b
@@ -4071,6 +4072,7 @@ type instance Typ Bool b = Num b
 func :: Typ a b => a -> b -> b
 func = ...
 </programlisting>
+
 		</listitem>
 	</itemizedlist>
 </para>
