@@ -3837,12 +3837,12 @@ type family S1 a :: k -> *      -- S1 :: forall k. * -> k -> *
 <title>データ型の昇格</title>
 
 <para>
-この節では<emphasis>データ型の昇格</emphasis>を記述する。これは、型多相性を補う型システムへの拡張である。これは<option>-XDataKinds</option>によって有効になり、TLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。</para>
+この節では<emphasis>データ型の昇格</emphasis>を記述する。これは種システムへの拡張で、種多相性を補うものである。これは<option>-XDataKinds</option>によって有効になり、TLDI 2012に現れた論文<ulink url="http://dreixel.net/research/pdf/ghp.pdf">Giving Haskell a Promotion</ulink>により詳しく記述されている。</para>
 
 <sect2> <title>動機</title>
 
 <para>
-標準のHaskellには豊かな型言語が備わっている。型は式を分類し、多くのよくあるプログラミング上の間違いを避けるのに役立つ。一方で、Haskellの種言語(訳注: kind language; 型の型の言語)は比較的単純であり、持ち上げられた型(種<literal>*</literal>)と型構築子(たとえば種<literal>* -> * -> *</literal>)と持ち上げられていない型(<xref linkend="glasgow-unboxed"/>)を区別するのみである。特に型族(<xref linkend="type-families"/>)やGADT(<xref linkend="gadt"/>)などの高度な型システムの機能を使う場合、この単純な種システムでは不十分であり、単純な間違いを防ぐことができない。例として、型水準の自然数と、長さによって添字付けられたベクトルを考えよ。
+標準のHaskellには豊かな型言語が備わっている。型は式を分類し、多くのよくあるプログラミング上の間違いを避けるのに役立つ。一方で、Haskellの種言語(訳注: kind language; 型の型の言語)は比較的単純であり、持ち上げられた型(種<literal>*</literal>)と型構築子(たとえば種<literal>* -> * -> *</literal>)と持ち上げられていない型(<xref linkend="glasgow-unboxed"/>)を区別するのみである。特に型族(<xref linkend="type-families"/>)やGADT(<xref linkend="gadt"/>)などの高度な型システム上の機能を使う場合、この単純な種システムは不十分であり、単純な間違いを防ぐことができない。例として、型水準の自然数と、長さによって添字付けられたベクトルを考えよ。
 <programlisting>
 data Ze
 data Su n
@@ -3851,7 +3851,7 @@ data Vec :: * -> * -> * where
   Nil  :: Vec a Ze
   Cons :: a -> Vec a n -> Vec a (Su n)
 </programlisting>
-<literal>Vec</literal>の種は<literal>* -> * -> *</literal>である。これば、例えば<literal>Vec Int Char</literal>が種の正しい型であることを意味する。長さによって添字付けられたベクトルを定義するときにこれを意図している訳ではないにもかかわらずである。
+<literal>Vec</literal>の種は<literal>* -> * -> *</literal>である。これば、例えば<literal>Vec Int Char</literal>が正しい種を持つ型であることを意味する。しかし、長さによって添字付けられたベクトルを定義するときにこれを意図している訳ではない。
 </para>
 
 <para>
@@ -3863,13 +3863,13 @@ data Vec :: * -> Nat -> * where
   Nil  :: Vec a Ze
   Cons :: a -> Vec a n -> Vec a (Su n)
 </programlisting>
-この改善された<literal>Vec</literal>の種のもとでは、<literal>Vec Int Char</literal>のようなものは今や種が間違っており、GHCはエラーを報告するだろう。
+<literal>Vec</literal>の種をこのように改善すると、<literal>Vec Int Char</literal>のようなものは今や種が間違っており、GHCはエラーを報告するだろう。
 </para>
 </sect2>
 
 <sect2><title>概観</title>
 <para>
-<option>-XDataKinds</option>を使うと、GHCは全ての適したデータ型を種へと昇格させ、その(値)構築子を型構築子へと昇格させる。以下の型は、
+<option>-XDataKinds</option>を使うと、GHCは適したデータ型を全て種へと昇格させ、その(値)構築子を型構築子へと昇格させる。以下の型は、
 <programlisting>
 data Nat = Ze | Su Nat
 
@@ -3896,7 +3896,7 @@ Sum k1 k2 :: BOX
 L :: k1 -> Sum k1 k2
 R :: k2 -> Sum k1 k2
 </programlisting>
-ここで、<literal>BOX</literal>は種を分類する(唯一の)ソートである。例えば<literal>List</literal>が<literal>BOX -> BOX</literal>という種を得ないことに注意。種はそれ以上区別されないからである。全ての種は<literal>BOX</literal>というソートを持つ。
+ここで、<literal>BOX</literal>は種を分類する(唯一の)ソートである。例えば<literal>List</literal>が<literal>BOX -> BOX</literal>というソートを得ないことに注意。種はそれ以上区別されないからである。全ての種は<literal>BOX</literal>というソートを持つ。
 </para>
 
 <para>
@@ -3922,7 +3922,7 @@ data Prom = P   -- 2
 
 type T = P      -- 1か、それとも昇格した2か？
 </programlisting>
-このような場合には、昇格した構築子に言及したい場合、名前に引用符を前置する必要がある。
+このような場合に昇格した構築子に言及したい場合、名前に引用符を前置する必要がある。
 <programlisting>
 type T1 = P     -- 1
 
