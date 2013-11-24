@@ -6277,7 +6277,7 @@ GHCはインライン化が永遠に続くことがないことを保証する�
       </sect3>
 
       <sect3 id="phase-control">
-	<title>段階管理</title>
+	<title>段階制御</title>
 
         <para>GHCのパイプライン中のどの段階でINLINEプラグマが有効になるかを制御したいことがあるだろう。インライン化が行われるのは、<emphasis>単純化器</emphasis>の実行過程だけである。単純化器は、毎回異なる<emphasis>段階番号</emphasis>で実行される。段階番号は零に向かって減少する。<option>-dverbose-core2core</option>を使えば、単純化器が連続して実行されるに際しての段階番号を見ることができる。次のように、INLINEプラグマに段階番号を指定することができる。
 	<itemizedlist>
