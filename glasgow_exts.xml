@@ -1423,7 +1423,7 @@ let infixr 9 $ in ...
 import "network" Network.Socket
 </programlisting>
 
-  <para>こうすると、<literal>network</literal>パッケージ(のいずれかのバージョン)から<literal>Network.Socket</literal>をインポートすることになる。これは、同じモジュールが複数のパッケージから利用できたり、現在ビルド中のパッケージと外部のパッケージの両方にあったりする場合に、インポートの曖昧性を取り除くために使うことができる。</para>
+  <para>こうすると、<literal>network</literal>パッケージ(のいずれかのバージョン)から<literal>Network.Socket</literal>をインポートすることになる。これは、同じモジュールが複数のパッケージから利用できたり、現在ビルド中のパッケージと他のパッケージの両方にあったりする場合に、インポートの曖昧性を取り除くために使うことができる。</para>
 
   <para>特別なパッケージ名<literal>this</literal>を使うと、現在ビルド中のパッケージを示すことができる。</para>
 

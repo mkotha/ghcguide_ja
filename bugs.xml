@@ -219,7 +219,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
     </sect3>
 
     <sect3 id="infelicities-ffi">
-      <title>他言語関数インタフェース</title>
+      <title>外部関数インタフェース</title>
       <variablelist>
         <varlistentry>
           <term><literal>hs_exit()</literal>の後に<literal>hs_init()</literal>を呼ぶことが許されない</term>

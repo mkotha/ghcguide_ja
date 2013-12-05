@@ -708,7 +708,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
 	</listitem>
 
 	<listitem>
-          <para>プログラムテキスト自体、Cスタック、あらゆるヒープ外データ(例えば、他言語のライブラリで確保されたデータやRTSが確保したデータ)、<literal>mmap()</literal>されたメモリはヒーププロファイルで考慮されない。</para>
+          <para>プログラムテキスト自体、Cスタック、あらゆるヒープ外データ(例えば、外部のライブラリで確保されたデータやRTSが確保したデータ)、<literal>mmap()</literal>されたメモリはヒーププロファイルで考慮されない。</para>
 	</listitem>
       </itemizedlist>
     </sect2>

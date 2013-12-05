@@ -2,9 +2,9 @@
 <!-- FFI docs as a chapter -->
 
 <chapter id="ffi">
- <title>他言語関数インタフェース(FFI)</title>
+ <title>外部関数インタフェース(FFI)</title>
 
-  <para>GHCは、Haskellの他言語関数インタフェースに(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>にあるHaskellレポートの一部である。</para>
+  <para>GHCは、Haskellの外部関数インタフェースに(大部分)準拠している。これの定義は<ulink url="http://www.haskell.org/"><literal>http://www.haskell.org/</literal></ulink>にあるHaskellレポートの一部である。</para>
 
   <para>FFI対応はデフォルトで有効であるが、<option>-XForeignFunctionInterface</option><indexterm><primary><option>-XForeignFunctionInterface</option></primary> </indexterm>で明示的に有効にしたり無効にしたりできる。</para>
 
@@ -20,7 +20,7 @@
     <sect2>
       <title>非ボックス化型</title>
 
-      <para>基本他言語型(FFI追補の3.2節を見よ)として、以下の型を使える。<literal>Int#</literal>、<literal>Word#</literal>、<literal>Char#</literal>、<literal>Float#</literal>、<literal>Double#</literal>、<literal>Addr#</literal>、<literal>StablePtr# a</literal>、<literal>MutableByteArray#</literal>、<literal>ForeignObj#</literal>、<literal>ByteArray#</literal>。</para>
+      <para>基本外部型(FFI追補の3.2節を見よ)として、以下の型を使える。<literal>Int#</literal>、<literal>Word#</literal>、<literal>Char#</literal>、<literal>Float#</literal>、<literal>Double#</literal>、<literal>Addr#</literal>、<literal>StablePtr# a</literal>、<literal>MutableByteArray#</literal>、<literal>ForeignObj#</literal>、<literal>ByteArray#</literal>。</para>
     </sect2>
 
     <sect2 id="ffi-newtype-io">
@@ -31,7 +31,7 @@
 </programlisting>
       (このようなことをする理由としては、例えば、プログラムのある場所において、任意のIO手続きを呼ばれることを防ぎたい、というのが考えられる)
 </para>
-<para>Haskell FFIは既に、他言語にインポート・エクスポートされるものの引数や結果がnewtypeだった場合、それらは自動的に外される、としている(FFI追補の3.2節)。GHCはこれを拡張して、IOモナド自体を包むnewtypeも自動的に外す。より正確にいうと、FFIの仕様がIO型を要求しているところならどこでも、IO型をnewtypeで包んだ物も認める。例えば、以下の宣言は問題ない。
+<para>Haskell FFIは既に、外部にインポート・エクスポートされるものの引数や結果がnewtypeだった場合、それらは自動的に外される、としている(FFI追補の3.2節)。GHCはこれを拡張して、IOモナド自体を包むnewtypeも自動的に外す。より正確にいうと、FFIの仕様がIO型を要求しているところならどこでも、IO型をnewtypeで包んだ物も認める。例えば、以下の宣言は問題ない。
 <programlisting>
    foreign import foo :: Int -> MyIO Int
    foreign import "dynamic" baz :: (Int -> MyIO Int) -> CInt -> MyIO Int
@@ -50,23 +50,23 @@
       </sect2>
 
       <sect2 id="ffi-interruptible">
-        <title>割り込み可能な他言語呼び出し</title>
-        <para>これは、他言語呼び出しと<literal>Control.Concurrent.throwTo</literal>の相互作用についてである。通常、<literal>throwTo</literal>の対象が他言語呼び出しの実行中であった場合、その呼び出しが完了するまで例外が発生せず、その間呼び出し元はブロックされる。これによってプログラムが無反応になることがあり、特にユーザによる割り込み(Control-Cなど)の場合に問題になる。Control-Cシグナルを受け取ったとき(Unixなら<literal>SIGINT</literal>)のデフォルトの振る舞いは、主スレッドに<literal>UserInterrupt</literal>例外を発生させることである。その時点で主スレッドが他言語関数呼び出しでブロックしていた場合、プログラムはユーザによる割り込みに反応しない。</para>
+        <title>割り込み可能な外部呼び出し</title>
+        <para>これは、外部呼び出しと<literal>Control.Concurrent.throwTo</literal>の相互作用についてである。通常、<literal>throwTo</literal>の対象が外部呼び出しの実行中であった場合、その呼び出しが完了するまで例外が発生せず、その間呼び出し元はブロックされる。これによってプログラムが無反応になることがあり、特にユーザによる割り込み(Control-Cなど)の場合に問題になる。Control-Cシグナルを受け取ったとき(Unixなら<literal>SIGINT</literal>)のデフォルトの振る舞いは、主スレッドに<literal>UserInterrupt</literal>例外を発生させることである。その時点で主スレッドが外部関数呼び出しでブロックしていた場合、プログラムはユーザによる割り込みに反応しない。</para>
 
-        <para>問題は、一般に他言語呼び出しに安全に割り込むことが不可能であることだ。しかしなお、ブロックするシステムコールに割り込む方法をGHCは提供しており、UnixとWindowsの両方で、大部分のシステムコールに対して動作する。<literal>InterruptibleFFI</literal>拡張が有効である場合、他言語呼び出しに<literal>safe</literal>や<literal>unsafe</literal>の代わりに<literal>interruptible</literal>という注釈を付けることができる。
+        <para>問題は、一般に外部呼び出しに安全に割り込むことが不可能であることだ。しかしなお、ブロックするシステムコールに割り込む方法をGHCは提供しており、UnixとWindowsの両方で、大部分のシステムコールに対して動作する。<literal>InterruptibleFFI</literal>拡張が有効である場合、外部呼び出しに<literal>safe</literal>や<literal>unsafe</literal>の代わりに<literal>interruptible</literal>という注釈を付けることができる。
 
 <programlisting>
 foreign import ccall interruptible
    "sleep" :: CUint -> IO CUint
 </programlisting>
 
-          <literal>interruptible</literal>は<literal>safe</literal>と同様に振る舞うが、違いは、interruptibleな他言語呼び出しを実行中のスレッドが<literal>throwTo</literal>の対象になった時、OS依存の機構を使って他言語呼び出しが返るように仕向けようとする点である。
+          <literal>interruptible</literal>は<literal>safe</literal>と同様に振る舞うが、違いは、interruptibleな外部呼び出しを実行中のスレッドが<literal>throwTo</literal>の対象になった時、OS依存の機構を使って外部呼び出しが返るように仕向けようとする点である。
 
           <variablelist>
             <varlistentry>
               <term>Unixシステム</term>
               <listitem>
-                <para>他言語呼び出しを行っているスレッドに対して<literal>SIGPIPE</literal>シグナルが送られる。通常、これだけでブロック中のシステムコールが<literal>EINTR</literal>で返ることになる(GHCはデフォルトで空のシグナルハンドラを<literal>SIGPIPE</literal>に設定し、デフォルトの挙動(プロセスの終了)を上書きしている)。</para>
+                <para>外部呼び出しを行っているスレッドに対して<literal>SIGPIPE</literal>シグナルが送られる。通常、これだけでブロック中のシステムコールが<literal>EINTR</literal>で返ることになる(GHCはデフォルトで空のシグナルハンドラを<literal>SIGPIPE</literal>に設定し、デフォルトの挙動(プロセスの終了)を上書きしている)。</para>
               </listitem>
             </varlistentry>
             <varlistentry>
@@ -78,7 +78,7 @@ foreign import ccall interruptible
             </varlistentry>
           </variablelist>
 
-          システムコールが成功裏に割り込まれると、それはHaskellに返り、そこで例外が発生する。<literal>interruptible</literal>を使う場合には、この他言語関数<!-- 訳注: システムコールの間違いか-->の呼び出し元が、呼び出しが割り込まれた結果を正しく扱えるようになっているかどうか特に注意すること。Unixでは<literal>EINTR</literal>を常に検査するのは良い習慣であるが、Windowsでは通常は<literal>ERROR_OPERATION_ABORTED</literal>に対処することが必要でない。</para>
+          システムコールが成功裏に割り込まれると、それはHaskellに返り、そこで例外が発生する。<literal>interruptible</literal>を使う場合には、この外部関数<!-- 訳注: システムコールの間違いか-->の呼び出し元が、呼び出しが割り込まれた結果を正しく扱えるようになっているかどうか特に注意すること。Unixでは<literal>EINTR</literal>を常に検査するのは良い習慣であるが、Windowsでは通常は<literal>ERROR_OPERATION_ABORTED</literal>に対処することが必要でない。</para>
       </sect2>
 
       <sect2 id="ffi-capi">
@@ -123,7 +123,7 @@ newtype {-# CTYPE            "useconds_t" #-} T = ...
   <sect1 id="ffi-ghc">
     <title>GHCでFFIを使う</title>
 
-    <para>以下の各節では、他言語関数インタフェースをGHCで使うに当たってのヒントを与える。</para>
+    <para>以下の各節では、外部関数インタフェースをGHCで使うに当たってのヒントを与える。</para>
 
     <sect2 id="foreign-export-ghc">
       <title>GHCで<literal>foreign export</literal>と<literal>foreign import ccall "wrapper"</literal>を使う</title>
@@ -256,7 +256,7 @@ typedef enum {
       </sect3>
 
       <sect3 id="ffi-library">
-        <title>他言語のコードから呼べるようなHaskellライブラリを作る</title>
+        <title>外部のコードから呼べるようなHaskellライブラリを作る</title>
 
         <para><xref linkend="using-own-main"/>とよく似た状況だが、完全なプログラムをリンクするのが目的ではなく、Haskellコードからライブラリを作って、Cのコードでできたライブラリと同じように使えるようにしたいという場合である。</para>
 
@@ -295,7 +295,7 @@ void mylib_end(void){
 
       <para>Cの関数は、通常、Cのヘッダファイルでプロトタイプを使って宣言される。前の版のGHC(6.8.3以前)は、Haskellコードから生成されるCソースファイルにヘッダを<literal>&num;include</literal>していたので、FFIを介して呼ばれるCの関数が正しい型で呼ばれているかどうかを、Cコンパイラが検査することができた。</para>
 
-      <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、<ulink linkend="native-code-gen">ネイティブコードのバックエンド</ulink>(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、他言語呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された他言語呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に他言語呼び出しをインライン化できるようになるからである。</para>
+      <para>GHCはもはや、Cを介してコンパイルするときに外部のヘッダファイルをインクルードしないので、この検査は行われない。この変更は、<ulink linkend="native-code-gen">ネイティブコードのバックエンド</ulink>(<literal>-fasm</literal>)との互換性、およびFFI仕様への準拠のために為された。(FFI仕様によると、FFI呼び出しは、Cのヘッダファイルを使ったときに起き得る、マクロ展開その他のCPPによる変換に影響されないことが要求される)。また、この方針によって、外部呼び出しをモジュール境界やパッケージ境界を越えてインライン化する作業が単純になる。インライン展開された外部呼び出しをコンパイルするときにそのヘッダファイルが存在する必要がないため、どんな文脈においてもコンパイラが自由に外部呼び出しをインライン化できるようになるからである。</para>
 
       <para><literal>-&num;include</literal>オプションはもはや非推奨であり、Cabalのパッケージ仕様の中の<literal>include-files</literal>フィールドは無視される。</para>
 
@@ -319,7 +319,7 @@ void mylib_end(void){
 	<varlistentry>
 	  <term><literal>mallocForeignPtr</literal></term>
 	  <listitem>
-	    <para>GCを必要とする、中長期にわたる確保に便利である。ただし、他言語のデータ構造の中にメモリへのポインタを保持したいなら、<literal>mallocForeignPtr</literal>は良い選択では<emphasis>ない</emphasis>。</para>
+	    <para>GCを必要とする、中長期にわたる確保に便利である。ただし、外部のデータ構造の中にメモリへのポインタを保持したいなら、<literal>mallocForeignPtr</literal>は良い選択では<emphasis>ない</emphasis>。</para>
 
             <para>GHCでは、<literal>mallocForeignPtr</literal>もまた<literal>MutableByteArray#</literal>で実装されている。メモリを指すのは<literal>ForeignPtr</literal>だが、実際には終了子が関係せず(<literal>addForeignPtrFinalizer</literal>で追加しない限り)、開放はGCが行うので、<literal>mallocForeignPtr</literal>は通常とても安価である。</para>
 	  </listitem>
@@ -350,10 +350,10 @@ void mylib_end(void){
 
         <para><literal>safe</literal>注釈(デフォルトである)付きで<literal>foreign import</literal>された関数を呼ぶ場合、プログラムが<option>-threaded</option>を使ってリンクされているなら、その呼び出しは他のHaskellスレッドと並行に走る。プログラムが<option>-threaded</option>なしでリンクされている時は、その呼び出しが返るまで他のHaskellスレッドはブロックされる。</para>
 
-        <para>つまり、長い時間が掛かったり、いつまでブロックするか分からない関数を他言語呼び出しする必要があるなら、それを<literal>safe</literal>にして、<option>-threaded</option>を使うべきである。ライブラリ関数の中には、内部的にこの種の呼び出しを行うものもある。その場合は説明文書にその旨記載があるべきである。</para>
-        <para>複数のHaskellスレッドから他言語呼び出しを行い、しかも<option>-threaded</option>を使っている場合、呼んでいる外部コードがスレッドセーフでなければならないことに注意すること。特に、ある種のGUIライブラリはスレッドセーフでなく、GUIメソッドを一つのスレッドからのみ呼ぶことを要求する。この場合、GUI操作は一つのHaskellスレッドからのみ行い、さらに結合スレッド(<xref linkend="haskell-threads-and-os-threads"/>を見よ)を使う必要があるかもしれない。</para>
+        <para>つまり、長い時間が掛かったり、いつまでブロックするか分からない関数を外部呼び出しする必要があるなら、それを<literal>safe</literal>にして、<option>-threaded</option>を使うべきである。ライブラリ関数の中には、内部的にこの種の呼び出しを行うものもある。その場合は説明文書にその旨記載があるべきである。</para>
+        <para>複数のHaskellスレッドから外部呼び出しを行い、しかも<option>-threaded</option>を使っている場合、呼んでいる外部コードがスレッドセーフでなければならないことに注意すること。特に、ある種のGUIライブラリはスレッドセーフでなく、GUIメソッドを一つのスレッドからのみ呼ぶことを要求する。この場合、GUI操作は一つのHaskellスレッドからのみ行い、さらに結合スレッド(<xref linkend="haskell-threads-and-os-threads"/>を見よ)を使う必要があるかもしれない。</para>
 
-        <para>複数のHaskellスレッドでなされた他言語呼び出しは<emphasis>並列</emphasis>に実行され得るのに注意。これは<literal>+RTS -N</literal>フラグ(<xref linkend="parallel-options"/>)を使っていない場合でもそうである。<literal>+RTS -N</literal>フラグはHaskellスレッドの並列実行を制御するが、ある時点での他言語の呼び出しは、<literal>+RTS -N</literal>の値に関係なく、いくらでも多くなり得る。</para>
+        <para>複数のHaskellスレッドでなされた外部呼び出しは<emphasis>並列</emphasis>に実行され得るのに注意。これは<literal>+RTS -N</literal>フラグ(<xref linkend="parallel-options"/>)を使っていない場合でもそうである。<literal>+RTS -N</literal>フラグはHaskellスレッドの並列実行を制御するが、ある時点での外部の呼び出しは、<literal>+RTS -N</literal>の値に関係なく、いくらでも多くなり得る。</para>
 
         <para>呼び出しが<literal>interruptible</literal>とされており、プログラムがマルチスレッドの場合、そのHaskellスレッドが例外を受けた場合に呼び出しが中断され得る。この中断が発生する機構はプラットフォームによって異なるが、ブロックしているシステムコールが「割り込み発生」のエラーコードで即座に返ることが意図されている。使われているOSスレッドを破壊するものではない。さらなる詳細は<xref linkend="ffi-interruptible"/>を見よ。</para>
       </sect3>
@@ -361,7 +361,7 @@ void mylib_end(void){
       <sect3 id="haskell-threads-and-os-threads">
         <title>HaskellスレッドとOSスレッドの関係</title>
 
-        <para>通常、HaskellスレッドとOSスレッドの間に固定された関係はない。つまり、他言語呼び出しを行った時、それがどのOSスレッドで起こるのかは規定されない。さらに、一つのHaskellスレッドが複数回の呼び出しを行ったとしても、それが同じOSスレッド上で実行される保証はない。</para>
+        <para>通常、HaskellスレッドとOSスレッドの間に固定された関係はない。つまり、外部呼び出しを行った時、それがどのOSスレッドで起こるのかは規定されない。さらに、一つのHaskellスレッドが複数回の呼び出しを行ったとしても、それが同じOSスレッド上で実行される保証はない。</para>
 
         <para>このことは普通問題にならないし、このおかげでGHCのランタイムシステムがOSのスレッド資源を効率的に利用することが可能になっている。しかし、例えばスレッドローカルな状態を使う外部コードを呼ぶ場合など、どのOSスレッドを使うかをもっと制御できた方が便利なことがある。このような場合のために、<emphasis>結合スレッド</emphasis>(bound thread)を用意している。これは、特定のOSスレッドに結び付けられたHaskellスレッドである。結合スレッドについての情報は、<ulink url="&libraryBaseLocation;/Control-Concurrent.html"><literal>Control.Concurrent</literal></ulink>モジュールの説明を見よ。</para>
       </sect3>
@@ -375,8 +375,8 @@ void mylib_end(void){
       <sect3 id="hs-exit">
         <title><literal>hs_exit()</literal>の使用について</title>
         <para>通常、<literal>hs_exit()</literal>によって、そのシステムで実行中のすべてのHaskellスレッドは終了し、<literal>hs_exit()</literal>が返る時点では、もはやHaskellスレッドは一つも走っていない。この後、ランタイムは、必要ならプロファイル出力や統計情報を生成したり、持っているメモリをすべて開放したりして、システムを規則正しく終了させる。</para>
-        <para>Haskellスレッドを強制的に終了させることができない場合もある。例えば、スレッドが他言語呼び出しを実行中かもしれないが、他言語の呼び出しを終了させる方法はない。さらに、ランタイムは、Haskellコードとランタイムがメモリから削除予定であるという最悪の場合を想定しなければならない。(例えば、<link linkend="win32-dlls">WindowsのDLL</link>では、<literal>hs_exit()</literal>が呼ばれるのは、通常そのDLLをアンロードする前である)。そのため、<literal>hs_exit()</literal>は、実行中のすべての他言語呼び出しが返るまで待ってからでないと、自分自身返ることができない。</para>
-        <para>要するに、他言語呼び出しでブロックしているHaskellスレッドがあるなら、その呼び出しが返るまで<literal>hs_exit()</literal>はハングする(場合によってはビジーウェイト)ということだ。よって、<literal>hs_exit()</literal>を呼び出すときにそのようなスレッドがシステム中にないようにするのが良い。これには、I/Oをしているあらゆるスレッドも含まれる。I/Oはブロックする他言語呼び出しを使って実装されているかもしれない(プラットフォームとI/Oの種類によってはそうでないかもしれない)からである。</para>
+        <para>Haskellスレッドを強制的に終了させることができない場合もある。例えば、スレッドが外部呼び出しを実行中かもしれないが、外部の呼び出しを終了させる方法はない。さらに、ランタイムは、Haskellコードとランタイムがメモリから削除予定であるという最悪の場合を想定しなければならない。(例えば、<link linkend="win32-dlls">WindowsのDLL</link>では、<literal>hs_exit()</literal>が呼ばれるのは、通常そのDLLをアンロードする前である)。そのため、<literal>hs_exit()</literal>は、実行中のすべての外部呼び出しが返るまで待ってからでないと、自分自身返ることができない。</para>
+        <para>要するに、外部呼び出しでブロックしているHaskellスレッドがあるなら、その呼び出しが返るまで<literal>hs_exit()</literal>はハングする(場合によってはビジーウェイト)ということだ。よって、<literal>hs_exit()</literal>を呼び出すときにそのようなスレッドがシステム中にないようにするのが良い。これには、I/Oをしているあらゆるスレッドも含まれる。I/Oはブロックする外部呼び出しを使って実装されているかもしれない(プラットフォームとI/Oの種類によってはそうでないかもしれない)からである。</para>
         <para>GHCのランタイムは、プログラムが終了する場合を特別扱いして、スタンドアローンの実行ファイルが終了するときにブロックしているスレッドを待つ必要がないようにしている。コードがメモリから取り除かれるのと同時にプログラムとそのすべてのスレッドが終了するのだから、スレッドが先に終了するように保証する必要がない。(非公式だが、この、早くていい加減な<literal>hs_exit()</literal>が欲しいなら、代わりに<literal>shutdownHaskellAndExit()</literal>を呼ぶと良い)</para>
       </sect3>
     </sect2>
@@ -397,7 +397,7 @@ void mylib_end(void){
             <para>浮動小数点環境はスレッドの通常のコンテキストスイッチに際して保存されない。なので、あるスレッドで浮動小数点状態を変更すると、その変更が他のスレッドから見えるかもしれない。さらに、例外状態を検査してもその結果は信頼できない。コンテキストスイッチによって変更を受けるかもしれないからである。浮動小数点状態を変更したり検査したりする必要があり、複数スレッドを使う必要もあるなら、bound thread (<literal>Control.Concurrent.forkOS</literal>)を使わねばならない。bound threadは一つのOSスレッドを占有し、OSスレッドが浮動小数点状態の保存と復帰を行なうからである。</para>
           </listitem>
           <listitem>
-            <para>他言語呼び出しは決してGHCにプリエンプトされないので、他言語呼び出しの間に一時的に浮動小数点状態を変更することは安全である。</para>
+            <para>外部呼び出しは決してGHCにプリエンプトされないので、外部呼び出しの間に一時的に浮動小数点状態を変更することは安全である。</para>
           </listitem>
         </itemizedlist>
       </para>

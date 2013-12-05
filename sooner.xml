@@ -251,7 +251,7 @@ f (Wibble x y)  # 醜いが、それで良い
 	<listitem>
           <para>これは大変だが、それでも、世の中には激しくチューンされたライブラリコードがたくさんあり、正しい道はそれらと競うのではなく、それらとリンクすることである。</para>
 
-          <para><xref linkend="ffi"/>に他言語関数インタフェースの説明がある。</para>
+          <para><xref linkend="ffi"/>に外部関数インタフェースの説明がある。</para>
 	</listitem>
       </varlistentry>
 
