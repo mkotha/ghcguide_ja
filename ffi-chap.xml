@@ -46,7 +46,7 @@
 <programlisting>
    foreign import prim "foo" foo :: ByteArray# -> (# Int#, Int# #)
 </programlisting>
-これは、GHCの内部的な呼び出し規約に従う、Cmmコードで書かれた関数群をインポートするのに使う。この機能は、専らGHC付属の中核ライブラリでのみ使うことを意図している。さらなる詳細はGHC開発者wikiを見よ。</para>
+これは、GHCの内部的な呼び出し規約に従う、Cmmコードで書かれた関数群をインポートするのに使う。この機能は、専らGHC付属の中核ライブラリでのみ使うことを意図している。さらなる詳細は<ulink linkend="http://ghc.haskell.org/trac/ghc/wiki/Commentary/PrimOps">GHC開発者wiki</ulink>を見よ。</para>
       </sect2>
 
       <sect2 id="ffi-interruptible">
@@ -117,6 +117,18 @@ data    {-# CTYPE "unistd.h" "useconds_t" #-} T = ...
 newtype {-# CTYPE            "useconds_t" #-} T = ...
 </programlisting>
         </para>
+      </sect2>
+
+      <sect2>
+        <title><literal>hs_thread_done()</literal></title>
+
+<programlisting>
+void hs_thread_done(void);
+</programlisting>
+
+        <para>スレッドが<literal>foreign export</literal>を介してHaskellの関数を呼ぶ際、GHCは少量のスレッドローカル・メモリを確保する。通常このメモリは<literal>hs_exit()</literal>まで解放されない。以降のHaskellへの呼び出しを高速で行なうために、このメモリはキャッシュされるのである。しかし、アプリケーションが長時間走り続けるものであり、Haskellを呼ぶスレッドを繰り返し作るのなら、おそらく、Haskell関数を呼び終わったスレッドにはこのメモリを解放させる方が良いだろう。そのためには、メモリを解放したいスレッドから<literal>hs_thread_done()</literal>を呼べば良い。</para>
+
+        <para><literal>hs_thread_done()</literal>を呼ぶか呼ばないかは完全に自由である。好きなだけの回数呼んで良い。Haskellの関数を呼んだことがない、あるいはこれから呼ぶ予定がないスレッドからこれを呼んでも安全である。これを呼ぶのを忘れた場合、起こり得る最悪の事態は、多少のメモリが<literal>hs_exit()</literal>が呼ばれるまで確保されたままになることである。これを必要以上に多く呼んだ場合、起こり得る最悪の事態は、Haskell関数を次に呼んだ時に多少のオーバーヘッドが発生することである。</para>
       </sect2>
   </sect1>
 

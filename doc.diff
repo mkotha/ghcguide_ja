@@ -1,57 +1,6 @@
 diff -urd 7.6.3-original/ffi-chap.xml original/ffi-chap.xml
 --- 7.6.3-original/ffi-chap.xml	2014-06-27 09:19:05.772249332 +0900
 +++ original/ffi-chap.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -75,7 +75,8 @@
- 	  This is used to import functions written in Cmm code that follow an
- 	  internal GHC calling convention. This feature is not intended for
- 	  use outside of the core libraries that come with GHC. For more
--	  details see the GHC developer wiki.
-+	  details see the <ulink linkend="http://ghc.haskell.org/trac/ghc/wiki/Commentary/PrimOps">
-+          GHC developer wiki</ulink>.
- 	</para>
-       </sect2>
- 
-@@ -212,6 +213,40 @@
- </programlisting>
-         </para>
-       </sect2>
-+
-+      <sect2>
-+        <title><literal>hs_thread_done()</literal></title>
-+
-+<programlisting>
-+void hs_thread_done(void);
-+</programlisting>
-+
-+        <para>
-+          GHC allocates a small amount of thread-local memory when a
-+          thread calls a Haskell function via a <literal>foreign
-+          export</literal>.  This memory is not normally freed until
-+          <literal>hs_exit()</literal>; the memory is cached so that
-+          subsequent calls into Haskell are fast.  However, if your
-+          application is long-running and repeatedly creates new
-+          threads that call into Haskell, you probably want to arrange
-+          that this memory is freed in those threads that have
-+          finished calling Haskell functions.  To do this, call
-+          <literal>hs_thread_done()</literal> from the thread whose
-+          memory you want to free.
-+        </para>
-+
-+        <para>
-+          Calling <literal>hs_thread_done()</literal> is entirely
-+          optional.  You can call it as often or as little as you
-+          like.  It is safe to call it from a thread that has never
-+          called any Haskell functions, or one that never will.  If
-+          you forget to call it, the worst that can happen is that
-+          some memory remains allocated until
-+          <literal>hs_exit()</literal> is called.  If you call it too
-+          often, the worst that can happen is that the next call to a
-+          Haskell function incurs some extra overhead.
-+        </para>
-+      </sect2>
-   </sect1>
- 
-   <sect1 id="ffi-ghc">
 @@ -274,7 +309,7 @@
          <filename>M_stub.o</filename> in the final link command line, or
          you'll get link errors for the missing function(s) (this isn't
