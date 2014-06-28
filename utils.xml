@@ -156,35 +156,35 @@ tags:
 
       <variablelist>
 	<varlistentry>
-	  <term><literal>-o FILE</literal>または<literal>&ndash;&ndash;output=FILE</literal></term>
+	  <term><literal>-o FILE</literal>または<literal>--output=FILE</literal></term>
 	  <listitem>
 	    <para>Haskellファイルの名前。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-t FILE</literal>または<literal>&ndash;&ndash;template=FILE</literal></term>
+	  <term><literal>-t FILE</literal>または<literal>--template=FILE</literal></term>
 	  <listitem>
 	    <para>テンプレートファイル(下記参照)。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-c PROG</literal>または<literal>&ndash;&ndash;cc=PROG</literal></term>
+	  <term><literal>-c PROG</literal>または<literal>--cc=PROG</literal></term>
 	  <listitem>
 	    <para>利用するCコンパイラ(デフォルト: <command>gcc</command>)。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-l PROG</literal>または<literal>&ndash;&ndash;ld=PROG</literal></term>
+	  <term><literal>-l PROG</literal>または<literal>--ld=PROG</literal></term>
 	  <listitem>
 	    <para>利用するリンカ(デフォルト: <command>gcc</command>)。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-C FLAG</literal>または<literal>&ndash;&ndash;cflag=FLAG</literal></term>
+	  <term><literal>-C FLAG</literal>または<literal>--cflag=FLAG</literal></term>
 	  <listitem>
 	    <para>Cコンパイラに渡す追加のフラグ。</para>
 	  </listitem>
@@ -198,28 +198,28 @@ tags:
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-L FLAG</literal>または<literal>&ndash;&ndash;lflag=FLAG</literal></term>
+	  <term><literal>-L FLAG</literal>または<literal>--lflag=FLAG</literal></term>
 	  <listitem>
 	    <para>リンカに渡す追加のフラグ。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-i FILE</literal>または<literal>&ndash;&ndash;include=FILE</literal></term>
+	  <term><literal>-i FILE</literal>または<literal>--include=FILE</literal></term>
 	  <listitem>
 	    <para>適切な<literal>#include</literal>がソース中に置かれたのと同様。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-D NAME[=VALUE]</literal>または<literal>&ndash;&ndash;define=NAME[=VALUE]</literal></term>
+	  <term><literal>-D NAME[=VALUE]</literal>または<literal>--define=NAME[=VALUE]</literal></term>
 	  <listitem>
 	    <para>ソース中に適切な<literal>#define</literal>が置かれたのと同様。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>&ndash;&ndash;no-compile</literal></term>
+	  <term><literal>--no-compile</literal></term>
 	  <listitem>
 	    <para>中間のCプログラムをディスクに書き込んだ後停止する。中間Cファイルの名前は、入力ファイル名の<literal>.hsc</literal>を<literal>_hsc_make.c</literal>で置き換えたものである。</para>
 	  </listitem>
@@ -227,7 +227,7 @@ tags:
 
 	<varlistentry>
 	  <term><literal>-k</literal> or
-	  <literal>&ndash;&ndash;keep-files</literal></term>
+	  <literal>--keep-files</literal></term>
 	  <listitem>
 	    <para>通常通りに進行するが、中間ファイルを全く削除しない。</para>
 	  </listitem>
@@ -235,14 +235,14 @@ tags:
 
 	<varlistentry>
 	  <term><literal>-x</literal> or
-	  <literal>&ndash;&ndash;cross-compile</literal></term>
+	  <literal>--cross-compile</literal></term>
 	  <listitem>
 	    <para>クロスコンパイルモードを起動する(<xref linkend="hsc2hs_cross"/>を見よ)。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>&ndash;&ndash;cross-safe</literal></term>
+	  <term><literal>--cross-safe</literal></term>
 	  <listitem>
             <para>.hscディレクティブを、<literal>--cross-compile</literal>モード(<xref linkend="hsc2hs_cross"/>を見よ)が対応しているものに限定する。これは、安全にクロスコンパイルされねばならない<literal>.hsc</literal>ファイルがあって、クロスコンパイル不能な要素が忍び込むことがないようにしたい場合に便利なはずである。</para>
 	  </listitem>
@@ -250,14 +250,14 @@ tags:
 
 
 	<varlistentry>
-	  <term><literal>-?</literal>または<literal>&ndash;&ndash;help</literal></term>
+	  <term><literal>-?</literal>または<literal>--help</literal></term>
 	  <listitem>
 	    <para>利用可能なフラグの要約を表示し、成功裡に終了する。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><literal>-V</literal>または<literal>&ndash;&ndash;version</literal></term>
+	  <term><literal>-V</literal>または<literal>--version</literal></term>
 	  <listitem>
 	    <para>バージョン情報を表示し、成功裡に終了する。</para>
 	  </listitem>

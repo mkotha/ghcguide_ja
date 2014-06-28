@@ -94,7 +94,7 @@ Ok, modules loaded: Main.
 
 <screen>ghci -i<replaceable>dir<subscript>1</subscript></replaceable>:...:<replaceable>dir<subscript>n</subscript></replaceable></screen>
 
-      <para>あるいは、GHCiの中から<literal>:set</literal>コマンドを使って設定することもできる(<xref linkend="ghci-cmd-line-options"/>を見よ)<footnote><para>GHCiや<option>&ndash;&ndash;make</option>モードでは<option>-i</option>オプションは<emphasis>ソース</emphasis>ファイルの探索パスを指定するのに対し、標準の一括コンパイルモードでは<option>-i</option>オプションはインターフェースファイルの探索パスを指定することに注意。<xref linkend="search-path"/>を見よ。</para></footnote>。</para>
+      <para>あるいは、GHCiの中から<literal>:set</literal>コマンドを使って設定することもできる(<xref linkend="ghci-cmd-line-options"/>を見よ)<footnote><para>GHCiや<option>--make</option>モードでは<option>-i</option>オプションは<emphasis>ソース</emphasis>ファイルの探索パスを指定するのに対し、標準の一括コンパイルモードでは<option>-i</option>オプションはインターフェースファイルの探索パスを指定することに注意。<xref linkend="search-path"/>を見よ。</para></footnote>。</para>
 
       <para>GHCiが上記のような方法で依存関係を追うことの帰結として、全てのモジュールにソースファイルがなければならない、というものがある。唯一の例外はパッケージ由来のモジュールで、これには<literal>Prelude</literal>や、<literal>IO</literal>、<literal>Complex</literal>といった標準ライブラリも含まれる。モジュールをロードしようとたときGHCiがソースファイルを見付けられなかった場合、たとえそのモジュールのオブジェクトファイルやインタフェースファイルがあったとしても、エラーメッセージが表示されるだろう。</para>
     </sect2>
@@ -199,7 +199,7 @@ Compiling A                ( A.hs, interpreted )
 
 <para><literal>-fobject-code</literal>オプションを使うと、常にあらゆる物をオブジェクトコードにコンパイルし、決してインタプリタを使わないようにすることができる(<xref linkend="ghci-obj"/>を見よ)。</para>
 
-    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc &ndash;&ndash;make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前にね)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、変更されたモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
+    <para>ヒント: GHCはコンパイル済みの版が最新であることが確かな場合しかコンパイル済みオブジェクトファイルを使わないので、大きいプロジェクトを扱っているときは、ときどき<literal>ghc --make</literal>を実行してプロジェクト全体をコンパイルし(例えば昼食を食べに行く前にね)、解釈実行器を使って作業を続けるというのが良い方法である。コードを変更すると、変更されたモジュールは解釈実行されるが、プロジェクト中のその他の部分は変わらずコンパイル済みのものが使われる。</para>
   </sect1>
 
   <sect1 id="interactive-evaluation">
@@ -1198,9 +1198,9 @@ Just 20
   <sect1 id="ghci-invocation">
     <title>GHCiを起動する</title>
     <indexterm><primary>invoking</primary><secondary>GHCi</secondary></indexterm>
-    <indexterm><primary><option>&ndash;&ndash;interactive</option></primary></indexterm>
+    <indexterm><primary><option>--interactive</option></primary></indexterm>
 
-    <para>GHCiは<literal>ghci</literal>または<literal>ghc &ndash;&ndash;interactive</literal>というコマンドで起動される。一つまたは複数のモジュールやファイル名をコマンド行から指定することもできる。そうすると、GHCiは、プロンプトで<literal>:load <replaceable>module</replaceable></literal>と入力されたときと同じように(<xref linkend="ghci-commands" />を見よ)、指定されたモジュールやファイル(と、それらが依存するモジュール)をロードする。例えば、GHCiを起動して、プログラム(<literal>Main.hs</literal>に最上位モジュールがある)をロードするには、次のように打てば良い。</para>
+    <para>GHCiは<literal>ghci</literal>または<literal>ghc --interactive</literal>というコマンドで起動される。一つまたは複数のモジュールやファイル名をコマンド行から指定することもできる。そうすると、GHCiは、プロンプトで<literal>:load <replaceable>module</replaceable></literal>と入力されたときと同じように(<xref linkend="ghci-commands" />を見よ)、指定されたモジュールやファイル(と、それらが依存するモジュール)をロードする。例えば、GHCiを起動して、プログラム(<literal>Main.hs</literal>に最上位モジュールがある)をロードするには、次のように打てば良い。</para>
 
 <screen>
 $ ghci Main.hs
@@ -1423,10 +1423,10 @@ Prelude> :def mycd mycd
 Prelude> :mycd ..
 </screen>
 
-          <para>あるいは、現在のディレクトリで「<literal>ghc &ndash;&ndash;make Main</literal>」を起動する単純な方法を定義することもできる。</para>
+          <para>あるいは、現在のディレクトリで「<literal>ghc --make Main</literal>」を起動する単純な方法を定義することもできる。</para>
 
 <screen>
-Prelude> :def make (\_ -> return ":! ghc &ndash;&ndash;make Main")
+Prelude> :def make (\_ -> return ":! ghc --make Main")
 </screen>
 
           <para>GHCiへの入力をファイルから読み込むコマンドを定義することもできる。これは、あらかじめ決まった束縛を繰り返しGHCiセッションにロードしたいというときに便利かもしれない。</para>

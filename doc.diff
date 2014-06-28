@@ -1,15 +1,3 @@
-diff -urd 7.6.3-original/ffi-chap.xml original/ffi-chap.xml
---- 7.6.3-original/ffi-chap.xml	2014-06-27 09:19:05.772249332 +0900
-+++ original/ffi-chap.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -274,7 +309,7 @@
-         <filename>M_stub.o</filename> in the final link command line, or
-         you'll get link errors for the missing function(s) (this isn't
-         necessary when building your program with <literal>ghc
--        &ndash;&ndash;make</literal>, as GHC will automatically link in the
-+        --make</literal>, as GHC will automatically link in the
-         correct bits).</para>
- 
-       <sect3 id="using-own-main">
 diff -urd 7.6.3-original/flags.xml original/flags.xml
 --- 7.6.3-original/flags.xml	2014-06-27 09:19:06.103240558 +0900
 +++ original/flags.xml	2014-04-08 03:26:08.000000000 +0900
@@ -54,25 +42,25 @@ diff -urd 7.6.3-original/flags.xml original/flags.xml
 -            <entry>-</entry>
 -          </row>
 -          <row>
--            <entry><option>&ndash;&ndash;supported-extensions</option> or <option>&ndash;&ndash;supported-languages</option></entry>
+-            <entry><option>--supported-extensions</option> or <option>--supported-languages</option></entry>
 -            <entry>display the supported languages and language extensions</entry>
 -            <entry>mode</entry>
 -            <entry>-</entry>
 -          </row>
 -          <row>
--            <entry><option>&ndash;&ndash;info</option></entry>
+-            <entry><option>--info</option></entry>
 -            <entry>display information about the compiler</entry>
 -            <entry>mode</entry>
 -            <entry>-</entry>
 -          </row>
 -          <row>
--            <entry><option>&ndash;&ndash;version</option></entry>
+-            <entry><option>--version</option></entry>
 -            <entry>display GHC version</entry>
 -            <entry>mode</entry>
 -            <entry>-</entry>
 -          </row>
 -          <row>
--            <entry><option>&ndash;&ndash;numeric-version</option></entry>
+-            <entry><option>--numeric-version</option></entry>
 -            <entry>display GHC version (numeric only)</entry>
 -            <entry>mode</entry>
 -            <entry>-</entry>
@@ -82,7 +70,7 @@ diff -urd 7.6.3-original/flags.xml original/flags.xml
 +            <entry>-fno-print-explicit-foralls</entry>
            </row>
            <row>
--            <entry><option>&ndash;&ndash;print-libdir</option></entry>
+-            <entry><option>--print-libdir</option></entry>
 -            <entry>display GHC library directory</entry>
 -            <entry>mode</entry>
 -            <entry>-</entry>
@@ -1161,24 +1149,6 @@ diff -urd 7.6.3-original/ghc.mk original/ghc.mk
 diff -urd 7.6.3-original/ghci.xml original/ghci.xml
 --- 7.6.3-original/ghci.xml	2014-06-27 09:19:06.080241168 +0900
 +++ original/ghci.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -161,7 +161,7 @@
-       <para>or it can be set using the <literal>:set</literal> command
-       from within GHCi (see <xref
-       linkend="ghci-cmd-line-options"/>)<footnote><para>Note that in
--      GHCi, and <option>&ndash;&ndash;make</option> mode, the <option>-i</option>
-+      GHCi, and <option>--make</option> mode, the <option>-i</option>
-       option is used to specify the search path for
-       <emphasis>source</emphasis> files, whereas in standard
-       batch-compilation mode the <option>-i</option> option is used to
-@@ -338,7 +338,7 @@
-     <para>HINT: since GHCi will only use a compiled object file if it
-     can be sure that the compiled version is up-to-date, a good technique
-     when working on a large program is to occasionally run
--    <literal>ghc &ndash;&ndash;make</literal> to compile the whole project (say
-+    <literal>ghc --make</literal> to compile the whole project (say
-     before you go for lunch :-), then continue working in the
-     interpreter.  As you modify code, the changed modules will be
-     interpreted, but the rest of the project will remain
 @@ -358,10 +358,10 @@
  </screen>
  </para>
@@ -1704,19 +1674,6 @@ diff -urd 7.6.3-original/ghci.xml original/ghci.xml
          </listitem>
        </itemizedlist>
      </sect2>
-@@ -1897,10 +1949,10 @@
-   <sect1 id="ghci-invocation">
-     <title>Invoking GHCi</title>
-     <indexterm><primary>invoking</primary><secondary>GHCi</secondary></indexterm>
--    <indexterm><primary><option>&ndash;&ndash;interactive</option></primary></indexterm>
-+    <indexterm><primary><option>--interactive</option></primary></indexterm>
- 
-     <para>GHCi is invoked with the command <literal>ghci</literal> or
--    <literal>ghc &ndash;&ndash;interactive</literal>.  One or more modules or
-+    <literal>ghc --interactive</literal>.  One or more modules or
-     filenames can also be specified on the command line; this
-     instructs GHCi to load the specified modules or filenames (and all
-     the modules they depend on), just as if you had said
 @@ -1970,17 +2022,17 @@
        searches the following places for libraries, in this order:</para>
  
@@ -2118,23 +2075,6 @@ diff -urd 7.6.3-original/ghci.xml original/ghci.xml
  
  <screen>
  Prelude> let mycd d = Directory.setCurrentDirectory d >> return ""
-@@ -2241,12 +2382,12 @@
- Prelude> :mycd ..
- </screen>
- 
--	  <para>Or I could define a simple way to invoke
--	  &ldquo;<literal>ghc &ndash;&ndash;make Main</literal>&rdquo; in the
--	  current directory:</para>
-+          <para>Or I could define a simple way to invoke
-+          &ldquo;<literal>ghc --make Main</literal>&rdquo; in the
-+          current directory:</para>
- 
- <screen>
--Prelude> :def make (\_ -> return ":! ghc &ndash;&ndash;make Main")
-+Prelude> :def make (\_ -> return ":! ghc --make Main")
- </screen>
- 
-           <para>We can define a command that reads GHCi input from a
 @@ -2268,86 +2409,86 @@
            existing command name results in an error unless the
            <literal>:def!</literal> form is used, in which case the old
@@ -7235,26 +7175,6 @@ diff -urd 7.6.3-original/intro.xml original/intro.xml
 diff -urd 7.6.3-original/packages.xml original/packages.xml
 --- 7.6.3-original/packages.xml	2014-06-27 09:19:06.055241831 +0900
 +++ original/packages.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -13,7 +13,7 @@
-     url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>.</para>
- 
-   <para>Using a package couldn't be simpler: if you're using
--    <option>&ndash;&ndash;make</option> or GHCi, then most of the installed packages will be
-+    <option>--make</option> or GHCi, then most of the installed packages will be
-     automatically available to your program without any further options.  The
-     exceptions to this rule are covered below in <xref
-       linkend="using-packages" />.</para>
-@@ -147,8 +147,8 @@
-             or dynamically is controlled by the flag
-             pair <option>-static</option>/<option>-dynamic</option>.</para>
- 
--          <para>In <option>&ndash;&ndash;make</option> mode
--            and <option>&ndash;&ndash;interactive</option> mode (see
-+          <para>In <option>--make</option> mode
-+            and <option>--interactive</option> mode (see
-             <xref linkend="modes" />), the compiler normally
-             determines which packages are required by the current
-             Haskell modules, and links only those.  In batch mode
 @@ -252,8 +252,8 @@
            </indexterm></term>
          <listitem>
@@ -7266,69 +7186,6 @@ diff -urd 7.6.3-original/packages.xml original/packages.xml
          </listitem>
        </varlistentry>
  
-@@ -961,9 +961,9 @@
- 
-       <varlistentry>
-         <term>
--          <option>&ndash;&ndash;force</option>
-+          <option>--force</option>
-           <indexterm><primary>
--              <option>&ndash;&ndash;force</option>
-+              <option>--force</option>
-             </primary></indexterm>
-         </term>
-         <listitem>
-@@ -977,7 +977,7 @@
- 
-       <varlistentry>
-         <term>
--          <option>&ndash;&ndash;global</option><indexterm><primary><option>&ndash;&ndash;global</option></primary>
-+          <option>--global</option><indexterm><primary><option>--global</option></primary>
-           </indexterm>
-         </term>
-         <listitem>
-@@ -991,7 +991,7 @@
- 
-       <varlistentry>
-         <term>
--          <option>&ndash;&ndash;help</option><indexterm><primary><option>&ndash;&ndash;help</option></primary>
-+          <option>--help</option><indexterm><primary><option>--help</option></primary>
-           </indexterm>
-         </term>
-         <term>
-@@ -1005,7 +1005,7 @@
- 
-       <varlistentry>
-         <term>
--          <option>&ndash;&ndash;user</option><indexterm><primary><option>&ndash;&ndash;user</option></primary>
-+          <option>--user</option><indexterm><primary><option>--user</option></primary>
-           </indexterm>
-         </term>
-         <listitem>
-@@ -1040,7 +1040,7 @@
-           </indexterm>
-         </term>
-         <term>
--          <option>&ndash;&ndash;version</option><indexterm><primary><option>&ndash;&ndash;version</option></primary>
-+          <option>--version</option><indexterm><primary><option>--version</option></primary>
-           </indexterm>
-         </term>
-         <listitem>
-@@ -1115,11 +1115,11 @@
-           it.  To build one manually, the following
-           GNU <command>ld</command> command can be used:</para>
- 
--<screen>ld -r &ndash;&ndash;whole-archive -o HSfoo.o libHSfoo.a</screen>
-+<screen>ld -r --whole-archive -o HSfoo.o libHSfoo.a</screen>
- 
-         <para>(replace
--          <literal>&ndash;&ndash;whole-archive</literal> with
--          <literal>&ndash;all_load</literal> on MacOS X)</para>
-+          <literal>--whole-archive</literal> with
-+          <literal>-all_load</literal> on MacOS X)</para>
-       </listitem>
-       <listitem>
-         <para>When building the package as shared library, GHC can be used to
 diff -urd 7.6.3-original/parallel.xml original/parallel.xml
 --- 7.6.3-original/parallel.xml	2014-06-27 09:19:05.750249915 +0900
 +++ original/parallel.xml	2014-04-08 03:26:08.000000000 +0900
@@ -7384,15 +7241,6 @@ diff -urd 7.6.3-original/phases.xml original/phases.xml
            <constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant>
            <indexterm><primary><constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant></primary></indexterm>
          </term>
-@@ -678,7 +704,7 @@
-         </term>
-         <listitem>
-           <para>Omits the link step.  This option can be used with
--            <option>&ndash;&ndash;make</option> to avoid the automatic linking
-+            <option>--make</option> to avoid the automatic linking
-             that takes place if the program contains a <literal>Main</literal>
-             module.</para>
-         </listitem>
 @@ -706,7 +732,7 @@
            <indexterm><primary><option>-framework</option></primary></indexterm>
          </term>
@@ -7471,15 +7319,6 @@ diff -urd 7.6.3-original/profiling.xml original/profiling.xml
        </blockquote>
  
        <para>In particular, constructors are <emphasis>not</emphasis>
-@@ -1071,7 +1077,7 @@
-   </sect1>
- 
-   <sect1 id="hp2ps">
--    <title><command>hp2ps</command>&ndash;&ndash;heap profile to PostScript</title>
-+    <title><command>hp2ps</command>--heap profile to PostScript</title>
- 
-     <indexterm><primary><command>hp2ps</command></primary></indexterm>
-     <indexterm><primary>heap profiles</primary></indexterm>
 @@ -1626,8 +1632,10 @@
      --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
      --srcdir=DIR                  path to source directory of .hs files
@@ -7703,15 +7542,6 @@ diff -urd 7.6.3-original/profiling.xml original/profiling.xml
 diff -urd 7.6.3-original/runtime_control.xml original/runtime_control.xml
 --- 7.6.3-original/runtime_control.xml	2014-06-27 09:19:06.065241566 +0900
 +++ original/runtime_control.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -100,7 +100,7 @@
-         <para>
-           If you absolutely positively want all the rest of the options
-           in a command line to go to the program (and not the RTS), use a
--          <option>&ndash;&ndash;RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>.
-+          <option>--RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>.
-         </para>
- 
-         <para>
 @@ -676,10 +676,12 @@
            <indexterm><primary>stack, maximum size</primary></indexterm>
          </term>
@@ -7950,33 +7780,6 @@ diff -urd 7.6.3-original/separate_compilation.xml original/separate_compilation.
  </itemizedlist>
  </para>
      </sect2>
-@@ -1037,7 +1051,7 @@
- 	locate any imported modules that come from packages.  The
- 	package modules won't be included in the dependencies
- 	generated, though (but see the
--	<option>&ndash;&ndash;include-pkg-deps</option> option below).</para>
-+	<option>--include-pkg-deps</option> option below).</para>
- 
- 	<para>The dependency generation phase of GHC can take some
-         additional options, which you may find useful.
-@@ -1104,7 +1118,7 @@
- 	  </varlistentry>
- 
- 	  <varlistentry>
--	    <term><option>&ndash;&ndash;exclude-module=&lt;file&gt;</option></term>
-+	    <term><option>--exclude-module=&lt;file&gt;</option></term>
- 	    <listitem>
- 	      <para>Regard <filename>&lt;file&gt;</filename> as
-               "stable"; i.e., exclude it from having dependencies on
-@@ -1113,7 +1127,7 @@
- 	  </varlistentry>
- 
- 	  <varlistentry>
--	    <term><option>&ndash;&ndash;include-pkg-deps</option></term>
-+	    <term><option>--include-pkg-deps</option></term>
- 	    <listitem>
- 	      <para>Regard modules imported from packages as unstable,
-               i.e., generate dependencies on any imported package modules
 diff -urd 7.6.3-original/ug-book.xml original/ug-book.xml
 --- 7.6.3-original/ug-book.xml	2014-06-27 09:19:05.733250365 +0900
 +++ original/ug-book.xml	2014-06-27 09:31:23.084721605 +0900
@@ -8008,15 +7811,6 @@ Only in 7.6.3-original: users_guide
 diff -urd 7.6.3-original/using.xml original/using.xml
 --- 7.6.3-original/using.xml	2014-06-27 09:19:05.746250021 +0900
 +++ original/using.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -183,7 +183,7 @@
-       <varlistentry>
-         <term>Mode flags</term>
-         <listitem>
--          <para>For example, <option>&ndash;&ndash;make</option> or <option>-E</option>.
-+          <para>For example, <option>--make</option> or <option>-E</option>.
-             There may only be a single mode flag on the command line.  The
-             available modes are listed in <xref linkend="modes"/>.</para>
-         </listitem>
 @@ -308,6 +308,7 @@
  
    <sect1 id="modes">
@@ -8025,55 +7819,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
  
      <para>
        GHC's behaviour is firstly controlled by a mode flag.  Only one
-@@ -341,10 +342,10 @@
- 
-       <varlistentry>
-         <term>
--          <cmdsynopsis><command>ghc &ndash;&ndash;make</command>
-+          <cmdsynopsis><command>ghc --make</command>
-           </cmdsynopsis>
-           <indexterm><primary>make mode</primary></indexterm>
--          <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
-+          <indexterm><primary><option>--make</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>In this mode, GHC will build a multi-module Haskell
-@@ -357,7 +358,7 @@
-           <para>
-             This mode is the default if there are any Haskell
-             source files mentioned on the command line, and in this case
--            the <option>&ndash;&ndash;make</option> option can be omitted.
-+            the <option>--make</option> option can be omitted.
-           </para>
-         </listitem>
-       </varlistentry>
-@@ -435,7 +436,7 @@
-           <cmdsynopsis>
-           <command>ghc --help</command> <command>ghc -?</command>
-             </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;help</option></primary></indexterm>
-+          <indexterm><primary><option>--help</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Cause GHC to spew a long usage message to standard
-@@ -448,7 +449,7 @@
-           <cmdsynopsis>
-             <command>ghc --show-iface <replaceable>file</replaceable></command>
-           </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;--show-iface</option></primary></indexterm>
-+          <indexterm><primary><option>--show-iface</option></primary></indexterm>
-         </term>
-         <listitem>
-               <para>Read the interface in
-@@ -463,7 +464,7 @@
-             <command>ghc --supported-extensions</command>
-             <command>ghc --supported-languages</command>
-           </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;supported-extensions</option></primary><primary><option>&ndash;&ndash;supported-languages</option></primary></indexterm>
-+          <indexterm><primary><option>--supported-extensions</option></primary><primary><option>--supported-languages</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Print the supported language extensions.</para>
 @@ -473,9 +474,21 @@
        <varlistentry>
          <term>
@@ -8092,76 +7837,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
 +          <cmdsynopsis>
              <command>ghc --info</command>
            </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;info</option></primary></indexterm>
-+          <indexterm><primary><option>--info</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Print information about the compiler.</para>
-@@ -489,7 +502,7 @@
-             <command>ghc -V</command>
-           </cmdsynopsis>
-           <indexterm><primary><option>-V</option></primary></indexterm>
--          <indexterm><primary><option>&ndash;&ndash;version</option></primary></indexterm>
-+          <indexterm><primary><option>--version</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Print a one-line string including GHC's version number.</para>
-@@ -501,7 +514,7 @@
-           <cmdsynopsis>
-             <command>ghc --numeric-version</command>
-           </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;numeric-version</option></primary></indexterm>
-+          <indexterm><primary><option>--numeric-version</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Print GHC's numeric version number only.</para>
-@@ -513,7 +526,7 @@
-           <cmdsynopsis>
-             <command>ghc --print-libdir</command>
-           </cmdsynopsis>
--          <indexterm><primary><option>&ndash;&ndash;print-libdir</option></primary></indexterm>
-+          <indexterm><primary><option>--print-libdir</option></primary></indexterm>
-         </term>
-         <listitem>
-           <para>Print the path to GHC's library directory.  This is
-@@ -530,8 +543,8 @@
-     </variablelist>
- 
-     <sect2 id="make-mode">
--      <title>Using <command>ghc</command> <option>&ndash;&ndash;make</option></title>
--      <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
-+      <title>Using <command>ghc</command> <option>--make</option></title>
-+      <indexterm><primary><option>--make</option></primary></indexterm>
-       <indexterm><primary>separate compilation</primary></indexterm>
- 
-       <para>In this mode, GHC will build a multi-module Haskell program by following
-@@ -542,7 +555,7 @@
-       program like this:</para>
- 
- <screen>
--ghc &ndash;&ndash;make Main.hs
-+ghc --make Main.hs
- </screen>
- 
-       <para>
-@@ -563,7 +576,7 @@
-       program will also be linked into an executable.</para>
- 
-       <para>The main advantages to using <literal>ghc
--      &ndash;&ndash;make</literal> over traditional
-+      --make</literal> over traditional
-       <literal>Makefile</literal>s are:</para>
- 
-       <itemizedlist>
-@@ -571,7 +584,7 @@
-           <para>GHC doesn't have to be restarted for each compilation,
-           which means it can cache information between compilations.
-           Compiling a multi-module program with <literal>ghc
--          &ndash;&ndash;make</literal> can be up to twice as fast as
-+          --make</literal> can be up to twice as fast as
-           running <literal>ghc</literal> individually on each source
-           file.</para>
-         </listitem>
 @@ -584,11 +597,16 @@
            invoked, so the dependencies never get out of sync with the
            source.</para>
@@ -8174,12 +7849,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
        </itemizedlist>
  
        <para>Any of the command-line options described in the rest of
-       this chapter can be used with
--      <option>&ndash;&ndash;make</option>, but note that any options
-+      <option>--make</option>, but note that any options
-       you give on the command line will apply to all the source files
-       compiled, so if you want any options to apply to a single source
-       file only, you'll need to use an <literal>OPTIONS_GHC</literal>
 @@ -774,9 +792,8 @@
    </sect1>
  
@@ -8191,17 +7860,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
      <indexterm><primary>verbosity options</primary></indexterm>
  
      <para>See also the <option>--help</option>, <option>--version</option>, <option>--numeric-version</option>,
-@@ -828,8 +845,8 @@
-               <listitem>
-                 <para>Minimal verbosity: print one line per
-                 compilation (this is the default when
--                <option>&ndash;&ndash;make</option> or
--                <option>&ndash;&ndash;interactive</option> is on).</para>
-+                <option>--make</option> or
-+                <option>--interactive</option> is on).</para>
-               </listitem>
-             </varlistentry>
- 
 @@ -864,6 +881,43 @@
          </listitem>
        </varlistentry>
@@ -9194,133 +8852,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
            </listitem>
          </varlistentry>
  
-diff -urd 7.6.3-original/utils.xml original/utils.xml
---- 7.6.3-original/utils.xml	2014-06-27 09:19:05.766249491 +0900
-+++ original/utils.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -187,7 +187,7 @@
-       <variablelist>
- 	<varlistentry>
- 	  <term><literal>-o FILE</literal> or
--	  <literal>&ndash;&ndash;output=FILE</literal></term>
-+	  <literal>--output=FILE</literal></term>
- 	  <listitem>
- 	    <para>Name of the Haskell file.</para>
- 	  </listitem>
-@@ -195,7 +195,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-t FILE</literal> or
--	  <literal>&ndash;&ndash;template=FILE</literal></term>
-+	  <literal>--template=FILE</literal></term>
- 	  <listitem>
- 	    <para>The template file (see below).</para>
- 	  </listitem>
-@@ -203,7 +203,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-c PROG</literal> or
--	  <literal>&ndash;&ndash;cc=PROG</literal></term>
-+	  <literal>--cc=PROG</literal></term>
- 	  <listitem>
- 	    <para>The C compiler to use (default:
- 	    <command>gcc</command>)</para>
-@@ -212,7 +212,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-l PROG</literal> or
--	  <literal>&ndash;&ndash;ld=PROG</literal></term>
-+	  <literal>--ld=PROG</literal></term>
- 	  <listitem>
- 	    <para>The linker to use (default:
- 	    <command>gcc</command>).</para>
-@@ -221,7 +221,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-C FLAG</literal> or
--	  <literal>&ndash;&ndash;cflag=FLAG</literal></term>
-+	  <literal>--cflag=FLAG</literal></term>
- 	  <listitem>
- 	    <para>An extra flag to pass to the C compiler.</para>
- 	  </listitem>
-@@ -236,7 +236,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-L FLAG</literal> or
--	  <literal>&ndash;&ndash;lflag=FLAG</literal></term>
-+	  <literal>--lflag=FLAG</literal></term>
- 	  <listitem>
- 	    <para>An extra flag to pass to the linker.</para>
- 	  </listitem>
-@@ -244,7 +244,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-i FILE</literal> or
--	  <literal>&ndash;&ndash;include=FILE</literal></term>
-+	  <literal>--include=FILE</literal></term>
- 	  <listitem>
- 	    <para>As if the appropriate <literal>#include</literal>
-             directive was placed in the source.</para>
-@@ -253,7 +253,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-D NAME[=VALUE]</literal> or
--	  <literal>&ndash;&ndash;define=NAME[=VALUE]</literal></term>
-+	  <literal>--define=NAME[=VALUE]</literal></term>
- 	  <listitem>
- 	    <para>As if the appropriate <literal>#define</literal>
-             directive was placed in the source.</para>
-@@ -261,7 +261,7 @@
- 	</varlistentry>
- 
- 	<varlistentry>
--	  <term><literal>&ndash;&ndash;no-compile</literal></term>
-+	  <term><literal>--no-compile</literal></term>
- 	  <listitem>
- 	    <para>Stop after writing out the intermediate C program to disk.
- 	    The file name for the intermediate C program is the input file name
-@@ -271,7 +271,7 @@
- 
- 	<varlistentry>
- 	  <term><literal>-k</literal> or
--	  <literal>&ndash;&ndash;keep-files</literal></term>
-+	  <literal>--keep-files</literal></term>
- 	  <listitem>
- 	    <para>Proceed as normal, but do not delete any intermediate files.</para>
- 	  </listitem>
-@@ -279,14 +279,14 @@
- 
- 	<varlistentry>
- 	  <term><literal>-x</literal> or
--	  <literal>&ndash;&ndash;cross-compile</literal></term>
-+	  <literal>--cross-compile</literal></term>
- 	  <listitem>
- 	    <para>Activate cross-compilation mode (see <xref linkend="hsc2hs_cross"/>).</para>
- 	  </listitem>
- 	</varlistentry>
- 
- 	<varlistentry>
--	  <term><literal>&ndash;&ndash;cross-safe</literal></term>
-+	  <term><literal>--cross-safe</literal></term>
- 	  <listitem>
- 	    <para>Restrict the .hsc directives to those supported by the
-             <literal>--cross-compile</literal> mode (see <xref linkend="hsc2hs_cross"/>).
-@@ -298,14 +298,14 @@
- 
- 
- 	<varlistentry>
--	  <term><literal>-?</literal> or <literal>&ndash;&ndash;help</literal></term>
-+	  <term><literal>-?</literal> or <literal>--help</literal></term>
- 	  <listitem>
- 	    <para>Display a summary of the available flags and exit successfully.</para>
- 	  </listitem>
- 	</varlistentry>
- 
- 	<varlistentry>
--	  <term><literal>-V</literal> or <literal>&ndash;&ndash;version</literal></term>
-+	  <term><literal>-V</literal> or <literal>--version</literal></term>
- 	  <listitem>
- 	    <para>Output version information and exit successfully.</para>
- 	  </listitem>
 diff -urd 7.6.3-original/what_glasgow_exts_does.gen.xml original/what_glasgow_exts_does.gen.xml
 --- 7.6.3-original/what_glasgow_exts_does.gen.xml	2014-06-27 09:19:05.984243713 +0900
 +++ original/what_glasgow_exts_does.gen.xml	2014-06-27 09:59:33.682802308 +0900
@@ -9332,54 +8863,3 @@ diff -urd 7.6.3-original/what_glasgow_exts_does.gen.xml original/what_glasgow_ex
  <option>-XExistentialQuantification</option>,
  <option>-XUnicodeSyntax</option>,
  <option>-XPostfixOperators</option>,
-diff -urd 7.6.3-original/win32-dlls.xml original/win32-dlls.xml
---- 7.6.3-original/win32-dlls.xml	2014-06-27 09:19:05.962244296 +0900
-+++ original/win32-dlls.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -313,7 +313,7 @@
- 
- <para>
- <indexterm><primary>Creating a Win32 DLL</primary></indexterm>
--<indexterm><primary>&ndash;shared</primary></indexterm>
-+<indexterm><primary>-shared</primary></indexterm>
- Sealing up your Haskell library inside a DLL is straightforward;
- compile up the object files that make up the library, and then build
- the DLL by issuing a command of the form:
-@@ -321,12 +321,12 @@
- 
- <para>
- <screen>
--ghc &ndash;shared -o foo.dll bar.o baz.o wibble.a -lfooble
-+ghc -shared -o foo.dll bar.o baz.o wibble.a -lfooble
- </screen>
- </para>
- 
- <para>
--By feeding the ghc compiler driver the option <option>&ndash;shared</option>, it
-+By feeding the ghc compiler driver the option <option>-shared</option>, it
- will build a DLL rather than produce an executable. The DLL will
- consist of all the object files and archives given on the command
- line.
-@@ -366,12 +366,12 @@
- <listitem>
- <para>
- By default, the entry points of all the object files will be exported from
--the DLL when using <option>&ndash;shared</option>. Should you want to constrain
-+the DLL when using <option>-shared</option>. Should you want to constrain
- this, you can specify the <emphasis>module definition file</emphasis> to use
- on the command line as follows:
- 
- <screen>
--ghc &ndash;shared -o .... MyDef.def
-+ghc -shared -o .... MyDef.def
- </screen>
- 
- See Microsoft documentation for details, but a module definition file
-@@ -390,7 +390,7 @@
- 
- <listitem>
- <para>
--In addition to creating a DLL, the <option>&ndash;shared</option> option also
-+In addition to creating a DLL, the <option>-shared</option> option also
- creates an import library. The import library name is derived from the
- name of the DLL, as follows:
- 

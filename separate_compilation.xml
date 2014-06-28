@@ -628,7 +628,7 @@ M.o : X.hi-boot
 
         <para>デフォルトでは、<command>ghc -M</command>は全ての依存関係を生成し、それを<filename>makefile</filename>(存在しなければ<filename>Makefile</filename>)の末尾に連結する。この時、追加部分は「<literal>&num; DO NOT DELETE: Beginning of Haskell dependencies</literal>」と「<literal>&num; DO NOT DELETE: End of Haskell dependencies</literal>」の二行で囲われる。これらの行がすでに存在するときは、先に古い依存関係が消去される。</para>
 
-        <para>コンパイル時に使うのと同じ<option>-package</option>オプションを<literal>ghc -M</literal>にも渡すのを忘れないように。こうすることで、依存関係生成器がパッケージ由来の被インポートモジュールの場所を把握できるようになる。ただし、パッケージモジュールは生成される依存関係には含まれない。(しかし下記の<option>&ndash;&ndash;include-pkg-deps</option>オプションを見よ)</para>
+        <para>コンパイル時に使うのと同じ<option>-package</option>オプションを<literal>ghc -M</literal>にも渡すのを忘れないように。こうすることで、依存関係生成器がパッケージ由来の被インポートモジュールの場所を把握できるようになる。ただし、パッケージモジュールは生成される依存関係には含まれない。(しかし下記の<option>--include-pkg-deps</option>オプションを見よ)</para>
 
         <para>GHCの依存関係生成の段階にいくつかのオプションを渡すことができるので、活用すると便利かもしれない。依存関係生成器に影響を与えるオプションは以下のものである。</para>
 
@@ -662,14 +662,14 @@ M.o : X.hi-boot
 	  </varlistentry>
 
 	  <varlistentry>
-	    <term><option>&ndash;&ndash;exclude-module=&lt;file&gt;</option></term>
+	    <term><option>--exclude-module=&lt;file&gt;</option></term>
 	    <listitem>
               <para><filename>&lt;file&gt;</filename>が「安定して」いるとみなす。つまり、このファイルへの依存性を含めない。</para>
 	    </listitem>
 	  </varlistentry>
 
 	  <varlistentry>
-	    <term><option>&ndash;&ndash;include-pkg-deps</option></term>
+	    <term><option>--include-pkg-deps</option></term>
 	    <listitem>
               <para>パッケージからインポートされているモジュールを不安定だとみなす。つまり、インポートされたパッケージモジュールへの依存性を全て生成する。(これには<literal>Prelude</literal>や、その他の標準Haskellライブラリも含まれる)。依存関係がパッケージの中身まで再帰的に追跡されることはない。生成されるのは、ホームパッケージのモジュールから、それが直接インポートするパッケージ外のモジュールへの依存性だけである。このオプションは通常、各種のシステムライブラリによってのみ使われる。</para>
 	    </listitem>

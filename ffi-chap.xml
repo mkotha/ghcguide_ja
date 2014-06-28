@@ -170,7 +170,7 @@ extern HsInt foo(HsInt a0);</programlisting>
 
       <para><filename>foo_stub.c</filename>と<filename>foo_stub.h</filename>は<option>-stubdir</option>を使って別の場所に生成するようにできる。<xref linkend="options-output"/>を見よ。</para>
 
-      <para>プログラムをリンクするとき、最終的なリンクのコマンド行に<filename>M_stub.o</filename>を含めるのを忘れないように。これをしないと、関数が足りない旨のエラーが発生する。(これは、<literal>ghc &ndash;&ndash;make</literal>でプログラムをビルドする時には不要である。GHCが自動的に必要なものをリンクするので)</para>
+      <para>プログラムをリンクするとき、最終的なリンクのコマンド行に<filename>M_stub.o</filename>を含めるのを忘れないように。これをしないと、関数が足りない旨のエラーが発生する。(これは、<literal>ghc --make</literal>でプログラムをビルドする時には不要である。GHCが自動的に必要なものをリンクするので)</para>
 
       <sect3 id="using-own-main"> 
 	<title>自分で用意した<literal>main()</literal>を使う</title>

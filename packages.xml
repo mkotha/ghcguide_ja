@@ -7,7 +7,7 @@
  
   <para>パッケージとは、Haskellモジュールから成るライブラリで、コンパイラが把握している。GHCにはいくつかのパッケージが付属している。同梱の<ulink url="../libraries/index.html">ライブラリ説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/libraries/index.html">web上の最新版</ulink>)を見よ。また、<ulink url="http://hackage.haskell.org/packages/hackage.html">HackageDB</ulink>から別のライブラリを入手してインストールすることができる。</para>
 
-  <para>パッケージを使う手順はこの上なく単純である。<option>&ndash;&ndash;make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
+  <para>パッケージを使う手順はこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
   <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="&libraryCabalLocation;/Distribution-Simple.html">Distribution.Simple</ulink>)を見よ。</para>
 
@@ -90,7 +90,7 @@ exposed-modules: Network.BSD,
 
           <para>さらに、<option>-package <replaceable>P</replaceable></option>オプションはパッケージ<replaceable>P</replaceable>が生成される実行ファイルや共有オブジェクトにリンクされるようにする。パッケージのライブラリが静的にリンクされるか動的にリンクされるかは<option>-static</option>/<option>-dynamic</option>の二つのフラグによって制御される。</para>
 
-          <para><option>&ndash;&ndash;make</option>モードと<option>&ndash;&ndash;interactive</option>モード(<xref linkend="modes" />を見よ)では、通常、コンパイラはどのパッケージが現在のHaskellモジュール群から必要とされているかを判断し、それらだけをリンクする。一方、一括処理モードでは、依存性情報が利用できず、リンク時に<option>-package</option>を明示的に与えなければならない。他に<option>-package</option>を使ってパッケージのリンクを強制しなければならないのは、そのパッケージがHaskellモジュールを一つも含んでいない(たとえばCライブラリのみとか)場合である。その場合、GHCがそのパッケージへの依存を発見することはないので、明示的に言及する必要がある。</para>
+          <para><option>--make</option>モードと<option>--interactive</option>モード(<xref linkend="modes" />を見よ)では、通常、コンパイラはどのパッケージが現在のHaskellモジュール群から必要とされているかを判断し、それらだけをリンクする。一方、一括処理モードでは、依存性情報が利用できず、リンク時に<option>-package</option>を明示的に与えなければならない。他に<option>-package</option>を使ってパッケージのリンクを強制しなければならないのは、そのパッケージがHaskellモジュールを一つも含んでいない(たとえばCライブラリのみとか)場合である。その場合、GHCがそのパッケージへの依存を発見することはないので、明示的に言及する必要がある。</para>
 
           <para>例えば、<filename>Foo.o</filename>と<filename>Main.o</filename>の二つのオブジェクトから成るプログラムをリンクするとき、<literal>network</literal>パッケージを使っているなら、GHCに次のように<literal>-package</literal>フラグを渡す必要がある。
 
@@ -602,9 +602,9 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
       <varlistentry>
         <term>
-          <option>&ndash;&ndash;force</option>
+          <option>--force</option>
           <indexterm><primary>
-              <option>&ndash;&ndash;force</option>
+              <option>--force</option>
             </primary></indexterm>
         </term>
         <listitem>
@@ -614,7 +614,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
       <varlistentry>
         <term>
-          <option>&ndash;&ndash;global</option><indexterm><primary><option>&ndash;&ndash;global</option></primary>
+          <option>--global</option><indexterm><primary><option>--global</option></primary>
           </indexterm>
         </term>
         <listitem>
@@ -624,7 +624,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
       <varlistentry>
         <term>
-          <option>&ndash;&ndash;help</option><indexterm><primary><option>&ndash;&ndash;help</option></primary>
+          <option>--help</option><indexterm><primary><option>--help</option></primary>
           </indexterm>
         </term>
         <term>
@@ -638,7 +638,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
       <varlistentry>
         <term>
-          <option>&ndash;&ndash;user</option><indexterm><primary><option>&ndash;&ndash;user</option></primary>
+          <option>--user</option><indexterm><primary><option>--user</option></primary>
           </indexterm>
         </term>
         <listitem>
@@ -666,7 +666,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
           </indexterm>
         </term>
         <term>
-          <option>&ndash;&ndash;version</option><indexterm><primary><option>&ndash;&ndash;version</option></primary>
+          <option>--version</option><indexterm><primary><option>--version</option></primary>
           </indexterm>
         </term>
         <listitem>
@@ -702,9 +702,9 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
 
         <para><literal>HSfoo.o</literal>ファイルはCabalによって自動的にビルドされる。これを無効にするには<option>--disable-library-for-ghci</option>を使う。手動でビルドするには、以下のGNU <command>ld</command>コマンドを使うことができる。</para>
 
-<screen>ld -r &ndash;&ndash;whole-archive -o HSfoo.o libHSfoo.a</screen>
+<screen>ld -r --whole-archive -o HSfoo.o libHSfoo.a</screen>
 
-        <para>(MacOS Xなら<literal>&ndash;&ndash;whole-archive</literal>の代わりに<literal>&ndash;all_load</literal>を使うこと。)</para>
+        <para>(MacOS Xなら<literal>--whole-archive</literal>の代わりに<literal>-all_load</literal>を使うこと。)</para>
         
       </listitem>
       <listitem>

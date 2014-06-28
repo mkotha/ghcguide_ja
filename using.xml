@@ -109,7 +109,7 @@ module X where
       <varlistentry>
         <term>モード指定フラグ</term>
 	<listitem>
-          <para>例えば<option>&ndash;&ndash;make</option>や<option>-E</option>がこれである。モード指定フラグはコマンド行から一つだけ指定しても良い。利用可能なモードの一覧は<xref linkend="modes"/>にある。</para>
+          <para>例えば<option>--make</option>や<option>-E</option>がこれである。モード指定フラグはコマンド行から一つだけ指定しても良い。利用可能なモードの一覧は<xref linkend="modes"/>にある。</para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -237,15 +237,15 @@ module X where
       <varlistentry>
 	<term>
 	  <cmdsynopsis><command>ghc</command>
-	    <arg choice='plain'>&ndash;&ndash;make</arg>
+	    <arg choice='plain'>--make</arg>
 	  </cmdsynopsis>
           <indexterm><primary>make mode</primary></indexterm>
-          <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
+          <indexterm><primary><option>--make</option></primary></indexterm>
 	</term>
 	<listitem>
           <para>このモードでは、GHCは複数のモジュールから成るHaskellのプログラムを、依存性を解析しながら自動的にビルドする。単純なHaskellプログラムなら、これは<command>make</command>を使うのに比べてずっと簡単で、しかも速い。makeモードは<xref linkend="make-mode"/>で説明されている。</para>
 
-          <para>コマンド行中に一つでもHaskellソースファイルがあるなら、このモードがデフォルトであり、この場合<option>&ndash;&ndash;make</option>オプションは省略できる。</para>
+          <para>コマンド行中に一つでもHaskellソースファイルがあるなら、このモードがデフォルトであり、この場合<option>--make</option>オプションは省略できる。</para>
 	</listitem>
       </varlistentry>
 
@@ -308,7 +308,7 @@ module X where
           <cmdsynopsis>
             <command>ghc --help</command> <command>ghc -?</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;help</option></primary></indexterm>
+          <indexterm><primary><option>--help</option></primary></indexterm>
         </term>
 	<listitem>
           <para>使いかたに関する長いメッセージを標準出力に吐いて、終了する。</para>
@@ -320,7 +320,7 @@ module X where
           <cmdsynopsis>
             <command>ghc --show-iface <replaceable>file</replaceable></command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;--show-iface</option></primary></indexterm>
+          <indexterm><primary><option>----show-iface</option></primary></indexterm>
         </term>
 	<listitem>
               <para><replaceable>file</replaceable>中のインタフェースを読んで、それをテキストとして<literal>stdout</literal>にダンプする。例えば、<literal>ghc --show-iface M.hi</literal>のようにする。</para>
@@ -333,7 +333,7 @@ module X where
             <command>ghc --supported-extensions</command>
             <command>ghc --supported-languages</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;supported-extensions</option></primary><primary><option>&ndash;&ndash;supported-languages</option></primary></indexterm>
+          <indexterm><primary><option>--supported-extensions</option></primary><primary><option>--supported-languages</option></primary></indexterm>
         </term>
 	<listitem>
 	  <para>対応している言語拡張を表示する。</para>
@@ -345,7 +345,7 @@ module X where
           <cmdsynopsis>
             <command>ghc --info</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;info</option></primary></indexterm>
+          <indexterm><primary><option>--info</option></primary></indexterm>
         </term>
 	<listitem>
           <para>コンパイラに関する情報を表示する。</para>
@@ -359,7 +359,7 @@ module X where
             <command>ghc -V</command>
           </cmdsynopsis>
           <indexterm><primary><option>-V</option></primary></indexterm>
-          <indexterm><primary><option>&ndash;&ndash;version</option></primary></indexterm>
+          <indexterm><primary><option>--version</option></primary></indexterm>
         </term>
 	<listitem>
           <para>GHCのバージョン番号を含む一行の文字列を印字する。</para>
@@ -371,7 +371,7 @@ module X where
           <cmdsynopsis>
             <command>ghc --numeric-version</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;numeric-version</option></primary></indexterm>
+          <indexterm><primary><option>--numeric-version</option></primary></indexterm>
         </term>
 	<listitem>
           <para>GHCの数値的なバージョン番号のみを印字する。</para>
@@ -383,7 +383,7 @@ module X where
 	  <cmdsynopsis>
             <command>ghc --print-libdir</command>
           </cmdsynopsis>
-          <indexterm><primary><option>&ndash;&ndash;print-libdir</option></primary></indexterm>
+          <indexterm><primary><option>--print-libdir</option></primary></indexterm>
         </term>
 	<listitem>
           <para>GHCのライブラリディレクトリのパスを表示する。これはGHCのライブラリファイル、インタフェースファイル、およびインクルードファイルが置かれているディレクトリツリーの最上位である。(Unixではふつう<literal>/usr/local/lib/ghc-5.04</literal>のようなところである)これはパッケージ設定ファイルにおける<literal>libdir</literal><indexterm><primary><literal>libdir</literal></primary></indexterm>の値である。(<xref linkend="packages"/>を見よ)</para>
@@ -393,14 +393,14 @@ module X where
     </variablelist>
 
     <sect2 id="make-mode">
-      <title><command>ghc</command> <option>&ndash;&ndash;make</option>を使う</title>
-      <indexterm><primary><option>&ndash;&ndash;make</option></primary></indexterm>
+      <title><command>ghc</command> <option>--make</option>を使う</title>
+      <indexterm><primary><option>--make</option></primary></indexterm>
       <indexterm><primary>separate compilation</primary></indexterm>
 
       <para>このモードではGHCは複数のモジュールから成るプログラムをビルドする。このとき、GHCは根となる一つ以上のモジュール(ふつうは<literal>Main</literal>だけ)から出発して依存性を追跡する。例えば、<literal>Main</literal>モジュールが<filename>Main.hs</filename>というファイルに置かれているとすると、次のようにしてこのプログラムをコンパイル・リンクすることができる。</para>
 
 <screen>
-ghc &ndash;&ndash;make Main.hs
+ghc --make Main.hs
 </screen>
 
       <para>実際には、コマンド行中にHaskellソースファイルが一つでもあり、他のモードが指定されてもいないなら、GHCは自動的にmakeモードに入るので、この例では次のように入力するだけでも良い。</para>
@@ -411,11 +411,11 @@ ghc Main.hs
 
       <para>ソースファイル名やモジュール名はいくつ指定しても良い。それらを初期モジュールとしてインポートを追いかけることで、GHCはプログラムの全てのモジュールを見つけ出す。次に、古くなったモジュールの再コンパイルが試みられ、最後に、もし<literal>Main</literal>モジュールがあるなら、プログラムはリンクされて実行可能形式になる。</para>
 
-      <para>伝統的な<literal>Makefile</literal>に比べて、<literal>ghc &ndash;&ndash;make</literal>を使うことの利点は、以下のようなことである。</para>
+      <para>伝統的な<literal>Makefile</literal>に比べて、<literal>ghc --make</literal>を使うことの利点は、以下のようなことである。</para>
 
       <itemizedlist>
 	<listitem>
-          <para>コンパイルのためにGHCを再起動する必要がないので、コンパイル間で情報をキャッシュすることができる。複数のモジュールから成るプログラムを<literal>ghc &ndash;&ndash;make</literal>でコンパイルすると、個々のソースファイルに対して<literal>ghc</literal>を走らせたときに比べて二倍も速いことがある。</para>
+          <para>コンパイルのためにGHCを再起動する必要がないので、コンパイル間で情報をキャッシュすることができる。複数のモジュールから成るプログラムを<literal>ghc --make</literal>でコンパイルすると、個々のソースファイルに対して<literal>ghc</literal>を走らせたときに比べて二倍も速いことがある。</para>
 	</listitem>
 	<listitem>
           <para><literal>Makefile</literal>を書く必要がない。</para>
@@ -426,7 +426,7 @@ ghc Main.hs
 	</listitem>
       </itemizedlist>
 
-      <para>この章でこれ以降に解説されるコマンド行オプションは全て<option>&ndash;&ndash;make</option>とともに用いることができる。ただし、コマンド行から与えられたオプションは全てのソースファイルに適用されるので、単一のソースファイルにのみ適用したいオプションについては<literal>OPTIONS_GHC</literal>プラグマ(<xref linkend="source-file-options"/>を見よ)を使う必要があることに注意せよ。</para>
+      <para>この章でこれ以降に解説されるコマンド行オプションは全て<option>--make</option>とともに用いることができる。ただし、コマンド行から与えられたオプションは全てのソースファイルに適用されるので、単一のソースファイルにのみ適用したいオプションについては<literal>OPTIONS_GHC</literal>プラグマ(<xref linkend="source-file-options"/>を見よ)を使う必要があることに注意せよ。</para>
 
       <para>プログラムを追加のオブジェクト(例えばCの補助コード)にリンクする必要があるなら、そのオブジェクトファイルをコマンド行で与えれば、GHCは実行ファイルをリンクするときにそれを含める。</para>
 
@@ -607,7 +607,7 @@ ghc -c Foo.hs
 	    <varlistentry>
 	      <term><option>-v1</option></term>
 	      <listitem>
-                <para>最小限の多弁さ。コンパイル一回毎に一行を表示する。(<option>&ndash;&ndash;make</option>または<option>&ndash;&ndash;interactive</option>が有効のときはこれがデフォルト)</para>
+                <para>最小限の多弁さ。コンパイル一回毎に一行を表示する。(<option>--make</option>または<option>--interactive</option>が有効のときはこれがデフォルト)</para>
 	      </listitem>
 	    </varlistentry>
 

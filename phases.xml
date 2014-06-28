@@ -496,7 +496,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-c</option></primary></indexterm>
         </term>
         <listitem>
-          <para>リンクを省略する。<option>&ndash;&ndash;make</option>と併用して、プログラムに<literal>Main</literal>モジュールがあったときに行われる自動リンクを避けることができる。</para>
+          <para>リンクを省略する。<option>--make</option>と併用して、プログラムに<literal>Main</literal>モジュールがあったときに行われる自動リンクを避けることができる。</para>
 	</listitem>
       </varlistentry>
 

@@ -54,7 +54,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
 % hls -ltr /usr/etc +RTS -A5m
     </screen>
 
-      <para>残りのオプションを問答無用で(RTSでなく)プログラムに渡したいなら、<option>&ndash;&ndash;RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>を使うことができる。</para>
+      <para>残りのオプションを問答無用で(RTSでなく)プログラムに渡したいなら、<option>--RTS</option><indexterm><primary><option>--RTS</option></primary></indexterm>を使うことができる。</para>
 
       <para>いつもと同様、<replaceable>size</replaceable>を取るRTSオプションについては、以下が適用される。<replaceable>size</replaceable>の最後の文字がKまたはkなら、数値は1000倍される。Mまたはmなら、1,000,000倍される。GまたはG<!-- 訳注: たぶん誤り -->なら、1,000,000,000倍される。(カウンタのオーバーフローは<emphasis>あなたの</emphasis>責任である)</para>
 

@@ -51,31 +51,31 @@
 	      <entry>-</entry>
 	    </row>
             <row>
-              <entry><option>&ndash;&ndash;supported-extensions</option>または<option>&ndash;&ndash;supported-languages</option></entry>
+              <entry><option>--supported-extensions</option>または<option>--supported-languages</option></entry>
               <entry>対応している言語および言語拡張を表示</entry>
               <entry>モード</entry>
               <entry>-</entry>
             </row>
             <row>
-              <entry><option>&ndash;&ndash;info</option></entry>
+              <entry><option>--info</option></entry>
               <entry>コンパイラに関する情報を表示</entry>
               <entry>モード</entry>
               <entry>-</entry>
             </row>
 	    <row>
-	      <entry><option>&ndash;&ndash;version</option></entry>
+	      <entry><option>--version</option></entry>
 	      <entry>GHCのバージョンを表示</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>&ndash;&ndash;numeric-version</option></entry>
+	      <entry><option>--numeric-version</option></entry>
 	      <entry>GHCのバージョンを表示(数値のみ)</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>&ndash;&ndash;print-libdir</option></entry>
+	      <entry><option>--print-libdir</option></entry>
 	      <entry>GHCのライブラリディレクトリを表示</entry>
 	      <entry>モード</entry>
 	      <entry>-</entry>
