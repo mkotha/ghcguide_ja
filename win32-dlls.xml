@@ -338,7 +338,7 @@ ghc -shared -o Adder.dll Adder.o Adder_stub.o StartEnd.o
 <para>これで、<filename>Adder.dll</filename>ファイルが他の言語から使えるようになった。Adderの関数を呼ぶ前に<literal>HsStart</literal>を呼ぶことが必要であり、一番最後には<literal>HsEnd</literal>を呼ぶ必要がある。
 </para>
 <para>
-  <emphasis>警告:</emphasis> <literal>hs_init</literal>/<literal>hs_exit</literal>を呼ぶのに<literal>DllMain</literal>を使うことが魅力的に思えるかもしれないが、これは動作しない(特に<literal>-threaded</literal>付きでコンパイルしているなら)。<literal>DllMain</literal>の間に実行してよい動作には厳しい制約があり、<literal>hs_init</literal>はこれらの制約を破るので、セットアップ中にdllがフリーズするのにつながることがある。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/3605">bug #3605</ulink>を見よ)</para>
+  <emphasis>警告:</emphasis> <literal>hs_init</literal>/<literal>hs_exit</literal>を呼ぶのに<literal>DllMain</literal>を使うことが魅力的に思えるかもしれないが、これは動作しない(特に<literal>-threaded</literal>付きでコンパイルしているなら)。<literal>DllMain</literal>の間に実行してよい動作には厳しい制約があり、<literal>hs_init</literal>はこれらの制約を破るので、セットアップ中にdllがフリーズするのにつながることがある。(<ulink url="http://ghc.haskell.org/trac/ghc/ticket/3605">bug #3605</ulink>を見よ)</para>
 
 <sect3 id="win32-dlls-vba">
 <title>VBAから使う</title>

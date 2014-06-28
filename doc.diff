@@ -1,15 +1,6 @@
 diff -urd 7.6.3-original/extending_ghc.xml original/extending_ghc.xml
 --- 7.6.3-original/extending_ghc.xml	2014-06-27 09:19:05.808248378 +0900
 +++ original/extending_ghc.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -40,7 +40,7 @@
-           (disregarding the usual type restrictions of the splice syntax, and the usual restriction on splicing inside a splice - <literal>$([|1|])</literal> is fine as an annotation, albeit redundant).</para></listitem>
-         </itemizedlist>
- 
--        If you feel strongly that any of these restrictions are too onerous, <ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">
-+        If you feel strongly that any of these restrictions are too onerous, <ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC">
-         please give the GHC team a shout</ulink>.
-       </para>
- 
 @@ -90,10 +90,10 @@
  <programlisting>
  import GHC
@@ -23,15 +14,6 @@ diff -urd 7.6.3-original/extending_ghc.xml original/extending_ghc.xml
        runGhc (Just libdir) $ do
          dflags &lt;- getSessionDynFlags
          setSessionDynFlags dflags
-@@ -126,7 +126,7 @@
- 
-     <para>GHC has the ability to load compiler plugins at compile time. The feature is similar to the one provided by <ulink url="http://gcc.gnu.org/wiki/plugins">GCC</ulink>, and allows users to write plugins that can inspect and modify the compilation pipeline, as well as transform and inspect GHC's intermediate language, Core. Plugins are suitable for experimental analysis or optimization, and require no changes to GHC's source code to use.</para>
- 
--    <para>Plugins cannot optimize/inspect C--, nor can they implement things like parser/front-end modifications like GCC. If you feel strongly that any of these restrictions are too onerous, <ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC"> please give the GHC team a shout</ulink>.</para>
-+    <para>Plugins cannot optimize/inspect C--, nor can they implement things like parser/front-end modifications like GCC. If you feel strongly that any of these restrictions are too onerous, <ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC"> please give the GHC team a shout</ulink>.</para>
- 
-     <sect2 id="using-compiler-plugins">
-       <title>Using compiler plugins</title>
 @@ -226,12 +226,13 @@
    return (CoreDoPluginPass "Say name" pass : todo)
  
@@ -117,15 +99,6 @@ diff -urd 7.6.3-original/external_core.xml original/external_core.xml
      under <code>utils/ext-core</code>.</para>
  
    </section>
-@@ -1623,7 +1620,7 @@
-       </authorgroup>
-       <citetitle pubwork="article">System FC: equality constraints and coercions</citetitle>
-       <pubdate>2006</pubdate>  
--      <bibliomisc><ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/FC">http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/FC</ulink></bibliomisc>
-+      <bibliomisc><ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/FC">http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/FC</ulink></bibliomisc>
-     </biblioentry>
- 
-     <biblioentry>
 @@ -1789,7 +1786,7 @@
          <state>South Carolina</state>
        </address>
@@ -3731,24 +3704,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
      <!-- ====================== HIERARCHICAL MODULES =======================  -->
  
  
-@@ -615,7 +664,7 @@
- <para>
- View patterns are enabled by the flag <literal>-XViewPatterns</literal>.
- More information and examples of view patterns can be found on the
--<ulink url="http://hackage.haskell.org/trac/ghc/wiki/ViewPatterns">Wiki
-+<ulink url="http://ghc.haskell.org/trac/ghc/wiki/ViewPatterns">Wiki
- page</ulink>.
- </para>
- 
-@@ -733,7 +782,7 @@
- </programlisting>
- 
- (For some amplification on this design choice see
--<ulink url="http://hackage.haskell.org/trac/ghc/ticket/4061">Trac #4061</ulink>.)
-+<ulink url="http://ghc.haskell.org/trac/ghc/ticket/4061">Trac #4061</ulink>.)
- 
- </para>
- </listitem>
 @@ -800,6 +849,299 @@
  
  </sect2>
@@ -5761,7 +5716,7 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
 +<sect2 id="typelit-tyfuns">
 +<title>Computing With Type-Level Naturals</title>
  <para>
--See also <ulink url="http://hackage.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>.
+-See also <ulink url="http://ghc.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>.
 +GHC 7.8 can evaluate arithmetic expressions involving type-level natural
 +numbers.  Such expressions may be constructed using the type-families
 +<literal>(+), (*), (^)</literal> for addition, multiplication,
@@ -6522,15 +6477,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
  
  <sect1 id="defer-type-errors">
  <title>Deferring type errors to runtime</title>
-@@ -7104,7 +8232,7 @@
-   </para>
-   <para>
-     For more motivation and details please refer to the <ulink
--      url="http://hackage.haskell.org/trac/ghc/wiki/DeferErrorsToRuntime">HaskellWiki</ulink>
-+      url="http://ghc.haskell.org/trac/ghc/wiki/DeferErrorsToRuntime">HaskellWiki</ulink>
-     page or the <ulink
-       url="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/">original
-       paper</ulink>.
 @@ -7151,7 +8279,7 @@
      In the expression: 1 == 'a'
      In the first argument of `fst', namely `(True, 1 == 'a')'
@@ -6734,15 +6680,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
  
  </sect2>
  
-@@ -7512,7 +8773,7 @@
- quoter function interpret <literal>"|~]"</literal> as <literal>"|]"</literal>.
- One way to implement this is to compose your quoter with a pre-processing pass to
- perform your escape conversion.  See the
--<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5348">
-+<ulink url="http://ghc.haskell.org/trac/ghc/ticket/5348">
- discussion in Trac</ulink> for details.
- </para></listitem>
- </itemizedlist>
 @@ -7897,7 +9158,7 @@
  which is translated to
  <screen>
@@ -6884,15 +6821,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
  </itemizedlist>
  
  </sect2>
-@@ -8174,7 +9451,7 @@
- patterns</emphasis>, written <literal>!<replaceable>pat</replaceable></literal>.
- Bang patterns are under consideration for Haskell Prime.
- The <ulink
--url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell
-+url="http://ghc.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell
- prime feature description</ulink> contains more discussion and examples
- than the material below.
- </para>
 @@ -8422,7 +9699,9 @@
  <literal>e</literal>.  You can also disable assertions using the
        <option>-fignore-asserts</option>
@@ -7032,15 +6960,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
  
  </sect2>
  
-@@ -9172,7 +10499,7 @@
-       conjunction with <option>-O</option><footnote>in fact, UNPACK
-           has no effect without <option>-O</option>, for technical
-           reasons
--      (see <ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick
-+      (see <ulink url="http://ghc.haskell.org/trac/ghc/ticket/5252">tick
-             5252</ulink>)</footnote>, in order to expose
-       unfoldings to the compiler so the reboxing can be removed as
-       often as possible.  For example:</para>
 @@ -9321,6 +10648,12 @@
  notation "[~2]" is also accepted, meaning that the rule is active up to, but not including,
  Phase 2.
@@ -7375,24 +7294,6 @@ diff -urd 7.6.3-original/glasgow_exts.xml original/glasgow_exts.xml
 diff -urd 7.6.3-original/intro.xml original/intro.xml
 --- 7.6.3-original/intro.xml	2014-06-27 09:19:06.085241036 +0900
 +++ original/intro.xml	2014-04-10 22:34:21.000000000 +0900
-@@ -53,7 +53,7 @@
- 
-     <para>Alternatively, if you want to build GHC yourself, head on
-       over to the
--      <ulink url="http://hackage.haskell.org/trac/ghc/wiki/Building">GHC
-+      <ulink url="http://ghc.haskell.org/trac/ghc/wiki/Building">GHC
-         Building Guide</ulink> to find out how to get the sources, and
-         build it on your system.  Note that GHC itself is written in
-         Haskell, so you will still need to install GHC in order to
-@@ -76,7 +76,7 @@
-       </listitem>
- 
-       <listitem>
--	<para><ulink url="http://hackage.haskell.org/trac/ghc/">GHC
-+	<para><ulink url="http://ghc.haskell.org/trac/ghc/">GHC
- 	Developers Home</ulink> (developer documentation, wiki, and
- 	bug tracker)</para>
-       </listitem>
 @@ -130,60 +130,15 @@
        </varlistentry>
  
@@ -7483,33 +7384,6 @@ diff -urd 7.6.3-original/intro.xml original/intro.xml
  	      </listitem>
  	    </varlistentry>
  	  </variablelist>
-@@ -234,7 +189,7 @@
-     <para>
-         Glasgow Haskell is a changing system so there are sure to be
-         bugs in it. If you find one, please see
--        <ulink url="http://hackage.haskell.org/trac/ghc/wiki/ReportABug">this wiki page</ulink>
-+        <ulink url="http://ghc.haskell.org/trac/ghc/wiki/ReportABug">this wiki page</ulink>
-         for information on how to report it.
-     </para>
- 
-@@ -281,7 +236,7 @@
-             We may make snapshot releases of the current stable branch <ulink
-             url="http://www.haskell.org/ghc/dist/stable/dist/">available for
-             download</ulink>, and the latest sources are available from <ulink
--            url="http://hackage.haskell.org/trac/ghc/wiki/Repositories">the git
-+            url="http://ghc.haskell.org/trac/ghc/wiki/Repositories">the git
-             repositories</ulink>.
- 	  </para>
- 
-@@ -316,7 +271,7 @@
-             We may make snapshot releases of the HEAD <ulink
-             url="http://www.haskell.org/ghc/dist/current/dist/">available for
-             download</ulink>, and the latest sources are available from <ulink
--            url="http://hackage.haskell.org/trac/ghc/wiki/Repositories">the git
-+            url="http://ghc.haskell.org/trac/ghc/wiki/Repositories">the git
-             repositories</ulink>.
- 	  </para>
- 
 @@ -347,7 +302,7 @@
  
      <para>The version number of your copy of GHC can be found by
@@ -8214,15 +8088,6 @@ diff -urd 7.6.3-original/separate_compilation.xml original/separate_compilation.
  
  	<varlistentry>
  	  <term>
-@@ -692,7 +699,7 @@
-       sight!</para>
- 
-       <para>You can read
--      about <ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance">how
-+      about <ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance">how
-           all this works</ulink> in the GHC commentary.</para>
- 
-     </sect2>
 @@ -836,7 +843,13 @@
  </programlisting>
  </para></listitem>
@@ -8273,18 +8138,6 @@ diff -urd 7.6.3-original/separate_compilation.xml original/separate_compilation.
  	    <listitem>
  	      <para>Regard modules imported from packages as unstable,
                i.e., generate dependencies on any imported package modules
-diff -urd 7.6.3-original/sooner.xml original/sooner.xml
---- 7.6.3-original/sooner.xml	2014-06-27 09:19:05.762249597 +0900
-+++ original/sooner.xml	2014-04-08 03:26:08.000000000 +0900
-@@ -294,7 +294,7 @@
-           the third field in the pragma; it should say
-           <literal>Strictness: &lt;string&gt;</literal>.  The
-           <literal>&lt;string&gt;</literal> gives the strictness of
--          the function's arguments: see <ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/Demand">
-+          the function's arguments: see <ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/Demand">
-           the GHC Commentary</ulink> for a description of the strictness notation.
-           </para>
- 
 diff -urd 7.6.3-original/ug-book.xml original/ug-book.xml
 --- 7.6.3-original/ug-book.xml	2014-06-27 09:19:05.733250365 +0900
 +++ original/ug-book.xml	2014-06-27 09:31:23.084721605 +0900
@@ -9502,15 +9355,6 @@ diff -urd 7.6.3-original/using.xml original/using.xml
            </listitem>
          </varlistentry>
  
-@@ -2662,7 +3001,7 @@
- 
-     </variablelist>
- 
--<para>Currently (as of version 6.8.2), GHC does not have the ability to read in External Core files as source. If you would like GHC to have this ability, please <ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">make your wishes known to the GHC Team</ulink>.</para>
-+<para>Currently (as of version 6.8.2), GHC does not have the ability to read in External Core files as source. If you would like GHC to have this ability, please <ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC">make your wishes known to the GHC Team</ulink>.</para>
- 
- </sect1>
- 
 diff -urd 7.6.3-original/utils.xml original/utils.xml
 --- 7.6.3-original/utils.xml	2014-06-27 09:19:05.766249491 +0900
 +++ original/utils.xml	2014-04-08 03:26:08.000000000 +0900
@@ -9699,13 +9543,4 @@ diff -urd 7.6.3-original/win32-dlls.xml original/win32-dlls.xml
 +In addition to creating a DLL, the <option>-shared</option> option also
  creates an import library. The import library name is derived from the
  name of the DLL, as follows:
- 
-@@ -486,7 +486,7 @@
-   severe restrictions on which actions can be performed during
-   <literal>DllMain</literal>, and <literal>hs_init</literal> violates these
-   restrictions, which can lead to your dll freezing during startup (see
--  <ulink url="http://hackage.haskell.org/trac/ghc/ticket/3605">bug
-+  <ulink url="http://ghc.haskell.org/trac/ghc/ticket/3605">bug
-   #3605</ulink>).
- </para>
  

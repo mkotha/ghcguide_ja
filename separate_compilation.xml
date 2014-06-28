@@ -404,7 +404,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 
       <para>GHCは、インタフェースファイルそれぞれ、およびその中の宣言それぞれについて指紋(実はMD5ハッシュ)を計算する。さらに、全てのインタフェースファイルに、最後にコンパイルされたときに使われたもの全ての指紋一覧を記録しておく。ソースファイルの変更日時が<filename>.o</filename>よりも古く(つまり最後にコンパイルされたときからソースが変更されていない)、再コンパイル検査が有効なら、GHCは賢い振る舞いをする。今回必要なものの指紋一覧と前回必要とされたものの指紋一覧(これはコンパイルされているモジュールのインタフェースファイルから拾ってくる)を比較し、全て同じなら「Compilation IS NOT required」と言ってコンパイルをかなり早い段階で中断するのである。何と美しい眺めであろうか！</para>
 
-      <para>GHC commentaryで<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance">これら全てがどうやって動いているか</ulink>について読むことができる。</para>
+      <para>GHC commentaryで<ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/RecompilationAvoidance">これら全てがどうやって動いているか</ulink>について読むことができる。</para>
 
     </sect2>
 

@@ -34,7 +34,7 @@ foo = ...
             <para>正確には、注釈<literal>{-# ANN x e #-}</literal>が段階として正しい(well staged)のは、<literal>$(e)</literal>が段階として正しい場合であり、その場合に限る。(ただし、接合構文にかかる通常の型の制限は無視し、接合の中に接合を書くことについての通常の制限も無視する。<literal>$([|1|])</literal>は注釈として問題ない(冗長ではあるが)。)</para></listitem>
           </itemizedlist>
           
-          これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。
+          これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。
         </para>
         
         <para>一方で、これらの制限を別にすれば、多くのことが許されており、完全に評価されていない式でさえも使うことができる。注釈式は、Template Haskellの接合がコンパイラによって評価されるのとちょうど同じように評価される。よって、この注釈は問題ない。</para>
@@ -117,7 +117,7 @@ $
 
     <para>GHCは、コンパイル時にコンパイラプラグインをロードする能力を持っている。この機能は<ulink url="http://gcc.gnu.org/wiki/plugins">GCC</ulink>が提供するものに似ており、利用者がプラグインを書いてコンパイルのパイプラインを確認/変更したり、GHCの中間言語であるCoreを変換したりできる。プラグインは実験的な分析や最適化に適しており、利用に際してGHCのソースコードを必要としない。</para>
 
-    <para>プラグインはC--を読んだり最適化したりできず、GCCと違ってパーサ/フロントエンドへの変更を実装することができない。これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。</para>
+    <para>プラグインはC--を読んだり最適化したりできず、GCCと違ってパーサ/フロントエンドへの変更を実装することができない。これらの制限のうちどれかがあまりに重荷だと強く思うなら、<ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームに連絡を寄越して欲しい</ulink>。</para>
 
     <sect2 id="using-compiler-plugins">
       <title>コンパイラプラグインを使う</title>

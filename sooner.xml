@@ -193,7 +193,7 @@ f (Wibble x y)  # 醜いが、それで良い
 	<listitem>
           <para>推測しようとしてはいけない。問い合わせるのだ。</para>
 
-          <para>インタフェースファイル中でその関数を探し、そのプラグマ中の第三フィールドを探す。<literal>Strictness: &lt;string&gt;</literal>となっているはずである。<literal>&lt;string&gt;</literal>の部分がこの関数の引数の正格性を表している。正格性の記法については、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/Commentary/Compiler/Demand">the GHC Commentary</ulink>を見よ。</para>
+          <para>インタフェースファイル中でその関数を探し、そのプラグマ中の第三フィールドを探す。<literal>Strictness: &lt;string&gt;</literal>となっているはずである。<literal>&lt;string&gt;</literal>の部分がこの関数の引数の正格性を表している。正格性の記法については、<ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Compiler/Demand">the GHC Commentary</ulink>を見よ。</para>
 
           <para>アンパック可能な<function>U(...)</function>引数については、構成要素の正格性が括弧内に書かれる。つまり、もし引数が二要素のタプルで、<function>U(AU(LSS))</function>と書かれていたなら、これが意味するのは「このタプルの第一要素は使われない。第二要素は再びアンパック可能で、三つの構成要素(第一要素についてはlazy、第二・第三要素については正格)から成っている」ということである。</para>
 

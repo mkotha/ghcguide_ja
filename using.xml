@@ -1831,7 +1831,7 @@ last (x : xs) = last' x xs
 
     </variablelist>
 
-<para>現在(バージョン6.8.2以降)、GHCは外部コアファイルをソースとして読み込む能力を持たない。GHCにこの機能があって欲しいと思うなら、<ulink url="http://hackage.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームにその願いを伝え</ulink>てほしい。</para>
+<para>現在(バージョン6.8.2以降)、GHCは外部コアファイルをソースとして読み込む能力を持たない。GHCにこの機能があって欲しいと思うなら、<ulink url="http://ghc.haskell.org/trac/ghc/wiki/MailingListsAndIRC">GHCチームにその願いを伝え</ulink>てほしい。</para>
 
 </sect1>
 

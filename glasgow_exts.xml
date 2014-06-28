@@ -425,7 +425,7 @@ f x | [y] &lt;- x
 </title>
 
 <para>
-ビューパターンを有効にするフラグは<literal>-XViewPatterns</literal>である。ビューパターンに関するさらなる情報と実例は<ulink url="http://hackage.haskell.org/trac/ghc/wiki/ViewPatterns">Wikiのページ</ulink>にある。
+ビューパターンを有効にするフラグは<literal>-XViewPatterns</literal>である。ビューパターンに関するさらなる情報と実例は<ulink url="http://ghc.haskell.org/trac/ghc/wiki/ViewPatterns">Wikiのページ</ulink>にある。
 </para>
 
 <para>
@@ -507,7 +507,7 @@ let {(x -> y) = e1 ;
      (y -> x) = e2 } in x
 </programlisting>
 
-(この設計上の決定について、よりはっきりと述べたものが<ulink url="http://hackage.haskell.org/trac/ghc/ticket/4061">Trac #4061</ulink>にある。)
+(この設計上の決定について、よりはっきりと述べたものが<ulink url="http://ghc.haskell.org/trac/ghc/ticket/4061">Trac #4061</ulink>にある。)
 
 </para>
 </listitem>
@@ -4010,7 +4010,7 @@ type instance UnEx k (MkEx k x) = x
 </para>
 
 <para>
-<ulink url="http://hackage.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>も見よ。
+<ulink url="http://ghc.haskell.org/trac/ghc/ticket/7347">Trac #7347</ulink>も見よ。
 </para>
 </sect2>
 
@@ -5111,7 +5111,7 @@ main = print "b"
 <literal>a</literal>の型は間違っているが、最終的には使われていないので、<literal>main</literal>のことしか気にしないなら、<literal>a</literal>についての問題を無視できると便利かもしれない。
   </para>
   <para>さらなる動機付けと詳細については、<ulink
-      url="http://hackage.haskell.org/trac/ghc/wiki/DeferErrorsToRuntime">HaskellWiki</ulink>のページか、<ulink
+      url="http://ghc.haskell.org/trac/ghc/wiki/DeferErrorsToRuntime">HaskellWiki</ulink>のページか、<ulink
       url="http://research.microsoft.com/en-us/um/people/simonpj/papers/ext-f/">原論文</ulink>を見よ。
   </para>
 
@@ -5381,7 +5381,7 @@ Hello
 クォートされる<replaceable>string</replaceable>は任意であり、改行を含んでもよい。
 </para></listitem>
 <listitem><para>
-クォートされる<replaceable>string</replaceable>は、<literal>"|]"</literal>という二文字の並びが最初に出現したところで終わる。一切のエスケープは行なわれない。文字列中にこの文字の並びを埋め込みたい場合、自分でエスケープ方式を発明し(たとえば<literal>"|~]"</literal>で代用するなど)、クォート関数が<literal>"|~]"</literal>を<literal>"|]"</literal>と解釈するようにしなければならない。これをする一つの方法は、あなたのエスケープ方式を実行する前処理過程をクォート子に合成することである。詳細は<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5348">Trac上の議論</ulink>を見よ。
+クォートされる<replaceable>string</replaceable>は、<literal>"|]"</literal>という二文字の並びが最初に出現したところで終わる。一切のエスケープは行なわれない。文字列中にこの文字の並びを埋め込みたい場合、自分でエスケープ方式を発明し(たとえば<literal>"|~]"</literal>で代用するなど)、クォート関数が<literal>"|~]"</literal>を<literal>"|]"</literal>と解釈するようにしなければならない。これをする一つの方法は、あなたのエスケープ方式を実行する前処理過程をクォート子に合成することである。詳細は<ulink url="http://ghc.haskell.org/trac/ghc/ticket/5348">Trac上の議論</ulink>を見よ。
 </para></listitem>
 </itemizedlist>
 </para></listitem>
@@ -5873,7 +5873,7 @@ cond f g = arr (\ (e,b) -> if b then Left e else Right e) >>> f ||| g
 <title>びっくりパターン
 <indexterm><primary>Bang patterns</primary></indexterm>
 </title>
-<para>GHCは<emphasis>びっくりパターン</emphasis>と呼ばれるパターン照合の拡張をサポートしている。これは<literal>!<replaceable>pat</replaceable></literal>と書く。びっくりパターンはHaskell Primeへの採用が検討されている。<ulink url="http://hackage.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell primeの特徴まとめ</ulink>には、以下にあるのよりも多くの議論と例が載っている。
+<para>GHCは<emphasis>びっくりパターン</emphasis>と呼ばれるパターン照合の拡張をサポートしている。これは<literal>!<replaceable>pat</replaceable></literal>と書く。びっくりパターンはHaskell Primeへの採用が検討されている。<ulink url="http://ghc.haskell.org/trac/haskell-prime/wiki/BangPatterns">Haskell primeの特徴まとめ</ulink>には、以下にあるのよりも多くの議論と例が載っている。
 </para>
 <para>
 鍵となる変更は、<ulink url="http://haskell.org/onlinereport/exps.html#sect3.17.2">Haskell98レポート中のパターン照合の意味論</ulink>(<ulink url="http://www.sampou.org/haskell/report-revised-j/exps.html#sect3.17.2">和訳</ulink>)に規則を一つ追加するというものである。第十項目として次を付け加える。「パターン<literal>!pat</literal>の値<literal>v</literal>への照合は、次のように振る舞う」
@@ -6510,7 +6510,7 @@ data T = T {-# UNPACK #-} !Float
 
       <para>これにより、二つの非ボックス化Floatを保持する構築子<literal>T</literal>ができる。これは常に最適化になっているとは限らない。例えば、構築子<function>T</function>の内容を調べて、そのfloatを非正格な関数に渡す場合、それらを再びボックス化しなければならない。(これはコンパイラによって自動的に行われる)</para>
 
-      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである<footnote><para>実は、技術的な事情によりUNPACKプラグマは<option>-O</option>なしでは何もしない。(<ulink url="http://hackage.haskell.org/trac/ghc/ticket/5252">tick 5252</ulink>を見よ)</para></footnote>。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
+      <para>構築子のアンパックは専ら<option>-O</option>と組み合わせて使われるべきである<footnote><para>実は、技術的な事情によりUNPACKプラグマは<option>-O</option>なしでは何もしない。(<ulink url="http://ghc.haskell.org/trac/ghc/ticket/5252">tick 5252</ulink>を見よ)</para></footnote>。再ボックス化をなるべく排除できるように展開候補をコンパイラに露出するためである。次の例を考える。</para>
 
 <programlisting>
 f :: T -&#62; Float
