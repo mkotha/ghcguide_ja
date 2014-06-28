@@ -296,7 +296,7 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
   <sect1 id="bugs">
     <title>既知のバグと問題点</title>
 
-    <para>バグトラッカには、報告されたもののまだ修正されていないGHCのバグが列挙されている。<ulink url="http://hackage.haskell.org/trac/ghc/">GHC Trac</ulink>を見よ。加えて、GHCには、既知のバグや問題点として以下のものがある。これらはより永続的である。つまり、これらはどれも短期的に修正される可能性が低い。</para>
+    <para>バグトラッカには、報告されたもののまだ修正されていないGHCのバグが列挙されている。<ulink url="http://ghc.haskell.org/trac/ghc/">GHC Trac</ulink>を見よ。加えて、GHCには、既知のバグや問題点として以下のものがある。これらはより永続的である。つまり、これらはどれも短期的に修正される可能性が低い。</para>
 
   <sect2 id="bugs-ghc">
     <title>GHCのバグ</title>
@@ -334,10 +334,6 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
       </listitem>
 
       <listitem>
-	<para>インスタンス宣言が他のパッケージから取り込まれた場合、どれが「スコープにあるか」についてGHCは細かく管理しない。GHCがそのパッケージで見かけたインスタンス宣言は、そのパッケージ由来のモジュールがコマンド行の式で使われているかどうかに依らず、あらゆる場所でスコープに入る。このバグが影響するのは<option>--make</option>モードとGHCiだけである。</para>
-      </listitem>
-
-      <listitem>
         <para>32ビットのx86プラットフォームでネイティブコード生成器を使う場合、<option>-fexcess-precision</option><indexterm><primary><option>-fexcess-precision</option></primary></indexterm>オプションが常に有効になる。これにより、プログラムのコンパイルのされかた(例えば最適化設定)に依存して、ある種の浮動小数点演算が、32ビットや64ビットが意図されているにもかかわらず80ビットで為される。この結果、浮動小数点演算は非決定的になる。最適化が有効だと浮動小数点の結果が異なることがある。最悪の場合、参照透明性が守られない。<literal>let x = E1 in E2</literal>が<literal>E2[E1/x]</literal>とは異なる値に評価され得るからである。</para>
 
         <para>回避策の一つに<option>-msse2</option><indexterm><primary><option>-msse2</option></primary></indexterm>オプション(<xref linkend="options-platform"/>)を使うというものがある。これはx87命令セットの代わりにSSE2命令セットを使ってコードを生成する。SSE2は全ての浮動小数点演算を正しい精度で行なうので、決定的な結果を与える。ただし、これはSSE2に対応したプロセッサ(Intel Pentium 4またはAMD Athlon 64以降)においてのみ動作することに注意。このため、このオプションはデフォルトで有効になっていない。GHC付属のライブラリはおそらくこのオプションなしでビルドされている(あなたが自分でビルドしたのでないかぎり)。
@@ -364,6 +360,10 @@ Loading package javavm ... linking ... WARNING: Overflown relocation field (# re
       我々が最後に確認したときはこのバグはまだBFDのコードベースにあり、2001年あたりにこのバグが報告されて以来、興味がもたれた様子もない。
       </para>
       <para>回避するには、パッケージを構成する.oファイルを複数個の.oに分ければ良い。これは「base」パッケージが行っていることである。</para>
+      </listitem>
+
+      <listitem>
+	<para>他のパッケージにあるインスタンス宣言に関して、どれが「スコープにあるか」をGHCは細かく管理しない。GHCが他のパッケージで見つけたインスタンス宣言はすべてプロンプトから利用可能であり、現在スコープにあるモジュールの集合を勘案した場合にそのインスタンスが可視であるべきかどうかに依らない。</para>
       </listitem>
     </itemizedlist>
   </sect2>
