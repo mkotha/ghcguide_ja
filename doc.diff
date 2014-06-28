@@ -1,7 +1,3 @@
-Only in 7.6.3-original: 7.6.1-notes.xml
-Only in 7.6.3-original: 7.6.2-notes.xml
-Only in original: 7.8.1-notes.xml
-Only in original: 7.8.2-notes.xml
 diff -urd 7.6.3-original/bugs.xml original/bugs.xml
 --- 7.6.3-original/bugs.xml	2014-06-27 09:19:05.776249226 +0900
 +++ original/bugs.xml	2014-04-08 03:26:08.000000000 +0900
@@ -8439,45 +8435,6 @@ diff -urd 7.6.3-original/ug-book.xml.in original/ug-book.xml.in
  </address>
  </bookinfo>
  
-diff -urd 7.6.3-original/ug-ent.xml original/ug-ent.xml
---- 7.6.3-original/ug-ent.xml	2014-06-27 09:19:06.108240426 +0900
-+++ original/ug-ent.xml	2014-06-27 09:31:23.281716511 +0900
-@@ -3,8 +3,8 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.8.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.8.2-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
-@@ -27,7 +27,7 @@
- <!ENTITY ffi-chap       SYSTEM "ffi-chap.xml">
- <!ENTITY shared_libs    SYSTEM "shared_libs.xml">
- <!ENTITY what_glasgow_exts_does SYSTEM "what_glasgow_exts_does.gen.xml">
--<!ENTITY libraryBaseLocation    "../libraries/base-4.6.0.1">
--<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.16.0">
--<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.0.0">
-+<!ENTITY libraryBaseLocation    "../libraries/base-4.7.0.0">
-+<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.18.1.3">
-+<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.3.1.0">
- <!ENTITY arw "-&gt;">
-diff -urd 7.6.3-original/ug-ent.xml.in original/ug-ent.xml.in
---- 7.6.3-original/ug-ent.xml.in	2014-06-27 09:19:05.779249146 +0900
-+++ original/ug-ent.xml.in	2014-04-10 22:34:06.000000000 +0900
-@@ -3,8 +3,8 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY relnotes1      SYSTEM "7.6.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.6.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.8.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.8.2-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
 Only in 7.6.3-original: users_guide
 diff -urd 7.6.3-original/using.xml original/using.xml
 --- 7.6.3-original/using.xml	2014-06-27 09:19:05.746250021 +0900
