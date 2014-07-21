@@ -260,14 +260,14 @@ Prelude>
       <literal>x &lt;- return 42</literal>という文は、「<literal>return 42</literal>を<literal>IO</literal>モナドの中で実行し、結果を<literal>x</literal>に束縛する」という意味である。以降、<literal>x</literal>を文の中で使う(例えば、上でしたように、値を印字する)ことができるようになる。</para>
 
       <para><option>-fprint-bind-result</option>が設定されているなら、GHCiは次の場合に(そしてその場合に限り)、文の結果を印字する。
-	<itemizedlist>
-	  <listitem>
+        <itemizedlist>
+          <listitem>
             <para>文が束縛ではないか、ただ一つの変数を束縛するモナド束縛(<literal>p &lt;- e</literal>)である。</para>
-	  </listitem>
-	  <listitem>
+          </listitem>
+          <listitem>
             <para>変数の型が多相的でなく、<literal>()</literal>でなく、<literal>Show</literal>のインスタンスである。</para>
-	  </listitem>
-	</itemizedlist>
+          </listitem>
+        </itemizedlist>
       <indexterm><primary><option>-fprint-bind-result</option></primary></indexterm><indexterm><primary><option>-fno-print-bind-result</option></primary></indexterm>
       </para>
 
@@ -551,7 +551,7 @@ Prelude System.IO Map>
       </sect3>
  
       <sect3 id="ghci-import-qualified">
-	<title>修飾名</title>
+        <title>修飾名</title>
 
         <para>手間をすこし省くことができるように、GHCiのプロンプトは、全てのパッケージの全てのモジュールと、現在GHCiにロードされている全てのモジュールについて、暗黙の<literal>import qualified</literal>宣言があるかのように振る舞う。これは<option>-fno-implicit-import-qualified</option><indexterm><primary><option>-fno-implicit-import-qualified</option></primary></indexterm>というフラグで無効にできる。</para>
 
@@ -689,12 +689,12 @@ it &lt;- <replaceable>e</replaceable>
 </programlisting>
     のようになる。しかし、利用者が型を指定しなければならないというのは面倒なので、GHCiはHaskellの型デフォルト化規則(Haskell 2010レポートの4.3.4節)を以下のように拡張している。標準の規則では、個々の型変数<literal>a</literal>について制約の集まり<literal>(C1 a, C2 a, ..., Cn a)</literal>を考え、次の条件が満たされたとき、この型変数をデフォルト化する。
     <orderedlist>
-	    <listitem><para>型変数<literal>a</literal>が他のどの制約にも現れない。</para></listitem>
+            <listitem><para>型変数<literal>a</literal>が他のどの制約にも現れない。</para></listitem>
             <listitem><para><literal>Ci</literal>が全て標準のクラスである。</para></listitem>
             <listitem><para><literal>Ci</literal>のうち、少なくとも一つが数値クラスである。</para></listitem>
     </orderedlist>
 GHCiのプロンプトでは、あるいはGHCで<literal>-XExtendedDefaultRules</literal>フラグが与えられている場合、以下の変更が適用される。
-	<itemizedlist>
+        <itemizedlist>
             <listitem><para>上の規則2が次のように緩和される: <literal>Ci</literal>が<emphasis>全て</emphasis>単引数の型クラスである。</para></listitem>
             <listitem><para>上の規則3が次のように緩和される: <literal>Ci</literal>のうち、少なくとも一つが数値クラスである<emphasis>か、<literal>Show</literal>であるか、<literal>Eq</literal>であるか、<literal>Ord</literal>である</emphasis>。</para></listitem>
             <listitem><para>単位型<literal>()</literal>が、型のデフォルト化の際に通常試す型のリストの先頭に追加される。</para></listitem>
@@ -725,21 +725,21 @@ def = toEnum 0
      </para>
      <para>例として、以下の特別な表示モジュールがあるとしよう。
        <programlisting>
-	 module SpecPrinter where
-	 import System.IO
+         module SpecPrinter where
+         import System.IO
 
-	 sprint a = putStrLn $ show a ++ "!"
+         sprint a = putStrLn $ show a ++ "!"
        </programlisting>
        関数<literal>sprint</literal>は表示された値の最後に感嘆符を付ける。次のコマンドでGHCiを走らせると、
        <programlisting>
-	 ghci -interactive-print=SpecPrinter.sprinter SpecPrinter
+         ghci -interactive-print=SpecPrinter.sprinter SpecPrinter
        </programlisting>
        対話セッションが開始され、そこでは値が<literal>sprint</literal>で表示される。
        <programlisting>
-	 *SpecPrinter> [1,2,3]
-	 [1,2,3]!
-	 *SpecPrinter> 42
-	 42!
+         *SpecPrinter> [1,2,3]
+         [1,2,3]!
+         *SpecPrinter> 42
+         42!
        </programlisting>
      </para>
      <para>デフォルト以外の表示関数は、例えば、木構造や入れ子の構造をより読み易く表示するために使うことができる。
@@ -747,8 +747,8 @@ def = toEnum 0
      <para>
        <literal>-interactive-print</literal>フラグは、GHCを<literal>-eモード</literal>で走らせるときにも使える。
        <programlisting>
-	 % ghc -e "[1,2,3]" -interactive-print=SpecPrinter.sprint SpecPrinter
-	 [1,2,3]!
+         % ghc -e "[1,2,3]" -interactive-print=SpecPrinter.sprint SpecPrinter
+         [1,2,3]!
        </programlisting>
      </para>
    </sect2>
@@ -1225,9 +1225,9 @@ Just 20
           <para>ブレークポイントで停止したとき、既に評価中の変数を評価しようとすると、二番目の評価はハングする。この理由は、その変数が評価中であることをGHCが知っているため、新しい評価では、先に進む前にその結果を待つが、最初の評価はブレークポイントで停止しているのだから、もちろん結果は得られない、ということにある。評価がハングしたときはCtrl-Cで中断してプロンプトに戻ることができる。</para>
           <para>これがもっともよく起こるのは、CAF(例えばmain)を評価していて、ブレークポイントで停止し、そのCAFの値を再びプロンプトで要求した場合である。</para>
         </listitem>
-	<listitem><para>
+        <listitem><para>
           暗黙パラメタ(<xref linkend="implicit-parameters"/>)がブレークポイントで利用できるのは、明示的な型シグネチャがある場合だけである。
-	</para>
+        </para>
         </listitem>
       </itemizedlist>
     </sect2>
@@ -1284,12 +1284,12 @@ $ ghci -lm
       <para><literal>.so</literal>形式の共有ライブラリを使うシステムでは、実際にロードされるライブラリは<filename>lib<replaceable>lib</replaceable>.so</filename>である。GHCiは、ライブラリを探すとき、以下の場所をこの順で試す。</para>
 
       <itemizedlist>
-	<listitem>
+        <listitem>
           <para><literal>-L<replaceable>path</replaceable></literal>コマンド行オプションで指定されたパス。</para>
-	</listitem>
-	<listitem>
+        </listitem>
+        <listitem>
           <para>システムの標準ライブラリ探索パス。これは、システムによっては、<literal>LD_LIBRARY_PATH</literal>環境変数を設定することで変更できる。</para>
-	</listitem>
+        </listitem>
       </itemizedlist>
 
       <para><literal>.dll</literal>形式の共有ライブラリを使うシステムでは、実際にロードされるライブラリは<filename><replaceable>lib</replaceable>.dll</filename>である。この場合も、ライブラリが見付からなかった場合はGHCiはエラーを報告する。</para>
@@ -1312,51 +1312,51 @@ $ ghci -lm
           <literal>:abandon</literal>
           <indexterm><primary><literal>:abandon</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>実行中の評価を捨てる。(ブレークポイントでの停止中のみ有効)</para>
-	</listitem>
+        <listitem>
+          <para>実行中の評価を捨てる。(ブレークポイントでの停止中のみ有効)</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:add</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
           <indexterm><primary><literal>:add</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>module</replaceable>を現在の<firstterm>ターゲット集合</firstterm>に追加し、リロードを行う。通常、可能ならそのモジュールのコンパイル済みコードがロードされ、そうでなければそのモジュールはバイトコードにコンパイルされる。接頭辞<literal>*</literal>を使うことでモジュールがバイトコードとしてロードされることを強制できる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:back</literal>
           <indexterm><primary><literal>:back</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>履歴中を一つ戻る。<xref linkend="tracing" />を見よ。<literal>:trace</literal>、<literal>:history</literal>、<literal>:forward</literal>も参照。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:break [<replaceable>identifier</replaceable> |
             [<replaceable>module</replaceable>] <replaceable>line</replaceable>
             [<replaceable>column</replaceable>]]</literal>
         </term>
           <indexterm><primary><literal>:break</literal></primary></indexterm>
-	<listitem>
+        <listitem>
           <para>指定された関数、または指定された行の指定された位置にブレークポイントを設定する。<xref linkend="setting-breakpoints" />を見よ。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:browse</literal><optional><literal>!</literal></optional> <optional><optional><literal>*</literal></optional><replaceable>module</replaceable></optional> ...
           <indexterm><primary><literal>:browse</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>module</replaceable>からエクスポートされている識別子を表示する。<replaceable>module</replaceable>は、GHCiにロードされているか、パッケージの要素でなければならない。<replaceable>module</replaceable>が省略された場合、直近にロードされたモジュールが使われる。</para>
-	  <para>GHCiのコマンド全てと同様に、出力はGHCiの現在のスコープ(<xref linkend="ghci-scope"/>)で表示される。</para>
+          <para>GHCiのコマンド全てと同様に、出力はGHCiの現在のスコープ(<xref linkend="ghci-scope"/>)で表示される。</para>
 
           <para>browseコマンドには二つの変種がある。
           <itemizedlist>
@@ -1386,31 +1386,31 @@ maybe :: b -> (a -> b) -> Maybe a -> b
     この出力が示すのは、現在のセッションの文脈(<literal>Prelude</literal>のスコープ)で、<literal>Data.Maybe</literal>の項目の最初の一団はスコープになく(ただしGHCiセッションでは完全修飾された形で利用できる。<xref linkend="ghci-scope"/>を見よ)、二番目の一団は(<literal>Prelude</literal>を介して)スコープにあり、修飾なし、あるいは<literal>Prelude.</literal>という修飾子付きの形式で利用できる、ということである。
   </para>
           </listitem>
-	</itemizedlist>
+        </itemizedlist>
       </para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:cd</literal> <replaceable>dir</replaceable>
           <indexterm><primary><literal>:cd</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>作業ディレクトリを<replaceable>dir</replaceable>に変更する。<replaceable>dir</replaceable>の先頭が「<literal>&tilde;</literal>」記号の場合、それは<literal>HOME</literal>環境変数の内容で置き換えられる。現在の作業ディレクトリを表示することについては<literal>:show paths</literal>コマンドも見よ。 </para>
 
           <para>注意: ディレクトリを変更すると、ロードされているモジュールは全て未ロードになる。これは、探索パスがふつう相対ディレクトリを使って表されており、また、セッションの途中で探索パスを変更することがサポートされていないためである。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:cmd</literal> <replaceable>expr</replaceable>
           <indexterm><primary><literal>:cmd</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>expr</replaceable>を<literal>IO String</literal>型の計算として実行し、その結果の文字列をGHCiコマンドのリストとして実行する。複数のコマンドは改行で区切る。<literal>:cmd</literal>コマンドは<literal>:def</literal>および<literal>:set stop</literal>と組み合わせて使うのに便利である。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -1474,35 +1474,35 @@ Prelude&gt; :complete repl 5-10 "map"
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:continue</literal>
           <indexterm><primary><literal>:continue</literal></primary></indexterm>
         </term>
-	<listitem><para>ブレークポイントで停止しているとき、実行中の評価を再開する。</para>
-	</listitem>
+        <listitem><para>ブレークポイントで停止しているとき、実行中の評価を再開する。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
-	  <literal>:ctags</literal> <optional><replaceable>filename</replaceable></optional>
-	  <literal>:etags</literal> <optional><replaceable>filename</replaceable></optional>
-	  <indexterm><primary><literal>:etags</literal></primary>
-	  </indexterm>
-	  <indexterm><primary><literal>:etags</literal></primary>
-	  </indexterm>
-	</term>
-	<listitem>
+        <term>
+          <literal>:ctags</literal> <optional><replaceable>filename</replaceable></optional>
+          <literal>:etags</literal> <optional><replaceable>filename</replaceable></optional>
+          <indexterm><primary><literal>:etags</literal></primary>
+          </indexterm>
+          <indexterm><primary><literal>:etags</literal></primary>
+          </indexterm>
+        </term>
+        <listitem>
           <para>Vi風のエディタ用(<literal>:ctags</literal>)またはEmacs風エディタ用(<literal>:etags</literal>)のタグファイルを生成する。ファイル名が指定されなかった場合は、それぞれデフォルトの<filename>tags</filename>または<filename>TAGS</filename>が使われる。ロードされているモジュール内の全ての関数、構築子、型のタグが作られる。これらのコマンドが働くには、全てのモジュールが解釈実行されていなければならない。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:def<optional>!</optional> <optional><replaceable>name</replaceable> <replaceable>expr</replaceable></optional></literal>
           <indexterm><primary><literal>:def</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para><literal>:def</literal>は、GHCiにおいて新しいコマンド(マクロと言ってもいい)を定義するのに使われる。コマンド<literal>:def</literal> <replaceable>name</replaceable> <replaceable>expr</replaceable>は、新しいGHCiコマンド<literal>:<replaceable>name</replaceable></literal>を、Haskellの式<replaceable>expr</replaceable>で実装されたものとして定義する。式の型は<literal>String -&gt; IO String</literal>でなければならない。<literal>:<replaceable>name</replaceable> <replaceable>args</replaceable></literal>がプロンプトに入力されると、GHCiは式<literal>(<replaceable>name</replaceable> <replaceable>args</replaceable>)</literal>を走らせ、結果の<literal>String</literal>を受け取り、それをコマンドの列として再びGHCiに入力する。結果においては、隣り合うコマンドは「<literal>\n</literal>」で区切られていなければならない。</para>
+        <listitem>
+          <para><literal>:def</literal>は、GHCiにおいて新しいコマンド(マクロと言ってもいい)を定義するのに使われる。コマンド<literal>:def</literal> <replaceable>name</replaceable> <replaceable>expr</replaceable>は、新しいGHCiコマンド<literal>:<replaceable>name</replaceable></literal>を、Haskellの式<replaceable>expr</replaceable>で実装されたものとして定義する。式の型は<literal>String -&gt; IO String</literal>でなければならない。<literal>:<replaceable>name</replaceable> <replaceable>args</replaceable></literal>がプロンプトに入力されると、GHCiは式<literal>(<replaceable>name</replaceable> <replaceable>args</replaceable>)</literal>を走らせ、結果の<literal>String</literal>を受け取り、それをコマンドの列として再びGHCiに入力する。結果においては、隣り合うコマンドは「<literal>\n</literal>」で区切られていなければならない。</para>
 
           <para>これは少々ややこしいので、いくつか例を挙げる。まず、次に示す新しいGHCiコマンドは、引数を取らず、結果を生成せず、単に現在の日時を出力するだけのものである。</para>
 
@@ -1537,103 +1537,103 @@ Prelude> :. cmds.ghci
           <para>このコマンドの名前は<literal>:.</literal>であるが、これは「<literal>.</literal>」(同じことをするUnixシェルのコマンド)のアナロジーである。</para>
 
           <para><literal>:def</literal>と単独で入力すると、現在定義されているマクロの一覧を表示する。既に存在するコマンド名を再定義しようとすると失敗する。ただし<literal>:def!</literal>の形式が使われた場合は別で、この場合その名前の古いコマンドは黙って失われる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:delete * | <replaceable>num</replaceable> ...</literal>
           <indexterm><primary><literal>:delete</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>ブレークポイントを番号で指定して削除する。(それぞれのブレークポイントの番号を見るには<literal>:show breaks</literal>を使う)。<literal>*</literal>の形式では、ブレークポイントを全て削除する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:edit <optional><replaceable>file</replaceable></optional></literal>
           <indexterm><primary><literal>:edit</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>エディタを開いて、<replaceable>file</replaceable>、それが省略されたときは直近にロードされたモジュールを編集する。起動されるエディタは<literal>EDITOR</literal>環境変数から採られるか、<literal>EDITOR</literal>が設定されていないときはシステムのデフォルトエディタが使われる。使われるエディタは<literal>:set editor</literal>で変更することができる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:etags</literal>
         </term>
-	<listitem>
-	  <para><literal>:ctags</literal>を見よ。</para>
-	</listitem>
+        <listitem>
+          <para><literal>:ctags</literal>を見よ。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:force <replaceable>identifier</replaceable> ...</literal>
           <indexterm><primary><literal>:force</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>identifier</replaceable>の値を<literal>:print</literal>と同じ方法で表示する。<literal>:print</literal>と異なり、<literal>:force</literal>は、値をたどっていく間に出会ったサンクを評価する。これによって、例外や無限ループが発生したり、別のブレークポイント(これは無視されるが、その旨表示される)に当ったりするかもしれない。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:forward</literal>
           <indexterm><primary><literal>:forward</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>履歴中で前進する。<xref linkend="tracing" />を見よ。<literal>:trace</literal>、<literal>:history</literal>、<literal>:back</literal>も参照。</para>
-	</listitem>
+        <listitem>
+          <para>履歴中で前進する。<xref linkend="tracing" />を見よ。<literal>:trace</literal>、<literal>:history</literal>、<literal>:back</literal>も参照。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:help</literal>
           <indexterm><primary><literal>:help</literal></primary></indexterm>
         </term>
-	<term>
+        <term>
           <literal>:?</literal>
           <indexterm><primary><literal>:?</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>利用可能なコマンドの一覧を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:</literal>
           <indexterm><primary><literal>:</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>前のコマンドを繰り返す。</para>
-	</listitem>
+        <listitem>
+          <para>前のコマンドを繰り返す。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
 
-	<term>
+        <term>
           <literal>:history [<replaceable>num</replaceable>]</literal>
           <indexterm><primary><literal>:history</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>評価ステップの履歴を表示する。数値が与えられると、その数のステップを表示する(デフォルト: 20)。<literal>:trace</literal>と組み合わせて使う。<xref linkend="tracing" />を見よ。GHCiが保存する履歴の数を設定するには<option>-fghci-hist-size=<replaceable>n</replaceable></option>を使う。</para>
-	</listitem>
+        <listitem>
+          <para>評価ステップの履歴を表示する。数値が与えられると、その数のステップを表示する(デフォルト: 20)。<literal>:trace</literal>と組み合わせて使う。<xref linkend="tracing" />を見よ。GHCiが保存する履歴の数を設定するには<option>-fghci-hist-size=<replaceable>n</replaceable></option>を使う。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:info</literal><optional><literal>!</literal></optional><replaceable>name</replaceable> ...
           <indexterm><primary><literal>:info</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>与えられた名前についての情報を表示する。例えば、もし<replaceable>name</replaceable>がクラスなら、クラスメソッドとその型が印字される。もし<replaceable>name</replaceable>が型構築子なら、その定義が印字される。もし<replaceable>name</replaceable>が関数なら、その型が印字される。<replaceable>name</replaceable>がソースファイルからロードされたものであった場合、GHCiはその定義のソースコード中の位置も表示する。</para>
           <para>型およびクラスについては、それに言及するインスタンスもまとめて示す。無関係な情報を見せることがないように、インスタンスは、(a)その頭部が<replaceable>name</replaceable>に言及している、かつ(b)そのインスタンスで言及されているものが全て<literal>:load</literal>または<literal>:module</literal>コマンドの結果としてスコープにある(修飾されていてもそうでなくても良い)、場合にのみ表示される。</para>
           <para><literal>:info!</literal>コマンドも同様に動作するが、上記の制限(b)を外し、頭部が<replaceable>name</replaceable>に言及するインスタンスでスコープにあるものを全て表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -1652,7 +1652,7 @@ Prelude> :. cmds.ghci
                         <replaceable>type</replaceable>
           <indexterm><primary><literal>:kind</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。実際、<literal>:kind</literal>は、(通常許されない)型シノニムの部分適用を書くことも認めるので、以下が動作する。
 <programlisting>
 ghci> type T a b = (a,b,a)
@@ -1667,7 +1667,7 @@ T Int :: * -> *
             <para>
 
           省略可能な"<literal>!</literal>"を指定した場合、GHCはさらに、型シノニムを展開して型関数の適用を評価することによって型を正規化し、その結果を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -1695,7 +1695,7 @@ T Int :: * -> *
           <literal>:load</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
           <indexterm><primary><literal>:load</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>指定された<replaceable>module</replaceable>とそれが依存するモジュールすべてを再帰的にロードする。ここで、個々の<replaceable>module</replaceable>はモジュール名またはファイル名でなければならない。また、パッケージ中のモジュールの名前であってはいけない。</para>
 
           <para>以前にロードされていたモジュールは、パッケージ中のものを除いて、忘れ去られる。この新しいモジュールの集合を<firstterm>ターゲット集合</firstterm>と呼ぶ。<literal>:load</literal>を引数なしで使うと、ロードされているモジュールや束縛を全て未ロードにできることに注意。</para>
@@ -1704,22 +1704,22 @@ T Int :: * -> *
 
           <para><literal>:load</literal>コマンドの後、以下のものが文脈として設定される。</para>
 
-	  <itemizedlist>
-	    <listitem>
+          <itemizedlist>
+            <listitem>
               <para><replaceable>module</replaceable>が成功裡にロードされたなら、<replaceable>module</replaceable>。</para>
-	    </listitem>
-	    <listitem>
+            </listitem>
+            <listitem>
               <para>そうでないとき、今回の<literal>:load</literal>でロードされたモジュールがあるなら、最後に成功裡にロードされたモジュール。</para>
-	    </listitem>
-	    <listitem>
-	      <para>そうでなければ、<literal>Prelude</literal>。</para>
-	    </listitem>
-	  </itemizedlist>
-	</listitem>
+            </listitem>
+            <listitem>
+              <para>そうでなければ、<literal>Prelude</literal>。</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:main <replaceable>arg<subscript>1</subscript></replaceable> ... <replaceable>arg<subscript>n</subscript></replaceable></literal>
           <indexterm><primary><literal>:main</literal></primary></indexterm>
         </term>
@@ -1765,113 +1765,113 @@ bar
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable></literal>
           <indexterm><primary><literal>:module</literal></primary></indexterm>
         </term>
         <term>
           <literal>import <replaceable>mod</replaceable></literal>
         </term>
-	<listitem>
+        <listitem>
           <para>プロンプトに入力される文のための文脈を設定または改変する。<literal>import <replaceable>mod</replaceable></literal>の形式は<literal>:module +<replaceable>mod</replaceable></literal>と等価である。詳しくは<xref linkend="ghci-scope"/>を見よ。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:print </literal> <replaceable>names</replaceable> ...
           <indexterm><primary><literal>:print</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>評価を強制せずに値を表示する。<literal>:print</literal>は、型が不明、または部分的にしか分かっていない値に対して使うことができる。ブレークポイントにおける、多相型を持った局所変数がこれに当たる。<literal>:print</literal>は、実行時の値を調査しつつ、その値の型を再構築しようとし、可能ならGHCiの環境中でその型を精密にする。未評価の部分(サンク)に遭遇すると、<literal>:print</literal>は、それぞれのサンクに対して、<literal>_t</literal>で始まる名前の新しい変数を束縛する。さらなる情報は<xref linkend="breakpoints" />を見よ。<literal>:sprint</literal>コマンドも参照。これは<literal>:print</literal>と同様だが、新しい変数を束縛しない。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:quit</literal>
           <indexterm><primary><literal>:quit</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>GHCiを終了する。プロンプトでCtrl-Dを打つことでも終了できる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:reload</literal>
           <indexterm><primary><literal>:reload</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>現在のターゲット集合とそれらが依存するモジュールのうち、変更のあったものがあれば、ターゲット集合を再ロードしようと試みる。結果として、新しいモジュールがロードされたり、ターゲットから間接的に必要とされなくなったモジュールが外されたりするかもしれないことに注意せよ。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:run</literal>
           <indexterm><primary><literal>:run</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para><literal>:main</literal>を見よ。</para>
-	</listitem>
+        <listitem>
+          <para><literal>:main</literal>を見よ。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:script</literal> <optional><replaceable>n</replaceable></optional>
-	  <literal>filename</literal>
+          <literal>filename</literal>
           <indexterm><primary><literal>:script</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
     <para>ファイルの各行をGHCiコマンドとして実行する。このコマンドは、<literal>:set +m</literal>で設定される複数行モードと同時に使うことができる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:set</literal> <optional><replaceable>option</replaceable>...</optional>
           <indexterm><primary><literal>:set</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>色々なオプションを設定する。利用可能なオプションの一覧は<xref linkend="ghci-set"/>を、GHCi固有のフラグは<xref linkend="interactive-mode-options"/>を見よ。<literal>:set</literal>コマンド単独では、どのオプションが現在有効になっているか表示する。また、現在の動的フラグの設定状況の一覧も表示する。GHCi固有のフラグは分けて表示される。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:set</literal> <literal>args</literal> <replaceable>arg</replaceable> ...
           <indexterm><primary><literal>:set args</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>プログラムが<literal>System.getArgs</literal><indexterm><primary>getArgs</primary></indexterm>を呼んだときに返される引数のリストを設定する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
            <literal>:set</literal> <literal>editor</literal> <replaceable>cmd</replaceable>
         </term>
-	<listitem>
+        <listitem>
           <para><literal>:edit</literal>コマンドで使われるエディタを<replaceable>cmd</replaceable>にする。</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
            <literal>:set</literal> <literal>prog</literal> <replaceable>prog</replaceable>
            <indexterm><primary><literal>:set prog</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>プログラムが<literal>System.getProgName</literal><indexterm><primary>getProgName</primary></indexterm>を呼んだときに返される文字列を設定する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
            <literal>:set</literal> <literal>prompt</literal> <replaceable>prompt</replaceable>
         </term>
-	<listitem>
+        <listitem>
           <para>GHCiのプロンプトとして使われる文字列を設定する。<replaceable>prompt</replaceable>の中では、<literal>%s</literal>という並びは現在スコープにあるモジュールの名前に置き換えられ、<literal>%l</literal>は現在のプロンプトの行番号(コンパイラメッセージで参照されるもの)に置き換えられ、<literal>%%</literal>は<literal>%</literal>に置き換えられる。<replaceable>prompt</replaceable>が&quot;で始まる場合、HaskellのStringとしてパースされる。そうでない場合はそのまま文字列として扱われる。</para>
         </listitem>
       </varlistentry>
@@ -1890,8 +1890,8 @@ bar
            <literal>:set</literal> <literal>stop</literal>
           [<replaceable>num</replaceable>] <replaceable>cmd</replaceable>
         </term>
-	<listitem>
-	  <para>ブレークポイントに当たったとき、または履歴中で新しい項目が選択されたときに実行されるコマンドを設定する。<literal>:set :stop</literal>の最も一般的な使われ方は、現在位置のソースコードを表示することである。例えば<literal>:set stop :list</literal>のようにする。</para>
+        <listitem>
+          <para>ブレークポイントに当たったとき、または履歴中で新しい項目が選択されたときに実行されるコマンドを設定する。<literal>:set :stop</literal>の最も一般的な使われ方は、現在位置のソースコードを表示することである。例えば<literal>:set stop :list</literal>のようにする。</para>
 
           <para>コマンドの前に数値が与えられた場合、指定されたブレークポイント(だけ)に到達した場合に実行される。これは場合によって非常に便利である。例えば、<literal>:set stop 1 :continue</literal>とすると、ブレークポイント1に到達した場合必ず<literal>:continue</literal>が実行されるので、実質的にこのブレークポイントを無効化している。(但し、ブレークポイントに到達した場合のメッセージは出力される)。さらには、<literal>:def</literal>と<literal>:cmd</literal>を巧妙に使って、<literal>:set stop</literal>で条件付きブレークポイントを実装することができる。</para>
 <screen>
@@ -1899,15 +1899,15 @@ bar
 *Main> :set stop 0 :cond (x &lt; 3)
 </screen>
           <para>同様の技法を使えば、指定した回数だけブレークポイントを無視することもできる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:seti</literal> <optional><replaceable>option</replaceable>...</optional>
           <indexterm><primary><literal>:seti</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><literal>:set</literal>と似ているが、<literal>:seti</literal>で設定されたオプションはプロンプトに入力された式とコマンドにのみ影響し、<literal>:load</literal>でロードされたモジュールには影響しない(対照的に、<literal>:set</literal>で設定されたオプションはあらゆるところで適用される)。<xref linkend="ghci-interactive-options" />を見よ。
           </para>
           <para>引数を与えなかった場合、プロンプトに入力される式とコマンドに適用されるオプションの集合を表示する。
@@ -1916,67 +1916,67 @@ bar
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show bindings</literal>
           <indexterm><primary><literal>:show bindings</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>プロンプトで導入された束縛と、その型を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show breaks</literal>
           <indexterm><primary><literal>:show breaks</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>有効になっているブレークポイントの一覧を表示する。</para>
-	</listitem>
+        <listitem>
+          <para>有効になっているブレークポイントの一覧を表示する。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show context</literal>
           <indexterm><primary><literal>:show context</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>ブレークポイントで停止している、継続中の評価の一覧を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show imports</literal>
           <indexterm><primary><literal>:show imports</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><literal>import</literal>コマンドや<literal>:module</literal>コマンドによって作られ現在効力を持っているインポートを表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show modules</literal>
           <indexterm><primary><literal>:show modules</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>現在ロードされているモジュールの一覧を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show packages</literal>
           <indexterm><primary><literal>:show packages</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
     <para>現在有効なパッケージフラグと、現在ロードされているパッケージの一覧を表示する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show paths</literal>
           <indexterm><primary><literal>:show paths</literal></primary></indexterm>
         </term>
@@ -2007,32 +2007,32 @@ bar
 
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:show [args|prog|prompt|editor|stop]</literal>
           <indexterm><primary><literal>:show</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>指定された設定を表示する(<literal>:set</literal>を見よ)。</para>
-	</listitem>
+        <listitem>
+          <para>指定された設定を表示する(<literal>:set</literal>を見よ)。</para>
+        </listitem>
       </varlistentry>
 
        <varlistentry>
- 	<term>
+         <term>
           <literal>:sprint</literal>
           <indexterm><primary><literal>:sprint</literal></primary></indexterm>
          </term>
- 	<listitem>
-	  <para>評価を強制せずに値を表示する。<literal>:sprint</literal>は<literal>:print</literal>に似ているが、違いは、未評価の部分項が新しい変数に束縛されず、単に「_」と表されることである。</para>
- 	</listitem>
+         <listitem>
+          <para>評価を強制せずに値を表示する。<literal>:sprint</literal>は<literal>:print</literal>に似ているが、違いは、未評価の部分項が新しい変数に束縛されず、単に「_」と表されることである。</para>
+         </listitem>
        </varlistentry>
       <varlistentry>
-	<term>
+        <term>
           <literal>:step</literal> <optional><replaceable>expr</replaceable></optional>
           <indexterm><primary><literal>:step</literal></primary></indexterm>
         </term>
         <listitem>
           <para>全てのブレークポイントを有効にして、式を単一ステップモードで評価開始する。このモードでは、簡約一回ごとに評価が停止し、局所変数を確認することができる。<replaceable>expr</replaceable>が与えられなかった場合、最後のブレークポイントから評価を再開する。<xref linkend="single-stepping" />を見よ。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -2060,50 +2060,50 @@ bar
           <literal>:trace <optional><replaceable>expr</replaceable></optional></literal>
           <indexterm><primary><literal>:trace</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>与えられた式を評価(式を与えられなかった場合は直近のブレークポイントから再開)するが、後で<literal>:history</literal>で観察できるように評価ステップのログを残す。<xref linkend="tracing" />を見よ。</para>
-	</listitem>
+        <listitem>
+          <para>与えられた式を評価(式を与えられなかった場合は直近のブレークポイントから再開)するが、後で<literal>:history</literal>で観察できるように評価ステップのログを残す。<xref linkend="tracing" />を見よ。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
          <literal>:type</literal> <replaceable>expression</replaceable>
          <indexterm><primary><literal>:type</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para><replaceable>expression</replaceable>の型を推論し、印字する。多相型には明示的な全称量化が加えられる。推論に際して、単相性制限は適用されない。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:undef</literal> <replaceable>name</replaceable>
           <indexterm><primary><literal>:undef</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>利用者定義のコマンド<replaceable>name</replaceable>を未定義にする。(上の<literal>:def</literal>を見よ)</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:unset</literal> <replaceable>option</replaceable>...
           <indexterm><primary><literal>:unset</literal></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>ある種のオプションを無効にする。利用可能なオプションの一覧は、<xref linkend="ghci-set"/>を見よ。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           <literal>:!</literal> <replaceable>command</replaceable>...
           <indexterm><primary><literal>:!</literal></primary></indexterm>
           <indexterm><primary>shell commands</primary><secondary>in GHCi</secondary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>シェルのコマンド<replaceable>command</replaceable>を実行する。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
     </variablelist>
@@ -2129,49 +2129,49 @@ bar
       <para>利用できるGHCiオプションは以下のものである。</para>
 
       <variablelist>
-	<varlistentry>
-	  <term>
+        <varlistentry>
+          <term>
             <literal>+m</literal>
             <indexterm><primary><literal>+m</literal></primary></indexterm>
           </term>
-	  <listitem>
-	    <para>複数行コマンドのパースを有効にする。複数行コマンドは、現在の行が閉じていないレイアウト文脈を含んでいる場合に受け付けられる(<xref linkend="ghci-multiline" />を見よ)。</para>
-	  </listitem>
-	</varlistentry>
+          <listitem>
+            <para>複数行コマンドのパースを有効にする。複数行コマンドは、現在の行が閉じていないレイアウト文脈を含んでいる場合に受け付けられる(<xref linkend="ghci-multiline" />を見よ)。</para>
+          </listitem>
+        </varlistentry>
 
-	<varlistentry>
-	  <term>
+        <varlistentry>
+          <term>
             <literal>+r</literal>
             <indexterm><primary><literal>+r</literal></primary></indexterm>
             <indexterm><primary>CAFs</primary><secondary>in GHCi</secondary></indexterm>
             <indexterm><primary>Constant Applicative Form</primary><see>CAFs</see></indexterm>
           </term>
-	  <listitem>
+          <listitem>
             <para>通常、ロードされたモジュールにあるトップレベルの式(CAF(Constant Applicative Form)、あるいは定作用形とも呼ばれる)を評価した結果は、複数回のプロンプトでの評価をまたがって保持される。<literal>+r</literal>を有効にすると、トップレベルの式の評価結果はすべて、一回の評価が終わるごとに捨てられるようになる(それでも一回の評価の<emphasis>間は</emphasis>保持される)。</para>
-	
+        
             <para>このオプションは、評価済みのトップレベル式が大量のメモリを消費するときや、再現性のある実行性能の計測をしたいときに有用かもしれない。</para>
-	  </listitem>
-	</varlistentry>
+          </listitem>
+        </varlistentry>
 
-	<varlistentry>
-	  <term>
+        <varlistentry>
+          <term>
             <literal>+s</literal>
             <indexterm><primary><literal>+s</literal></primary></indexterm>
           </term>
-	  <listitem>
+          <listitem>
             <para>一つ式を評価するごとに、経過時間や確保されたバイト数などの統計情報を表示する。注意: 確保されたバイト数はGC毎に計算されるので、これは記憶領域管理器の確保領域の大きさ程度の正確さしかない。そういうわけで、GCが起こらなかった場合、値として0が表示されるかもしれない。</para>
-	  </listitem>
-	</varlistentry>
+          </listitem>
+        </varlistentry>
 
-	<varlistentry>
-	  <term>
+        <varlistentry>
+          <term>
             <literal>+t</literal>
             <indexterm><primary><literal>+t</literal></primary></indexterm>
           </term>
-	  <listitem>
+          <listitem>
             <para>文がプロンプトに入力されたとき、束縛された変数それぞれの型を表示する。入力されたのが単一の式なら、束縛されるのは変数「<literal>it</literal>」だけである。</para>
-	  </listitem>
-	</varlistentry>
+          </listitem>
+        </varlistentry>
       </variablelist>
     </sect2>
 
@@ -2277,28 +2277,28 @@ warning settings:
 
     <para>あなたの<filename>.ghci</filename>にこのマクロを置いておけば、<literal>:source file</literal>とすることで<literal>file</literal>からGHCiコマンドを読み込むことができる。Haskell wikiのページ<ulink url="http://haskell.org/haskellwiki/GHC/GHCi">GHC/GHCi</ulink>では、<filename>.ghci</filename>についてのその他の助言を読むことが(そしてもちろん、追加することも)できる。</para>
 
-	<para>加えて、標準のファイルの後には<literal>-ghci-script</literal>フラグで指定されたファイルが全て読まれる。これによってデフォルト以外の.ghciファイルを使うことができる。</para>
+        <para>加えて、標準のファイルの後には<literal>-ghci-script</literal>フラグで指定されたファイルが全て読まれる。これによってデフォルト以外の.ghciファイルを使うことができる。</para>
 
     <para>開始時ファイルが読まれるかどうかを制御する二つのコマンド行オプションがある。</para>
 
     <variablelist>
       <varlistentry>
-	<term>
+        <term>
           <option>-ignore-dot-ghci</option>
           <indexterm><primary><option>-ignore-dot-ghci</option></primary></indexterm>
         </term>
-	<listitem>
+        <listitem>
           <para>開始するとき、<filename>./.ghci</filename>その他の開始時ファイルを読まない。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
       <varlistentry>
-	<term>
+        <term>
          <option>-ghci-script</option>
          <indexterm><primary><option>-ghci-script</option></primary></indexterm>
         </term>
-	<listitem>
-	  <para>通常の開始ファイルの後に指定されたファイルを読む。繰り返すことで複数の入力を指定できる。</para>
-	</listitem>
+        <listitem>
+          <para>通常の開始ファイルの後に指定されたファイルを読む。繰り返すことで複数の入力を指定できる。</para>
+        </listitem>
       </varlistentry>
     </variablelist>
 
@@ -2361,44 +2361,44 @@ warning settings:
     <variablelist>
       <varlistentry>
         <term>インタプリタがforeign export宣言のあるモジュールをロードできません！</term>
-	<listitem>
+        <listitem>
           <para>残念ながらその通りである。それはまだ実装されていない。問題のあるモジュールは手でコンパイルしてからGHCiにロードしてほしい。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
           GHCiで<literal>-O</literal>がうまく働きません！
           <indexterm><primary><option>-O</option></primary></indexterm>
          </term>
-	<listitem>
+        <listitem>
           <para>技術的な理由から、バイトコードコンパイラが特定の最適化過程とうまく相互作用しないので、解釈実行器を使うときは最適化が無効にしてある。これは大きな問題ではない。高速に実行されるべきコードは、コンパイルしておくことで、最適化つきで解釈実行するよりもずっと速く実行できる。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
         <term>非ボックス化タプルがGHCiで使えない</term>
-	<listitem>
+        <listitem>
           <para>その通り。しかし、非ボックス化タプルを使うモジュールをコンパイルして、それをGHCiにロードするということは常にできる。(ちなみに、上記の、<literal>-O</literal>がGHCiで使えないというのは、バイトコードコンパイラが非ボックス化タプルを扱えないからである)</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
         <term>GHCiが入力を待っている間、並列スレッドが走りつづけてくれない。</term>
-	<listitem>
+        <listitem>
           <para>GHCiが<option>-threaded</option>スイッチを有効(デフォルト)にしてコンパイルされている限り、問題はないはずである。インストールしたGHCの供給元に相談してほしい。</para>
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
         <term><literal>getContents</literal>を使った後、<literal>:load</literal>か<literal>:reload</literal>するまで<literal>stdin</literal>が使えない。</term>
 
-	<listitem>
+        <listitem>
           <para>それは<literal>getContents</literal>の定義通りの振る舞いである。<literal>getContents</literal>はハンドルを<firstterm>セミクローズ</firstterm>という状態にするが、その状態ではいかなるIO操作も禁止される。計算と計算の間でIOの状態は保持されるので、次に<literal>:load</literal>か<literal>:reload</literal>コマンドが実行されるまでセミクローズ状態が続く。</para>
 
           <para><literal>:set +r</literal>というコマンドで<literal>stdin</literal>が毎回元の状態に復元されるようにすることができる。これがうまく行くのは、<literal>stdin</literal>が単なるトップレベルの式で、他のトップレベルの式(CAF)と同様の方法で未評価の状態に戻すことができるからである。</para>
 
-	</listitem>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -2409,7 +2409,7 @@ warning settings:
       </varlistentry>
 
       <varlistentry>
-	<term>デフォルトのバッファリングモードがGHCiとGHCで異なっている。</term>
+        <term>デフォルトのバッファリングモードがGHCiとGHCで異なっている。</term>
         <listitem>
           <para>
             GHCでは、デフォルトでstdoutハンドルは行バッファされている。しかし、GHCiでは、stdoutに関するバッファリングを無効にしてある。これが通常インタプリタに期待される振る舞いだからである。出力は生成されるとすぐに出現する。
