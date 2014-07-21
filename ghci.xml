@@ -214,7 +214,7 @@ Prelude> 5+5
 </screen>
 </para>
 
-<sect2><title>I/O動作とプロンプト</title>
+<sect2 id="actions-at-prompt"><title>I/O動作とプロンプト</title>
 
 <para>GHCiはプロンプトにおいて行うのは単なる式の評価だけではない。なんらかの<literal>a</literal>について<literal>IO a</literal>の型を持つものを入力すると、GHCiはそれをIO動作として<emphasis>実行</emphasis>するのである。
 <screen>
@@ -222,6 +222,11 @@ Prelude> "hello"
 "hello"
 Prelude> putStrLn "hello"
 hello
+</screen>
+これは、式の型を<literal>IO a</literal>に<emphasis>具体化</emphasis>することができる限り、その型がもっと一般的であっても動作する。例えば
+<screen>
+Prelude> return True
+True
 </screen>
 さらに、次の場合には(そしてその場合に限り)、GHCiはIO動作の結果を印字する。
 <itemizedlist>
@@ -350,7 +355,7 @@ Prelude|
 Prelude> :set +m
 Prelude> let x = 42
 Prelude|     y = 3
-Prelude| 
+Prelude|
 Prelude>
 </screen>
 
@@ -395,7 +400,7 @@ Prelude>
     <sect2 id="ghci-decls">
       <title>型、クラスおよびその他の宣言</title>
 
-      <para>[<emphasis role="bold">バージョン7.4.1の新機能</emphasis>] GHCiプロンプトではまた、Haskellの任意の最上位宣言を入力することができる。これには以下の各宣言が含まれる。<literal>data</literal>、<literal>type</literal>、<literal>newtype</literal>、<literal>class</literal>、<literal>instance</literal>、<literal>deriving</literal>、<literal>foreign</literal>。例を挙げる。</para>
+      <para>GHCiプロンプトではまた、Haskellの任意の最上位宣言を入力することができる。これには以下の各宣言が含まれる。<literal>data</literal>、<literal>type</literal>、<literal>newtype</literal>、<literal>class</literal>、<literal>instance</literal>、<literal>deriving</literal>、<literal>foreign</literal>。例を挙げる。</para>
 
 <screen>
 Prelude> data T = A | B | C deriving (Eq, Ord, Show, Enum)
@@ -423,21 +428,44 @@ Prelude> f A
     In the first argument of `f', namely `A'
     In the expression: f A
     In an equation for `it': it = f A
-Prelude> 
+Prelude>
 </screen>
 
     <para>古い、隠された方の<literal>T</literal>はGHCiによって<literal>main::Interactive.T</literal>と表示されている。これは、新しい<literal>T</literal>(単に<literal>T</literal>と表示される)と区別しようとしてこうなっている。</para>
 
+    <para>クラスや型族のインスタンス宣言は、単に「利用可能なインスタンスの一覧」に追加される。ただし例外が一つある。型族インスタンスには重複があってはならないが、再定義したいこともあるので、左辺が同一であるインスタンスが過去にあった場合にはそれを<emphasis>置き換える</emphasis>。(<xref linkend="type-families"/>を見よ。)</para>
     </sect2>
 
     <sect2 id="ghci-scope">
       <title>プロンプトで実際にスコープにあるのは何か</title>
 
-      <para>プロンプトに式を入力するとき、どの識別子や型がスコープにあるのだろうか。GHCiでは、式を評価する際の環境をどうやって構築するか、正確に指定することができる。単純な場合から始めよう。GHCiを開始すると、プロンプトは次のようになっている。</para>
+      <para>プロンプトに式を入力するとき、どの識別子や型がスコープにあるのだろうか。GHCiでは、式を評価する際の環境をどうやって構築するか、正確に指定することができる。以下のように。
+
+  <itemizedlist>
+  <listitem><para>
+        <literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の各コマンド(<xref linkend="ghci-load-scope"/>)。
+   </para></listitem>
+  <listitem><para>
+        <literal>import</literal>宣言(<xref linkend="ghci-import-decl"/>)。
+   </para></listitem>
+  <listitem><para>
+        <literal>:module</literal>コマンド(<xref linkend="ghci-module-cmd"/>)。
+   </para></listitem>
+  </itemizedlist>
+      </para>
+      <para><literal>:show imports</literal>は、どのモジュールの内容がスコープにあるかについて要約を表示する。</para>
+      <para>
+        ヒント: GHCiはスコープにある名前をtab補完する。たとえば、GHCiを起動して<literal>J&lt;tab&gt;</literal>を打ち込むと、GHCiはそれを「<literal>Just </literal>」に展開する。
+      </para>
+
+   <sect3 id="ghci-load-scope">
+   <title>スコープ内容に対する<literal>:load</literal>の影響</title>
+      <para>
+      <literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の各コマンドがスコープに影響する。(<xref linkend="loading-source-files"/>および<xref linkend="ghci-compiled"/>)。単純な場合から始めよう。GHCiを開始すると、プロンプトは次のようになっている。
 
 <screen>Prelude></screen>
 
-      <para>これは、<literal>Prelude</literal>モジュールの全てのものが現在スコープにあるということを示している。可視な識別子は、ちょうど<literal>import</literal>宣言のないHaskellファイルで可視なものである。</para>
+      これは、<literal>Prelude</literal>モジュールの全てのものが現在スコープにあるということを示している。可視な識別子は、ちょうど<literal>import</literal>宣言のないHaskellファイルで可視なものである。</para>
       <para>ここでファイルをGHCiにロードすると、プロンプトは次のように変わる。</para>
 
 <screen>
@@ -448,11 +476,28 @@ Compiling Main             ( Main.hs, interpreted )
 
       <para>新しいプロンプトは<literal>*Main</literal>であり、これは、入力される式が、<literal>Main</literal>モジュールのトップレベルの文脈で評価されるということである。<!-- 今ロードしたばかりの --><literal>Main</literal>モジュールのトップレベルでスコープにあるものは、全てプロンプトでもスコープにある。(<literal>Main</literal>が明示的に隠していない限り、これにはおそらく<literal>Prelude</literal>も含まれる)</para>
 
-      <para><literal>*<replaceable>module</replaceable></literal>という構文は、プロンプトから入力される式に対して、<replaceable>module</replaceable>の完全なトップレベルスコープが使われるということを示している。<literal>*</literal>がない場合、そのモジュールがエクスポートしているものだけが可視である。</para>
-
-      <para>扱えるのは単一のモジュールだけではない。GHCiは複数のモジュールのスコープを組み合わせることができ、このとき<literal>*</literal>が付く形式と<literal>*</literal>なしの形式を混合して用いることができる。GHCiはこれらのモジュールのスコープを全て組み合わせ、プロンプトのスコープとする。</para>
+      <para>プロンプトにおける<literal>*<replaceable>module</replaceable></literal>という構文は、プロンプトから入力される式に対して、<replaceable>module</replaceable>の完全なトップレベルスコープが使われるということを示している。<literal>*</literal>がない場合、そのモジュールがエクスポートしているものだけが可視である。</para>
 
       <para>注意: 技術的な理由から、GHCiは解釈実行されるモジュールについてしか<literal>*</literal>形式をサポートしない。そのため、コンパイル済みモジュールとパッケージのモジュールは、それがエクスポートしたものでしかプロンプトのスコープに寄与できない。GHCiがモジュールの解釈実行版を使っていることを確実にするには、モジュールをロードする時に<literal>*</literal>を加えれば良い。例えば<literal>:load *M</literal>のように。</para>
+
+      <para>一般に、<literal>:load</literal>コマンドが実行された後、直近にロードされた「ターゲット」モジュールに対するインポートが自動的にスコープに追加される。このとき、可能なら<literal>*</literal>形式が使われる。例えば、<literal>:load foo.hs bar.hs</literal>と入力したとき、<filename>bar.hs</filename>には<literal>Bar</literal>というモジュールがあるとすると、スコープは、<literal>Bar</literal>が解釈実行されているなら<literal>*Bar</literal>になり、<literal>Bar</literal>がコンパイル済みなら<literal>Prelude Bar</literal>になる。(GHCiは<literal>Prelude</literal>が指定されておらず、しかも<literal>*</literal>形式のモジュールが一つもないとき、自動的にそれを付け加える)。これらの自動追加されたインポートは<literal>:show imports</literal>で見ることができる。
+
+<screen>
+Prelude> :load hello.hs
+[1 of 1] Compiling Main             ( hello.hs, interpreted )
+Ok, modules loaded: Main.
+*Main> :show imports
+:module +*Main -- added automatically
+*Main>
+</screen>
+
+      この自動追加されたインポートは、次に<literal>:load</literal>または<literal>:add</literal>または<literal>:reload</literal>を行なったときに別のものに置き換えられる。通常のインポートと同様に<literal>:module</literal>で削除することもできる。</para>
+   </sect3>
+
+      <sect3 id="ghci-import-decl">
+      <title><literal>import</literal>を使ったスコープ制御</title>
+
+      <para>扱えるのは単一のモジュールだけではない。GHCiは複数のモジュールのスコープを組み合わせることができ、このとき<literal>*</literal>が付く形式と<literal>*</literal>なしの形式を混合して用いることができる。GHCiはこれらのモジュールのスコープを全て組み合わせ、プロンプトのスコープとする。</para>
 
       <para>モジュールをスコープに加えるには、通常のHaskellの<literal>import</literal>構文を使う。</para>
 
@@ -477,7 +522,22 @@ Prelude System.IO Map>
 
       <para><literal>Prelude</literal>のインポートがimplicitと標示されているのに注意。通常のHaskellモジュール内と同様に、明示的に<literal>Prelude</literal>をインポートすればそちらが優先される。</para>
 
-      <para>スコープを操作するもう一つの方法は<literal>:module</literal>コマンドである。これは、通常の<literal>import</literal>宣言では実現できないことをする方法を提供する。</para>
+      <para>複数のモジュールがスコープにあるとき、特に複数の<literal>*</literal>形式のモジュールがあるときは、名前の衝突が起こりやすい。Haskellでは、名前の衝突は曖昧な識別子が使われたときのみ報告されると定められており、GHCiもプロンプトで入力される式についてこれに倣っている。</para>
+
+      </sect3>
+
+      <sect3 id="ghci-module-cmd">
+      <title><literal>:module</literal>コマンドを使ったスコープ制御</title>
+
+      <para>スコープを操作するもう一つの方法は<literal>:module</literal>コマンドである。構文は以下である。
+
+<screen>
+:module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable>
+</screen>
+
+      <para><literal>+</literal>を使えばモジュールが現在のスコープに加えられ、<literal>-</literal>では削除される。<literal>+</literal>も<literal>-</literal>もない場合は、指定されたモジュール群がそのままで現在のスコープになる。この形式を使って、しかも<literal>Prelude</literal>を含めなかった場合、GHCiは暗黙の<literal>Prelude</literal>インポートを自動的に追加する。</para>
+
+      <para><literal>:module</literal>コマンドは、通常の<literal>import</literal>宣言では実現できないことをする方法を提供する。</para>
       <itemizedlist>
         <listitem>
           <para><literal>:module</literal>は、モジュールに付く<literal>*</literal>修飾子に対応する。これは、単にモジュールがエクスポートしているものだけでなく、そのモジュールの完全な最上位スコープを開く。</para>
@@ -486,51 +546,10 @@ Prelude System.IO Map>
           <para><literal>:module -M</literal>構文を使うと、文脈からモジュールを<emphasis>削除</emphasis>することができる。<literal>import</literal>構文は(Haskellモジュール内と同じく)累積的なので、これがスコープから一部を取り除く唯一の方法である。</para>
         </listitem>
       </itemizedlist>
-      <literal>:module</literal>コマンドの完全な構文は以下である。
 
-<screen>
-:module <optional>+|-</optional> <optional>*</optional><replaceable>mod<subscript>1</subscript></replaceable> ... <optional>*</optional><replaceable>mod<subscript>n</subscript></replaceable>
-</screen>
-
-      <para><literal>+</literal>を使えばモジュールが現在のスコープに加えられ、<literal>-</literal>では削除される。<literal>+</literal>も<literal>-</literal>もない場合は、指定されたモジュール群がそのままで現在のスコープになる。この形式を使って、しかも<literal>Prelude</literal>を含めなかった場合、GHCiは暗黙の<literal>Prelude</literal>インポートを自動的に追加する。</para>
-
-      <para><literal>:load</literal>コマンドが実行されると、直近にロードされた「ターゲット」モジュールに対するインポートが自動的に追加される。このとき、可能なら<literal>*</literal>形式が使われる。例えば、<literal>:load foo.hs bar.hs</literal>と入力したとき、<filename>bar.hs</filename>には<literal>Bar</literal>というモジュールがあるとすると、スコープは、<literal>Bar</literal>が解釈実行されているなら<literal>*Bar</literal>になり、<literal>Bar</literal>がコンパイル済みなら<literal>Prelude Bar</literal>になる。(GHCiは<literal>Prelude</literal>が指定されておらず、しかも<literal>*</literal>形式のモジュールが一つもないとき、自動的に<literal>Prelude</literal>を付け加える)。これらの自動追加されたインポートは<literal>:show imports</literal>で見ることができる。
-
-<screen>
-Prelude> :load hello.hs
-[1 of 1] Compiling Main             ( hello.hs, interpreted )
-Ok, modules loaded: Main.
-*Main> :show imports
-:module +*Main -- added automatically
-*Main>
-</screen>
-
-      この自動追加されたインポートは、次に<literal>:load</literal>または<literal>:add</literal>または<literal>:reload</literal>を行なったときに別のものに置き換えられる。通常のインポートと同様に<literal>:module</literal>で削除することもできる。</para>
-
-      <para>複数のモジュールがスコープにあるとき、特に複数の<literal>*</literal>形式のモジュールがあるときは、名前の衝突が起こりやすい。Haskellでは、名前の衝突は曖昧な識別子が使われたときのみ報告されると定められており、GHCiもプロンプトで入力される式についてこれに倣っている。</para>
-
-      <para>
-        ヒント: GHCiはスコープにある名前についてタブ補完を行う。例えば、GHCiを起動して<literal>J&lt;tab&gt;</literal>と打つと、GHCiはそれを&ldquo;<literal>Just </literal>&rdquo;に展開する。
       </para>
-
-      <sect3>
-        <title><literal>:module</literal>と<literal>:load</literal></title>
-
-        <para><literal>:module</literal>と<literal>:load</literal>は似たようなことをするように思えるかもしれない。どちらも、モジュールをスコープに入れるのに使うことができる。しかし、この二つには明確な違いがある。GHCiは、以下の二つのモジュール集合を意識する。</para>
-
-        <itemizedlist>
-          <listitem>
-            <para>現在<emphasis>ロードされている</emphasis>モジュールの集合。この集合は、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>によって変更され、<literal>:show modules</literal>で見ることができる。
-            </para>
-          </listitem>
-          <listitem>
-            <para>現在<emphasis>スコープにある</emphasis>モジュールの集合。この集合は<literal>import</literal>と<literal>:module</literal>によって変更される。また、上述のように<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の後に自動的に変更が加えられる</para>
-          </listitem>
-        </itemizedlist>
-
-        <para>ロードされていないモジュールをスコープに入れることはできない。新しいモジュールをロードするために<literal>:module</literal>を使おうとすると「<literal>module M is not loaded</literal>」というメッセージが表示されるのはこのためである。</para>
       </sect3>
-
+ 
       <sect3 id="ghci-import-qualified">
 	<title>修飾名</title>
 
@@ -539,6 +558,25 @@ Ok, modules loaded: Main.
       </sect3>
 
       <sect3>
+        <title><literal>:module</literal>と<literal>:load</literal></title>
+
+        <para><literal>:module</literal>と<literal>:load</literal>は似たようなことをするように思えるかもしれない。どちらも、モジュールをスコープに入れるのに使うことができる。しかし、この二つには非常に重要な違いがある。GHCiは、以下の二つのモジュール集合を意識する。</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>現在<emphasis>ロードされている</emphasis>モジュールの集合。この集合は、<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>によって変更され、<literal>:show modules</literal>で見ることができる。
+            </para>
+          </listitem>
+          <listitem>
+            <para>現在<emphasis>スコープにある</emphasis>モジュールの集合。この集合は<literal>import</literal>と<literal>:module</literal>によって変更される。また、上述のように<literal>:load</literal>、<literal>:add</literal>、<literal>:reload</literal>の後に自動的に変更が加えられる。スコープにあるモジュールの集合は<literal>:show imports</literal>で見ることができる。</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>(<literal>:module</literal>や<literal>import</literal>で)スコープに入れることができるのは、(a)ロードされているモジュールか、(b)GHCiが知っているパッケージに入っているモジュールだけである。<literal>:module</literal>を使ってロードされていないモジュールをスコープに入れようとすると「<literal>module M is not loaded</literal>」というメッセージが表示されることがある。</para>
+      </sect3>
+
+    </sect2>
+      <sect2>
         <title><literal>:main</literal>コマンドと<literal>:run</literal>コマンド</title>
 
         <para>
@@ -578,7 +616,6 @@ bar
 ["foo","bar baz"]
 </screen>
 
-      </sect3>
     </sect2>
 
 
@@ -675,6 +712,7 @@ def = toEnum 0
     これが、<literal>0</literal>ではなく<literal>()</literal>を表示する。型が<literal>Integer</literal>でなく<literal>()</literal>にデフォルト化されるためである。</para>
    <para>
     この変更の理由は、これによって<literal>IO a</literal>の動作が<literal>IO ()</literal>にデフォルト化されるので、ghciがこれらを走らせたときに結果を表示する必要がなくなることである。これは<literal>printf</literal>の場合に特に重要である。<literal>printf</literal>には<literal>IO a</literal>を返すインスタンスがあるが、これが返せるのは<literal>undefined</literal>だけである。(インスタンスがこの型なのは、printfがクラスシステムの拡張を必要としないようにである)。このため、もし型が<literal>Integer</literal>にデフォルト化されるなら、ghciはprintfを実行する時にエラーを発生させることになる。</para>
+   <para>計算を扱う式のモナドが可能なら<literal>IO</literal>にデフォルト化される事については<xref linkend="actions-at-prompt"/>を見よ。</para>
     </sect2>
    <sect2 id="ghci-interactive-print">
      <title>デフォルト以外の対話表示関数を使う</title>
@@ -938,7 +976,7 @@ Stopped at qsort.hs:5:7-47
 _result :: IO ()
 </screen>
 
-      <para><literal>:step <replaceable>expr</replaceable></literal>コマンドは、<replaceable>expr</replaceable>のステップ実行を開始する。<replaceable>expr</replaceable>が省略された時は、現在のブレークポイントからステップ実行する。<literal>:stepover</literal>も同様に動作する。</para>
+      <para><literal>:step <replaceable>expr</replaceable></literal>コマンドは、<replaceable>expr</replaceable>のステップ実行を開始する。<replaceable>expr</replaceable>が省略された時は、現在のブレークポイントからステップ実行する。<literal>:steplocal</literal>と<literal>:stepmodule</literal>も同様に動作する。</para>
 
       <para>ステップ実行中には<literal>:list</literal>が特に便利で、自分がどこにいるか知ることができる。</para>
 
@@ -1064,7 +1102,7 @@ a :: a
 
       <para><literal>:trace</literal>コマンドには式を与えても与えなくても良い。与えなかった場合、<literal>:step</literal>の場合と同様、追跡は現在のブレークポイントから始まる。</para>
 
-      <para>履歴は<literal>:trace</literal>を使ったときしか記録されない。これは、全てのブレークポイントを履歴に記録することで性能が二倍以上悪化することが分かったからである。GHCiは最後の50ステップを履歴に記憶する。(将来、これを可変にするかもしれない)</para>
+      <para>履歴は<literal>:trace</literal>を使ったときしか記録されない。これは、全てのブレークポイントを履歴に記録することで性能が二倍以上悪化することが分かったからである。デフォルトではGHCiは最後の50ステップを履歴に記憶するが、これは<option>-fghci-hist-size=<replaceable>n</replaceable></option><indexterm><primary><option>-fghci-hist-size</option></primary></indexterm>オプションで変更できる。</para>
     </sect2>
 
     <sect2 id="ghci-debugger-exceptions">
@@ -1359,7 +1397,7 @@ maybe :: b -> (a -> b) -> Maybe a -> b
           <indexterm><primary><literal>:cd</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para>作業ディレクトリを<replaceable>dir</replaceable>に変更する。<replaceable>dir</replaceable>の先頭が「<literal>&tilde;</literal>」記号の場合、それは<literal>HOME</literal>環境変数の内容で置き換えられる。</para>
+          <para>作業ディレクトリを<replaceable>dir</replaceable>に変更する。<replaceable>dir</replaceable>の先頭が「<literal>&tilde;</literal>」記号の場合、それは<literal>HOME</literal>環境変数の内容で置き換えられる。現在の作業ディレクトリを表示することについては<literal>:show paths</literal>コマンドも見よ。 </para>
 
           <para>注意: ディレクトリを変更すると、ロードされているモジュールは全て未ロードになる。これは、探索パスがふつう相対ディレクトリを使って表されており、また、セッションの途中で探索パスを変更することがサポートされていないためである。</para>
 	</listitem>
@@ -1373,6 +1411,66 @@ maybe :: b -> (a -> b) -> Maybe a -> b
 	<listitem>
           <para><replaceable>expr</replaceable>を<literal>IO String</literal>型の計算として実行し、その結果の文字列をGHCiコマンドのリストとして実行する。複数のコマンドは改行で区切る。<literal>:cmd</literal>コマンドは<literal>:def</literal>および<literal>:set stop</literal>と組み合わせて使うのに便利である。</para>
 	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:complete</literal> <replaceable>type</replaceable>
+                                       <optional><replaceable>n</replaceable>-</optional><optional><replaceable>m</replaceable></optional>
+                                       <replaceable>string-literal</replaceable>
+          <indexterm><primary><literal>:complete</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>このコマンドは、GHCiが正規のターミナルでなくパイプを通してやりとりをしている場合でもコマンド補完を可能にするものであり、GHCiの補完をテキストエディタやIDEに統合するために設計されている。</para>
+
+          <para><literal>:complete</literal>は、呼ばれたとき、<replaceable>string-literal</replaceable>という不完全な入力に対する領域<replaceable>type</replaceable>用の補完候補のうち<replaceable>n</replaceable><superscript>番目</superscript>から<replaceable>m</replaceable><superscript>番目</superscript>までのものを表示する。現在対応している領域は<literal>repl</literal>のみであり、これはGHCiの入力プロンプトで対話的に提供される種類の補完を意味する。</para>
+
+          <para>省略された場合、デフォルトで<replaceable>n</replaceable>と<replaceable>m</replaceable>はそれぞれ最初と最後の利用可能な補完候補になる。この引数によって指定される範囲よりも少ない補完候補しかない場合、<replaceable>n</replaceable>と<replaceable>m</replaceable>は、補完候補の数まで暗黙に切り詰められる。</para>
+
+          <para><literal>:complete</literal>の出力は、以下の三つのフィールドを空白区切りで含むヘッダ行から始まる。
+
+          <itemizedlist>
+            <listitem>表示される候補の数<replaceable>l</replaceable>を表す整数。</listitem>
+
+            <listitem>利用可能な全ての補完の数を表す整数。</listitem>
+
+            <listitem>返される補完候補に付加されるべき共通接頭辞を表す文字列リテラル。</listitem>
+          </itemizedlist>
+
+          ヘッダ行の後には、<replaceable>l</replaceable>行が続く。それぞれの行には、一つの補完候補が(クォート付きの)文字列リテラルとしてエンコードされて含まれる。いろいろな場合の起動例をいくつかここに示す。</para>
+
+<screen>
+Prelude&gt; :complete repl 0 ""
+0 470 ""
+Prelude&gt; :complete repl 5 "import For"
+5 21 "import "
+"Foreign"
+"Foreign.C"
+"Foreign.C.Error"
+"Foreign.C.String"
+"Foreign.C.Types"
+Prelude&gt; :complete repl 5-10 "import For"
+6 21 "import "
+"Foreign.C.Types"
+"Foreign.Concurrent"
+"Foreign.ForeignPtr"
+"Foreign.ForeignPtr.Safe"
+"Foreign.ForeignPtr.Unsafe"
+"Foreign.Marshal"
+Prelude&gt; :complete repl 20- "import For"
+2 21 "import "
+"Foreign.StablePtr"
+"Foreign.Storable"
+Prelude&gt; :complete repl "map"
+3 3 ""
+"map"
+"mapM"
+"mapM_"
+Prelude&gt; :complete repl 5-10 "map"
+0 3 ""
+</screen>
+
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -1522,34 +1620,78 @@ Prelude> :. cmds.ghci
           <indexterm><primary><literal>:history</literal></primary></indexterm>
         </term>
 	<listitem>
-	  <para>評価ステップの履歴を表示する。数値が与えられると、その数のステップを表示する(デフォルト: 20)。<literal>:trace</literal>と組み合わせて使う。<xref linkend="tracing" />を見よ。</para>
+	  <para>評価ステップの履歴を表示する。数値が与えられると、その数のステップを表示する(デフォルト: 20)。<literal>:trace</literal>と組み合わせて使う。<xref linkend="tracing" />を見よ。GHCiが保存する履歴の数を設定するには<option>-fghci-hist-size=<replaceable>n</replaceable></option>を使う。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
 	<term>
-          <literal>:info</literal> <replaceable>name</replaceable> ...
+          <literal>:info</literal><optional><literal>!</literal></optional><replaceable>name</replaceable> ...
           <indexterm><primary><literal>:info</literal></primary></indexterm>
         </term>
 	<listitem>
           <para>与えられた名前についての情報を表示する。例えば、もし<replaceable>name</replaceable>がクラスなら、クラスメソッドとその型が印字される。もし<replaceable>name</replaceable>が型構築子なら、その定義が印字される。もし<replaceable>name</replaceable>が関数なら、その型が印字される。<replaceable>name</replaceable>がソースファイルからロードされたものであった場合、GHCiはその定義のソースコード中の位置も表示する。</para>
-          <para>型およびクラスについては、それに言及するインスタンスもまとめて示す。無関係な情報を見せることがないように、インスタンスは、(a)その頭部が<replaceable>name</replaceable>に言及している、かつ(b)そのインスタンスで言及されているものが全て、<literal>:load</literal>または<literal>:module</literal>コマンドの結果としてスコープにある(修飾されていてもそうでなくても良い)、場合にのみ表示される。</para>
+          <para>型およびクラスについては、それに言及するインスタンスもまとめて示す。無関係な情報を見せることがないように、インスタンスは、(a)その頭部が<replaceable>name</replaceable>に言及している、かつ(b)そのインスタンスで言及されているものが全て<literal>:load</literal>または<literal>:module</literal>コマンドの結果としてスコープにある(修飾されていてもそうでなくても良い)、場合にのみ表示される。</para>
+          <para><literal>:info!</literal>コマンドも同様に動作するが、上記の制限(b)を外し、頭部が<replaceable>name</replaceable>に言及するインスタンスでスコープにあるものを全て表示する。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
-          <literal>:kind</literal><optional><literal>!</literal></optional> 
+        <term>
+          <literal>:issafe</literal><optional><replaceable>module</replaceable></optional>
+          <indexterm><primary><literal>:issafe</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>与えられたモジュール(省略された場合は現在のモジュール)についてのSafe Haskell情報を表示する。これには、モジュールおよびそのパッケージの信用型を含む。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:kind</literal><optional><literal>!</literal></optional>
                         <replaceable>type</replaceable>
           <indexterm><primary><literal>:kind</literal></primary></indexterm>
         </term>
 	<listitem>
-          <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。省略可能な"<literal>!</literal>"を指定した場合、GHCはさらに、型シノニムを展開して型関数の適用を評価することによって型を正規化し、その結果を表示する。</para>
+          <para><replaceable>type</replaceable>の種を推論し、印字する。<replaceable>type</replaceable>は任意の型式で、<literal>Either Int</literal>のような型構築子の部分適用であっても構わない。実際、<literal>:kind</literal>は、(通常許されない)型シノニムの部分適用を書くことも認めるので、以下が動作する。
+<programlisting>
+ghci> type T a b = (a,b,a)
+ghci> :k T Int Bool
+T Int Bool :: *
+ghci> :k T
+T :: * -> * -> *
+ghci> :k T Int
+T Int :: * -> *
+</programlisting>
+            </para>
+            <para>
+
+          省略可能な"<literal>!</literal>"を指定した場合、GHCはさらに、型シノニムを展開して型関数の適用を評価することによって型を正規化し、その結果を表示する。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
+          <literal>:list</literal> <replaceable>identifier</replaceable>
+          <indexterm><primary><literal>:list</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>identifier</replaceable>の定義の周りか、与えられなかった場合には現在のブレークポイントの周りのソースコードを表示する。この識別子は解釈実行されているモジュールで定義されている必要がある。もし出力装置が対応しているなら、GHCiは注目している部分式を太字で強調する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:list</literal> <optional><replaceable>module</replaceable></optional> <replaceable>line</replaceable>
+          <indexterm><primary><literal>:list</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para><replaceable>module</replaceable>の与えられた行数の周りのソースコードを表示する。このモジュールは解釈実行されている必要がある。もし出力装置が対応しているなら、GHCiは注目している部分式を太字で強調する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
           <literal>:load</literal> <optional><literal>*</literal></optional><replaceable>module</replaceable> ...
           <indexterm><primary><literal>:load</literal></primary></indexterm>
         </term>
@@ -1730,12 +1872,21 @@ bar
            <literal>:set</literal> <literal>prompt</literal> <replaceable>prompt</replaceable>
         </term>
 	<listitem>
-          <para>GHCiのプロンプトとして使われる文字列を設定する。<replaceable>prompt</replaceable>の中では、<literal>%s</literal>という並びは現在スコープにあるモジュールの名前に置き換えられ、<literal>%%</literal>は<literal>%</literal>に置き換えられる。<replaceable>prompt</replaceable>が&quot;で始まる場合、HaskellのStringとしてパースされる。そうでない場合はそのまま文字列として扱われる。</para>
+          <para>GHCiのプロンプトとして使われる文字列を設定する。<replaceable>prompt</replaceable>の中では、<literal>%s</literal>という並びは現在スコープにあるモジュールの名前に置き換えられ、<literal>%l</literal>は現在のプロンプトの行番号(コンパイラメッセージで参照されるもの)に置き換えられ、<literal>%%</literal>は<literal>%</literal>に置き換えられる。<replaceable>prompt</replaceable>が&quot;で始まる場合、HaskellのStringとしてパースされる。そうでない場合はそのまま文字列として扱われる。</para>
         </listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
+        <term>
+           <literal>:set</literal> <literal>prompt2</literal> <replaceable>prompt</replaceable>
+        </term>
+        <listitem>
+          <para>GHCiの継続プロンプト(<literal>:{</literal>コマンドを使う際に使われる)として使われる文字列を設定する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
            <literal>:set</literal> <literal>stop</literal>
           [<replaceable>num</replaceable>] <replaceable>cmd</replaceable>
         </term>
@@ -1826,12 +1977,32 @@ bar
 
       <varlistentry>
 	<term>
-          <literal>:show languages</literal>
-          <indexterm><primary><literal>:show languages</literal></primary></indexterm>
+          <literal>:show paths</literal>
+          <indexterm><primary><literal>:show paths</literal></primary></indexterm>
         </term>
-	<listitem>
-    <para>現在有効な言語フラグを表示する。</para>
-	</listitem>
+        <listitem>
+          <para>現在の作業ディレクトリ(<literal>:cd</literal>コマンドによって設定される)と、ソースファイルを探すディレクトリの一覧(<option>-i</option>オプションによって設定される)を表示する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:show language</literal>
+          <indexterm><primary><literal>:show language</literal></primary></indexterm>
+        </term>
+        <listitem>
+    <para>ソースファイルに対して現在有効になっている言語フラグを表示する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:showi language</literal>
+          <indexterm><primary><literal>:showi language</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>プロンプトで入力される式に対して現在有効になっている言語フラグを表示する(<literal>:seti</literal>も見よ)。</para>
+        </listitem>
       </varlistentry>
 
 
@@ -1856,17 +2027,37 @@ bar
        </varlistentry>
       <varlistentry>
 	<term>
-          <literal>:step [<replaceable>expr</replaceable>]</literal>
+          <literal>:step</literal> <optional><replaceable>expr</replaceable></optional>
           <indexterm><primary><literal>:step</literal></primary></indexterm>
         </term>
-	<listitem>
-	  <para>直近のブレークポイントから一ステップ実行する。引数として式を与えられた場合、その式の評価のステップ実行を開始する。</para>
+        <listitem>
+          <para>全てのブレークポイントを有効にして、式を単一ステップモードで評価開始する。このモードでは、簡約一回ごとに評価が停止し、局所変数を確認することができる。<replaceable>expr</replaceable>が与えられなかった場合、最後のブレークポイントから評価を再開する。<xref linkend="single-stepping" />を見よ。</para>
 	</listitem>
       </varlistentry>
 
       <varlistentry>
-	<term>
-          <literal>:trace [<replaceable>expr</replaceable>]</literal>
+        <term>
+          <literal>:steplocal</literal>
+          <indexterm><primary><literal>:steplocal</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>現在の最上位束縛の中にあるブレークポイントのみを有効にした状態で、最後のブレークポイントから評価を再開する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:stepmodule</literal>
+          <indexterm><primary><literal>:stepmodule</literal></primary></indexterm>
+        </term>
+        <listitem>
+          <para>現在のモジュール内にあるブレークポイントのみを有効にした状態で、最後のブレークポイントから評価を再開する。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <literal>:trace <optional><replaceable>expr</replaceable></optional></literal>
           <indexterm><primary><literal>:trace</literal></primary></indexterm>
         </term>
 	<listitem>
@@ -2018,6 +2209,7 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
 Prelude> :seti
 base language is: Haskell2010
 with the following modifiers:
+  -XNoMonomorphismRestriction
   -XNoDatatypeContexts
   -XNondecreasingIndentation
   -XExtendedDefaultRules
@@ -2026,14 +2218,15 @@ other dynamic, non-language, flag settings:
   -fimplicit-import-qualified
 warning settings:
 </screen>
-
       <para><option>-XExtendedDefaultRules</option>が有効になっていることに注意。これは、プロンプトに入力された式に特別なデフォルト規則(<xref linkend="extended-default-rules" />を見よ)を適用しているからである。
       </para>
 
-      <para>プロンプトに入力される式についてのみ言語オプションを変え、ロードされるモジュールにはそのオプションを適用しないでおくのが便利なことがよくある。良い例の一つが以下である。
+      <para>加えて、GHCiでは単相性限定はデフォルトで無効になっている。(<xref linkend="monomorphism" />を見よ)。</para>
+
+      <para>プロンプトに入力される式についてのみ言語オプションを変え、ロードされるモジュールにはそのオプションを適用しないでおくのが便利なことがよくある。例えば、
 <screen>
-:seti -XNoMonomorphismRestriction
-</screen><option>-XNoMonomorphismRestriction</option>がロードされるモジュールにも適用されるのは望ましくないだろう。コンパイルエラーを引き起すかもしれないが、もっとよくあるのは、フラグが変わったのでモジュールの再コンパイルが必要だとGHCが判断することで、無駄な再コンパイルが発生することである。
+:seti -XMonoLocalBinds
+</screen><option>-XMonoLocalBinds</option>がロードされるモジュールにも適用されるのは望ましくないだろう。コンパイルエラーを引き起すかもしれないが、もっとよくあるのは、フラグが変わったのでモジュールの再コンパイルが必要だとGHCが判断することで、無駄な再コンパイルが発生することである。
       </para>
 
       <para>従って、<literal>.ghci</literal>ファイルで言語オプションを設定するときは、本当にGHCiにロードするモジュール全てにそれを適用したいのでない限り、<literal>:set</literal>でなく<literal>:seti</literal>を使うのが良い習慣である。
@@ -2109,6 +2302,47 @@ warning settings:
       </varlistentry>
     </variablelist>
 
+    <para>GHCiマクロを定義する際、名前が組み込みコマンドと衝突するかもしれない場合、特にtab補完に関して知っておいた方が良い重要な振る舞いがある。</para>
+    <para>例えば、<literal>:time</literal>というコマンドを定義したとして、シェルで<literal>:t 3</literal>と打ち込んだ場合に何が起こるべきだろうか。現在、コマンド補完のアルゴリズムは以下である。
+
+      <orderedlist>
+        <listitem>
+          <para>まず、定義されているマクロの中から完全一致のものを探す。</para>
+        </listitem>
+        <listitem>
+          <para>組み込みコマンドの一覧の中から完全一致のものを探す。</para>
+        </listitem>
+        <listitem>
+          <para>組み込みコマンドの一覧から前方一致で探す。該当する組み込みコマンドがあり、さらにそれと同名のマクロもあるなら、マクロの方を選ぶ。</para>
+        </listitem>
+        <listitem>
+          <para>組み込みコマンドの一覧から前方一致で探す。</para>
+        </listitem>
+        <listitem>
+          <para>定義済みマクロの一覧から前方一致で探す。</para>
+        </listitem>
+      </orderedlist>
+    </para>
+
+    <para>例をいくつか挙げる。
+
+      <orderedlist>
+        <listitem>
+          <para><literal>:time</literal>というマクロがあり、<literal>:t 3</literal>と入力する</para>
+          <para><literal>:type 3</literal>の意味になる。</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>:type</literal>というマクロがあり、<literal>:t 3</literal>と入力する</para>
+          <para><literal>:type 3</literal>の意味になる。ここで、組み込みコマンドではなく定義されたマクロの方が使われる。</para>
+        </listitem>
+
+        <listitem>
+          <para><literal>:time</literal>というマクロと<literal>:type</literal>というマクロがあり、<literal>:t 3</literal>と入力する</para>
+          <para><literal>:type 3</literal>の意味になる。定義されたマクロの方が使われる。</para>
+        </listitem>
+      </orderedlist>
+    </para>
   </sect1>
 
   <sect1 id="ghci-obj">
