@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module XMLFormat(format, ContentView(..), Element(..)) where
 
 import Data.List(groupBy, findIndex)
@@ -50,16 +51,20 @@ type SS = String -> String
 lit :: String -> SS
 lit = (++)
 
-cmap :: (a -> SS) -> [ContentView a] -> SS
-cmap f = foldr (+++) id . map ff
+cmap :: Bool -> (a -> SS) -> [ContentView a] -> SS
+cmap verbatim f = foldr (+++) id . map ff
   where
     ff (Child e) = f e
-    ff (Other str) = lit str
+    ff (Other str)
+      | verbatim = lit str
+      | otherwise  = lit $ normalize_white str
 
 to_str = ($"")
-format :: (Element a) => a -> String
+
+format :: forall a. (Element a) => a -> String
 format x = to_str $ fmt 0 x
   where
+    fmt :: Int -> a -> SS
     fmt level x
       | isLeaf x = indent leaf
       | isVerbatim x = lit "\n" +++ complete_open +++ verbatim_content +++ close +++ lit "\n"
@@ -71,10 +76,10 @@ format x = to_str $ fmt 0 x
         complete_open = open_tag x
         close = close_tag x +++ lit "\n"
 
-        verbatim_content = lit $ {- cut_indent $ -} to_str raw_content
-        inline_content = lit $ remove_white $ to_str raw_content
-        raw_content = cmap fmt_inline cont
-        block_content = cmap (fmt (level + 1)) cont
+        verbatim_content :: SS
+        verbatim_content = cmap True (fmt_inline True) cont
+        inline_content = cmap False (fmt_inline False) cont
+        block_content = cmap True (fmt (level + 1)) cont
         cont = remove_extra_space $ content x
         remove_extra_space cs
           | all (maybe True breakAndIndent . fromText) cs = filter (maybe True (not . breakAndIndent) . fromText) cs
@@ -83,14 +88,16 @@ format x = to_str $ fmt 0 x
           | noEmpty x = complete_open +++ close
           | otherwise = open +++ lit " />\n"
 
-    fmt_inline x
+    fmt_inline :: Bool -> a -> SS
+    fmt_inline verbatim x
       | isLeaf x  = leaf
       | otherwise = complete_open +++ inline_content +++ close
       where
         open = open_tag_open x
         complete_open = open_tag x
         close = close_tag x
-        inline_content = cmap fmt_inline (content x)
+        verbatim' = verbatim || isVerbatim x
+        inline_content = cmap verbatim' (fmt_inline verbatim') (content x)
         leaf
           | noEmpty x = complete_open +++ close
           | otherwise = open +++ lit " />\n"
@@ -121,12 +128,12 @@ cut_indent = init . unlines . fixTop . cut . fixBottom . lines
         prec = findIndex (/=' ')
     empty = all (==' ')
 
-remove_white :: String -> String
-remove_white = trim . concat . map newline_to_space . groupBy weq
+normalize_white :: String -> String
+normalize_white = trim . concat . map to_space . groupBy weq
   where
     weq x y = white x == white y
-    newline_to_space s
-      | elem '\n' s = " "
+    to_space s
+      | white (head s) = " "
       | otherwise = s
 
 drop_white = dropWhile white
