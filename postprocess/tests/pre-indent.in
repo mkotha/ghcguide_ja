@@ -1,0 +1,10 @@
+<html>
+<body>
+<pre>
+  module Main where
+
+  main :: IO ()
+  main = return ()
+</pre>
+</body>
+</html>
