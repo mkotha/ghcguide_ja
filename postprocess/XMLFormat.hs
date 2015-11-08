@@ -65,16 +65,14 @@ format root = to_str $ fmt 0 root
   where
     fmt :: Int -> a -> SS
     fmt level x
-      | isLeaf x = indent leaf
+      | isLeaf x = indent $ leaf x +++ lit "\n"
       | isVerbatim x = if elem '\n' verbatim_content
-          then lit "\n" +++ complete_open +++ lit "\n" +++ lit verbatim_content +++ lit "\n" +++ close +++ lit "\n"
-          else indent $ complete_open +++ lit verbatim_content +++ close
-      | any isText cont = indent $ complete_open +++ inline_content +++ close
-      | otherwise    = indent complete_open +++ lit "\n" +++ block_content +++ indent close
+          then lit "\n" +++ open_tag x +++ lit "\n" +++ lit verbatim_content +++ lit "\n" +++ close +++ lit "\n"
+          else indent $ open_tag x +++ lit verbatim_content +++ close
+      | any isText cont = indent $ open_tag x +++ inline_content +++ close
+      | otherwise = indent (open_tag x) +++ lit "\n" +++ block_content +++ indent close
       where
         indent = (lit (replicate (2*level) ' ')+++)
-        open = open_tag_open x
-        complete_open = open_tag x
         close = close_tag x +++ lit "\n"
 
         verbatim_content = fmt_verbatim_content cont
@@ -84,33 +82,26 @@ format root = to_str $ fmt 0 root
         remove_extra_space cs
           | all (maybe True breakAndIndent . fromText) cs = filter (maybe True (not . breakAndIndent) . fromText) cs
           | otherwise = cs
-        leaf
-          | noEmpty x = complete_open +++ close
-          | otherwise = open +++ lit " />\n"
 
     fmt_inline :: Bool -> a -> SS
     fmt_inline verbatim x
-      | isLeaf x  = leaf
-      | isVerbatim x = complete_open +++ lit (fmt_verbatim_content (content x)) +++ close
-      | otherwise = complete_open +++ inline_content +++ close
+      | isLeaf x = leaf x
+      | isVerbatim x = open_tag x +++ lit (fmt_verbatim_content (content x)) +++ close
+      | otherwise = open_tag x +++ inline_content +++ close
       where
-        open = open_tag_open x
-        complete_open = open_tag x
         close = close_tag x
         inline_content = cmap verbatim (fmt_inline verbatim) (content x)
-        leaf
-          | noEmpty x = complete_open +++ close
-          | otherwise = open +++ lit " />\n"
+
+    leaf x
+      | noEmpty x = open_tag x +++ close_tag x
+      | otherwise = open_tag_open x +++ lit " />\n"
 
     fmt_verbatim_content cont =
         cut_indent $ to_str $ cmap True (fmt_inline True) cont
 
-    open_tag_open x = lit $ safe_init $ ("<" ++ (tag x) ++ " ") ++ format_attr (attr x)
+    open_tag_open x = lit $ unwords $ ("<" ++ tag x) : map format_attr (attr x)
     open_tag x = open_tag_open x +++ lit ">"
     close_tag x = lit ("</" ++ tag x ++ ">")
-
-    safe_init [] = []
-    safe_init xs = init xs
 
 cut_indent :: String -> String
 cut_indent = init . unlines . fixTop . cut . fixBottom . lines
@@ -148,7 +139,5 @@ white '\n' = True
 white '\t' = True
 white _ = False
 
-format_attr :: [(String, String)] -> String
-format_attr = concatMap attr1
-  where
-    attr1 (k, v) = k ++ "=\"" ++ v ++ "\" "
+format_attr :: (String, String) -> String
+format_attr (k, v) = k ++ "=\"" ++ v ++ "\""

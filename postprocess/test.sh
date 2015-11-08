@@ -7,6 +7,6 @@ for infile in tests/*.in; do
   actual=actual/$(basename "$infile")
   ./postprocess <"$infile" >"$actual"
   if ! diff "$actual" "$expected" >/dev/null 2>&1; then
-    ${DIFF-diff -u} "$actual" "$expected"
+    ${DIFF-diff -u} "$expected" "$actual"
   fi
 done
