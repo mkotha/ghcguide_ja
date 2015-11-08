@@ -151,7 +151,7 @@ exposed-modules: Network.BSD,
         <indexterm><primary><option>-no-auto-link-packages</option></primary>
           </indexterm></term>
         <listitem>
-          <para>デフォルトでは、GHCは<literal>haskell98</literal>パッケージを自動的にリンクに組み入れる。このフラグはこの振る舞いを無効にする。</para>
+          <para>デフォルトでは、GHCは<literal>base</literal>および<literal>rts</literal>パッケージを自動的にリンクに組み入れる。このフラグはこの振る舞いを無効にする。</para>
         </listitem>
       </varlistentry>
 
