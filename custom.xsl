@@ -32,7 +32,7 @@
     <xsl:variable name="row2" select="($prev and $navig.showtitles != 0)                                     or (generate-id($home) != generate-id(.)                                         or $nav.context = 'toc')                                     or ($chunk.tocs.and.lots != 0                                         and $nav.context != 'toc')                                     or ($next and $navig.showtitles != 0)"/>
 
     <xsl:if test="$suppress.navigation = '0' and $suppress.header.navigation = '0'">
-      <div class="navheader">
+      <div class="navheader" lang="ja">
         <xsl:if test="$header.rule != 0">
           <hr/>
         </xsl:if>
