@@ -5,11 +5,12 @@ import Data.List(groupBy, findIndex)
 import Data.Maybe(mapMaybe)
 import Data.Char
 
-import Debug.Trace
-
 data ContentView element
   = Child element
   | Other String
+
+instance Element a => Show (ContentView a) where
+  show = view_to_str
 
 class Element a where
   tag :: a -> String
@@ -28,9 +29,6 @@ view_to_str (Other s) = "Other " ++ show s
 isText :: ContentView a -> Bool
 isText (Child _) = False
 isText _ = True
-
-hasText :: (Element a) => a -> Bool
-hasText = any isText . content
 
 fromText :: ContentView a -> Maybe String
 fromText (Other s) = Just s
@@ -59,10 +57,11 @@ cmap verbatim f = foldr (+++) id . map ff
       | verbatim = lit str
       | otherwise  = lit $ normalize_white str
 
+to_str :: SS -> String
 to_str = ($"")
 
 format :: forall a. (Element a) => a -> String
-format x = to_str $ fmt 0 x
+format root = to_str $ fmt 0 root
   where
     fmt :: Int -> a -> SS
     fmt level x
@@ -137,16 +136,19 @@ normalize_white = concat . map to_space . groupBy weq
       | white (head s) = " "
       | otherwise = s
 
+drop_white :: String -> String
 drop_white = dropWhile white
+
+trim :: String -> String
 trim = drop_white . reverse . drop_white . reverse
 
+white :: Char -> Bool
 white ' ' = True
 white '\n' = True
 white '\t' = True
 white _ = False
 
 format_attr :: [(String, String)] -> String
-format_attr = concatMap attr
+format_attr = concatMap attr1
   where
-    attr (k, v) = k ++ "=\"" ++ v ++ "\" "
-
+    attr1 (k, v) = k ++ "=\"" ++ v ++ "\" "
