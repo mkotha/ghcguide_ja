@@ -85,7 +85,7 @@ nfib n | n &#60;= 1 = 1
     <para>並列性を表現するためのより洗練されたコンビネータが<ulink url="http://hackage.haskell.org/package/parallel">parallelパッケージ</ulink>の<literal>Control.Parallel.Strategies</literal>モジュールにある。このモジュールは<literal>par</literal>を基に機能を構築しており、例えば並列<literal>map</literal>のような、並列計算の複雑なパターンを表現できる。</para>
   </sect2>
 
-<sect2><title>Data Parallel Haskell</title>
+<sect2 id="dph"><title>Data Parallel Haskell</title>
   <para>GHCにはData Parallel Haskell(DPH)への試験的対応が含まれている。このコードは非常に不安定であり、もっぱら技術の下見のために供給されている。対応する<ulink url="http://www.haskell.org/haskellwiki/GHC/Data_Parallel_Haskell">DPHのwikiページ</ulink>にはより多くの情報がある。</para>
 </sect2>
 
