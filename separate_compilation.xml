@@ -152,7 +152,7 @@
 $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
 </screen>
 
-            <para><filename>Foo.o</filename>、<filename>Bar.o</filename>、<filename>Bumble.o</filename>の各オブジェクトファイルは、実行中の機械のアーキテクチャの名前(<filename>x86</filename>、<filename>mips</filename>など)のサブディレクトリに置かれる。</para>
+            <para>こうすると、<filename>Foo.o</filename>、<filename>Bar.o</filename>、<filename>Bumble.o</filename>の各オブジェクトファイルは、実行中の機械のアーキテクチャの名前(<filename>x86</filename>、<filename>mips</filename>など)のサブディレクトリに置かれる。</para>
 
             <para><option>-odir</option>オプションはインタフェースファイルがどこに置かれるかに影響しないことに注意。それには<option>-hidir</option>オプションを使うこと。上の例では、インタフェースファイルは相変わらず<filename>parse/Foo.hi</filename>、<filename>parse/Bar.hi</filename>、<filename>gurgle/Bumble.hi</filename>に置かれる。</para>
 	  </listitem>
@@ -364,7 +364,7 @@ $ ghc -c parse/Foo.hs parse/Bar.hs gurgle/Bumble.hs -odir `uname -m`
             <indexterm><primary><option>-ddump-minimal-imports</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para>モジュールをコンパイルするとき、そのモジュールの「最小の」インポート宣言を「M.imports」(ただしMはモジュール名)というファイルに出力する。「M.hs」にあるインポート宣言を「M.imports」にあるものに置き換えても安全である。こうすることの利点は、(1)「最小の」インポート宣言は全てを明示的にインポートする (2)不要なものは全くインポートしない ことである。この特徴を手で維持するのは非常な苦痛であり得るので、その作業を軽減するためにこのフラグがある。</para>
+            <para>モジュールをコンパイルするとき、そのモジュールの「最小の」インポート宣言を<filename><replaceable>M</replaceable>.imports</filename>(ただし<replaceable>M</replaceable>はモジュール名)というファイルに出力する。<filename>.imports</filename>ファイルが作られるディレクトリは<option>-dumpdir</option>オプションによって制御される。<filename><replaceable>M</replaceable>.hs</filename>にあるインポート宣言を、対応する<filename>.imports</filename>ファイルにあるものに置き換えても安全である。こうすることの利点は、(1)「最小の」インポート宣言は全てを明示的にインポートする (2)不要なものは全くインポートしない ことである。この特徴を手で維持するのは非常な苦痛であり得るので、その作業を軽減するためにこのフラグがある。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -499,7 +499,13 @@ hs-bootファイルにはブートストラップのための最小限の情報�
 </programlisting>
 </para></listitem>
 <listitem><para>結合性宣言はHaskellと同じである。</para></listitem>
-<listitem><para>型シノニムの宣言はHaskellと同じである。</para></listitem>
+<listitem><para>通常の型シノニムの宣言はHaskellと同じである。</para></listitem>
+<listitem><para>開型族の宣言、およびデータ族の宣言はHaskellと同じである。</para></listitem>
+<listitem><para>閉型族は、以下の例のように等式を省略しても良い。
+<programlisting>
+  type family ClosedFam a where ..
+</programlisting>
+ここでの<literal>..</literal>は文字通りの意味で使われている。つまり、ファイル中に二個のドットを書くのである。閉型族を開型族と区別するために、<literal>where</literal>節は相変わらず必要である。閉型族に等式を一つでも与えるなら、全ての等式を与えなければならず、それらは対応するHaskellファイルに現われるのと同じ順序でなければならない。</para></listitem>
 <listitem><para>データ型の宣言はHaskellと同じように完全な形で与えても良いし、「=」記号以下を省略して抽象的に与えても良い。例えば、
 <programlisting>
   data T a b
@@ -517,6 +523,7 @@ hs-bootファイルにはブートストラップのための最小限の情報�
 </para></listitem>
 <listitem><para>Haskellと同じようにインスタンス宣言を含めることができる。ただし「where」部は含めないこと。
  </para></listitem>
+<listitem><para>クラスおよびデータ型のデフォルトの役割はrepresentationalになった。その他の役割を得るには、役割注釈を使うこと。(<xref linkend="roles"/>を見よ。)</para></listitem>
 </itemizedlist>
 </para>
     </sect2>
