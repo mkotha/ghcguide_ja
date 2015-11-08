@@ -9,7 +9,7 @@
 
   <para>パッケージを使う手順はこの上なく単純である。<option>--make</option>やGHCiを使っているなら、インストール済みパッケージの大部分を余分なオプションなしでプログラムから使うことができる。例外は下記<xref linkend="using-packages"/>で説明されている。</para>
 
-  <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="&libraryCabalLocation;/Distribution-Simple.html">Distribution.Simple</ulink>)を見よ。</para>
+  <para>自分のパッケージをビルドするのもとても簡単な作業である。我々が提供する<ulink url="http://www.haskell.org/cabal">Cabal</ulink>インフラストラクチャがパッケージの設定、ビルド、インストール及び配布を自動化する。必要なのは、単純な設定ファイルを書き、いくつかのファイルを正しい場所に置くことだけである。詳細は<ulink url="../Cabal/index.html">Cabal説明書</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/cabal/users-guide/">web上の最新版</ulink>)およびCabalライブラリ(例えば<ulink url="&libraryCabalLocation;/Distribution-Simple.html">Distribution.Simple</ulink>)を見よ。</para>
 
   <sect2 id="using-packages">
   <title>パッケージを使う
@@ -682,7 +682,7 @@ ghc-pkg dot | tred | dot -Tpdf >pkgs.pdf
     <indexterm><primary>packages</primary>
       <secondary>building</secondary></indexterm>
 
-    <para>苦労してパッケージをビルドすることは推奨されない。代わりに、可能なら<ulink url="../Cabal/index.html">Cabal</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/ghc/docs/latest/html/Cabal/index.html">web上の最新版</ulink>)を使ってほしい。しかし、あなたのパッケージが特に複雑だったリ、大量の設定を要したりするなら、低レベルな機構にフォールバックしなければならないかもしれないので、そういう強者のためにいくつか手がかりを示しておく。</para>
+    <para>苦労してパッケージをビルドすることは推奨されない。代わりに、可能なら<ulink url="../Cabal/index.html">Cabal</ulink>(訳注: 未訳。<ulink url="http://www.haskell.org/cabal/users-guide/">web上の最新版</ulink>)を使ってほしい。しかし、あなたのパッケージが特に複雑だったリ、大量の設定を要したりするなら、低レベルな機構にフォールバックしなければならないかもしれないので、そういう強者のためにいくつか手がかりを示しておく。</para>
  
     <para>パッケージをインストールする際、<literal>ghc-pkg</literal>に渡すための「インストール済みパッケージ情報」ファイルを構築する必要がある。このファイルの内容は<xref linkend="installed-pkg-info"/>に説明されている。</para>
 
