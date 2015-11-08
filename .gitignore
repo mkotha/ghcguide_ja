@@ -1,0 +1,5 @@
+*.swp
+/postprocess/actual/
+/postprocess/dist/
+/*original/
+/xhtml/
