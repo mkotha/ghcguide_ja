@@ -67,7 +67,9 @@ format x = to_str $ fmt 0 x
     fmt :: Int -> a -> SS
     fmt level x
       | isLeaf x = indent leaf
-      | isVerbatim x = lit "\n" +++ complete_open +++ verbatim_content +++ close +++ lit "\n"
+      | isVerbatim x = if elem '\n' verbatim_content
+          then lit "\n" +++ complete_open +++ lit "\n" +++ lit verbatim_content +++ lit "\n" +++ close +++ lit "\n"
+          else indent $ complete_open +++ lit verbatim_content +++ close
       | any isText cont = indent $ complete_open +++ inline_content +++ close
       | otherwise    = indent complete_open +++ lit "\n" +++ block_content +++ indent close
       where
@@ -76,9 +78,8 @@ format x = to_str $ fmt 0 x
         complete_open = open_tag x
         close = close_tag x +++ lit "\n"
 
-        verbatim_content :: SS
-        verbatim_content = cmap True (fmt_inline True) cont
-        inline_content = cmap False (fmt_inline False) cont
+        verbatim_content = fmt_verbatim_content cont
+        inline_content = lit $ trim $ to_str $ cmap False (fmt_inline False) cont
         block_content = cmap True (fmt (level + 1)) cont
         cont = remove_extra_space $ content x
         remove_extra_space cs
@@ -91,16 +92,19 @@ format x = to_str $ fmt 0 x
     fmt_inline :: Bool -> a -> SS
     fmt_inline verbatim x
       | isLeaf x  = leaf
+      | isVerbatim x = complete_open +++ lit (fmt_verbatim_content (content x)) +++ close
       | otherwise = complete_open +++ inline_content +++ close
       where
         open = open_tag_open x
         complete_open = open_tag x
         close = close_tag x
-        verbatim' = verbatim || isVerbatim x
-        inline_content = cmap verbatim' (fmt_inline verbatim') (content x)
+        inline_content = cmap verbatim (fmt_inline verbatim) (content x)
         leaf
           | noEmpty x = complete_open +++ close
           | otherwise = open +++ lit " />\n"
+
+    fmt_verbatim_content cont =
+        cut_indent $ to_str $ cmap True (fmt_inline True) cont
 
     open_tag_open x = lit $ safe_init $ ("<" ++ (tag x) ++ " ") ++ format_attr (attr x)
     open_tag x = open_tag_open x +++ lit ">"
@@ -112,13 +116,10 @@ format x = to_str $ fmt 0 x
 cut_indent :: String -> String
 cut_indent = init . unlines . fixTop . cut . fixBottom . lines
   where
-    fixTop [] = []
-    fixTop [first] = [first]
-    fixTop (first:second:ls) = (first++second):ls
-    fixBottom ls = reverse $ case reverse ls of
-      [] -> []
-      [last] -> [last]
-      last:second:rest -> (second ++ dropWhile (==' ') last):rest
+    fixTop (first:ls)
+      | null (trim first) = ls
+    fixTop ls = ls
+    fixBottom ls = reverse $ fixTop $ reverse ls
     cut [] = []
     cut (first:ls)
       | all empty ls = first:map (const "") ls
@@ -129,7 +130,7 @@ cut_indent = init . unlines . fixTop . cut . fixBottom . lines
     empty = all (==' ')
 
 normalize_white :: String -> String
-normalize_white = trim . concat . map to_space . groupBy weq
+normalize_white = concat . map to_space . groupBy weq
   where
     weq x y = white x == white y
     to_space s
@@ -141,6 +142,7 @@ trim = drop_white . reverse . drop_white . reverse
 
 white ' ' = True
 white '\n' = True
+white '\t' = True
 white _ = False
 
 format_attr :: [(String, String)] -> String
