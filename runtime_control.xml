@@ -373,7 +373,7 @@ $ ./prog -f +RTS -H32m -S -RTS -h foo bar
           <indexterm><primary>stack, maximum size</primary></indexterm>
         </term>
 	<listitem>
-          <para>&lsqb;デフォルト: 8M&rsqb; 個々のスレッドの最大スタックサイズを<replaceable>size</replaceable>に設定する。スレッドがこの制限を超えようとした場合、<literal>StackOverflow</literal>例外が送られる。</para>
+          <para>&lsqb;デフォルト: 物理メモリの大きさの80%&rsqb; 個々のスレッドの最大スタックサイズを<replaceable>size</replaceable>に設定する。スレッドがこの制限を超えようとした場合、<literal>StackOverflow</literal>例外が送られる。sizeとして0を指定すると、この検査は完全に無効になる。</para>
           <para>このオプションは主に、プログラムが無限ループに陥ったときに利用可能なメモリを使い果たすことがないようするために存在している。</para>
 	</listitem>
       </varlistentry>
@@ -862,7 +862,7 @@ $ ./a.out +RTS --info
       <varlistentry>
         <term><literal>RTS way</literal></term>
         <listitem>
-          <para>ランタイムの種類(「way」)。特によくある値は、<literal>rts</literal>(バニラ)、<literal>rts_thr</literal>(スレッド化されたランタイム、つまり<literal>-threaded</literal>オプション付きでリンクされたもの)、<literal>rts_p</literal>(プロファイル用ランタイム、つまり<literal>-prof</literal>オプション付きでリンクされたもの)である。他の種類には、<literal>debug</literal>(<literal>-debug</literal>を使ってリンクされたもの)、<literal>dyn</literal>(RTSが動的にリンクされる、つまり実行ファイルに静的にリンクされているのでない共有ライブラリである)などがある。これらは組み合わせることができる。例えば、<literal>rts_thr_debug_p</literal>というものが可能である。</para>
+          <para>ランタイムの種類(「way」)。特によくある値は、<literal>rts_v</literal>(バニラ)、<literal>rts_thr</literal>(スレッド化されたランタイム、つまり<literal>-threaded</literal>オプション付きでリンクされたもの)、<literal>rts_p</literal>(プロファイル用ランタイム、つまり<literal>-prof</literal>オプション付きでリンクされたもの)である。他の種類には、<literal>debug</literal>(<literal>-debug</literal>を使ってリンクされたもの)、<literal>dyn</literal>(RTSが動的にリンクされる、つまり実行ファイルに静的にリンクされているのでない共有ライブラリである)などがある。これらは組み合わせることができる。例えば、<literal>rts_thr_debug_p</literal>というものが可能である。</para>
         </listitem>
       </varlistentry>
 
