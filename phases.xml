@@ -118,6 +118,16 @@
           <para>Windowsにおいて、マニフェストを埋め込むためのプログラムとして<replaceable>cmd</replaceable>を使う。通常、これは、GHCのインストールで供給される<literal>windres</literal>プログラムである。<xref linkend="options-linker"/>の<option>-fno-embed-manifest</option>参照。</para>
         </listitem>
       </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-pgmlibtool</option> <replaceable>cmd</replaceable>
+          <indexterm><primary><option>-pgmlibtool</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>libtoolコマンドとして<replaceable>cmd</replaceable>を使う(<option>-staticlib</option>を使っているときのみ)。</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </sect2>
 
@@ -313,6 +323,16 @@ $ cat foo.hspp</screen>
 
       <varlistentry>
 	<term>
+          <constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;LLVM&lowbar;&lowbar;</constant>
+          <indexterm><primary><constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;LLVM&lowbar;&lowbar;</constant></primary></indexterm>
+        </term>
+        <listitem>
+          <para><option>-fllvm</option>が指定された場合にのみ定義される。GHCがLLVMのバージョン<literal><replaceable>x</replaceable>.<replaceable>y</replaceable>.<replaceable>z</replaceable></literal>を使っている場合、<constant>&lowbar;&lowbar;GLASGOW&lowbar;HASKELL&lowbar;LLVM&lowbar;&lowbar;</constant>の値は整数<replaceable>xy</replaceable>になる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
           <constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant>
           <indexterm><primary><constant>&lowbar;&lowbar;PARALLEL&lowbar;HASKELL&lowbar;&lowbar;</constant></primary></indexterm>
         </term>
@@ -516,7 +536,18 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-framework</option></primary></indexterm>
         </term>
         <listitem>
-          <para>Darwin/MacOS Xのみ。フレームワーク<replaceable>name</replaceable>をリンクする。このオプションはAppleのリンカの<option>-framework</option>オプションに相当する。フレームワークとパッケージは別々のものだということに注意してほしい。フレームワークはHaskellのコードを含まない。むしろ、これは共有ライブラリをパッケージ化するApple流のやりかたである。例えば、Appleの「Carbon」APIにリンクするには、<option>-framework Carbon</option>を使うことができる。</para>
+          <para>Darwin/OS X/iOSのみ。フレームワーク<replaceable>name</replaceable>をリンクする。このオプションはAppleのリンカの<option>-framework</option>オプションに相当する。フレームワークとパッケージは別々のものだということに注意してほしい。フレームワークはHaskellのコードを含まない。むしろ、これは共有ライブラリをパッケージ化するApple流のやりかたである。例えば、Appleの「Carbon」APIにリンクするには、<option>-framework Carbon</option>を使うことができる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <option>-staticlib</option>
+          <indexterm><primary><option>-staticlib</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>Darwin/OS X/iOSのみ。与えられたファイルを全て、iOS(クロスコンパイラを使っている場合)かMacのXcodeプロジェクトにリンクするのに適した静的ライブラリへとコンパイルする。名前を制御するには、通常通り<option>-o</option> <replaceable>name</replaceable>を使う。デフォルトの名前は<literal>liba.a</literal>である。クロスコンパイラを使ってiOS向けのコンパイルをしている場合、ほとんど常にこれを渡すべきである。
+          </para>
         </listitem>
       </varlistentry>
 
@@ -536,7 +567,7 @@ $ cat foo.hspp</screen>
           <indexterm><primary><option>-framework-path</option></primary></indexterm>
         </term>
         <listitem>
-          <para>Darwin/MacOS Xのみ。ディレクトリ<replaceable>dir</replaceable>をフレームワークディレクトリパスの先頭に加える。これはAppleのリンカの<option>-F</option>オプションに相当する。(GHCでは<option>-F</option>は別の要素に使用済みである)</para>
+          <para>Darwin/OS X/iOSのみ。ディレクトリ<replaceable>dir</replaceable>をフレームワークディレクトリパスの先頭に加える。これはAppleのリンカの<option>-F</option>オプションに相当する。(GHCでは<option>-F</option>は別のものに使用済みである)</para>
         </listitem>
       </varlistentry>
 
@@ -770,7 +801,7 @@ $ cat foo.hspp</screen>
           </indexterm>
         </term>
         <listitem>
-          <para>Darwin/MacOS Xでは、動的ライブラリにはビルド時に「install name」が付加される。これは、そのライブラリの最終的なインストールパスである。後にこのライブラリをリンクするライブラリや実行ファイルは、このライブラリを実行時に探索する場所としてこのパスを選ぶ。デフォルトでは、ghcはライブラリがビルドされた場所をinstall nameとして設定する。このオプションは、指定したパスでそれを上書きすることを可能にする。(Appleのリンカに<literal>-install_name</literal>を渡すものである)。他のプラットフォームでは無視される。</para>
+          <para>Darwin/OS Xでは、動的ライブラリにはビルド時に「install name」が付加される。これは、そのライブラリの最終的なインストールパスである。後にこのライブラリをリンクするライブラリや実行ファイルは、このライブラリを実行時に探索する場所としてこのパスを選ぶ。デフォルトでは、ghcはライブラリがビルドされた場所をinstall nameとして設定する。このオプションは、指定したパスでそれを上書きすることを可能にする。(Appleのリンカに<literal>-install_name</literal>を渡すものである)。他のプラットフォームでは無視される。</para>
         </listitem>
       </varlistentry>
     </variablelist>
