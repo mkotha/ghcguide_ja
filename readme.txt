@@ -14,5 +14,4 @@ pull requestするかweb@kotha.netにメールしてください。
 成功すれば./xhtml/以下にファイルが作成されます。
 
 postprocessはxhtmlの整形をするHaskellスクリプトです。
-コンパイルには古いHaXmlが必要です。
 動かなくてもあまり支障はありません。
