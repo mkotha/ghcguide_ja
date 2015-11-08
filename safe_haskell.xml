@@ -19,6 +19,9 @@ Safe Haskellの設計は以下の面にわたっている。
   </itemizedlist>
   </para>
 
+  <para>一方で、Safe Haskellは、コンパイル時安全性を<emphasis>提供しない</emphasis>。コンパイル時には、例えば<link linkend="pre-processor">プリプロセッサを変更する</link>フラグによって任意のプロセスが起動され得る。これを操作することで、コンパイル時にユーザのシステムを危険にさらしたり、コンパイルの直前にソースコードを改変することで設定されたSafe Haskellのフラグに変更を加えることができる。これについては、節<xref linkend="safe-compilation"/>にさらなる議論がある。
+  </para>
+
   <sect2 id="safe-use-cases">
     <title>Safe Haskellの用途</title>
     <indexterm><primary>safe haskell uses</primary></indexterm>
@@ -117,9 +120,9 @@ Safe Haskellの設計は以下の面にわたっている。
     <itemizedlist>
       <listitem><emphasis>参照透明性</emphasis> &mdash; safe languageの関数は決定的であり、それらを評価することはいかなる副作用も引き起こさない。<literal>IO</literal>モナドの関数は通常通りに振る舞うことが許される。しかし、純粋な関数は全て、その型に従って実際に純粋であることが保証される。この性質によって、safe languageの利用者は型を信頼することが可能になる。これは、例えば<literal>unsafePerformIO :: IO a -> a</literal>がsafe languageにおいて禁止されることを意味している。
       </listitem>
-      <listitem><emphasis>モジュール境界の制御</emphasis> &mdash; safe languageを使ってコンパイルされたHaskellコードは、他のモジュールのエクスポートリストから公的に利用可能なシンボルにしかアクセスできないことが保証される。このうち重要な点として、safeでコンパイルされたコードは、自分がインポートできない構築子を使ってデータ値を検査したり作ったりすることができない。モジュールMが、エクスポートリストを注意深く使うことである不変条件を確立しているなら、safe languageを使ってコンパイルされたコードでMをインポートするものは、これらの不変条件を守ることが保証される。このために、<emphasis><link linkend="template-haskell">Template Haskell</link></emphasis>と<emphasis><link linkend="newtype-deriving">GeneralizedNewtypeDeriving</link></emphasis>はsafe languageにおいては無効にされる。これらを使ってこの性質に違反することができるからである。
+      <listitem><emphasis>モジュール境界の制御</emphasis> &mdash; safe languageを使ってコンパイルされたHaskellコードは、他のモジュールのエクスポートリストから公的に利用可能なシンボルにしかアクセスできないことが保証される。このうち重要な点として、safeでコンパイルされたコードは、自分がインポートできない構築子を使ってデータ値を検査したり作ったりすることができない。モジュールMが、エクスポートリストを注意深く使うことである不変条件を確立しているなら、safe languageを使ってコンパイルされたコードでMをインポートするものは、これらの不変条件を守ることが保証される。このために、<emphasis><link linkend="template-haskell">Template Haskell</link></emphasis>はsafe languageにおいては無効にされる。これらを使ってこの性質に違反することができるからである。
       </listitem>
-      <listitem><emphasis>意味的な整合性</emphasis> &mdash; safe languageはHaskellのGHC実装の厳密なサブセットである。safe languageでコンパイル可能なあらゆる式は、通常のHaskellでコンパイルされた場合と全く同じ意味を持つ。さらに、safe languageモジュールをインポートするあらゆるモジュールにおいて、このsafe importを付けても付けなくてもコンパイル可能なあらゆる式は、どちらの場合でも同じ意味を持つ。つまり、safe languageを使ってモジュールをインポートすることで、そのモジュールに依存していない既存コードの意味を変えることはできない。よって例えば、<emphasis><link linkend="instance-overlap">重複インスタンス</link></emphasis>拡張はこの性質に違反できるので、いくらかの制限が課される。
+      <listitem><emphasis>意味的な整合性</emphasis> &mdash; safe languageはHaskellのGHC実装の厳密なサブセットである。safe languageでコンパイル可能なあらゆる式は、通常のHaskellでコンパイルされた場合と全く同じ意味を持つ。さらに、safe languageモジュールをインポートするあらゆるモジュールにおいて、このsafe importを付けても付けなくてもコンパイル可能なあらゆる式は、どちらの場合でも同じ意味を持つ。つまり、safe languageを使ったモジュールをインポートすることで、そのモジュールに依存していない既存コードの意味を変えることはできない。よって例えば、<emphasis><link linkend="instance-overlap">重複インスタンス</link></emphasis>拡張はこの性質に違反できるので、いくらかの制限が課される。
       </listitem>
     </itemizedlist>
 
@@ -128,7 +131,6 @@ Safe Haskellの設計は以下の面にわたっている。
     ではsafe languageの詳細を見ていこう。safe lauguage方言(<option>-XSafe</option>によって有効になる)においては、以下の機能は完全に無効になる。
 
     <itemizedlist>
-      <listitem><emphasis>GeneralizedNewtypeDeriving</emphasis> &mdash; これは構築子のアクセス制御に違反するために使うことができる。信頼されていないコードが、保護されたデータ型をデータ型の作者が意図しない方法で操作することを可能にする、すなわち確立された不変条件を破ることができる。</listitem>
       <listitem><emphasis>TemplateHaskell</emphasis> &mdash; これは、コンパイル時に副作用を起こすことを可能にし、抽象データ型の構築子にアクセスするために使えるので特に危険である。</listitem>
    </itemizedlist>
 
@@ -136,7 +138,7 @@ Safe Haskellの設計は以下の面にわたっている。
     <itemizedlist>
       <listitem><emphasis>ForeignFunctionInterface</emphasis> &mdash; これは大部分において安全であるが、関数をIOでない型でインポートするforeign import宣言は禁止される。全てのFFIインポートはIOモナドに生息しなければならない。</listitem>
       <listitem><emphasis>RULES</emphasis> &mdash; 信頼されたコードの振る舞いを予測不可能な形で変更し、意味上の整合性に違反することができるので、機能が制限される。具体的には、<option>-XSafe</option>でコンパイルされたモジュールMで定義されたRULESは全て捨てられる。MがインポートするTrustworthyモジュールで定義されたRULESはなお有効であり、通常通り発動する。</listitem>
-      <listitem><emphasis>OverlappingInstances</emphasis> &mdash; この拡張は意味上の整合性に違反するために使うことができる。悪意のあるコードは、この信頼されていないモジュールをインポートしているコードの振る舞いを変えるようなインスタンスを再定義できるかもしれない(より特殊性の高いインスタンス宣言を持つことで)からである。<option>-XSafe</option>でコンンパイルされたモジュールMにおいて、この拡張は無効されないが制限を受ける。Mは重複インスタンス宣言を定義できるが、それらはMで定義された別のインスタンス宣言としか重複できない。MをインポートするモジュールNの中、型クラス関数を使う呼び出し地点で、どのインスタンスを使うかの選択肢(つまり重複)があり、最も特殊性の高いインスタンスがM由来の場合、他の全ての選択肢もM由来でなければならない。これについての簡単な考え方は、Safeコンパイルされたモジュールで定義された重複インスタンスに関する<emphasis>同一生成元ポリシー</emphasis>(same origin policy)だと思うことである。</listitem>
+      <listitem><emphasis>OverlappingInstances</emphasis> &mdash; この拡張は意味上の整合性に違反するために使うことができる。悪意のあるコードは、この信頼されていないモジュールをインポートしているコードの振る舞いを変えるようなインスタンスを再定義できるかもしれない(より特殊性の高いインスタンス宣言を持つことで)からである。<option>-XSafe</option>でコンンパイルされたモジュールMにおいて、この拡張は無効化されないが制限を受ける。Mは重複インスタンス宣言を定義できるが、それらはMで定義された別のインスタンス宣言としか重複できない。MをインポートするモジュールNの中、型クラス関数を使う呼び出し地点で、どのインスタンスを使うかの選択肢(つまり重複)があり、最も特殊性の高いインスタンスがM由来の場合、他の全ての選択肢もM由来でなければならない。これについての簡単な考え方は、Safeコンパイルされたモジュールで定義された重複インスタンスに関する<emphasis>同一生成元ポリシー</emphasis>(same origin policy)だと思うことである。</listitem>
 	  <listitem><emphasis>Data.Typeable</emphasis> &mdash; Typeableインスタンスを自動導出(GHCによって<link linkend="deriving-typeable"><option>-XDeriveDataTypeable</option></link>拡張を介して提供されている)されたもののみに制限している。Typeable型クラスの手書きインスタンスは、unasfeに型変換を行うように簡単に悪用できるので、Safe Haskellでは許されていない。</listitem>
     </itemizedlist>
   </sect2>
@@ -379,6 +381,25 @@ Safe Haskellの設計は以下の面にわたっている。
         </listitem>
       </varlistentry>
     </variablelist>
+  </sect2>
+
+  <sect2 id="safe-compilation">
+    <title>安全なコンパイル</title>
+    <indexterm><primary>safe compilation</primary></indexterm>
+
+    <para>GHCには、コンパイル時に任意のプロセスを走らせることを許すフラグが豊富にある。一つの例は<link linkend="pre-processor">プリプロセッサの変更</link>フラグである。また、IOアクションを含む任意のHaskellコードをコンパイル時に走らせる能力のあるTemplate Haskellもそうである。Safe Haskellは<emphasis>この危険性に対処しない</emphasis>(Template Haskellは禁止される機能だが)。
+    </para>
+
+    <para>よって、信頼できないコードを、人力での検査なしでコンパイルする場合、以下の予防策を取ることが提案される。
+    <itemizedlist>
+      <listitem>chrootや類似のコンテナ技術などのサンドボックス内でコンパイルする。あるいは、単にシステムへのアクセスが非常に制限されたユーザとしてコンパイルする。</listitem>
+      <listitem>信頼できないコードは<option>-XSafe</option>をコマンド行で指定してコンパイルする。コマンド行のフラグはソースレベルのプラグマよりも優先されるので、これによって、コンパイル対象のソースファイルの改変によってSafe Languageを無効にすることができないようになる。</listitem>
+      <listitem>信頼できないコードが全て<link linkend="safe-imports">safe import</link>でインポートされ、<emphasis>なおかつ</emphasis><link linkend="safe-package-trust"><option>-fpackage-trust</option></link>を使い、信頼できない供給元のパッケージが信頼されていないとみなされているようにする。</listitem>
+    </itemizedlist>
+    </para>
+
+    <para><ulink url="http://ghc.haskell.org/trac/ghc/wiki/SafeHaskell/SafeCompilation">GHC Wiki</ulink>には、コンパイル時安全性に関する問題点と、その解決策の可能性についてのさらに詳細な議論がある。</para>
+
   </sect2>
 
 </sect1>
