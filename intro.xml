@@ -86,54 +86,15 @@
       </varlistentry>
 
       <varlistentry>
-	<term>glasgow-haskell-bugs:</term>
+	<term>ghc-devs:</term>
 	<listitem>
-	  <para>これはGHCのバグを報告したり議論したりするためのリストである。ただし、ここに投稿する前に<xref linkend="bug-reporting" />を見てほしい。</para>
-
-	  <variablelist>
-	    <varlistentry>
-	      <term>リストのメールアドレス:</term>
-	      <listitem>
-		<para><email>glasgow-haskell-bugs@haskell.org</email></para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>加入:</term>
-	      <listitem>
-		<para><ulink
-	      url="http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs"><literal>http://www.haskell.org/mailman/listinfo/glasgow-haskell-bugs</literal></ulink>.</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>管理メールアドレス:</term>
-	      <listitem>
-		<para><email>glasgow-haskell-bugs-admin@haskell.org</email></para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>リストのアーカイブ:</term>
-	      <listitem>
-		<para><ulink
-                         url="http://www.haskell.org/pipermail/glasgow-haskell-bugs/"><literal>http://www.haskell.org/pipermail/glasgow-haskell-bugs/</literal></ulink></para>
-	      </listitem>
-	    </varlistentry>
-	  </variablelist>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>cvs-ghc:</term>
-	<listitem>
-	  <para>ここには筋金入りのGHC開発者たちがたむろしている。GHCのdarcsリポジトリのコミットメッセージもこのリストに送られてくる。他のdarcsリポジトリについては他のメーリングリストがある(もっとも注目に値するのは<literal>cvs-liberaries</literal>だ)。</para>
+	  <para>ここには筋金入りのGHC開発者たちがたむろしている。</para>
 	
 	  <variablelist>
 	    <varlistentry>
 	      <term>リストのメールアドレス:</term>
 	      <listitem>
-		<para><email>cvs-ghc@haskell.org</email></para>
+		<para><email>ghc-devs@haskell.org</email></para>
 	      </listitem>
 	    </varlistentry>
 
@@ -141,14 +102,14 @@
 	      <term>加入:</term>
 	      <listitem>
 		<para><ulink
-	      url="http://www.haskell.org/mailman/listinfo/cvs-ghc"><literal>http://www.haskell.org/mailman/listinfo/cvs-ghc</literal></ulink>.</para>
+	      url="http://www.haskell.org/mailman/listinfo/ghc-devs"><literal>http://www.haskell.org/mailman/listinfo/ghc-devs</literal></ulink>.</para>
 	      </listitem>
 	    </varlistentry>
 
 	    <varlistentry>
 	      <term>管理メールアドレス:</term>
 	      <listitem>
-		<para><email>cvs-ghc-admin@haskell.org</email></para>
+		<para><email>ghc-devs-admin@haskell.org</email></para>
 	      </listitem>
 	    </varlistentry>
 
@@ -156,7 +117,7 @@
 	      <term>リストのアーカイブ:</term>
 	      <listitem>
 		<para><ulink
-          url="http://www.haskell.org/pipermail/cvs-ghc/"><literal>http://www.haskell.org/pipermail/cvs-ghc/</literal></ulink></para>
+          url="http://www.haskell.org/pipermail/ghc-devs/"><literal>http://www.haskell.org/pipermail/ghc-devs/</literal></ulink></para>
 	      </listitem>
 	    </varlistentry>
 	  </variablelist>
