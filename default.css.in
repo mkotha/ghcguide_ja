@@ -41,7 +41,7 @@ em code {
 }
 
 ul, ol {
-  margin-left: 5%;
+  margin-left: 4ex;
 }
 ul {
 # ifdef NO_DATA_SCHEME
