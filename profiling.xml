@@ -228,7 +228,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
 
       <para>関数呼び出しに際しては、GHCは呼ばれる関数に保存されているスタック(これは最上位の関数については空)を取り出し、それをその時点のスタックの<emphasis>後ろに連結</emphasis>する。このとき、その時点のスタックのprefixであるようなprefixは全て無視する。</para>
 
-      <para>遅延された計算すなわちサンクが、作成された時にその時点のスタックを捕捉することは先に言及した。最上位のサンクについてはどうか？これらはプログラムがコンパイルされたときに「作成」されるのだから、どんなスタックを与えるべきか？最上位のサンクを指す述語はCAF(Constant Applicative Form; 定作用形)である。GHCはモジュール中の全てのCAFに単一のコスト集約点<literal>M.CAF</literal>を与える。ここで<literal>M</literal>はそのモジュールの名前である。それぞれのCAFに異なるスタックを与えることも可能であり、<option>-fprof-cafs</option><indexterm><primary><option>-fprof-cafs</option></primary></indexterm>オプションを使う。</para>
+      <para>遅延された計算すなわちサンクが、作成された時にその時点のスタックを捕捉することは先に言及した。最上位のサンクについてはどうか？これらはプログラムがコンパイルされたときに「作成」されるのだから、どんなスタックを与えるべきか？最上位のサンクを指す述語はCAF(Constant Applicative Form; 定作用形)である。GHCはモジュール中の全てのCAFに単一のコスト集約点<literal>M.CAF</literal>を与える。ここで<literal>M</literal>はそのモジュールの名前である。それぞれのCAFに異なるスタックを与えることも可能であり、<option>-fprof-cafs</option><indexterm><primary><option>-fprof-cafs</option></primary></indexterm>オプションを使う。<option>-ffull-laziness</option>(<option>-O</option>以上でデフォルトである)を使ってコンパイルする場合、関数本体にある定数が最上位へと持ち上げられてCAFになるので、これが特に便利である。これらのCAFが何に対応するかを知るには、おそらくCore(<option>-ddump-simpl</option>)を参照する必要があるだろう。</para>
     </sect2>
   </sect1>
 
@@ -261,7 +261,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
           <indexterm><primary><option>-fprof-auto</option></primary></indexterm>
         </term>
 	<listitem>
-          <para>INLINE指定されていない<emphasis>全て</emphasis>の関数は、エクスポートされているか、最上位が局所的かにかかわらず、<function>SCC</function>注釈が自動的に与えられる。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
+          <para>INLINE指定されていない<emphasis>全て</emphasis>の束縛に、エクスポートされているか、最上位か局所的かにかかわらず、<function>SCC</function>注釈を自動的に与える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
 
@@ -272,7 +272,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
           <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
         </term>
 	<listitem>
-          <para>INLINE指定されていない全ての最上位の関数に、GHCが<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
+          <para>INLINE指定されていない全ての最上位の束縛に、<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
 
@@ -283,7 +283,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
           <indexterm><primary>cost centres</primary><secondary>automatically inserting</secondary></indexterm>
         </term>
 	<listitem>
-          <para>INLINE指定されていない全てのエクスポートされた関数に、GHCが<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
+          <para>INLINE指定されていない全てのエクスポートされた関数に、<function>SCC</function>注釈を自動的に加える。INLINE関数に付属したコスト集約点が欲しい場合は手動で付け加えなければならない。</para>
 	</listitem>
       </varlistentry>
 
@@ -617,7 +617,7 @@ MAIN            MAIN                    102           0    0.0    0.0   100.0  1
       <para>維持原因プロファイルは<quote>なぜこのデータが回収されずに残っているのか</quote>という類の疑問に答えるように設計された。まず、維持原因オブジェクトとは何かを定義しよう。</para>
 
       <blockquote>
-        <para>維持原因オブジェクトとは、システムスタックまたは未評価のクロージャ(サンク)である。</para>
+        <para>維持原因オブジェクトとは、システムスタックまたは未評価のクロージャ(サンク)または明示的に可変(mutable)なオブジェクトである。</para>
       </blockquote>
 
       <para>特に、構築子は維持原因オブジェクト<emphasis>ではない</emphasis>。</para>
@@ -1082,8 +1082,10 @@ Options:
     --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
     --srcdir=DIR                  path to source directory of .hs files
                                   multi-use of srcdir possible
-    --hpcdir=DIR                  sub-directory that contains .mix files
+    --hpcdir=DIR                  append sub-directory that contains .mix files
                                   default .hpc [rarely used]
+    --reset-hpcdirs               empty the list of hpcdir's
+                                  [rarely used]
     --xml-output                  show output in XML
 </screen>
        </sect3>
@@ -1100,8 +1102,10 @@ Options:
     --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
     --srcdir=DIR                  path to source directory of .hs files
                                   multi-use of srcdir possible
-    --hpcdir=DIR                  sub-directory that contains .mix files
+    --hpcdir=DIR                  append sub-directory that contains .mix files
                                   default .hpc [rarely used]
+    --reset-hpcdirs               empty the list of hpcdir's
+                                  [rarely used]
     --fun-entry-count             show top-level function entry counts
     --highlight-covered           highlight covered code, rather that code gaps
     --destdir=DIR                 path to write output to
@@ -1171,8 +1175,10 @@ Options:
 
     --srcdir=DIR   path to source directory of .hs files
                    multi-use of srcdir possible
-    --hpcdir=DIR   sub-directory that contains .mix files
-                   default .hpc [rarely used]
+    --hpcdir=DIR                  append sub-directory that contains .mix files
+                                  default .hpc [rarely used]
+    --reset-hpcdirs               empty the list of hpcdir's
+                                  [rarely used]
     --output=FILE  output FILE
 % hpc help draft
 Usage: hpc draft [OPTION] .. &lt;TIX_FILE&gt;
@@ -1183,8 +1189,10 @@ Options:
     --include=[PACKAGE:][MODULE]  include MODULE and/or PACKAGE
     --srcdir=DIR                  path to source directory of .hs files
                                   multi-use of srcdir possible
-    --hpcdir=DIR                  sub-directory that contains .mix files
+    --hpcdir=DIR                  append sub-directory that contains .mix files
                                   default .hpc [rarely used]
+    --reset-hpcdirs               empty the list of hpcdir's
+                                  [rarely used]
     --output=FILE                 output FILE
 </screen>
       </sect3>
@@ -1200,116 +1208,7 @@ Options:
     <title>「ticky-ticky」プロファイルを使う</title>
     <indexterm><primary>ticky-ticky profiling</primary></indexterm>
 
-    <para>(ToDo: ちゃんと書く。)</para>
-
-    <para>ものすごい数のいろんな分かるとうれしいこと(例えば、更新の回数、データ構築子への進入の回数、などなど)を数えるようにHaskellプログラムをコンパイルすることが可能である。我々はこれを「ticky-ticky」プロファイルと呼んでいる。<indexterm><primary>ticky-ticky profiling</primary></indexterm> <indexterm><primary>profiling, ticky-ticky</primary></indexterm>これは、CPUがこれらの数を(<emphasis>ゆっくりと</emphasis>)数えているときにこういう音を発するからである。</para>
-
-    <para>ticky-tickyプロファイルは主に実装者向けである。通常のプロファイルシステムである「コスト集約点」式(これは全ての利用者があらゆる場合に使うように意図されている)とは大きく異なる。</para>
-
-    <para>ticky-tickyプロファイルを使うのに、GHCやライブラリやRTSを特別な方法でビルドする必要はない。コンパイル時の<option>-ticky</option>を使って、カウンタを含めてコンパイルするかどうかをモジュール単位で決めることができる。<option>-ticky</option>付きでコンパイルされなかったモジュールはticky-tickyプロファイルの結果に寄与しない。通常、これにはプログラムにリンクされる全てのコンパイル済みパッケージが含まれる。
-    </para>
-
-    <para>プログラムにticky-tickyの数値を出力させるには、
-
-      <itemizedlist>
-        <listitem>
-          <para>プログラムを<option>-debug</option>付きでリンクする(リンク時においては<option>-ticky</option>は<option>-debug</option>の同義語である)。これによって、ticky-tickyプロファイルの結果を収集して報告するためのコードを含んだデバッグ版RTSがリンクされる。
-          </para>
-        </listitem>
-        <listitem>
-          <para>プログラムをRTSオプション<option>-r</option><indexterm><primary>-r RTS option</primary></indexterm>を付けて実行する。<xref linkend="runtime-control"/>を見よ。
-          </para>
-        </listitem>
-      </itemizedlist>
-    </para>
-
-    <para>以下に示すのはticky-ticky統計ファイルの例であり、<command>foo +RTS -rfoo.ticky</command>というコマンドで生成されたものである。</para>
-
-<screen>
- foo +RTS -rfoo.ticky
-
-ALLOCATIONS: 3964631 (11330900 words total: 3999476 admin, 6098829 goods, 1232595 slop)
-                                total words:        2     3     4     5    6+
-  69647 (  1.8%) function values                 50.0  50.0   0.0   0.0   0.0
-2382937 ( 60.1%) thunks                           0.0  83.9  16.1   0.0   0.0
-1477218 ( 37.3%) data values                     66.8  33.2   0.0   0.0   0.0
-      0 (  0.0%) big tuples
-      2 (  0.0%) black holes                      0.0 100.0   0.0   0.0   0.0
-      0 (  0.0%) prim things
-  34825 (  0.9%) partial applications             0.0   0.0   0.0 100.0   0.0
-      2 (  0.0%) thread state objects             0.0   0.0   0.0   0.0 100.0
-
-Total storage-manager allocations: 3647137 (11882004 words)
-        [551104 words lost to speculative heap-checks]
-
-STACK USAGE:
-
-ENTERS: 9400092  of which 2005772 (21.3%) direct to the entry code
-                  [the rest indirected via Node's info ptr]
-1860318 ( 19.8%) thunks
-3733184 ( 39.7%) data values
-3149544 ( 33.5%) function values
-                  [of which 1999880 (63.5%) bypassed arg-satisfaction chk]
- 348140 (  3.7%) partial applications
- 308906 (  3.3%) normal indirections
-      0 (  0.0%) permanent indirections
-
-RETURNS: 5870443
-2137257 ( 36.4%) from entering a new constructor
-                  [the rest from entering an existing constructor]
-2349219 ( 40.0%) vectored [the rest unvectored]
-
-RET_NEW:         2137257:  32.5% 46.2% 21.3%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
-RET_OLD:         3733184:   2.8% 67.9% 29.3%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
-RET_UNBOXED_TUP:       2:   0.0%  0.0%100.0%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
-
-RET_VEC_RETURN : 2349219:   0.0%  0.0%100.0%  0.0%  0.0%  0.0%  0.0%  0.0%  0.0%
-
-UPDATE FRAMES: 2241725 (0 omitted from thunks)
-SEQ FRAMES:    1
-CATCH FRAMES:  1
-UPDATES: 2241725
-      0 (  0.0%) data values
-  34827 (  1.6%) partial applications
-                  [2 in place, 34825 allocated new space]
-2206898 ( 98.4%) updates to existing heap objects (46 by squeezing)
-UPD_CON_IN_NEW:         0:       0      0      0      0      0      0      0      0      0
-UPD_PAP_IN_NEW:     34825:       0      0      0  34825      0      0      0      0      0
-
-NEW GEN UPDATES: 2274700 ( 99.9%)
-
-OLD GEN UPDATES: 1852 (  0.1%)
-
-Total bytes copied during GC: 190096
-
-**************************************************
-3647137 ALLOC_HEAP_ctr
-11882004 ALLOC_HEAP_tot
-  69647 ALLOC_FUN_ctr
-  69647 ALLOC_FUN_adm
-  69644 ALLOC_FUN_gds
-  34819 ALLOC_FUN_slp
-  34831 ALLOC_FUN_hst_0
-  34816 ALLOC_FUN_hst_1
-      0 ALLOC_FUN_hst_2
-      0 ALLOC_FUN_hst_3
-      0 ALLOC_FUN_hst_4
-2382937 ALLOC_UP_THK_ctr
-      0 ALLOC_SE_THK_ctr
- 308906 ENT_IND_ctr
-      0 E!NT_PERM_IND_ctr requires +RTS -Z
-[... たくさん省略 ...]
-      0 GC_SEL_ABANDONED_ctr
-      0 GC_SEL_MINOR_ctr
-      0 GC_SEL_MAJOR_ctr
-      0 GC_FAILED_PROMOTION_ctr
-  47524 GC_WORDS_COPIED_ctr
-</screen>
-
-    <para>アスタリスクの行より上の部分の情報の書式は変更されるかもしれないが、人間可読な要約としては便利だろう、hopefully。アスタリスクより下にはticky-tickyシステムが管理する<emphasis>全ての計測結果</emphasis>がダンプされている。この形式は機械処理を意図したものである。零個以上のスペース、整数、一つのスペース、カウンタ名、改行。</para>
-
-    <para>実際には、<emphasis>全て</emphasis>のカウンタがダンプされる必要はない。コンパイル時や実行時のフラグがある種のカウンタを無効にすることがある。このような場合、そういうカウンタは現れないか、カウンタ名が変更されて(場合によっては省略原因の説明と一緒に)出現する。(上記で、<literal>ENT_PERM_IND_ctr</literal>が<literal>!</literal>を挿入された状態で現れているのを確認せよ)。この出力を解析するソフトウェアは予期したカウンタが存在するか常に検査しなければならない。もう一つ注意。カウンタには<emphasis>大きな</emphasis>値をとるものがあるからね！</para>
-
+    <para>ticky-tickyプロファイルは、GHCの内部についてある意味で熟知していることを要求するので、我々はこれの文書をwikiに移した。<ulink url="http://ghc.haskell.org/trac/ghc/wiki/Commentary/Profiling">プロファイル方式についての概観</ulink>に目を通すと良い。ticky-tickyプロファイルのページへのリンクが含まれている。</para>
   </sect1>
 
 </chapter>
