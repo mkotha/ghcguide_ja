@@ -109,7 +109,7 @@ tags:
     <indexterm><primary>Yacc for Haskell</primary></indexterm>
     <indexterm><primary>parser generator for Haskell</primary></indexterm>
 
-    <para>Andy GillとSimon Marlowが<command>happy</command>呼ばれるHaskell用パーサジェネレータを書いた。<indexterm><primary>happy parser generator</primary></indexterm><command>happy</command>は、<command>Yacc</command>がCで行うことをHaskellで行うものである。</para>
+    <para>Andy GillとSimon Marlowが<command>happy</command>と呼ばれるHaskell用パーサジェネレータを書いた。<indexterm><primary>happy parser generator</primary></indexterm><command>happy</command>は、<command>Yacc</command>がCで行うことをHaskellで行うものである。</para>
 
     <para><command>happy</command>は<ulink url="http://www.haskell.org/happy/">the Happy Homepage</ulink>で手に入る。</para>
 

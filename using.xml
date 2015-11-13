@@ -213,6 +213,7 @@ module X where
 
   <sect1 id="modes">
     <title>実行モード</title>
+    <indexterm><primary>help options</primary></indexterm>
 
     <para>GHCの振る舞いはまずモード指定フラグによって制御される。これらのフラグのうちただ一つだけを使うことができるが、コマンド行において最初のオプションである必要はない。</para>
 
@@ -343,6 +344,18 @@ module X where
       <varlistentry>
 	<term>
           <cmdsynopsis>
+            <command>ghc --show-options</command>
+          </cmdsynopsis>
+          <indexterm><primary><option>--show-options</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>対応しているコマンド行オプションを印字する。シェルでの自動補完のために使うことができる。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term>
+          <cmdsynopsis>
             <command>ghc --info</command>
           </cmdsynopsis>
           <indexterm><primary><option>--info</option></primary></indexterm>
@@ -424,6 +437,9 @@ ghc Main.hs
 	<listitem>
           <para>起動されるたびにGHCが依存関係を再計算するので、ソースとの整合性が失われることがない。</para>
 	</listitem>
+        <listitem>
+          <para><literal>-j</literal>フラグを使うと、モジュールを並列にコンパイルできる。<replaceable>N</replaceable>個のジョブを並列コンパイルするには<literal>-jN</literal>と指定すれば良い。</para>
+        </listitem>
       </itemizedlist>
 
       <para>この章でこれ以降に解説されるコマンド行オプションは全て<option>--make</option>とともに用いることができる。ただし、コマンド行から与えられたオプションは全てのソースファイルに適用されるので、単一のソースファイルにのみ適用したいオプションについては<literal>OPTIONS_GHC</literal>プラグマ(<xref linkend="source-file-options"/>を見よ)を使う必要があることに注意せよ。</para>
@@ -569,9 +585,8 @@ ghc -c Foo.hs
   </sect1>
 
   <sect1 id="options-help">
-    <title>ヘルプと多弁さに関するオプション</title>
+    <title>多弁さに関するオプション</title>
 
-    <indexterm><primary>help options</primary></indexterm>
     <indexterm><primary>verbosity options</primary></indexterm>
 
     <para><xref linkend="modes"/>にある、<option>--help</option>、<option>--version</option>、<option>--numeric-version</option>、<option>--print-libdir</option>の各モードも参照。</para>
@@ -636,6 +651,39 @@ ghc -c Foo.hs
       </varlistentry>
 
       <varlistentry>
+        <term><option>--fprint-explicit-foralls, -fprint-explicit-kinds</option>
+          <indexterm><primary><option>-fprint-explicit-foralls</option></primary></indexterm>
+          <indexterm><primary><option>-fprint-explicit-kinds</option></primary></indexterm>
+        </term>
+        <listitem>
+          <para>これら二つのフラグは、エラーメッセージやGHCiにおいてGHCが型を表示する際、そのやりかたに影響する。<option>-fprint-explicit-foralls</option>は、型の最上位において明示的に(通常表示されない)<literal>forall</literal>を表示する。以下はGHCi内での例である。
+<screen>
+ghci> let f x = x
+ghci> :t f
+f :: a -> a
+ghci> :set -fprint-explicit-foralls
+ghci> :t f
+f :: forall a. a -> a
+</screen>
+         <option>-fprint-explicit-kinds</option>を使うと、通常抑制される型内の種forallと種適用を表示するようになる。種多相を使っている場合、これが重要になることがある。例を挙げる。
+<screen>
+ghci> :set -XPolyKinds
+ghci> data T a = MkT
+ghci> :t MkT
+MkT :: T b
+ghci> :set -fprint-explicit-foralls
+ghci> :t MkT
+MkT :: forall (b::k). T b
+ghci> :set -fprint-explicit-kinds
+ghci> :t MkT
+MkT :: forall (k::BOX) (b:k). T b
+</screen>
+         </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+
 	<term><option>-ferror-spans</option>
           <indexterm><primary><option>-ferror-spans</option></primary>
 	  </indexterm>
@@ -698,7 +746,7 @@ test.hs:(5,4)-(6,7):
     <indexterm><primary>warnings</primary></indexterm>
 
 
-    <para>GHCでは、いくつかのオプションを使って、致命的でないエラーメッセージ(警告ともいう)のうちどの種類のものを生成するか選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-lazy-unlifted-bindings</option>、<option>-fwarn-wrong-do-bind</option>、<option>-fwarn-unsupported-calling-conventions</option>、<option>-fwarn-dodgy-foreign-imports</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
+    <para>GHCでは、いくつかのオプションを使って、致命的でないエラーメッセージ(警告ともいう)のうちどの種類のものを生成するか選ぶことができる。デフォルトでは、一般にプログラムのバグを示していることが多い警告が有効になっている。これは<option>-fwarn-overlapping-patterns</option>、<option>-fwarn-warnings-deprecations</option>、<option>-fwarn-amp</option>、<option>-fdeprecated-flags</option>、<option>-fwarn-unrecognised-pragmas</option>、<option>-fwarn-pointless-pragmas</option>、<option>-fwarn-duplicate-constraints</option>、<option>-fwarn-duplicate-exports</option>、<option>-fwarn-missing-fields</option>、<option>-fwarn-missing-methods</option>、<option>-fwarn-wrong-do-bind</option>、<option>-fwarn-unsupported-calling-conventions</option>、<option>-fwarn-dodgy-foreign-imports</option>、<option>-fwarn-inline-rule-shadowing</option>、<option>-fwarn-unsupported-llvm-version</option>である。以下のフラグは標準的な警告の「詰め合わせ」を簡単に選択するためのものである。</para>
     <variablelist>
 
       <varlistentry>
@@ -748,6 +796,19 @@ test.hs:(5,4)-(6,7):
     <variablelist>
 
       <varlistentry>
+        <term><option>-fwarn-typed-holes</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-typed-holes</option></primary>
+          </indexterm>
+          <indexterm><primary>warnings</primary></indexterm>
+            <para><literal>_</literal>から始まる未束縛の局所変数か、単独の<literal>_</literal>を式の右辺で見つけた場合、型検査に通るためにこの項がどの型を持たねばならぬかを、エラーメッセージに含める。これは、特に <link linkend="defer-type-errors">型エラーの遅延</link>と相性が良い。<xref linkend="typed-holes"/>を見よ。</para>
+
+            <para>この警告はデフォルトで有効である。</para>
+        </listitem>
+      </varlistentry>
+
+
+      <varlistentry>
         <term><option>-fdefer-type-errors</option>:</term>
         <listitem>
           <indexterm><primary><option>-fdefer-type-errors</option></primary>
@@ -782,6 +843,19 @@ test.hs:(5,4)-(6,7):
       </varlistentry>
 
       <varlistentry>
+        <term><option>-fwarn-pointless-pragmas</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-pointless-pragmas</option></primary>
+          </indexterm>
+          <indexterm><primary>warnings</primary></indexterm>
+          <indexterm><primary>pragmas</primary></indexterm>
+          <para>モジュールが効果のないプラグマを含んでいることをGHCが発見した場合に警告を発する。</para>
+
+          <para>このオプションはデフォルトで有効である。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
 	<term><option>-fwarn-warnings-deprecations</option>:</term>
 	<listitem>
 	  <indexterm><primary><option>-fwarn-warnings-deprecations</option></primary>
@@ -792,6 +866,19 @@ test.hs:(5,4)-(6,7):
 
           <para>このオプションはデフォルトで有効である。</para>
 	</listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-fwarn-amp</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-amp</option></primary>
+          </indexterm>
+          <indexterm><primary>amp</primary></indexterm>
+          <indexterm><primary>applicative-monad proposal</primary></indexterm>
+          <para>AMP(Applicative-Monad proosal)と衝突する宣言がある場合に警告する。具体的には、1. ApplicativeでないMonadインスタンス、2. AlternativeでないMonadPlusインスタンス、3. join/pure/&lt;*&gt;の独自定義。</para>
+
+          <para>このオプションはデフォルトで有効である。</para>
+        </listitem>
       </varlistentry>
 
       <varlistentry>
@@ -851,7 +938,35 @@ foreign import "&amp;f" f :: FunPtr t
 	<listitem>
 	  <indexterm><primary><option>-fwarn-dodgy-imports</option></primary>
 	  </indexterm>
-	  <para>データ型<literal>T</literal>が全ての構築子を伴ってインポート(つまり<literal>T(..)</literal>)されているものの、抽象的にエクスポート(つまり<literal>T</literal>)されている場合に警告を出力する。</para>
+          <para>以下の場合に警告を発する。</para>
+          <itemizedlist>
+            <listitem>
+              <para>データ型<literal>T</literal>が全ての構築子を伴ってインポート(つまり<literal>T(..)</literal>)されているものの、抽象的にエクスポート(つまり<literal>T</literal>)されている。</para>
+            </listitem>
+            <listitem>
+              <para><literal>import</literal>文が、エクスポートされてない実体を(訳注: <literal>hiding</literal>で)隠した場合。</para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-fwarn-overflowed-literals</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-overflowed-literals</option></primary>
+          </indexterm>
+          <para>リテラルがオーバーフローするであろう場合に警告する。例: <literal>300 :: Word8</literal>。
+          </para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-fwarn-empty-enumerations</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-empty-enumerations</option></primary>
+          </indexterm>
+          <para>列挙が空の場合に警告する。例: <literal>[5 .. 3]</literal>.
+          </para>
 	</listitem>
       </varlistentry>
 
@@ -860,8 +975,24 @@ foreign import "&amp;f" f :: FunPtr t
 	<listitem>
 	  <indexterm><primary><option>-fwarn-lazy-unlifted-bindings</option></primary>
 	  </indexterm>
-	  <para>持ち上げられていない型(訳注: unlifed type; ボトムを持たない型)が、まるで遅延するかのように束縛されている場合に警告を発する。例えば<literal>where (I# x) = ...</literal>のような場合である。代わりに<literal>where !(I# x) = ...</literal>を使うこと。GHC 7.2では、これは警告でなくエラーになる予定である。
-      </para>
+          <para>このフラグはno-opであり、GHC 7.10で削除される。</para>
+        </listitem>
+      </varlistentry>
+
+      <varlistentry>
+        <term><option>-fwarn-duplicate-constraints</option>:</term>
+        <listitem>
+          <indexterm><primary><option>-fwarn-duplicate-constraints</option></primary></indexterm>
+          <indexterm><primary>duplicate constraints, warning</primary></indexterm>
+
+          <para>型シグネチャに二重になった制約がある場合に警告する。例えば、
+          <programlisting>
+             f :: (Eq a, Show a, Eq a) => a -> a
+          </programlisting>
+          この警告は<literal>Eq a</literal>制約が二重になっていることを指摘する。
+          </para>
+
+          <para>このオプションはデフォルトで有効である。</para>
 	</listitem>
       </varlistentry>
 
@@ -1015,6 +1146,7 @@ module M where
 	      </programlisting>
             意図は、(a) クラスの利用者は専ら<literal>complexFn</literal>を呼び、<literal>_simpleFn</literal>を呼ぶことはない。(b) インスタンス宣言では<literal>complexFn</literal>か<literal>_simpleFn</literal>のどちらかを定義すれば良い。というものである。
 	    </para>
+          <para>MINIMALプラグマを使うと、特定のクラスに関して、どのメソッドの組み合わせが要求されるかを変更することができる。<xref linkend="minimal-pragma"/>を見よ。</para>
 	</listitem>
       </varlistentry>
 
@@ -1062,7 +1194,7 @@ module M where
 
           <para>これらのオプションが有効なら、モジュールに「孤立した」インスタンス宣言や書き換え規則があるときに警告する。インスタンス宣言が孤立インスタンス宣言なのは、クラスおよびインスタンス化される型の両方と別のモジュールに置かれているときである。規則が孤立規則なのは、それが別のモジュールで宣言された関数についての規則であるときである。「孤立した」ものを含むモジュールは孤立モジュールと呼ばれる。</para>
           <para>問題は、孤立モジュールについては、そのインスタンスや規則が意味を持つ場合に備えて、他に理由がなくても、GHCが積極的にインタフェースファイルを読まなければいけないということである。詳しくは<xref linkend="orphan-modules"/>を参照せよ。</para>
-           <para><option>-fwarn-orphans</option>フラグは、ユーザによって書かれた孤立規則や孤立インスタンスについて警告する。 <option>-fwarn-auto-orphans</option>フラグは、自動生成された孤立規則、特に型クラス(<literal>Specialise</literal>)や引数の値(<literal>SpecConstr</literal>)についての特殊化の結果として生成されたものについて警告する。</para>
+           <para><option>-fwarn-orphans</option>フラグは、ユーザによって書かれた孤立規則や孤立インスタンスについて警告する。 <option>-fwarn-auto-orphans</option>フラグは、自動生成された孤立規則、特に型クラス(<literal>Specialise</literal>)や引数の値(<literal>-fspec-constr</literal>)についての特殊化の結果として生成されたものについて警告する。</para>
 	</listitem>
       </varlistentry>
 
@@ -1281,10 +1413,47 @@ f "2"    = 2
       <indexterm><primary>-f* options (GHC)</primary></indexterm>
       <indexterm><primary>-fno-* options (GHC)</primary></indexterm>
 
-      <para>これらのフラグは個々の最適化を有効・無効にする。これらは通常、上記の<option>-O</option>系のオプションを介して設定され、したがって、どれも明示的に指定する必要はないはずである。(実際、そうすると予期せぬ結果が訪れるかもしれない)。<option>-fhoge</option>というフラグは<option>-fno-hoge</option>とすることで打ち消せる。以下のフラグは、示されていない限りデフォルトで無効である。</para>
+      <para>これらのフラグは個々の最適化を有効・無効にする。これらは通常、上記の<option>-O</option>系のオプションを介して設定され、したがって、どれも明示的に指定する必要はないはずである。(実際、そうすると予期せぬ結果が訪れるかもしれない)。<option>-fhoge</option>というフラグは<option>-fno-hoge</option>とすることで打ち消せる。以下のフラグは、示されていない限りデフォルトで無効である。<xref linkend="options-f-compact"/><!-- 訳注: リンク切れ -->には小さくまとまった一覧がある。</para>
 
       <variablelist>
 	<varlistentry>
+          <term>
+            <option>-favoid-vect</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+          <listitem>
+            <para><link linkend="dph">Data Parallel Haskell (DPH)</link>の一部。</para>
+
+            <para><emphasis>デフォルトで無効。</emphasis><emphasis>ベクトル化</emphasis>回避の最適化を有効にする。この最適化は、<option>-fvectorise</option>変換と組み合わせた場合にのみ動作する。</para>
+
+            <para>DPHを使ったコードのベクトル化は大きな改善をもたらすことが多いが、ある種のコードについては結果を悪化させることがある。この最適化は、ベクトル化変換に変更を加えて、関数をベクトル化しない方が良いかどうか判断しようとし、もしそうならそうする。</para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>
+            <option>-fcase-merge</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+          <listitem>
+            <para><emphasis>デフォルトで有効。</emphasis> 直接入れ子になったcase式の検査対象が同じ変数である場合、一つにまとめる。例
+<programlisting>
+  case x of
+     Red -> e1
+     _   -> case x of 
+              Blue -> e2
+              Green -> e3
+==>
+  case x of
+     Red -> e1
+     Blue -> e2
+     Green -> e2
+</programlisting>
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
           <term>
             <option>-fcse</option>
             <indexterm><primary><option>-fcse</option></primary></indexterm>
@@ -1294,83 +1463,67 @@ f "2"    = 2
 	  </listitem>
 	</varlistentry>
 
-	<varlistentry>
+        <varlistentry>
           <term>
-            <option>-fstrictness</option>
+            <option>-fdicts-cheap</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+          <listitem>
+            <para>極めて実験的なフラグ。辞書を値に持つような式のコストを、最適化器が低く見積もるようにする。
+            </para>
+          </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fdo-lambda-eta-expansion</option>
             <indexterm><primary><option></option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><emphasis>デフォルトで有効</emphasis>。正格性解析器を有効にする。GHCの正格性解析器については非常に古い論文<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/simple-strictnes-analyser.ps.gz">Measuring the effectiveness of a simple strictness analyser</ulink>があるが、現在のものとはかなり違いがある。</para>
-
-            <para>正格性解析器は、どの引数と変数が関数内で「正格に」(つまり、その関数内でいずれ評価される)使われ得るかを調べる。これによって、lazyな引数に適用された場合にはプログラムの意味を変えるようなある種の最適化(非ボックス化など)をGHCが適用できるようになる。
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-funbox-strict-fields</option>:
-	    <indexterm><primary><option>-funbox-strict-fields</option></primary></indexterm>
-	    <indexterm><primary>strict constructor fields</primary></indexterm>
-	    <indexterm><primary>constructor fields, strict</primary></indexterm>
-          </term>
-	  <listitem>
-            <para>このオプションは正格と印の付けられた(つまり「!」)構築子フィールドを可能なら全て非ボックス化、つまりアンパックする。これは全ての正格な構築子フィールドに<literal>UNPACK</literal>プラグマを付けるのと同等である。(<xref linkend="unpack-pragma"/>を見よ)</para>
-
-            <para>このオプションは少々大槌を振り回す感じがある。場合によっては状況を悪化させかねない。<literal>UNPACK</literal>を使ってフィールドを選択的に非ボックス化する方が良いかもしれない。もう一つの選択肢は、<option>-funbox-strict-fields</option>を使ってデフォルトで非ボックス化を有効にしつつ、特定の構築子フィールドについては<literal>NOUNPACK</literal>プラグマを使って無効にすることである(<xref linkend="nounpack-pragma"/>を見よ)。
+            <para><emphasis>デフォルトで有効</emphasis>。アリティを増やすためにlet束縛をη展開する。
             </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
 	  <term>
-            <option>-fspec-constr</option>
-            <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
+            <option>-fdo-eta-reduction</option>
+            <indexterm><primary><option></option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><emphasis>デフォルトで無効だが、-O2によって有効になる。</emphasis>呼び出しパターンへの特殊化を有効にする。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/spec-constr/index.htm">Call-pattern specialisation for Haskell programs</ulink>を見よ。</para>
-
-            <para>この最適化は、再帰関数を、その引数の「形」に対して特殊化する。これは例を出すのが分かり易い。以下を考えよ。
-<programlisting>
-last :: [a] -> a
-last [] = error "last"
-last (x : []) = x
-last (x : xs) = last xs
-</programlisting>
-            このコードでは、最初に空リストかどうかの検査をした後では、再帰的に呼ばれた場合にこのパターン照合が冗長であることが分かる。そういうわけで、<option>-fspec-constr</option>は上のコードを次のように変形する。
-<programlisting>
-last :: [a] -> a
-last []       = error "last"
-last (x : xs) = last' x xs
-    where
-      last' x []       = x
-      last' x (y : ys) = last' y ys
-</programlisting>
+            <para><emphasis>デフォルトで有効</emphasis>。ラムダ式をη簡約することで複数のラムダをまとめて除去できるなら、そうする。
             </para>
+          </listitem>
+        </varlistentry>
 
-            <para>不要なパターン照合を避けるだけでなく、これによって不要なメモリ確保が必要なくなることもある。これは、ある引数が、自己再帰呼び出しの場合には正格だが最初に呼ばれたときにはそうでないという場合にあてはまる。上の例と同様に正格で再帰的な選択肢が作られるからである。</para>
+        <varlistentry>
+          <term>
+            <option>-feager-blackholing</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+          <listitem>
+            <para>GHCは通常スレッドを切り替える場合にのみブラックホール化を行なう。このフラグは、サンクに進入してすぐにこれを行なうようにする。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/parallel/">Haskell on a shared-memory multiprocessor</ulink>を見よ。
+            </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term>
-            <option>-fspecialise</option>
-            <indexterm><primary><option>-fspecialise</option></primary></indexterm>
-          </term>
+	  <term><option>-fexcess-precision</option>:</term>
 	  <listitem>
-            <para><emphasis>デフォルトで有効</emphasis>。このモジュールで定義された、型クラスによる多重定義関数それぞれを、このモジュールで使われている型について特殊化する。また、INLINABLEプラグマ(<xref linkend="inlinable-pragma"/>)を持つインポートされた関数を、このモジュールで呼ばれている型で特殊化する。
+	    <indexterm><primary><option>-fexcess-precision</option></primary></indexterm>
+            <para>このオプションが与えられると、中間の浮動小数点数が最終的な型よりも<emphasis>大きな</emphasis>精度/範囲をもつことが許される。一般にはこれは良いことだが、<literal>Float</literal>/<literal>Double</literal>の正確な精度/範囲に依存したプログラムがあるかもしれず、そのようなプログラムはこのオプションなしでコンパイルせねばならない。</para>
+            <para>32ビットのx86コード生成器は、excess-precisionモードにのみ対応しているので、<option>-fexcess-precision</option>も<option>-fno-excess-precision</option>も効果を持たない。これは既知のバグである。<xref linkend="bugs-ghc" />を見よ。
             </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
 	  <term>
-            <option>-fstatic-argument-transformation</option>
-            <indexterm><primary><option>-fstatic-argument-transformation</option></primary></indexterm>
+            <option>-fexpose-all-unfoldings</option>
+            <indexterm><primary><option></option></primary></indexterm>
           </term>
 	  <listitem>
-            <para>静的引数変換(static argument transformation)を有効にする。これは、再帰的な関数を、再帰的な局所ループを持つ非再帰関数へと変化させるものである。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/santos-thesis.ps.gz">Andre Santosの博士論文</ulink>の7章を見よ。
-            </para>
+            <para>実験的なフラグ。非常に大きな関数や再帰関数も含めて、すべての展開を露出する。通常GHCは大きい関数をインライン化することを避けるが、これによって、全ての関数がインライン化可能になる。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1403,49 +1556,44 @@ last (x : xs) = last' x xs
 	  </listitem>
 	</varlistentry>
 
-	<varlistentry>
-	  <term>
-            <option>-fdo-lambda-eta-expansion</option>
-            <indexterm><primary><option></option></primary></indexterm>
+        <varlistentry>
+          <term>
+            <option>-ffun-to-thunk</option>
+            <indexterm><primary><option>-ffun-to-thunk</option></primary></indexterm>
           </term>
-	  <listitem>
-            <para><emphasis>デフォルトで有効</emphasis>。アリティを増やすためにlet束縛をη展開する。
+          <listitem>
+            <para>worker-wrapperは使われていない引数を削除するが、通常全ての引数を削除することはない。そうすると、関数クロージャをサンクへと変化させることになり、スペースリークを発生させたり、インライン化を阻害することになるかもしれないからである。このフラグは、worker/wrapperによって値ラムダを<emphasis>全て</emphasis>削除することを許す。デフォルトで無効。
             </para>
+          </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term><option>-fignore-asserts</option>:</term>
+	  <listitem>
+	    <indexterm><primary><option>-fignore-asserts</option></primary></indexterm>
+            <para>ソースコード中で<literal>Exception.assert</literal>関数が使われていても無視する。(言い替えると、<literal>Exception.assert p e</literal>を<literal>e</literal>に書き換える。<xref linkend="assertions"/>を見よ)。このフラグは<option>-O</option>が指定されていると有効になる。</para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
 	  <term>
-            <option>-fdo-eta-reduction</option>
-            <indexterm><primary><option></option></primary></indexterm>
+            <option>-fignore-interface-pragmas</option>
+	    <indexterm><primary><option>-fignore-interface-pragmas</option></primary></indexterm>
           </term>
 	  <listitem>
-            <para><emphasis>デフォルトで有効</emphasis>。ラムダ式をη簡約することで複数のラムダをまとめて除去できるなら、そうする。
-            </para>
-          </listitem>
-        </varlistentry>
+            <para>インタフェースファイルを読むときに必須でない情報を全て無視するようにGHCに指示する。つまり、仮に<filename>M.hi</filename>に関数の展開候補や正格性情報があったとしても、GHCはその情報を無視する。</para>
+	  </listitem>
+	</varlistentry>
 
         <varlistentry>
           <term>
-            <option>-fcase-merge</option>
-            <indexterm><primary><option></option></primary></indexterm>
+            <option>-flate-dmd-anal</option>
+            <indexterm><primary><option>-flate-dmd-anal</option></primary></indexterm>
           </term>
           <listitem>
-            <para><emphasis>デフォルトで有効</emphasis>。直接入れ子になっている二つのcase式が同じ変数を検査しているなら、一つにまとめる。例。
-<programlisting>
-  case x of
-     Red -> e1
-     _   -> case x of 
-              Blue -> e2
-              Green -> e3
-==>
-  case x of
-     Red -> e1
-     Blue -> e2
-     Green -> e2
-</programlisting>
+            <para><emphasis>デフォルトで無効。</emphasis>単純化パイプラインの最後に、要求解析(demand analysis)をもう一度走らせる。以前には見えなかった正確性を発見する機会を我々はいくつか見つけた。また、<literal>-spec-constr</literal>などの最適化が作った関数の未使用の引数を、この後段の要求解析が排除できることがある。改善はささやかであるが、コストもささやかである。<ulink href="http://ghc.haskell.org/trac/ghc/wiki/LateDmd">Tracのwikiページ</ulink>にあるメモを参照。
             </para>
-          </listitem>
+            </listitem>
         </varlistentry>
 
         <varlistentry>
@@ -1461,25 +1609,25 @@ last (x : xs) = last' x xs
 
         <varlistentry>
           <term>
-            <option>-fdicts-cheap</option>
-            <indexterm><primary><option></option></primary></indexterm>
+            <option>-fliberate-case-threshold=N</option>
+            <indexterm><primary><option>-fliberate-case-threshold</option></primary></indexterm>
           </term>
           <listitem>
-            <para>極めて実験的なフラグ。辞書を値に持つような式のコストを、最適化器が低く見積もるようにする。
+            <para>liberate-case変換における大きさの閾値を設定する。
             </para>
           </listitem>
         </varlistentry>
 
         <varlistentry>
           <term>
-            <option>-feager-blackholing</option>
-            <indexterm><primary><option></option></primary></indexterm>
+            <option>-fmax-relevant-bindings=N</option>
+            <indexterm><primary><option>-fmax-relevant-bindings</option></primary></indexterm>
           </term>
           <listitem>
-            <para>GHCは通常スレッドを切り替える場合にのみブラックホール化を行なう。このフラグは、サンクに進入してすぐにこれを行なうようにする。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/parallel/">Haskell on a shared-memory multiprocessor</ulink>を見よ。
+            <para>型検査器がエラーメッセージの中で型環境の断片を表示することがあるが、このフラグがその最大数を定める。デフォルトは6である。<option>-fno-max-relevant-bindings</option>によってこれを無効にすると無制限になる。構文的に最上位である束縛は通常除外される(通常たくさんあるので)が、<option>-fno-max-relevant-bindings</option>はそれらも含める。
             </para>
-	  </listitem>
-	</varlistentry>
+          </listitem>
+        </varlistentry>
 
 	<varlistentry>
 	  <term>
@@ -1493,88 +1641,33 @@ last (x : xs) = last' x xs
 
 	<varlistentry>
 	  <term>
-            <option>-fpedantic-bottoms</option>
-            <indexterm><primary><option>-fpedantic-bottoms</option></primary></indexterm>
+            <option>-fomit-interface-pragmas</option>
+	    <indexterm><primary><option>-fomit-interface-pragmas</option></primary></indexterm>
           </term>
 	  <listitem>
-	    <para>GHCがボトムをより精密に扱うようにする(しかし、<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。このようなイータ展開は性能には良いが、部分適用の結果に対して<literal>seq</literal>を使っているなら悪いものになる。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-fsimpl-tick-factor=<replaceable>n</replaceable></option>
-            <indexterm><primary><option>-fsimpl-tick-factor</option></primary></indexterm>
-          </term>
-	  <listitem>
-	    <para>GHCの最適化器は、停止しない書き換え規則(<xref linkend="rewrite-rules"/>)を書いたとき、または(もうすこし嫌なことに)データ型を通して再帰を組み上げた場合(<xref linkend="bugs-ghc"/>)に発散する。コンパイラが無限ループに陥るのを避けるため、最適化器は「tickの回数」を保持し、この回数が超過したときにはインライン化と書き換え規則の適用をやめる。大きいプログラムが多くのtickを使えるように、この限界はプログラムの大きさの定数倍になる。<option>-fsimpl-tick-factor</option>はこの定数を変えられるようにする。デフォルトは100である。100より大きな数はより沢山のtickを与え、100より小さい数はより少ないtickを与える。</para>
-            <para>tickの数が尽きると、GHCはそれまでに実行した単純化器の歩みを要約する。<option>-fddump-simpl-stats</option>を使うとずっと詳細な一覧を生成することができる。通常これでループをかなり精密に同定することができる。いくつかの数がとても大きくなるからである。
+	    <para>コンパイル中のモジュール(Mとしよう)のインタフェースファイルにおいて、必須でない情報を全て省略するようにGHCに指示する。これによって、Mをインポートするモジュールからは、Mがエクスポートする関数の<emphasis>型</emphasis>しか見えず、展開候補や正格性情報などが見えなくなる。よって、例えば、Mからエクスポートされた関数が、それをインポートするモジュールでインライン化されるということがなくなる。これによる利点は、Mをインポートするモジュールを再コンパイルしなければならない頻度が減るということである。(Mのエクスポート物の型が変わった場合だけ再コンパイルすればよく、実装が変わっただけならしなくてよい)
 	      </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-funfolding-creation-threshold=<replaceable>n</replaceable></option>:
-	    <indexterm><primary><option>-funfolding-creation-threshold</option></primary></indexterm>
-	    <indexterm><primary>inlining, controlling</primary></indexterm>
-	    <indexterm><primary>unfolding, controlling</primary></indexterm>
-          </term>
-	  <listitem>
-            <para>(デフォルト: 45)関数の展開候補(unfolding)に許される最大の大きさを定める。(展開候補には、それが呼び出し点で展開されたときの「コード膨張」のコストを反映した「大きさ」が与えられる。大きい関数ほど大きなコストを持つ)</para>
-
-            <para>これによる影響は、(a)これより大きい物は(INLINEプラグマがない限り)決してインライン展開されない (b)これより大きい物は決してインタフェースファイルに吐かれることはない、という点である。</para>
-
-            <para>この数値を増やしても、結果としてコードが速くなるというよりは単にコンパイル時間が長くなる公算が高い。<option>-funfolding-use-threshold</option>の方が便利である。</para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term><option>-funfolding-use-threshold=<replaceable>n</replaceable></option>:</term>
-	  <listitem>
-	    <indexterm><primary><option>-funfolding-use-threshold</option></primary></indexterm>
-	    <indexterm><primary>inlining, controlling</primary></indexterm>
-	    <indexterm><primary>unfolding, controlling</primary></indexterm>
-
-            <para>(デフォルト: 8)これは展開(インライン化)にあたっての魔法のカットオフ値である。これより小さい関数定義は呼び出し元に展開され、これより大きい物は展開されない。関数の大きさは二つのものに依存する。式の実際の大きさと、それに適用される割引である。(<option>-funfolding-con-discount</option>を見よ<!-- 訳注: このオプションはもはや存在しない -->)</para>
-
-            <para>これと<option>-funfolding-creation-threshold</option>の違いは、これが関数がインライン化されるかどうかを<emphasis>呼び出し地点で</emphasis>決定するのに対し、他方は将来のインライン化のために関数定義を持っておくかどうかを決定することである。
-            </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-fexpose-all-unfoldings</option>
-            <indexterm><primary><option></option></primary></indexterm>
-          </term>
-	  <listitem>
-            <para>実験的なフラグ。非常に大きな関数や再帰関数も含めて、すべての展開を露出する。これによって、全ての関数がインライン化可能になる。ただし、通常GHCは大きい関数をインライン化することを避ける。
-            </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>
-            <option>-fvectorise</option>
-            <indexterm><primary><option></option></primary></indexterm>
-          </term>
-	  <listitem>
-            <para>Data Parallel Haskell。
-            </para>
-            TODO: Document optimisation
 	  </listitem>
 	</varlistentry>
 
         <varlistentry>
           <term>
-            <option>-favoid-vect</option>
-            <indexterm><primary><option></option></primary></indexterm>
+            <option>-fomit-yields</option>
+            <indexterm><primary><option>-fomit-yields</option></primary></indexterm>
           </term>
           <listitem>
-            <para>Data Parallel Haskell。
-        </para>
-            TODO: Document optimisation
+              <para><emphasis>デフォルトで有効。</emphasis>メモリ確保がされない場合、GHCがヒープ検査を省略するようにする。これはバイナリの大きさを5%ほど改善するが、スレッドがメモリ確保のないループを実行している場合、すぐには割り込まれないということも意味する。このようなスレッドに常に割り込めることが重要な場合、この最適化を無効にするべきである。また、割り込み可能性を保証したい場合、この最適化を無効にした上で全てのライブラリを再コンパイルすることを検討するべきである。
+            </para>
+          </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fpedantic-bottoms</option>
+            <indexterm><primary><option>-fpedantic-bottoms</option></primary></indexterm>
+          </term>
+	  <listitem>
+	    <para>GHCがボトムをより精密に扱うようにする(ただし<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。このようなイータ展開は性能には良いが、部分適用の結果に対して<literal>seq</literal>を使っているなら悪いものになる。</para>
 	  </listitem>
 	</varlistentry>
 
@@ -1601,43 +1694,176 @@ last (x : xs) = last' x xs
         </varlistentry>
  
 	<varlistentry>
-	  <term><option>-fexcess-precision</option>:</term>
+	  <term>
+            <option>-fsimpl-tick-factor=<replaceable>n</replaceable></option>
+            <indexterm><primary><option>-fsimpl-tick-factor</option></primary></indexterm>
+          </term>
 	  <listitem>
-	    <indexterm><primary><option>-fexcess-precision</option></primary></indexterm>
-            <para>このオプションが与えられると、中間の浮動小数点数が最終的な型よりも<emphasis>大きな</emphasis>精度/範囲をもつことが許される。一般にはこれは良いことだが、<literal>Float</literal>/<literal>Double</literal>の正確な精度/範囲に依存したプログラムがあるかもしれず、そのようなプログラムはこのオプションなしでコンパイルせねばならない。</para>
-            <para>32ビットのx86コード生成器は、excess-precisionモードにのみ対応しているので、<option>-fexcess-precision</option>も<option>-fno-excess-precision</option>も効果を持たない。これは既知のバグであり、<xref linkend="bugs-ghc" />を見よ。
+	    <para>GHCの最適化器は、停止しない書き換え規則(<xref linkend="rewrite-rules"/>)を書いたとき、または(もうすこし嫌なことに)データ型を通して再帰を組み上げた場合(<xref linkend="bugs-ghc"/>)に発散する。コンパイラが無限ループに陥るのを避けるため、最適化器は「tickの回数」を保持し、この回数が超過したときにはインライン化と書き換え規則の適用をやめる。大きいプログラムが多くのtickを使えるように、この限界はプログラムの大きさの定数倍になる。<option>-fsimpl-tick-factor</option>はこの定数を変えられるようにする。デフォルトは100である。100より大きな数はより沢山のtickを与え、100より小さい数はより少ないtickを与える。</para>
+            <para>tickの数が尽きると、GHCはそれまでに実行した単純化器の歩みを要約する。<option>-fddump-simpl-stats</option>を使うとずっと詳細な一覧を生成することができる。通常これでループをかなり精密に同定することができる。いくつかの数がとても大きくなるからである。
+	      </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-funfolding-creation-threshold=<replaceable>n</replaceable></option>:
+	    <indexterm><primary><option>-funfolding-creation-threshold</option></primary></indexterm>
+	    <indexterm><primary>inlining, controlling</primary></indexterm>
+	    <indexterm><primary>unfolding, controlling</primary></indexterm>
+          </term>
+	  <listitem>
+            <para>(デフォルト: 45)関数の展開候補(unfolding)に許される最大の大きさを定める。(展開候補には、それが呼び出し点で展開されたときの「コード膨張」のコストを反映した「大きさ」が与えられる。大きい関数ほど大きなコストを持つ)</para>
+            <para>これによる影響は、(a)これより大きい物は(INLINEプラグマがない限り)決してインライン展開されない (b)これより大きい物は決してインタフェースファイルに吐かれることはない、という点である。</para>
+            <para>この数値を増やしても、結果としてコードが速くなるというよりは単にコンパイル時間が長くなる公算が高い。<option>-funfolding-use-threshold</option>の方が便利である。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term><option>-funfolding-use-threshold=<replaceable>n</replaceable></option>:</term>
+	  <listitem>
+	    <indexterm><primary><option>-funfolding-use-threshold</option></primary></indexterm>
+	    <indexterm><primary>inlining, controlling</primary></indexterm>
+	    <indexterm><primary>unfolding, controlling</primary></indexterm>
+            <para>(デフォルト: 8)これは展開(インライン化)にあたっての魔法のカットオフ値である。これより小さい関数定義は呼び出し元に展開され、これより大きい物は展開されない。関数の大きさは二つのものに依存する。式の実際の大きさと、それに適用される割引である。(<option>-funfolding-con-discount</option>を見よ<!-- 訳注: このオプションはもはや存在しない -->)</para>
+            <para>これと<option>-funfolding-creation-threshold</option>の違いは、これが関数がインライン化されるかどうかを<emphasis>呼び出し地点で</emphasis>決定するのに対し、他方は将来のインライン化のために関数定義を持っておくかどうかを決定することである。
+            </para>
+	  </listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term>
+            <option>-fvectorise</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+          <listitem>
+            <para><link linkend="dph">Data Parallel Haskell (DPH)</link>の一部。</para>
+
+            <para><emphasis>デフォルトで無効。</emphasis><emphasis>ベクトル化</emphasis>という最適化変換を有効にする。この最適化は、lDPHを使ったプログラムのネストされたデータ並列性を平坦なデータ並列性へと変換する。平坦なデータ並列プログラムはより良い負荷分散を持ち、SIMD並列性を可能にし、キャッシュに関してより友好的な振る舞いが可能になる。</para>
+          </listitem>
+        </varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fspec-constr</option>
+            <indexterm><primary><option>-fspec-constr</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><emphasis>デフォルトで無効だが、-O2によって有効になる。</emphasis>呼び出しパターンへの特殊化を有効にする。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/spec-constr/index.htm">Call-pattern specialisation for Haskell programs</ulink>を見よ。</para>
+            <para>この最適化は、再帰関数を、その引数の「形」に対して特殊化する。これは例を出すのが分かり易い。以下を考えよ。
+<programlisting>
+last :: [a] -> a
+last [] = error "last"
+last (x : []) = x
+last (x : xs) = last xs
+</programlisting>
+            このコードでは、最初に空リストかどうかの検査をした後では、再帰的に呼ばれた場合にこのパターン照合が冗長であることが分かる。そういうわけで、<option>-fspec-constr</option>は上のコードを次のように変形する。
+<programlisting>
+last :: [a] -> a
+last []       = error "last"
+last (x : xs) = last' x xs
+    where
+      last' x []       = x
+      last' x (y : ys) = last' y ys
+</programlisting>
+            </para>
+            <para>不要なパターン照合を避けるだけでなく、これによって不要なメモリ確保が必要なくなることもある。これは、ある引数が、自己再帰呼び出しの場合には正格だが最初に呼ばれたときにはそうでないという場合にあてはまる。上の例と同様に正格で再帰的な選択肢が作られるからである。</para>
+            <para>ライブラリ作者は、呼び出しパータンへの特殊化を極めて攻撃的に行なうようにGHCに指示することもできる。これはある種の高度に最適化されたライブラリに必要である。そこでは、特殊板の数やコードサイズがどうなろうとも特殊化したいと思うことがあるかもしれない。例として、<literal>vector</literal>ライブラリでの利用例を単純化したものを挙げる。</para>
+<programlisting>
+import GHC.Types (SPEC(..))
+
+foldl :: (a -> b -> a) -> a -> Stream b -> a
+{-# INLINE foldl #-}
+foldl f z (Stream step s _) = foldl_loop SPEC z s
+  where
+    foldl_loop !sPEC z s = case step s of
+                            Yield x s' -> foldl_loop sPEC (f z x) s'
+                            Skip       -> foldl_loop sPEC z s'
+                            Done       -> z
+</programlisting>
+
+            <para>ここで、ループ本体の引数として<literal>SPEC</literal>があるので、<literal>foldl</literal>の本体が呼び出し地点にインライン化された後、<literal>foldl_loop</literal>に対してGHCは非常に攻撃的な呼び出しパターン特殊化を行なう。<literal>GHC.Types</literal>で定義された<literal>SPEC</literal>はコンパイラによって特別に認識される。</para>
+
+            <para>(注意: <literal>SPEC</literal>引数に対して<literal>seq</literal>またはびっくりパターンを使うことが非常に重要である！)</para>
+
+            <para>特筆すべき点として、インライン化によって、ループ本体から<literal>f</literal>が直接見えるようになるので、再帰する選択肢にに関して激しい特殊化が可能になる。</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>
+            <option>-fspecialise</option>
+            <indexterm><primary><option>-fspecialise</option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><emphasis>デフォルトで有効</emphasis>。このモジュールで定義された、型クラスによる多重定義関数それぞれを、このモジュールで使われている型について特殊化する。また、インポートされた関数でINLINABLEプラグマ(<xref linkend="inlinable-pragma"/>)を持つものを、このモジュールで呼ばれている型で特殊化する。
             </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term><option>-fignore-asserts</option>:</term>
+	  <term>
+            <option>-fstatic-argument-transformation</option>
+            <indexterm><primary><option>-fstatic-argument-transformation</option></primary></indexterm>
+          </term>
 	  <listitem>
-	    <indexterm><primary><option>-fignore-asserts</option></primary></indexterm>
-            <para>ソースコード中で<literal>Exception.assert</literal>関数が使われていても無視する。(言い替えると、<literal>Exception.assert p e</literal>を<literal>e</literal>に書き換える。<xref linkend="assertions"/>を見よ)。このフラグは<option>-O</option>が指定されていると有効になる。</para>
+            <para>静的引数変換(static argument transformation)を有効にする。これは、再帰的な関数を、再帰的な局所ループを持つ非再帰関数へと変化させるものである。<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/santos-thesis.ps.gz">Andre Santosの博士論文</ulink>の7章を見よ。
+            </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term>
+            <option>-fstrictness</option>
+            <indexterm><primary><option></option></primary></indexterm>
+          </term>
+	  <listitem>
+            <para><emphasis>デフォルトで有効</emphasis>。正格性解析器を有効にする。GHCの正格性解析器については非常に古い論文<ulink url="http://research.microsoft.com/en-us/um/people/simonpj/papers/simple-strictnes-analyser.ps.gz">Measuring the effectiveness of a simple strictness analyser</ulink>があるが、現在のものとはかなり違いがある。</para>
+
+            <para>正格性解析器は、どの引数と変数が関数内で「正格に」(つまり、その関数内でいずれ評価される)使われ得るかを調べる。これによって、lazyな引数に適用された場合にはプログラムの意味を変えるようなある種の最適化(非ボックス化など)をGHCが適用できるようになる。
+	    </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
 	  <term>
-            <option>-fignore-interface-pragmas</option>
-	    <indexterm><primary><option>-fignore-interface-pragmas</option></primary></indexterm>
+            <option>-funbox-strict-fields</option>:
+	    <indexterm><primary><option>-funbox-strict-fields</option></primary></indexterm>
+	    <indexterm><primary>strict constructor fields</primary></indexterm>
+	    <indexterm><primary>constructor fields, strict</primary></indexterm>
           </term>
 	  <listitem>
-            <para>インタフェースファイルを読むときに必須でない情報を全て無視するようにGHCに指示する。つまり、仮に<filename>M.hi</filename>に関数の展開候補や正格性情報があったとしても、GHCはその情報を無視する。</para>
+            <para>このオプションは正格と標示された(つまり「!」)構築子フィールドを可能なら全てアンパックする。これは全ての正格な構築子フィールドに<literal>UNPACK</literal>プラグマを付けるのと同等である。(<xref linkend="unpack-pragma"/>を見よ)</para>
+
+            <para>このオプションは少々大槌を振り回す感じがある。場合によっては状況を悪化させかねない。<literal>UNPACK</literal>を使ってフィールドを選択的に非ボックス化する方が良いかもしれない。もう一つの選択肢は、<option>-funbox-strict-fields</option>を使ってデフォルトで非ボックス化を有効にしつつ、特定の構築子フィールドについては<literal>NOUNPACK</literal>プラグマを使って無効にすることである(<xref linkend="nounpack-pragma"/>を見よ)。
+            </para>
 	  </listitem>
 	</varlistentry>
 
-	<varlistentry>
-	  <term>
-            <option>-fomit-interface-pragmas</option>
-	    <indexterm><primary><option>-fomit-interface-pragmas</option></primary></indexterm>
+        <varlistentry>
+          <term>
+            <option>-funbox-small-strict-fields</option>:
+            <indexterm><primary><option>-funbox-small-strict-fields</option></primary></indexterm>
+            <indexterm><primary>strict constructor fields</primary></indexterm>
+            <indexterm><primary>constructor fields, strict</primary></indexterm>
           </term>
-	  <listitem>
-	    <para>コンパイル中のモジュール(Mとしよう)のインタフェースファイルにおいて、必須でない情報を全て省略するようにGHCに指示する。これによって、Mをインポートするモジュールからは、Mがエクスポートする関数の<emphasis>型</emphasis>しか見えず、展開候補や正格性情報などが見えなくなる。よって、例えば、Mからエクスポートされた関数が、それをインポートするモジュールでインライン化されるということがなくなる。これによる利点は、Mをインポートするモジュールを再コンパイルしなければならない頻度が減るということである。(Mのエクスポート物の型が変わった場合だけ再コンパイルすればよく、実装が変わっただけならしなくてよい)
-	      </para>
-	  </listitem>
-	</varlistentry>
+          <listitem>
+            <para><emphasis>デフォルトで有効</emphasis>。このオプションは、正格であると標示(つまり「!」)された構築子フィールドで、表現がポインタ一個以下の大きさであるものを、可能なら全てアンパックする。これは、大きさの制約を満たす全ての正格なフィールドに<literal>UNPACK</literal>を付けるのと同等である。</para>
+
+            <para>例として、以下の構築子を考えよ。
+<programlisting>
+data A = A !Int
+data B = B !A
+newtype C = C B
+data D = D !C
+</programlisting>
+            <option>-funbox-small-strict-fields</option>が有効だと、これらのフィールドは全て、一つの<literal>Int#</literal>(<xref linkend="primitives"/>を見よ)で表現される。</para>
+
+            <para>このオプションは、<option>-funbox-strict-fields</option>に比べて大槌を振り回す感が少ない。これが状況を悪化させることは少ないはずである。<option>-funbox-small-strict-fields</option>を使ってデフォルトでの非ボックス化を有効にしている場合、<literal>NOUNPACK</literal>を使って個々の構築子フィールドについてこれを無効にすることができる(<xref linkend="nounpack-pragma"/>を見よ)。</para>
+
+            <para>整合性のため、32ビットのプラットフォームにおいて、<literal>Double</literal>、<literal>Word64</literal>、<literal>Int64</literal>の構築子フィールドは、技術的にはポインタよりも大きいにも関わらずアンパックされることに注意せよ。</para>
+          </listitem>
+        </varlistentry>
 
       </variablelist>
 
