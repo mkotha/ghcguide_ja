@@ -463,7 +463,7 @@ module A where
 <programlisting>
   ghc -c A.hs-boot
 </programlisting>
-<filename>A.hs-boot</filename>というhs-bootファイルがコンパイルされると、通用範囲と型に関するエラーがないかどうか検査される。親モジュールである<filename>A.hs</filename>がコンパイルされるとき、この二つが比較され、不整合があればエラーが報告される。
+<filename>A.hs-boot</filename>というhs-bootファイルがコンパイルされると、スコープと型に関するエラーがないかどうか検査される。親モジュールである<filename>A.hs</filename>がコンパイルされるとき、この二つが比較され、不整合があればエラーが報告される。
    </para></listitem>
 
 	<listitem>
