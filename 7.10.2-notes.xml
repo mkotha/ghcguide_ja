@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<sect1 id="release-7-10-2">
+  <title>Release notes for version 7.10.2</title>
+
+  <para>
+    The 7.10.2 release is a bugfix release, with over 70+ bug fixes
+    relative to 7.10.1. The major fixes are listed below. For the full
+    list with more detail, see the <ulink
+    url="https://ghc.haskell.org/trac/ghc/milestone/7.10.2">GHC 7.10.2
+    milestone</ulink> on our bug tracker.
+  </para>
+
+  <sect2>
+    <title>GHC</title>
+
+    <itemizedlist>
+       <listitem>
+          <para>
+            The source location of a function's caller can now be made
+            available to the callee as an implicit parameter. This will
+            enable better location information in runtime errors (e.g. from
+            <literal>error</literal> and partial functions like
+            <literal>head</literal>). For more details see
+            <xref linkend="special-implicit-params"/>.
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug in the typechecker which could result in strange,
+            inconsistent reduction of type families has been fixed
+            (issue #10488).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A variety of fixes of the new API annotations support.
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused GHC to generate bad DWARF unwinding
+            information has been fixed (issue #10236).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            DWARF support should now work on Windows/MinGW (#10468).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused GHC's <literal>libffi.so</literal>
+            library to be built with executable stacks on some
+            platforms has been fixed (issue #10208).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bus error on SPARC machines caused by misaligned data
+            accesses in the RTS has been fixed.
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused the simplifier to produce code which
+            segfaulted at runtime has been fixed (issue #10538).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A type-system bug which could allow a user to write
+            <literal>unsafeCoerce</literal> has been fixed (issue
+            #9858).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused GHC to generate incorrect hyperlinks to
+            documentation in Haddock has been fixed (#10206).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug in the typechecker which allowed erroneous programs
+            using <literal>Coercible</literal> to typecheck has been
+            fixed (issue #10285).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            An issue which could cause the "Call Arity" analysis to
+            perform poorly in general has been fixed (issue #10293).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            Several dozen bugs in the new API annotations work have
+            been fixed (issues #10395, #10363, #10358, #10357, #10315,
+            #10314, #10312, and many more).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A regression which could cause the typechecker fail to
+            properly simplify type-level terms has been fixed (issue
+            #10321).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused programs compiled with
+            <literal>-flate-dmd-anal</literal> to crash at runtime has
+            been fixed (issue #10288).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which caused ARM/Linux binaries to be built with
+            executable stacks has been fixed (issue #10369).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            Several bugs in GHC's cross compilation support using LLVM
+            have been fixed (#10275).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            Several bugs in GHC's support for AArch64 have been fixed
+            (such as issue #10264).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            The SMP runtime and GHCi are now enabled on AArch64 (issue #10525).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug in the code which caused GHC to emit invalid C code
+            when porting to a new platform has been fixed (issue
+            #10518).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which could cause GHC to generate incorrect code at
+            runtime (generating an infinite loop exception) has been
+            fixed (issue #10218).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            Several performance-related issues inside GHC have been
+            fixed. As a result, you should see improved compilation
+            times and memory usage (issues #10397, #10370, #10422).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which could cause GHCi to crash if exceptions were
+            raised in the <literal>:cmd</literal> command has been
+            fixed.
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug in the event manager which could cause 'multi-shot'
+            event registrations to only fire once has been fixed
+            (issue #10317).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            Support for PowerPC relocations has been added (issue
+            #10402).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A lurking bug in the code generator which could cause
+            incorrect assembly code to be generated due to register
+            aliasing issues has been fixed (issue #10521).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug in the runtime system which could cause a deadlock
+            when scheduling garbage collections has been fixed (issue
+            #10545).
+          </para>
+       </listitem>
+       <listitem>
+          <para>
+            A bug which could cause compiled programs to loop forever
+            when glibc's iconv implementation (gconv) wasn't available
+            has been fixed, so these programs will now terminate with
+            an error. As a result of this change, however, GHC
+            compiled programs now also specifically recognize ASCII
+            encodings, and can function without iconv in these cases. This
+            allows statically compiled programs to exist inside an
+            initramfs, for example (issues #10298, #7695).
+          </para>
+       </listitem>
+    </itemizedlist>
+  </sect2>
+
+  <sect2>
+    <title>Libraries</title>
+
+    <sect3>
+        <title>base</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 4.8.1.0 (was 4.8.0.0)
+               </para>
+           </listitem>
+            <listitem>
+                <para>
+                    The <literal>Lifetime</literal> datatype (and its
+                    constructors) are now exported from
+                    <literal>GHC.Event</literal>.
+                </para>
+           </listitem>
+       </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>binary</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 0.7.5.0 (was 0.7.3.0)
+               </para>
+           </listitem>
+       </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>Cabal</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Version number 1.22.4.0 (was 1.22.2.0).
+               </para>
+           </listitem>
+       </itemizedlist>
+    </sect3>
+
+    <sect3>
+        <title>ghc</title>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Several new constructors have been added to the
+                    <literal>AnnKeywordId</literal> datatype, in order
+                    to fix several problem with GHC's new support for
+                    API annotations (this should not regress or effect
+                    any clients of the GHC API not using these new
+                    features).
+               </para>
+           </listitem>
+           <listitem>
+              <para>
+                The source location functionality above required an breaking change
+                to the GHC API. Namely, the <literal>SrcSpan</literal>s of
+                <literal>CtLoc</literal> and <literal>TcLclEnv</literal> are now
+                <literal>RealSrcSpan</literal>s. While usually API changes like this
+                are avoided in bugfix releases, it was decided that the benefits
+                offered by the source location functionality outweighed the cost of
+                a small change to this rarely-used interface.
+              </para>
+           </listitem>
+       </itemizedlist>
+    </sect3>
+  </sect2>
+
+  <sect2>
+    <title>Known bugs</title>
+    <itemizedlist>
+        <listitem>
+            <para>
+                For issues dealing with language changes, please see
+                the <ulink
+                url="https://ghc.haskell.org/trac/ghc/wiki/Migration/7.10">GHC
+                7.10 Migration Guide</ulink> on the GHC wiki.
+           </para>
+       </listitem>
+        <listitem>
+            <para>
+                A bug in the simplifier which can cause it to totally
+                fail to compile certain programs that get 'very large'
+                at compile time is known (<ulink
+                url="https://ghc.haskell.org/trac/ghc/ticket/10527">issue
+                #10527</ulink>).
+           </para>
+       </listitem>
+        <listitem>
+            <para>
+                GHC's LLVM backend does not support LLVM 3.4 (<ulink
+		url="https://ghc.haskell.org/trac/ghc/ticket/9929">issue #9929</ulink>).
+           </para>
+       </listitem>
+        <listitem>
+            <para>
+                On Mac OS X, the <literal>-threaded</literal> Garbage
+                Collector currently suffers from a large performance
+                penalty due to a lack of system-specific optimization
+                (<ulink
+		url="https://ghc.haskell.org/trac/ghc/ticket/7602">issue #7602</ulink>).
+           </para>
+       </listitem>
+        <listitem>
+            <para>
+                GHCi fails to appropriately load
+                <literal>.dyn_o</literal> files (<ulink
+		url="https://ghc.haskell.org/trac/ghc/ticket/8736">issue #8736</ulink>).
+           </para>
+	</listitem>
+	<listitem>
+	  <para>
+	  Not all cases of non-terminating type-level computation (with both
+	  recursive type families and recursive newtypes) are caught. This
+	  means that GHC might hang, but it should do so only when the program
+	  is ill-typed (due to non-terminating type-level features). The bugs
+	  are reported as <ulink
+	  url="https://ghc.haskell.org/trac/ghc/ticket/7788">#7788</ulink>
+	  and <ulink
+	  url="https://ghc.haskell.org/trac/ghc/ticket/10139">#10139</ulink>.
+	  There also remain certain obscure scenarios where the solver for
+	  <literal>Coercible</literal> instances is known to be still
+	  incomplete. See comments in <ulink
+	  url="https://ghc.haskell.org/trac/ghc/ticket/10079">#10079</ulink>.
+	  </para>
+	</listitem>
+   </itemizedlist>
+  </sect2>
+</sect1>

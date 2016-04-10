@@ -1,8 +1,3 @@
-original のみに存在: 7.10.1-notes.xml
-original のみに存在: 7.10.2-notes.xml
-original のみに存在: 7.10.3-notes.xml
-7.8.2-original のみに存在: 7.8.1-notes.xml
-7.8.2-original のみに存在: 7.8.2-notes.xml
 diff -urd 7.8.2-original/bugs.xml original/bugs.xml
 --- 7.8.2-original/bugs.xml	2014-04-08 03:26:08.000000000 +0900
 +++ original/bugs.xml	2016-04-09 21:36:11.395998334 +0900
@@ -5210,17 +5205,6 @@ diff -urd 7.8.2-original/gone_wrong.xml original/gone_wrong.xml
                  # as mentioned above, use -dcore-lint to be more paranoid
  % ./my_prog ... # retry...
  </screen>
-diff -urd 7.8.2-original/intro.xml original/intro.xml
---- 7.8.2-original/intro.xml	2014-04-10 22:34:21.000000000 +0900
-+++ original/intro.xml	2016-04-09 21:36:11.394998369 +0900
-@@ -309,6 +309,7 @@
- 
- &relnotes1;
- &relnotes2;
-+&relnotes3;
- 
- </chapter>
- 
 diff -urd 7.8.2-original/packages.xml original/packages.xml
 --- 7.8.2-original/packages.xml	2014-04-08 03:26:08.000000000 +0900
 +++ original/packages.xml	2016-04-09 21:36:11.394998369 +0900
@@ -6098,18 +6082,6 @@ diff -urd 7.8.2-original/ug-book.xml.in original/ug-book.xml.in
 diff -urd 7.8.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.8.2-original/ug-ent.xml	2014-06-27 09:31:23.000000000 +0900
 +++ original/ug-ent.xml	2016-04-09 21:36:11.395998334 +0900
-@@ -3,8 +3,9 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY relnotes1      SYSTEM "7.8.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.8.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.10.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.10.2-notes.xml" >
-+<!ENTITY relnotes3      SYSTEM "7.10.3-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
 @@ -13,7 +14,6 @@
  <!ENTITY sooner         SYSTEM "sooner.xml" >
  <!ENTITY lang-features  SYSTEM "lang.xml" >
@@ -6129,29 +6101,6 @@ diff -urd 7.8.2-original/ug-ent.xml original/ug-ent.xml
 +<!ENTITY libraryCabalLocation   "../libraries/Cabal-1.22.5.0">
 +<!ENTITY libraryGhcPrimLocation "../libraries/ghc-prim-0.4.0.0">
  <!ENTITY arw "-&gt;">
-diff -urd 7.8.2-original/ug-ent.xml.in original/ug-ent.xml.in
---- 7.8.2-original/ug-ent.xml.in	2014-04-10 22:34:06.000000000 +0900
-+++ original/ug-ent.xml.in	2016-04-09 21:36:11.395998334 +0900
-@@ -3,8 +3,9 @@
- <!ENTITY flags          SYSTEM "flags.xml">
- <!ENTITY license        SYSTEM "license.xml">
- <!ENTITY intro          SYSTEM "intro.xml" >
--<!ENTITY relnotes1      SYSTEM "7.8.1-notes.xml" >
--<!ENTITY relnotes2      SYSTEM "7.8.2-notes.xml" >
-+<!ENTITY relnotes1      SYSTEM "7.10.1-notes.xml" >
-+<!ENTITY relnotes2      SYSTEM "7.10.2-notes.xml" >
-+<!ENTITY relnotes3      SYSTEM "7.10.3-notes.xml" >
- <!ENTITY using          SYSTEM "using.xml" >
- <!ENTITY code-gens      SYSTEM "codegens.xml" >
- <!ENTITY runtime        SYSTEM "runtime_control.xml" >
-@@ -13,7 +14,6 @@
- <!ENTITY sooner         SYSTEM "sooner.xml" >
- <!ENTITY lang-features  SYSTEM "lang.xml" >
- <!ENTITY glasgowexts    SYSTEM "glasgow_exts.xml" >
--<!ENTITY external-core  SYSTEM "external_core.xml" >
- <!ENTITY packages       SYSTEM "packages.xml" >
- <!ENTITY parallel       SYSTEM "parallel.xml" >
- <!ENTITY safehaskell    SYSTEM "safe_haskell.xml" >
 original のみに存在: users_guide
 diff -urd 7.8.2-original/using.xml original/using.xml
 --- 7.8.2-original/using.xml	2014-04-08 03:26:08.000000000 +0900
