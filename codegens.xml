@@ -18,16 +18,16 @@
     <title>LLVMコード生成器(<option>-fllvm</option>)</title>
     <indexterm><primary>LLVM code generator</primary></indexterm>
 
-    <para>これは<ulink url="http://llvm.org">LLVM</ulink>コンパイラを使って実行可能コードを生成する大体バックエンドである。一般的にはネイティブコード生成器とパフォーマンスで同等のコードを生成するが、場合によってはずっと速いコードを生成する。これは特に、vectorのようなパッケージを使った、数値的で配列を多用するコードについて真である。欠点は、コンパイル時間が有意に増えることである。LLVMバックエンドは<option>-fllvm</option>で選択できる。現在<emphasis>LLVM 2.8</emphasis>以降に対応している。</para>
+    <para>これは<ulink url="http://llvm.org">LLVM</ulink>コンパイラを使って実行可能コードを生成する大体バックエンドである。一般的にはネイティブコード生成器とパフォーマンスで同等のコードを生成するが、場合によってはずっと速いコードを生成する。これは特に、vectorのようなパッケージを使った、数値的で配列を多用するコードについて真である。欠点は、コンパイル時間が有意に増えることである。LLVMバックエンドは<option>-fllvm</option>で選択できる。現在<emphasis>LLVM 3.5</emphasis>に対応している。</para>
        
-    <para>LLVMコード生成器が動作するためには、LLVMをインストールしてPATHに置かなければならない。具体的にはGHCは<command>opt</command>と<command>llc</command>ツールを呼ぶ必要がある。第二に、Mac OS XをLLVM 3.0以降と共に使っているなら、<ulink url="http://clang.llvm.org">Clang c compiler</ulink>コンパイラもPATHに置かなければならない。
+    <para>LLVMコード生成器が動作するためには、LLVMをインストールしてPATHに置かなければならない。具体的にはGHCは<command>opt</command>と<command>llc</command>ツールを呼ぶ必要がある。第二に、Mac OS XをLLVM 3.5以降と共に使っているなら、<ulink url="http://clang.llvm.org">Clang c compiler</ulink>コンパイラもPATHに置かなければならない。
     </para>
 
     <para>LLVMとClangをインストールする方法。
       <itemizedlist>
         <listitem><emphasis>Linux</emphasis>: パッケージ管理ツールを使う。
         </listitem>
-        <listitem><emphasis>Mac OS X</emphasis>: 最近のOS Xコンピュータでは、XCodeがインストールされる時にデフォルトでclangが含まれる(<literal>10.6</literal>以降)。LLVMは含まれない。LLVMコード生成器を使うには、OS X用のパッケージマネージャである<ulink url="http://mxcl.github.com/homebrew/">Homebrew</ulink>をインストールするべきである。あるいはLLVMとClangのバイナリを<ulink url="http://llvm.org/releases/download.html">ここ</ulink>からダウンロードするのでも良い。</listitem>
+        <listitem><emphasis>Mac OS X</emphasis>: 最近のOS Xコンピュータでは、XCodeがインストールされる時にデフォルトでclangが含まれる(<literal>10.6</literal>以降)。LLVMは含まれない。LLVMコード生成器を使うには、OS X用のパッケージマネージャである<ulink url="http://mxcl.github.com/homebrew/">Homebrew</ulink>をインストールし、LLVM 3.5をインストールするべきである。あるいはLLVMとClangのバイナリを<ulink url="http://llvm.org/releases/download.html">ここ</ulink>からダウンロードするのでも良い。</listitem>
         <listitem><emphasis>Windows</emphasis>: LLVMとClangのバイナリを<ulink url="http://llvm.org/releases/download.html">ここ</ulink>からダウンロードする。
         </listitem>
       </itemizedlist>
