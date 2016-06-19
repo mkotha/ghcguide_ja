@@ -59,6 +59,12 @@ main = do args &lt;- getArgs
 <programlisting>
     (let x = 42 in x == 42 == True)</programlisting></para>
 	</listitem>
+
+	<listitem>
+	  <para>Haskellレポートは、キーワードで始まるある種の式の前に単項<literal>-</literal>を置くことを許すので、<literal>- case x of ...</literal>や<literal>- do { ... }</literal>といったものが書ける。GHCはこれを許さない。単項<literal>-</literal>を置くことができるのは、関数として適用し得るような式の前だけである。
+	  </para>
+	</listitem>
+
       </itemizedlist>
     </sect3>
 
@@ -188,7 +194,11 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
             <para>この制限は簡単に覆せるので、これで困ることがあったら教えてほしい。</para>
 	    </listitem>
 	  </varlistentry>
-
+          <varlistentry>
+            <term><literal>splitAt</literal>の意味論</term>
+            <!-- 訳注: listitemタグが欠けてる -->
+            <para>Haskellレポートでの仕様よりも、<literal>Data.List.splitAt</literal>の正格性が高い。具体的には、レポートによると<programlisting>splitAt n xs = (take n xs, drop n xs)</programlisting>であり、従って<programlisting>splitAt undefined undefined = (undefined, undefined)</programlisting>であるが、GHCの実装は第一引数について正格であり、よって<programlisting>splitAt undefined [] = undefined</programlisting>である。</para>
+          </varlistentry>
 	  <varlistentry>
 	    <term>整数の<literal>Read</literal></term>
 	    <listitem>
@@ -340,6 +350,9 @@ GHCの<literal>array</literal>の実装では、配列要素の値はリスト�
         </para>
       </listitem>
 
+      <listitem>
+        <para>弱参照と遅延評価の間に悪い相互作用があることが分かっている。特に、弱参照への参照を含むサンクを別の弱参照の中に置くと、実行時にクラッシュする場合があることが分かっている。詳細は<ulink url="https://ghc.haskell.org/trac/ghc/ticket/11108">Trac #11108</ulink>を見よ。</para>
+      </listitem>
     </itemizedlist>
   </sect2>
 
@@ -360,10 +373,6 @@ Loading package javavm ... linking ... WARNING: Overflown relocation field (# re
       我々が最後に確認したときはこのバグはまだBFDのコードベースにあり、2001年あたりにこのバグが報告されて以来、興味がもたれた様子もない。
       </para>
       <para>回避するには、パッケージを構成する.oファイルを複数個の.oに分ければ良い。これは「base」パッケージが行っていることである。</para>
-      </listitem>
-
-      <listitem>
-	<para>他のパッケージにあるインスタンス宣言に関して、どれが「スコープにあるか」をGHCは細かく管理しない。GHCが他のパッケージで見つけたインスタンス宣言はすべてプロンプトから利用可能であり、現在スコープにあるモジュールの集合を勘案した場合にそのインスタンスが可視であるべきかどうかに依らない。</para>
       </listitem>
     </itemizedlist>
   </sect2>
