@@ -166,16 +166,6 @@
 
 	    <varlistentry>
 	      <term>
-	        <option>-ddump-cpranal</option>:
-                <indexterm><primary><option>-ddump-cpranal</option></primary></indexterm>
-	      </term>
-	      <listitem>
-                <para>CPR解析の出力</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
 	        <option>-ddump-stranal</option>:
                 <indexterm><primary><option>-ddump-stranal</option></primary></indexterm>
 	      </term>
@@ -246,16 +236,6 @@
 
 	    <varlistentry>
 	      <term>
-	        <option>-ddump-flatC</option>:
-                <indexterm><primary><option>-ddump-flatC</option></primary></indexterm>
-	      </term>
-	      <listitem>
-                <para><emphasis>平坦化された</emphasis>(flattened)抽象C</para>
-	      </listitem>
-	    </varlistentry>
-
-	    <varlistentry>
-	      <term>
 	        <option>-ddump-cmm</option>:
                 <indexterm><primary><option>-ddump-cmm</option></primary></indexterm>
 	      </term>
@@ -314,16 +294,6 @@
 	      </listitem>
 	    </varlistentry>
 	  </variablelist>
-	</listitem>
-      </varlistentry>
-
-      <varlistentry>
-	<term>
-          <option>-ddump-simpl-phases</option>:
-          <indexterm><primary><option>-ddump-simpl-phases</option></primary></indexterm>
-        </term>
-	<listitem>
-	  <para>単純化器の毎回の出力を見せる。<option>-dverbose-core2core</option>でも足りないときに使う。</para>
 	</listitem>
       </varlistentry>
 
