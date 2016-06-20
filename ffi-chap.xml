@@ -57,7 +57,7 @@
 
 <programlisting>
 foreign import ccall interruptible
-   "sleep" :: CUint -> IO CUint
+   "sleep" sleepBlock :: CUint -> IO CUint
 </programlisting>
 
           <literal>interruptible</literal>は<literal>safe</literal>と同様に振る舞うが、違いは、interruptibleな外部呼び出しを実行中のスレッドが<literal>throwTo</literal>の対象になった時、OS依存の機構を使って外部呼び出しが返るように仕向けようとする点である。

@@ -1,16 +1,4 @@
-diff -urd 7.8.2-original/ffi-chap.xml original/ffi-chap.xml
---- 7.8.2-original/ffi-chap.xml	2014-04-08 03:26:08.000000000 +0900
-+++ original/ffi-chap.xml	2016-04-09 21:36:11.395998334 +0900
-@@ -110,7 +110,7 @@
- 
- <programlisting>
- foreign import ccall interruptible
--   "sleep" :: CUint -> IO CUint
-+   "sleep" sleepBlock :: CUint -> IO CUint
- </programlisting>
- 
-           <literal>interruptible</literal> behaves exactly as
-diff -urd 7.8.2-original/flags.xml original/flags.xml
+diff -urd 8.8.2-original/flags.xml original/flags.xml
 --- 7.8.2-original/flags.xml	2014-04-08 03:26:08.000000000 +0900
 +++ original/flags.xml	2016-04-09 21:36:11.394998369 +0900
 @@ -56,13 +56,13 @@
