@@ -1,4 +1,3 @@
-7.8.2-original のみに存在: external_core.xml
 diff -urd 7.8.2-original/ffi-chap.xml original/ffi-chap.xml
 --- 7.8.2-original/ffi-chap.xml	2014-04-08 03:26:08.000000000 +0900
 +++ original/ffi-chap.xml	2016-04-09 21:36:11.395998334 +0900
@@ -5775,25 +5774,6 @@ diff -urd 7.8.2-original/ug-book.xml original/ug-book.xml
  <author><othername>The GHC Team</othername></author>
  <address>
  <email>glasgow-haskell-users-request@haskell.org</email>
-@@ -17,7 +17,6 @@
- &lang-features;
- &ffi-chap;
- &extending-ghc;
--&external-core;
- &wrong;
- &utils;
- &win32-dll;
-diff -urd 7.8.2-original/ug-book.xml.in original/ug-book.xml.in
---- 7.8.2-original/ug-book.xml.in	2014-04-08 03:26:08.000000000 +0900
-+++ original/ug-book.xml.in	2016-04-09 21:36:11.395998334 +0900
-@@ -17,7 +17,6 @@
- &lang-features;
- &ffi-chap;
- &extending-ghc;
--&external-core;
- &wrong;
- &utils;
- &win32-dll;
 diff -urd 7.8.2-original/ug-ent.xml original/ug-ent.xml
 --- 7.8.2-original/ug-ent.xml	2014-06-27 09:31:23.000000000 +0900
 +++ original/ug-ent.xml	2016-04-09 21:36:11.395998334 +0900
