@@ -53,13 +53,13 @@
 	    <row>
 	      <entry><option>-H</option><replaceable>size</replaceable></entry>
 	      <entry>最低ヒープサイズを<replaceable>size</replaceable>にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-Rghc-timing</option></entry>
 	      <entry>GHCの時間情報の要約を表示する(<literal>+RTS -tstderr</literal>と同じ)</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -188,14 +188,14 @@
 	    </row>
 	    <row>
 	      <entry><option>-c</option></entry>
-	      <entry>リンクしない</entry>
-	      <entry>動</entry>
+              <entry>オブジェクトファイルまで(<literal>.o</literal>ファイル)</entry>
+              <entry>モード</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-x</option> <replaceable>suffix</replaceable></entry>
 	      <entry>ソースファイルの種類に対してデフォルトでない振る舞いをする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -376,13 +376,14 @@
 	    <row>
 	      <entry><option>-i</option><replaceable>dir1</replaceable>:<replaceable>dir2</replaceable>:...</entry>
 	      <entry><replaceable>dir</replaceable>、<replaceable>dir2</replaceable>…をインポートパスに追加する</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
+              <!-- 訳注: 動/:set は冗長 -->
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-i</option></entry>
 	      <entry>インポートディレクトリの一覧を空にする</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -487,16 +488,16 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-fbreak-on-exception</option></entry>
-	      <entry><link linkend="ghci-debugger-exceptions">例外が投げられる度にブレークする</link></entry>
-	      <entry>動</entry>
-	      <entry><option>-fno-break-on-exception</option></entry>
-	    </row>
-	    <row>
 	      <entry><option>-fbreak-on-error</option></entry>
 	      <entry><link linkend="ghci-debugger-exceptions">例外やエラーがキャッチされなかった場合にブレークする</link></entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-break-on-error</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-fbreak-on-exception</option></entry>
+	      <entry><link linkend="ghci-debugger-exceptions">例外が投げられる度にブレークする</link></entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-break-on-exception</option></entry>
 	    </row>
             <row>
               <entry><option>-fghci-hist-size=<replaceable>n</replaceable></option></entry>
@@ -557,69 +558,69 @@
 	  </thead>
 	  <tbody>
 	    <row>
-	      <entry><option>-package-name</option> <replaceable>P</replaceable></entry>
+              <entry><option>-this-package-key</option> <replaceable>P</replaceable></entry>
 	      <entry>パッケージ<replaceable>P</replaceable>の一員になるようにコンパイルする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-package</option> <replaceable>P</replaceable></entry>
 	      <entry>パッケージ<replaceable>P</replaceable>を露出する</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-hide-all-packages</option></entry>
 	      <entry>デフォルトで全てのパッケージを隠す</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-hide-package</option> <replaceable>name</replaceable></entry>
 	      <entry>パッケージ<replaceable>P</replaceable>を隠す</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-ignore-package</option> <replaceable>name</replaceable></entry>
 	      <entry>パッケージ<replaceable>P</replaceable>を無視する</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-package-db</option> <replaceable>file</replaceable></entry>
 	      <entry><replaceable>file</replaceable>をパッケージDBスタックに追加する。</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
             <entry><option>-clear-package-db</option></entry>
             <entry>パッケージDBスタックを空にする。</entry>
-            <entry>静</entry>
+            <entry>動</entry>
             <entry>-</entry>
           </row>
           <row>
             <entry><option>-no-global-package-db</option></entry>
             <entry>グローバルパッケージDBをスタックから取り除く。</entry>
-            <entry>静</entry>
+            <entry>動</entry>
             <entry>-</entry>
           </row>
           <row>
             <entry><option>-global-package-db</option></entry>
             <entry>グローバルパッケージDBをスタックに加える。</entry>
-            <entry>静</entry>
+            <entry>動</entry>
             <entry>-</entry>
           </row>
           <row>
             <entry><option>-no-user-package-db</option></entry>
             <entry>ユーザのパッケージDBをスタックから取り除く。</entry>
-            <entry>静</entry>
+            <entry>動</entry>
             <entry>-</entry>
           </row>
           <row>
             <entry><option>-user-package-db</option></entry>
             <entry>ユーザのパッケージDBをスタックに加える。</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
@@ -631,19 +632,19 @@
 	    <row>
 	      <entry><option>-trust</option> <replaceable>P</replaceable></entry>
               <entry>パッケージ<replaceable>P</replaceable>を露出し、trustedに設定する</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-distrust</option> <replaceable>P</replaceable></entry>
               <entry>パッケージ<replaceable>P</replaceable>を露出し、distrustedに設定する</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-distrust-all</option> </entry>
               <entry>デフォルトで全てのパッケージをdistrustする</entry>
-	      <entry>静/<literal>:set</literal></entry>
+	      <entry>動/<literal>:set</literal></entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -654,7 +655,7 @@
     <sect2>
       <title>言語オプション</title>
 
-      <para>言語オプションを有効にするには、<option>-Xなんたら</option>というコマンド行オプションを使うか、ファイル自体に<literal>{-# LANGUAGE なんたら #-}</literal>というプラグマを置く。<xref linkend="options-language"/>を見よ。</para>
+      <para>言語オプションを有効にするには、<option>-Xなんたら</option>というコマンド行オプションを使うか、ファイル自体に<literal>{-# LANGUAGE なんたら #-}</literal>というプラグマを置く。<xref linkend="options-language"/>を見よ。<option>-f*</option>フラグによって有効になるオプションもある。</para>
 
       <informaltable>
 	<tgroup cols="4" align="left" colsep="1" rowsep="1">
@@ -668,6 +669,12 @@
 	  </thead>
 	  <tbody>
 	    <row>
+              <entry><option>-fcontext-stack=</option><replaceable>n</replaceable></entry>
+              <entry><link linkend="undecidable-instances">型クラスの文脈簡約の制限値</link>を設定する。デフォルトは100。</entry>
+              <entry>動</entry>
+              <entry></entry>
+            </row>
+            <row>
 	      <entry><option>-fglasgow-exts</option></entry>
 	      <entry>非推奨。大部分の言語拡張を有効にする。具体的には<xref linkend="options-language"/>を見よ。</entry>
 	      <entry>動</entry>
@@ -680,13 +687,13 @@
 	      <entry><option>-fno-irrefutable-tuples</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fcontext-stack=N</option><replaceable>n</replaceable></entry>
-	      <entry><link linkend="undecidable-instances">文脈簡約の制限値</link>を設定する。デフォルトは20。</entry>
+	      <entry><option>-fpackage-trust</option></entry>
+        <entry><link linkend="safe-haskell">Safe Haskell</link>のtrustworthyモジュールに関するパッケージの信頼要件を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry></entry>
+	      <entry><option>-</option></entry>
 	    </row>
 	    <row>
-              <entry><option>-ftype-function-depth=N</option><replaceable>n</replaceable></entry>
+              <entry><option>-ftype-function-depth=</option><replaceable>n</replaceable></entry>
               <entry><link linkend="type-families">関数簡約の制限値</link>を設定する。デフォルト200。</entry>
 	      <entry>動</entry>
 	      <entry></entry>
@@ -705,15 +712,45 @@
 	    </row>
 	    <row>
               <entry><option>-XAutoDeriveTypeable</option></entry>
-              <entry>自動的に<link linkend="auto-derive-typeable">Typeableのインスタンスを全てのデータ型と型クラスの宣言に関して導出する</link>。<option>-XDeriveDataTypeable</option>も有効になる。</entry>
+              <entry>GHC 7.10以降では、このオプションは必要なく、使うべきでない。自動的に<link linkend="auto-derive-typeable">Typeableのインスタンスを全てのデータ型と型クラスの宣言に関して導出する</link>。<option>-XDeriveDataTypeable</option>も有効になる。</entry>
               <entry>動</entry>
               <entry><option>-XNoAutoDeriveTypeable</option></entry>
             </row>
+	    <row>
+	      <entry><option>-XBangPatterns</option></entry>
+	      <entry><link linkend="bang-patterns">びっくりパターン</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoBangPatterns</option></entry>
+	    </row>
+            <row>
+              <entry><option>-XBinaryLiterals</option></entry>
+              <entry><link linkend="binary-literals">二進リテラル</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoBinaryLiterals</option></entry>
+            </row>
+            <row>
+              <entry><option>-XCApiFFI</option></entry>
+              <entry><link linkend="ffi-capi">CAPI呼び出し規約</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoCAPIFFI</option></entry>
+            </row>
+	    <row>
+	      <entry><option>-XConstrainedClassMethods</option></entry>
+	      <entry><link linkend="class-method-types">制約付きクラスメソッド</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoConstrainedClassMethods</option></entry>
+	    </row>
 	    <row>
 	      <entry><option>-XConstraintKinds</option></entry>
 	      <entry><link linkend="constraint-kind">制約の種</link>を有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoConstraintKinds</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XCPP</option></entry>
+	      <entry><link linkend="c-pre-processor">Cプリプロセッサ</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoCPP</option></entry>
 	    </row>
             <row>
               <entry><option>-XDataKinds</option></entry>
@@ -722,11 +759,35 @@
               <entry><option>-XNoDataKinds</option></entry>
             </row>
 	    <row>
+	      <entry><option>-XDefaultSignatures</option></entry>
+	      <entry><link linkend="class-default-signatures">デフォルトシグネチャ</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoDefaultSignatures</option></entry>
+	    </row>
+            <row>
+              <entry><option>-XDeriveAnyClass</option></entry>
+              <entry><link linkend="derive-any-class">任意クラスの自動導出</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoDeriveAnyClass</option></entry>
+            </row>
+	    <row>
 	      <entry><option>-XDeriveDataTypeable</option></entry>
-	      <entry><link linkend="deriving-typeable">DataとTypeableの両クラスについての自動導出</link>を有効にする。</entry>
+	      <entry><link linkend="deriving-typeable">DataとTypeableの両クラスについての自動導出</link>を有効にする。<option>-XAutoDeriveTypeable</option>によっても有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoDeriveDataTypeable</option></entry>
 	    </row>
+            <row>
+              <entry><option>-XDeriveFunctor</option></entry>
+              <entry><link linkend="deriving-extra">Functorクラスについての自動導出</link>を有効にする。<option>-XDeriveTraversable</option>によっても有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoDeriveFunctor</option></entry>
+            </row>
+            <row>
+              <entry><option>-XDeriveFoldable</option></entry>
+              <entry><link linkend="deriving-extra">Foldableクラスについての自動導出</link>を有効にする。<option>-XDeriveTraversable</option>によっても有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoDeriveFoldable</option></entry>
+            </row>
 	    <row>
 	      <entry><option>-XDeriveGeneric</option></entry>
 	      <entry><link linkend="deriving-typeable">Genericクラスについての自動導出</link>を有効にする。</entry>
@@ -734,28 +795,65 @@
 	      <entry><option>-XNoDeriveGeneric</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XGeneralizedNewtypeDeriving</option></entry>
-	      <entry><link linkend="newtype-deriving">newtype deriving</link>を有効にする。</entry>
+              <entry><option>-XDeriveTraversable</option></entry>
+              <entry><link linkend="deriving-extra">Traversableクラスについての自動導出</link>を有効にする。<option>-XDeriveFunctor</option>と<option>-XDeriveFoldable</option>も有効になる。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoGeneralizedNewtypeDeriving</option></entry>
+              <entry><option>-XNoDeriveTraversable</option></entry>
 	    </row>
  	    <row>
 	      <entry><option>-XDisambiguateRecordFields</option></entry>
-	      <entry><link linkend="disambiguate-fields">レコードフィールドの曖昧性除去</link>を有効にする</entry>
+	      <entry><link linkend="disambiguate-fields">レコードフィールドの曖昧性除去</link>を有効にする。<option>-XRecordWildCards</option>によっても有効になる。</entry>
  	      <entry>動</entry>
 	      <entry><option>-XNoDisambiguateRecordFields</option></entry>
  	    </row>
             <row>
               <entry><option>-XEmptyCase</option></entry>
-              <entry><link linkend="empty-case">選択肢のないcase</link>を許す</entry>
+              <entry><link linkend="empty-case">選択肢のないcase</link>を許す。</entry>
               <entry>動</entry>
               <entry><option>-XNoEmptyCase</option></entry>
             </row>
 	    <row>
+	      <entry><option>-XEmptyDataDecls</option></entry>
+	      <entry>空のデータ型宣言を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoEmptyDataDecls</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XExistentialQuantification</option></entry>
+	      <entry><link linkend="existential-quantification">存在量化</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoExistentialQuantification</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XExplicitForAll</option></entry>
+	      <entry><link linkend="explicit-foralls">明示的な全称量化</link>を有効にする。以下の各オプションによっても有効になる。<option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRankNTypes</option>、<option>-XExistentialQuantification</option>。
+              </entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoExplicitForAll</option></entry>
+	    </row>
+	    <row>
+              <entry><option>-XExplicitNamespaces</option></entry>
+              <entry>インポートリストとエクスポートリストにおいて実体の名前空間を<literal>type</literal>キーワードを用いて指定するの(<xref linkend="explicit-namespaces"/>)を有効にする。<option>-XTypeOperators</option>または<option>-XTypeFamilies</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+              <entry><option>-XNoExplicitNamespaces</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XExtendedDefaultRules</option></entry>
-	      <entry>GHCiの<link linkend="extended-default-rules">拡張デフォルト化規則</link>を通常のモジュールで使う</entry>
+	      <entry>GHCiの<link linkend="extended-default-rules">拡張デフォルト化規則</link>を通常のモジュールで使う。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoExtendedDefaultRules</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XFlexibleContexts</option></entry>
+	      <entry><link linkend="flexible-contexts">柔軟な文脈</link>を有効にする。<option>-XImplicitParams</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoFlexibleContexts</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XFlexibleInstances</option></entry>
+	      <entry><link linkend="instance-rules">柔軟なインスタンス</link>を有効にする。<option>-XTypeSynonymInstances</option>も有効になる。<option>-XImplicitParams</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoFlexibleInstances</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XForeignFunctionInterface</option></entry>
@@ -764,8 +862,14 @@
 	      <entry><option>-XNoForeignFunctionInterface</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XFunctionalDependencies</option></entry>
+	      <entry><link linkend="functional-dependencies">関数従属</link>を有効にする。<option>-XMultiParamTypeClasses</option>も有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoFunctionalDependencies</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XGADTs</option></entry>
-	      <entry><link linkend="gadt">一般化代数データ型</link>を有効にする。</entry>
+	      <entry><link linkend="gadt">一般化代数データ型</link>を有効にする。<option>-XGADTSyntax</option>と<option>XMonoLocalBinds</option>も有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoGADTs</option></entry>
 	    </row>
@@ -777,6 +881,12 @@
 	      <entry><option>-XNoGADTSyntax</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XGeneralizedNewtypeDeriving</option></entry>
+	      <entry><link linkend="newtype-deriving">newtype deriving</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoGeneralizedNewtypeDeriving</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XGenerics</option></entry>
 	      <entry>非推奨。何もしない。もはや<link linkend="generic-classes">総称クラス</link>を有効にしない。GHCの<link linkend="generic-programming">ジェネリックプログラミングのサポート</link>も参照。</entry>
 	      <entry>動</entry>
@@ -784,31 +894,110 @@
 	    </row>
 	    <row>
 	      <entry><option>-XImplicitParams</option></entry>
-	      <entry><link linkend="implicit-parameters">暗黙パラメタ</link>を有効にする。</entry>
+	      <entry><link linkend="implicit-parameters">暗黙パラメタ</link>を有効にする。<option>-XFlexibleContexts</option>と<option>-XFlexibleInstances</option>も有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoImplicitParams</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XNoImplicitPrelude</option></entry>
-	      <entry>暗黙に<literal>import Prelude</literal>しない</entry>
+	      <entry>暗黙に<literal>import Prelude</literal>しない。<option>-XRebindableSyntax</option>によっても有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XImplicitPrelude</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XImpredicativeTypes</option></entry>
+	      <entry><link linkend="impredicative-polymorphism">非叙述的な型</link>を有効にする。<option>-XRankNTypes</option>も有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoImpredicativeTypes</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XIncoherentInstances</option></entry>
-	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-XOverlappingInstances</option>も有効になる</entry>
+	      <entry><link linkend="instance-overlap">非整合インスタンス</link>を有効にする。<option>-XOverlappingInstances</option>も有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoIncoherentInstances</option></entry>
 	    </row>
+             <row>
+              <entry><option>-XInstanceSigs</option></entry>
+              <entry><link linkend="instance-sigs">インスタンスシグネチャ</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoInstanceSigs</option></entry>
+             </row>
+	    <row>
+	      <entry><option>-XInterruptibleFFI</option></entry>
+	      <entry>割り込み可能なFFIを有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoInterruptibleFFI</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XKindSignatures</option></entry>
+	      <entry><link linkend="kinding">種シグネチャ</link>を有効にする。<option>-XTypeFamilies</option>や<option>-XPolyKinds</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoKindSignatures</option></entry>
+	    </row>
+	    <row>
+              <entry><option>-XLambdaCase</option></entry>
+              <entry><link linkend="lambda-case">ラムダcase式</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoLambdaCase</option></entry>
+            </row>
+	    <row>
+	      <entry><option>-XLiberalTypeSynonyms</option></entry>
+	      <entry><link linkend="type-synonyms">自由化型シノニム</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoLiberalTypeSynonyms</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XMagicHash</option></entry>
+	      <entry>「#」を<link linkend="magic-hash">識別子につける後置修飾子</link>として認める。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoMagicHash</option></entry>
+	    </row>
+            <row>
+	      <entry><option>-XMonadComprehensions</option></entry>
+	      <entry><link linkend="monad-comprehensions">モナド内包表記</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoMonadComprehensions</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XMonoLocalBinds</option></entry>
+	      <entry><link linkend="mono-local-binds">局所的な束縛を一般化しない</link>を有効にする。
+	      </entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoMonoLocalBinds</option></entry>
+	    </row>
 	    <row>
 	      <entry><option>-XNoMonomorphismRestriction</option></entry>
-	      <entry><link linkend="monomorphism">単相性限定</link>を無効にする</entry>
+	      <entry><link linkend="monomorphism">単相性限定</link>を無効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XMonomorphismRestriction</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XMultiParamTypeClasses</option></entry>
+	      <entry><link linkend="multi-param-type-classes">多引数の型クラス</link>を有効にする。<option>-XFunctionalDependencies</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoMultiParamTypeClasses</option></entry>
+	    </row>
+            <row>
+              <entry><option>-XMultiWayIf</option></entry>
+              <entry><link linkend="multi-way-if">多選択肢のif式</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoMultiWayIf</option></entry>
+            </row>
+	    <row>
+	      <entry><option>-XNamedFieldPuns</option></entry>
+	      <entry><link linkend="record-puns">レコード同名利用</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoNamedFieldPuns</option></entry>
+	    </row>
+            <row>
+              <entry><option>-XNamedWildCards</option></entry>
+              <entry><link linkend="named-wildcards">名前付きワイルドカード</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoNamedWildCards</option></entry>
+            </row>
+	    <row>
               <entry><option>-XNegativeLiterals</option></entry>
-              <entry><link linkend="negative-literals">負数リテラル</link>を有効にする</entry>
+              <entry><link linkend="negative-literals">負数リテラル</link>を有効にする。</entry>
 	      <entry>動</entry>
               <entry><option>-XNoNegativeLiterals</option></entry>
 	    </row>
@@ -818,9 +1007,15 @@
 	      <entry>動</entry>
 	      <entry><option>-XNPlusKPatterns</option></entry>
 	    </row>
+            <row>
+              <entry><option>-XNullaryTypeClasses</option></entry>
+              <entry>非推奨。何もしない。<link linkend="nullary-type-classes">無引数の型クラス</link>は<option>-XMultiParamTypeClasses</option>によって有効になるようになった。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoNullaryTypeClasses</option></entry>
+            </row>
 	    <row>
               <entry><option>-XNumDecimals</option></entry>
-              <entry>小数表記の整数リテラルへの対応を有効にする</entry>
+              <entry>小数表記の整数リテラルへの対応を有効にする。</entry>
 	      <entry>動</entry>
               <entry><option>-XNoNumDecimals</option></entry>
 	    </row>
@@ -843,35 +1038,41 @@
 	      <entry><option>-XNoOverloadedStrings</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XQuasiQuotes</option></entry>
-	      <entry><link linkend="th-quasiquotation">準クォート</link>を有効にする</entry>
+	      <entry><option>-XPackageImports</option></entry>
+	      <entry><link linkend="package-imports">パッケージ修飾されたインポート</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoQuasiQuotes</option></entry>
+	      <entry><option>-XNoPackageImports</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XParallelArrays</option></entry>
+	      <entry>parallel arrayを有効にする。<option>-XParallelListComp</option>も有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoParallelArrays</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XParallelListComp</option></entry>
+	      <entry><link linkend="parallel-list-comprehensions">並行リスト内包表記</link>を有効にする。<option>-XParallelArrays</option>によっても有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoParallelListComp</option></entry>
 	    </row>
             <row>
-              <entry><option>-XRelaxedPolyRec</option></entry>
-              <entry><link linkend="typing-binds">相互再帰的な多相関数</link>の検査を緩める</entry>
+             <entry><option>-XPartialTypeSignatures</option></entry>
+             <entry><link linkend="partial-type-signatures">部分型シグネチャ</link>を有効にする。</entry>
               <entry>動</entry>
-              <entry><option>-XNoRelaxedPolyRec</option></entry>
+             <entry><option>-XNoPartialTypeSignatures</option></entry>
             </row>
 	    <row>
-	      <entry><option>-XNoTraditionalRecordSyntax</option></entry>
-	      <entry>伝統的なレコード構文(Haskell 98が対応しているもの)<literal>C {f = x}</literal>への対応を無効にする。</entry>
+	      <entry><option>-XPatternGuards</option></entry>
+	      <entry><link linkend="pattern-guards">パターンガード</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XTraditionalRecordSyntax</option></entry>
+	      <entry><option>-XNoPatternGuards</option></entry>
 	    </row>
-	    <row>
-	      <entry><option>-XTypeFamilies</option></entry>
-	      <entry><link linkend="type-families">型の族</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoTypeFamilies</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XUndecidableInstances</option></entry>
-	      <entry><link linkend="undecidable-instances">決定不能インスタンス</link>を有効にする</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoUndecidableInstances</option></entry>
-	    </row>
+            <row>
+              <entry><option>-XPatternSynonyms</option></entry>
+              <entry><link linkend="pattern-synonyms">パターンシノニム</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoPatternSynonyms</option></entry>
+            </row>
 	    <row>
 	      <entry><option>-XPolyKinds</option></entry>
 	      <entry><link linkend="kind-polymorphism">種多相</link>を有効にする。<option>-XKindSignatures</option>も有効になる。</entry>
@@ -879,162 +1080,46 @@
 	      <entry><option>-XNoPolyKinds</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XMonoLocalBinds</option></entry>
-	      <entry><link linkend="mono-local-binds">局所的な束縛を一般化しない</link>を有効にする。
-	      </entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoMonoLocalBinds</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XRebindableSyntax</option></entry>
-	      <entry><link linkend="rebindable-syntax">再束縛可能な構文</link>を有効にする</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoRebindableSyntax</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XScopedTypeVariables</option></entry>
-	      <entry><link linkend="scoped-type-variables">字句的スコープを持つ型変数</link>を有効にする。<option>-fglasgow-exts</option>によっても有効になる。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoScopedTypeVariables</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XTemplateHaskell</option></entry>
-	      <entry><link linkend="template-haskell">Template Haskell</link>を有効にする。もはや<option>-fglasgow-exts</option>によって有効にはならない</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoTemplateHaskell</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XBangPatterns</option></entry>
-	      <entry><link linkend="bang-patterns">びっくりパターン</link>を有効にする</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoBangPatterns</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XCPP</option></entry>
-	      <entry><link linkend="c-pre-processor">Cプリプロセッサ</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoCPP</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XPatternGuards</option></entry>
-	      <entry><link linkend="pattern-guards">パターンガード</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoPatternGuards</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XViewPatterns</option></entry>
-	      <entry><link linkend="view-patterns">ビューパターン</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoViewPatterns</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XUnicodeSyntax</option></entry>
-	      <entry><link linkend="unicode-syntax">Unicode構文</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoUnicodeSyntax</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XMagicHash</option></entry>
-	      <entry>「#」を<link linkend="magic-hash">識別子につける後置修飾子</link>として認める。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoMagicHash</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XExplicitForAll</option></entry>
-	      <entry><link linkend="explicit-foralls">明示的な全称量化</link>を有効にする。以下の各オプションによっても有効になる。<option>-XScopedTypeVariables</option>、<option>-XLiberalTypeSynonyms</option>、<option>-XRankNTypes</option>、<option>-XExistentialQuantification</option>。
-              </entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoExplicitForAll</option></entry>
-	    </row>
-	    <row>
 	      <entry><option>-XPolymorphicComponents</option></entry>
 	      <entry><link linkend="universal-quantification">データ構築子が多相的な構成要素を持てるようにする。</link></entry>
 	      <entry>動、<option>-XRankNTypes</option>と同義</entry>
 	      <entry><option>-XNoPolymorphicComponents</option></entry>
 	    </row>
+            <row>
+              <entry><option>-XPostfixOperators</option></entry>
+              <entry><link linkend="postfix-operators">後置演算子</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoPostfixOperators</option></entry>
+            </row>
+	    <row>
+	      <entry><option>-XQuasiQuotes</option></entry>
+	      <entry><link linkend="th-quasiquotation">準クォート</link>を有効にする</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoQuasiQuotes</option></entry>
+	    </row>
 	    <row>
 	      <entry><option>-XRank2Types</option></entry>
-	      <entry>ランク2の型を有効にする。</entry>
+	      <entry><link linkend="universal-quantification">ランク2の型</link>を有効にする。</entry>
 	      <entry>動、<option>-XRankNTypes</option>と同義</entry>
 	      <entry><option>-XNoRank2Types</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRankNTypes</option></entry>
-	      <entry>ランクNの型を有効にする。</entry>
+	      <entry><link linkend="universal-quantification">ランクNの型</link>を有効にする。<option>-XImpredicativeTypes</option>によっても有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoRankNTypes</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XImpredicativeTypes</option></entry>
-	      <entry><link linkend="impredicative-polymorphism">非叙述的な型</link>を有効にする。</entry>
+	      <entry><option>-XRebindableSyntax</option></entry>
+	      <entry><link linkend="rebindable-syntax">再束縛可能な構文</link>を有効にする。<option>-XNoImplicitPrelude</option>も有効になる。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoImpredicativeTypes</option></entry>
+	      <entry><option>-XNoRebindableSyntax</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XExistentialQuantification</option></entry>
-	      <entry><link linkend="existential-quantification">存在量化</link>を有効にする。</entry>
+	      <entry><option>-XRecordWildCards</option></entry>
+	      <entry><link linkend="record-wildcards">レコードワイルドカード</link>を有効にする。<option>-XDisambiguateRecordFields</option>も有効になる。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoExistentialQuantification</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XKindSignatures</option></entry>
-	      <entry><link linkend="kinding">種シグネチャ</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoKindSignatures</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XEmptyDataDecls</option></entry>
-	      <entry>空のデータ型宣言を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoEmptyDataDecls</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XParallelListComp</option></entry>
-	      <entry><link linkend="parallel-list-comprehensions">並行リスト内包表記</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoParallelListComp</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XTransformListComp</option></entry>
-	      <entry><link linkend="generalised-list-comprehensions">一般化リスト内包表記</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoTransformListComp</option></entry>
-	    </row>
-        <row>
-	      <entry><option>-XMonadComprehensions</option></entry>
-	      <entry><link linkend="monad-comprehensions">モナド内包表記</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoMonadComprehensions</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XUnliftedFFITypes</option></entry>
-	      <entry>unlifted FFI typesを有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoUnliftedFFITypes</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XInterruptibleFFI</option></entry>
-	      <entry>割り込み可能なFFIを有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoInterruptibleFFI</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XLiberalTypeSynonyms</option></entry>
-	      <entry><link linkend="type-synonyms">自由化型シノニム</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoLiberalTypeSynonyms</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XTypeOperators</option></entry>
-	      <entry><link linkend="type-operators">型演算子</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoTypeOperators</option></entry>
-	    </row>
-	    <row>
-              <entry><option>-XExplicitNamespaces</option></entry>
-              <entry>インポートリストとエクスポートリストにおいて実体の名前空間を<literal>type</literal>キーワードを用いて指定するの(<xref linkend="explicit-namespaces"/>)を有効にする。<option>-XTypeOperators</option>または<option>-XTypeFamilies</option>によっても有効になる</entry>
-	      <entry>動</entry>
-              <entry><option>-XNoExplicitNamespaces</option></entry>
+	      <entry><option>-XNoRecordWildCards</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XRecursiveDo</option></entry>
@@ -1042,35 +1127,29 @@
 	      <entry>動</entry>
 	      <entry><option>-XNoRecursiveDo</option></entry>
 	    </row>
-	    <row>
-	      <entry><option>-XParallelArrays</option></entry>
-	      <entry>parallel arrayを有効にする。</entry>
+            <row>
+              <entry><option>-XRelaxedPolyRec</option></entry>
+              <entry><emphasis>(非推奨)</emphasis> <link linkend="typing-binds">相互再帰的な多相関数</link>の検査を緩める。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoRelaxedPolyRec</option></entry>
+            </row>
+            <row>
+              <entry><option>-XRoleAnnotations</option></entry>
+              <entry><link linkend="role-annotations">役割注釈</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoRoleAnnotations</option></entry>
+            </row>
+            <row>
+	      <entry><option>-XSafe</option></entry>
+              <entry><link linkend="safe-haskell">Safe Haskell</link>のSafeモードを有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoParallelArrays</option></entry>
+	      <entry><option>-</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XRecordWildCards</option></entry>
-	      <entry><link linkend="record-wildcards">レコードワイルドカード</link>を有効にする</entry>
+	      <entry><option>-XScopedTypeVariables</option></entry>
+	      <entry><link linkend="scoped-type-variables">字句的スコープを持つ型変数</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoRecordWildCards</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XNamedFieldPuns</option></entry>
-	      <entry><link linkend="record-puns">レコード同名利用</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoNamedFieldPuns</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XDisambiguateRecordFields</option></entry>
-	      <entry><link linkend="disambiguate-fields">フィールドの曖昧性除去</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoDisambiguateRecordFields</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XUnboxedTuples</option></entry>
-	      <entry><link linkend="unboxed-tuples">非ボックス化タプル</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoUnboxedTuples</option></entry>
+	      <entry><option>-XNoScopedTypeVariables</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XStandaloneDeriving</option></entry>
@@ -1079,94 +1158,88 @@
 	      <entry><option>-XNoStandaloneDeriving</option></entry>
 	    </row>
 	    <row>
+	      <entry><option>-XTemplateHaskell</option></entry>
+	      <entry><link linkend="template-haskell">Template Haskell</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoTemplateHaskell</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XNoTraditionalRecordSyntax</option></entry>
+	      <entry>伝統的なレコード構文(Haskell 98が対応しているもの)<literal>C {f = x}</literal>への対応を無効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XTraditionalRecordSyntax</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XTransformListComp</option></entry>
+	      <entry><link linkend="generalised-list-comprehensions">一般化リスト内包表記</link>を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoTransformListComp</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XTrustworthy</option></entry>
+              <entry><link linkend="safe-haskell">Safe Haskell</link>のTrustworthyモードを有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-</option></entry>
+	    </row>
+            <row>
+              <entry><option>-XTupleSections</option></entry>
+              <entry><link linkend="tuple-sections">タプルのセクション</link>を有効にする。</entry>
+              <entry>動</entry>
+              <entry><option>-XNoTupleSections</option></entry>
+            </row>
+	    <row>
+	      <entry><option>-XTypeFamilies</option></entry>
+	      <entry><link linkend="type-families">型の族</link>を有効にする。<option>-XExplicitNamespaces</option>、<option>-XKindSignatures</option>、<option>-XMonoLocalBinds</option>も有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoTypeFamilies</option></entry>
+	    </row>
+	    <row>
+	      <entry><option>-XTypeOperators</option></entry>
+	      <entry><link linkend="type-operators">型演算子</link>を有効にする。<option>-XExplicitNamespaces</option>も有効になる。</entry>
+	      <entry>動</entry>
+	      <entry><option>-XNoTypeOperators</option></entry>
+	    </row>
+	    <row>
 	      <entry><option>-XTypeSynonymInstances</option></entry>
-	      <entry><link linkend="flexible-instance-head">インスタンス頭部中の型シノニム</link>を有効にする。</entry>
+	      <entry><link linkend="flexible-instance-head">インスタンス頭部中の型シノニム</link>を有効にする。<option>-XFlexibleInstances</option>によっても有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-XNoTypeSynonymInstances</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XFlexibleContexts</option></entry>
-	      <entry><link linkend="flexible-contexts">柔軟な文脈</link>を有効にする。<option>-XTypeSynonymInstances</option>も有効になる。</entry>
+	      <entry><option>-XUnboxedTuples</option></entry>
+	      <entry><link linkend="unboxed-tuples">非ボックス化タプル</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoFlexibleContexts</option></entry>
+	      <entry><option>-XNoUnboxedTuples</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XFlexibleInstances</option></entry>
-	      <entry><link linkend="instance-rules">柔軟なインスタンス</link>を有効にする。</entry>
+	      <entry><option>-XUndecidableInstances</option></entry>
+	      <entry><link linkend="undecidable-instances">決定不能インスタンス</link>を有効にする</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoFlexibleInstances</option></entry>
+	      <entry><option>-XNoUndecidableInstances</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XConstrainedClassMethods</option></entry>
-	      <entry><link linkend="class-method-types">制約付きクラスメソッド</link>を有効にする。</entry>
+	      <entry><option>-XUnicodeSyntax</option></entry>
+	      <entry><link linkend="unicode-syntax">Unicode構文</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoConstrainedClassMethods</option></entry>
+	      <entry><option>-XNoUnicodeSyntax</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-XDefaultSignatures</option></entry>
-	      <entry><link linkend="class-default-signatures">デフォルトシグネチャ</link>を有効にする。</entry>
+	      <entry><option>-XUnliftedFFITypes</option></entry>
+	      <entry>unlifted FFI typesを有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-XNoDefaultSignatures</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XMultiParamTypeClasses</option></entry>
-	      <entry><link linkend="multi-param-type-classes">多引数の型クラス</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoMultiParamTypeClasses</option></entry>
-	    </row>
-            <row>
-              <entry><option>-XNullaryTypeClasses</option></entry>
-              <entry><link linkend="nullary-type-classes">無引数の型クラス</link>を有効にする。</entry>
-              <entry>動</entry>
-              <entry><option>-XNoNullaryTypeClasses</option></entry>
-            </row>
-	    <row>
-	      <entry><option>-XFunctionalDependencies</option></entry>
-	      <entry><link linkend="functional-dependencies">関数従属</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoFunctionalDependencies</option></entry>
- 	    </row>
-	    <row>
-	      <entry><option>-XPackageImports</option></entry>
-	      <entry><link linkend="package-imports">パッケージ修飾されたインポート</link>を有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-XNoPackageImports</option></entry>
-	    </row>
-	    <row>
-            <entry><option>-XLambdaCase</option></entry>
-            <entry><link linkend="lambda-case">lambda-case式</link>を有効にする。</entry>
-            <entry>動</entry>
-            <entry><option>-XNoLambdaCase</option></entry>
-          </row>
-          <row>
-            <entry><option>-XMultiWayIf</option></entry>
-            <entry><link linkend="multi-way-if">多選択肢のif式</link>を有効にする。</entry>
-            <entry>動</entry>
-            <entry><option>-XNoMultiWayIf</option></entry>
-          </row>
-          <row>
-	      <entry><option>-XSafe</option></entry>
-        <entry><link linkend="safe-haskell">Safe Haskell</link>のSafeモードを有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-</option></entry>
-	    </row>
-	    <row>
-	      <entry><option>-XTrustworthy</option></entry>
-        <entry><link linkend="safe-haskell">Safe Haskell</link>のTrustworthyモードを有効にする。</entry>
-	      <entry>動</entry>
-	      <entry><option>-</option></entry>
+	      <entry><option>-XNoUnliftedFFITypes</option></entry>
 	    </row>
 	    <row>
 	      <entry><option>-XUnsafe</option></entry>
-        <entry><link linkend="safe-haskell">Safe Haskell</link>のUnsafeモードを有効にする。</entry>
+              <entry><link linkend="safe-haskell">Safe Haskell</link>のUnsafeモードを有効にする。</entry>
 	      <entry>動</entry>
 	      <entry><option>-</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-fpackage-trust</option></entry>
-        <entry><link linkend="safe-haskell">Safe Haskell</link>のtrustworthyモジュールに関するパッケージの信頼要件を有効にする。</entry>
+	      <entry><option>-XViewPatterns</option></entry>
+	      <entry><link linkend="view-patterns">ビューパターン</link>を有効にする。</entry>
 	      <entry>動</entry>
-	      <entry><option>-</option></entry>
+	      <entry><option>-XNoViewPatterns</option></entry>
 	    </row>
 	  </tbody>
 	</tgroup>
@@ -1221,12 +1294,19 @@
 	  </row>
 	  <row>
             <entry><option>-fdefer-type-errors</option></entry>
-            <entry>型エラーを可能な限り実行時まで遅らせる。</entry>
+            <entry>型エラーを警告へと変換し、<link linkend="defer-type-errors">エラーを実行時まで遅らせる</link>。<option>-fdefer-typed-holes</option>も有効になる。</entry>
 	    <entry>動</entry>
             <entry><option>-fno-defer-type-errors</option></entry>
 	  </row>
 
 	  <row>
+            <entry><option>-fdefer-typed-holes</option></entry>
+            <entry><link linkend="typed-holes">型付き穴</link>のエラーを警告へと変換し、<link linkend="defer-type-errors">エラーを実行時まで遅らせる</link>。<option>-fdefer-type-errors</option>によっても有効になる。<option>-fwarn-typed-holes</option>も見よ。</entry>
+            <entry>動</entry>
+            <entry><option>-fno-defer-typed-holes</option></entry>
+          </row>
+
+          <row>
             <entry><option>-fhelpful-errors</option></entry>
             <entry>綴りの誤っている名前について忠告する。</entry>
 	    <entry>動</entry>
@@ -1331,6 +1411,13 @@
 	  </row>
 
 	  <row>
+            <entry><option>-fwarn-missing-exported-sigs</option></entry>
+            <entry>シグネチャのない最上位の関数がエクスポートされている場合に警告する。-fwarn-missing-signaturesよりも優先される</entry>
+            <entry>動</entry>
+            <entry><option>-fno-warn-missing-exported-sigs</option></entry>
+          </row>
+
+          <row>
 	    <entry><option>-fwarn-missing-local-sigs</option></entry>
 	    <entry>シグネチャのない多相的な局所束縛があれば警告する</entry>
 	    <entry>動</entry>
@@ -1387,6 +1474,13 @@
 	  </row>
 
 	  <row>
+            <entry><option>-fwarn-unticked-promoted-constructors</option></entry>
+            <entry>昇格された構築子に引用符が付いていない場合に警告する</entry>
+            <entry>動</entry>
+            <entry><option>-fno-warn-unticked-promoted-constructors</option></entry>
+          </row>
+
+          <row>
 	    <entry><option>-fwarn-unused-binds</option></entry>
 	    <entry>未使用の束縛があれば警告する</entry>
 	    <entry>動</entry>
@@ -1423,9 +1517,14 @@
 
 	  <row>
 	    <entry><option>-fwarn-unsafe</option></entry>
-       <entry>コンパイルしているモジュールがunsafeと見なされる場合に警告する。安全性推論を使う場合に、モジュールが安全かどうかを確認するために使うべきである。</entry>
+            <entry>コンパイルしているモジュールがunsafeと見なされる場合に警告する。安全性推論を使う場合に、モジュールが安全かどうかを確認するために使うべきである。<link linkend="safe-haskell">Safe Haskell</link>のモード(<option>-XTrustworthy</option>など)を明示的に指定しているモジュールを含め、あらゆる種類のモジュールに対して動作する。よって、設けられた前提条件をコンパイラに検査させるために使うことができる。</entry>
 	    <entry>動</entry>
 	    <entry><option>-fno-warn-unsafe</option></entry>
+          </row>
+
+          <row>
+            <entry><option>-fwarn-trustworthy-safe</option></entry>
+            <entry>モジュールが<option>-XTrustworthy</option>でコンパイルされているものの、実際は(より情報量の多い)<option>-XSafe</option>でもコンパイルできる場合に警告する。依存先が更新されたことでSafe Haskellの条件を改善し得る場合にそれを検出するために使うことができる。</entry>
 	  </row>
 
 	  <row>
@@ -1444,17 +1543,32 @@
 
           <row>
             <entry><option>-fwarn-amp</option></entry>
-            <entry>Applicative-Monad Proposal (AMP)に抵触する定義について警告する</entry>
+            <entry><emphasis>(非推奨)</emphasis> Applicative-Monad Proposal (AMP)に抵触する定義について警告する</entry>
             <entry>動</entry>
             <entry><option>-fno-warn-amp</option></entry>
           </row>
 
           <row>
             <entry><option>-fwarn-typed-holes</option></entry>
-            <entry>式中の<link linkend="typed-holes">穴</link>を有効にする。</entry>
+            <entry><link linkend="typed-holes">型付き穴</link>のエラーが<link linkend="defer-type-errors">実行時まで遅延</link>された場合に警告する。<option>-fdefer-typed-holes</option>を見よ。</entry>
             <entry>動</entry>
             <entry><option>-fno-warn-typed-holes</option></entry>
           </row>
+
+          <row>
+            <entry><option>-fwarn-partial-type-signatures</option></entry>
+            <entry><option>-XPartialTypesignatures</option>が有効なとき、部分型シグネチャに穴があった場合に報告する。<option>-XPartialTypesignatures</option>が有効でない場合、このフラグは適用されず、穴があった場合はエラーが生成される。<xref linkend="partial-type-signatures"/>を見よ。</entry>
+            <entry>動</entry>
+            <entry><option>-fno-warn-partial-type-signatures</option></entry>
+          </row>
+
+          <row>
+            <entry><option>-fwarn-deriving-typeable</option></entry>
+            <entry><literal>Typeable</literal>クラスを自動導出する要求があった場合に警告する。GHC 7.10以降は、この種の制約を解消するための専用のソルバを持っているので、このような宣言は不要であり無視される。</entry>
+            <entry>動</entry>
+            <entry><option>-fno-warn-deriving-typeable</option></entry>
+          </row>
+
 
 	  </tbody>
 	</tgroup>
@@ -1478,26 +1592,41 @@
 	  </thead>
 	  <tbody>
 	    <row>
-	      <entry><option>-O</option></entry>
-	      <entry>デフォルトの最適化(水準1)を有効にする</entry>
+             <entry><option>-O0</option></entry>
+             <entry>最適化を無効にする(デフォルト)</entry>
+             <entry>動</entry>
+             <entry><option>-O</option></entry>
+           </row>
+           <row>
+	      <entry><option>-O</option>または<option>-O1</option></entry>
+	      <entry>水準1の最適化を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-O0</option></entry>
 	    </row>
 	    <row>
-	      <entry><option>-O</option><replaceable>n</replaceable></entry>
-	      <entry>最適化水準を<replaceable>n</replaceable>に設定する</entry>
+	      <entry><option>-O</option><replaceable>2</replaceable></entry>
+	      <entry>水準2の最適化を有効にすある</entry>
 	      <entry>動</entry>
 	      <entry><option>-O0</option></entry>
 	    </row>
+          <row>
+            <entry><option>-Odph</option></entry>
+            <entry>水準2の最適化を有効にし、<option>-fmax-simplifier-iterations=20</option>を設定し、<option>-fsimplifier-phases=3</option>を設定する。</entry>
+            <entry>動</entry>
+            <entry>-</entry>
+          </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
-	
+
+    <para>水準1と2で有効になる最適化の一覧については、<xref linkend="options-f-compact"/>を見よ。</para>
+
     </sect2>
-    <sect2 id="options-f-compatct">
+    <sect2 id="options-f-compact">
       <title>個々の最適化</title>
 
-      <para>これらのオプションについてより詳しくは<xref linkend="options-f"/>に記述されている。</para>
+      <para>これらのオプションについてより詳しくは<xref linkend="options-f"/>に記述されている。あるフラグが<option>-O</option>によって有効になるなら、特に記載がない限り<option>-O2</option>によっても有効になる。フラグが<option>-O0</option>によってのみ有効になるなら、<option>-O</option>や<option>-O2</option>によっては有効にならない。
+      </para>
 
       <informaltable>
 	<tgroup cols="4" align="left" colsep="1" rowsep="1">
@@ -1511,6 +1640,13 @@
 	  </thead>
 	  <tbody>
 	    <row>
+            <entry><option>-fcall-arity</option></entry>
+            <entry>call-arity最適化を有効にする。<option>-O</option>によって有効になる。</entry>
+            <entry>動</entry>
+            <entry><option>-fno-call-arity</option></entry>
+          </row>
+
+          <row>
 	      <entry><option>-fcase-merge</option></entry>
 	      <entry>case-mergingを有効にする。<option>-O</option>オプションによって有効になる。</entry>
 	      <entry>動</entry>
@@ -1518,6 +1654,27 @@
 	    </row>
 
 	    <row>
+              <entry><option>-fcmm-elim-common-blocks</option></entry>
+              <entry>Cmmの共通ブロック最適化を有効にする。<option>-O</option>によって有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-cmm-elim-common-blocks</option></entry>
+            </row>
+
+            <row>
+              <entry><option>-fcmm-sink</option></entry>
+              <entry>Cmm sinkingを有効にする。<option>-O</option>によって有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-cmm-sink</option></entry>
+            </row>
+
+            <row>
+              <entry><option>-fcpr-off</option></entry>
+              <entry>要求解析器においてCPR解析を無効にする。</entry>
+              <entry>静</entry>
+              <entry>-</entry>
+            </row>
+
+            <row>
 	      <entry><option>-fcse</option></entry>
 	      <entry>共通部分式の除去を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
@@ -1525,13 +1682,28 @@
 	    </row>
 
 	    <row>
+              <entry><option>-fdicts-cheap</option></entry>
+              <entry>値が辞書であるような式が、最適化器からみて低コストに見えるようにする。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-dicts-cheap</option></entry>
+            </row>
+
+            <row>
 	      <entry><option>-fdicts-strict</option></entry>
 	      <entry>辞書を正格にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry><option>-fno-dicts-strict</option></entry>
 	    </row>
 
 	    <row>
+              <entry><option>-fdmd-tx-dict-sel</option>
+              </entry>
+              <entry>辞書セレクタ用の特別な要求変換子(demand transformer)を使う。常にデフォルトで有効。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-dmd-tx-dict-sel</option></entry>
+            </row>
+
+          <row>
 	      <entry><option>-fdo-eta-reduction</option></entry>
 	      <entry>イータ簡約を有効にする。<option>-O</option>によって有効になる。</entry>
 	      <entry>動</entry>
@@ -1540,7 +1712,7 @@
 
 	    <row>
 	      <entry><option>-fdo-lambda-eta-expansion</option></entry>
-	      <entry>ラムダイータ展開を有効にする</entry>
+	      <entry>ラムダイータ展開を有効にする。常にデフォルトで有効。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-do-lambda-eta-expansion</option></entry>
 	    </row>
@@ -1559,26 +1731,19 @@
 	      <entry><option>-fno-enable-rewrite-rules</option></entry>
  	    </row>
 
-	    <row>
-            <entry><option>-fvectorise</option></entry>
-            <entry>入れ子データ並列のベクトル化を有効にする</entry>
-            <entry>動</entry>
-            <entry><option>-fno-vectorise</option></entry>
-          </row>
-
-          <row>
-            <entry><option>-favoid-vect</option></entry>
-            <entry>ベクトル化回避を有効にする(実験的)</entry>
-            <entry>動</entry>
-            <entry><option>-fno-avoid-vect</option></entry>
-          </row>
-
-          <row>
+            <row>
 	      <entry><option>-fexcess-precision</option></entry>
 	      <entry>中間値の精度超過を有効にする</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-excess-precision</option></entry>
 	    </row>
+
+            <row>
+              <entry><option>-fexpose-all-unfoldings</option></entry>
+              <entry>非常に大きい関数や再帰的な関数も含めて、全ての展開候補(unfolding)を露出する。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-expose-all-unfoldings</option></entry>
+            </row>
 
             <row>
 	      <entry><option>-ffloat-in</option></entry>
@@ -1603,25 +1768,18 @@
 
 	    <row>
 	      <entry><option>-fignore-asserts</option></entry>
-	      <entry>ソース中のアサーションを無視する</entry>
+	      <entry>ソース中のアサーションを無視する。<option>-O</option>によって有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-ignore-asserts</option></entry>
 	    </row>
 
 	    <row>
 	      <entry><option>-fignore-interface-pragmas</option></entry>
-	      <entry>インタフェースファイル中のプラグマを無視する</entry>
+	      <entry>インタフェースファイル中のプラグマを無視する。<option>-O0</option>によってのみ有効になる。</entry>
 	      <entry>動</entry>
 	      <entry><option>-fno-ignore-interface-pragmas</option></entry>
 	    </row>
 
-	    <row>
-              <entry><option>-floopification</option></entry>
-              <entry>生成するアセンブリにおいて、部分適用でない自己再帰的な末尾呼び出しを局所ジャンプに変える。</entry>
-              <entry>動</entry>
-              <entry><option>-fno-loopification</option></entry>
-            </row>
-  
             <row>
               <entry><option>-flate-dmd-anal</option></entry>
               <entry>単純化パイプラインの最後に、要求解析(demand analysis)をもう一度実行する</entry>
@@ -1638,27 +1796,59 @@
 
 	    <row>
 	      <entry><option>-fliberate-case-threshold</option>=<replaceable>n</replaceable></entry>
-	      <entry>liberate-case変換における大きさ閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 200)</entry>
- 	      <entry>静</entry>
+	      <entry>liberate-case変換における大きさ閾値を<replaceable>n</replaceable>に設定する。(デフォルト: 2000)</entry>
+	      <entry>動</entry>
 	      <entry><option>-fno-liberate-case-threshold</option></entry>
  	    </row>
 
 	    <row>
-              <entry><option>-fmax-relevant-bindings=N</option></entry>
+              <entry><option>-floopification</option></entry>
+              <entry>生成するアセンブリにおいて、部分適用でない自己再帰的な末尾呼び出しを局所ジャンプに変える。<option>-O</option>によって有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-loopification</option></entry>
+            </row>
+
+            <row>
+              <entry><option>-fmax-inline-alloc-size</option>=<replaceable>n</replaceable></entry>
+              <entry>インラインでの配列確保の最大値を<replaceable>n</replaceable>バイトに設定する(デフォルト: 128)。GHCは、静的に大きさが分かっている非固定(non-pinned)配列が、GCオーバーヘッドを除いて<replaceable>n</replaceable>バイトを超えなければ(訳注: インラインで)確保する。この値はブロックの大きさ(典型的には4096)よりかなり小さくあるべきである。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+
+            <row>
+              <entry>
+              <option>-fmax-inline-memcpy-insns</option>=<replaceable>n</replaceable>
+              </entry>
+              <entry><replaceable>n</replaceable>個以下の疑似命令になるなら、memcpyの呼び出しをインライン化する(デフォルト: 32)。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+
+            <row>
+              <entry>
+              <option>-fmax-inline-memset-insns</option>=<replaceable>n</replaceable>
+              </entry>
+              <entry><replaceable>n</replaceable>個以下の疑似命令になるなら、memsetの呼び出しをインライン化する(デフォルト: 32)。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+
+	    <row>
+              <entry><option>-fmax-relevant-binds=<replaceable>n</replaceable></option></entry>
               <entry>エラーメッセージ中で表示する束縛の最大数を設定する(デフォルトは6)。</entry>
               <entry>動</entry>
               <entry><option>-fno-max-relevant-bindings</option></entry>
             </row>
   
             <row>
-	      <entry><option>-fmax-simplifier-iterations=N</option></entry>
-	      <entry>単純化器の最大繰り返し回数を設定する</entry>
+              <entry><option>-fmax-simplifier-iterations=<replaceable>n</replaceable></option></entry>
+	      <entry>単純化器の最大繰り返し回数を設定する(デフォルト: 4)。</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fmax-worker-args=N</option></entry>
+              <entry><option>-fmax-worker-args=<replaceable>n</replaceable></option></entry>
 	      <entry>ワーカにこれだけの引数があるとき、これ以上アンパックしない(デフォルト: 10)</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
@@ -1685,13 +1875,6 @@
 	      <entry>-</entry>
 	    </row>
 
- 	    <row>
-	      <entry><option>-fpedantic-bottoms</option></entry>
-	      <entry>GHCがボトムをより精密に扱うようにする(しかし、<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。</entry>
-              <entry>動</entry>
-	      <entry><option>-fno-pedantic-bottoms</option></entry>
- 	    </row>
-
 	    <row>
 	      <entry><option>-fomit-interface-pragmas</option></entry>
 	      <entry>インタフェースプラグマを生成しない</entry>
@@ -1699,8 +1882,36 @@
 	      <entry><option>-fno-omit-interface-pragmas</option></entry>
 	    </row>
 
+            <row>
+              <entry><option>-fomit-yields</option></entry>
+              <entry>メモリ確保が発生しない場合にヒープ検査を省略する。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-omit-yields</option></entry>
+            </row>
+
+ 	    <row>
+	      <entry><option>-fpedantic-bottoms</option></entry>
+	      <entry>GHCがボトムをより精密に扱うようにする(しかし、<option>-fno-state-hack</option>も見よ)。特に、case式を透過してイータ展開をすることがなくなる。</entry>
+              <entry>動</entry>
+	      <entry><option>-fno-pedantic-bottoms</option></entry>
+ 	    </row>
+
+            <row>
+              <entry><option>-fregs-graph</option></entry>
+              <entry>ネイティブコード生成器において、レジスタ割り当てのためにグラフ彩色割り当て器を使う。<option>-O2</option>によって有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-regs-graph</option></entry>
+            </row>
+
 	    <row>
-	      <entry><option>-fsimplifier-phases</option></entry>
+              <entry><option>-fregs-iterative</option></entry>
+              <entry>ネイティブコード生成器において、反復融合(iterative coalescing)グラフ彩色レジスタ割り当て器を使う。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-regs-iterative</option></entry>
+            </row>
+
+            <row>
+              <entry><option>-fsimplifier-phases=<replaceable>n</replaceable></option></entry>
 	      <entry>単純化器の段階の数を設定する(デフォルトは2)。<option>-O0</option>が与えられたときには無視される。</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
@@ -1721,17 +1932,17 @@
 	    </row>
 
 	    <row>
-	      <entry><option>-fspec-constr-threshold</option>=<replaceable>n</replaceable></entry>
-	      <entry>SpecConstr変換の大きさ閾値を<replaceable>n</replaceable>にする。(デフォルト: 200)</entry>
-	      <entry>静</entry>
-	      <entry><option>-fno-spec-constr-threshold</option></entry>
+	      <entry><option>-fspec-constr-count</option>=<replaceable>n</replaceable></entry>
+	      <entry>一つの関数についてSpecConstr変換で作られる特殊化の数の最大値を<replaceable>n</replaceable>にする。(デフォルト: 3)</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-spec-constr-count</option></entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-fspec-constr-count</option>=<replaceable>n</replaceable></entry>
-	      <entry>一つの関数についてSpecConstr変換で作られる特殊化の数の最大値を<replaceable>n</replaceable>にする。(デフォルト: 3)</entry>
-	      <entry>静</entry>
-	      <entry><option>-fno-spec-constr-count</option></entry>
+	      <entry><option>-fspec-constr-threshold</option>=<replaceable>n</replaceable></entry>
+	      <entry>SpecConstr変換の大きさ閾値を<replaceable>n</replaceable>にする。(デフォルト: 2000)</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-spec-constr-threshold</option></entry>
 	    </row>
 
 	    <row>
@@ -1742,6 +1953,13 @@
 	    </row>
 
 	    <row>
+	      <entry><option>-fstatic-argument-transformation</option></entry>
+	      <entry>静的引数変換を有効にする。</entry>
+	      <entry>動</entry>
+	      <entry><option>-fno-static-argument-transformation</option></entry>
+	    </row>
+
+	    <row>
 	      <entry><option>-fstrictness</option></entry>
               <entry>正格性解析を有効にする。<option>-O</option>によっても有効になる。</entry>
 	      <entry>動</entry>
@@ -1749,18 +1967,18 @@
 	    </row>
 
             <row>
-              <entry><option>-fstrictness=before</option>=<replaceable>n</replaceable></entry>
+              <entry><option>-fstrictness-before</option>=<replaceable>n</replaceable></entry>
               <entry>単純化器の段階<replaceable>n</replaceable>の前に、追加で正格性解析を行なう。</entry>
               <entry>動</entry>
               <entry>-</entry>
             </row>
 
-	    <row>
-	      <entry><option>-fstatic-argument-transformation</option></entry>
-	      <entry>静的引数変換を有効にする。<option>-O2</option>によって有効になる。</entry>
-	      <entry>動</entry>
-	      <entry><option>-fno-static-argument-transformation</option></entry>
-	    </row>
+            <row>
+              <entry><option>-funbox-small-strict-fields</option></entry>
+              <entry>構築子の正格なフィールドのうち、表現の大きさがポインタと同じであるものを平坦化する。<option>-O</option>によって有効になる。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-unbox-small-strict-fields</option></entry>
+            </row>
 
 	    <row>
 	      <entry><option>-funbox-strict-fields</option></entry>
@@ -1777,32 +1995,53 @@
             </row>
   
             <row>
-	      <entry><option>-funfolding-creation-threshold</option></entry>
-              <entry>展開の設定を調整する</entry>
+              <entry><option>-funfolding-creation-threshold=<replaceable>n</replaceable></option></entry>
+              <entry>展開の設定を調整する。デフォルト: 750</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-unfolding-creation-threshold</option></entry>
+	      <entry>-</entry>
+	    </row>
+
+            <row>
+              <entry><option>-funfolding-dict-discount=<replaceable>n</replaceable></option></entry>
+              <entry>展開の設定を調整する。デフォルト: 30</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+ 
+	    <row>
+              <entry><option>-funfolding-fun-discount=<replaceable>n</replaceable></option></entry>
+              <entry>展開の設定を調整する。デフォルト: 60</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-funfolding-fun-discount</option></entry>
-              <entry>展開の設定を調整する</entry>
+              <entry><option>-funfolding-keeness-factor=<replaceable>n</replaceable></option></entry>
+              <entry>展開の設定を調整する。デフォルト: 1.5</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-unfolding-fun-discount</option></entry>
+	      <entry>-</entry>
 	    </row>
 
 	    <row>
-	      <entry><option>-funfolding-keeness-factor</option></entry>
-              <entry>展開の設定を調整する</entry>
+              <entry><option>-funfolding-use-threshold=<replaceable>n</replaceable></option></entry>
+              <entry>展開の設定を調整する。デフォルト: 60</entry>
 	      <entry>動</entry>
-	      <entry><option>-fno-unfolding-keeness-factor</option></entry>
+	      <entry>-</entry>
 	    </row>
 
+            <row>
+              <entry><option>-fvectorisation-avoidance</option></entry>
+              <entry>ベクトル化回避を有効にする。常にデフォルトで有効。</entry>
+              <entry>動</entry>
+              <entry><option>-fno-vectorisation-avoidance</option></entry>
+            </row>
+
 	    <row>
-	      <entry><option>-funfolding-use-threshold</option></entry>
-              <entry>展開の設定を調整する</entry>
-	      <entry>動</entry>
-	      <entry><option>-fno-unfolding-use-threshold</option></entry>
-	    </row>
+              <entry><option>-fvectorise</option></entry>
+              <entry>入れ子データ並列のベクトル化を有効にする</entry>
+              <entry>動</entry>
+              <entry><option>-fno-vectorise</option></entry>
+            </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -1827,7 +2066,7 @@
 	    <row>
 	      <entry><option>-prof</option></entry>
 	      <entry>プロファイルを有効にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
@@ -1863,7 +2102,7 @@
 	    <row>
 	      <entry><option>-ticky</option></entry>
 	      <entry><link linkend="ticky-ticky">ticky-tickyプロファイルを有効にする</link></entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -2011,6 +2250,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+              <entry><option>-fwrite-interface</option></entry>
+              <entry>常にインタフェースファイルを書く</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+            <row>
 	      <entry><option>-fbyte-code</option></entry>
 	      <entry>バイトコードを生成する</entry>
 	      <entry>動</entry>
@@ -2064,31 +2309,31 @@
 	    <row>
 	      <entry><option>-dynamic</option></entry>
 	      <entry>(可能なら)動的なHaskellライブラリを使う</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
               <entry><option>-dynamic-too</option></entry>
               <entry>動的なオブジェクトファイルと静的なオブジェクトファイルの<emphasis>両方</emphasis>をコンパイル時に生成する</entry>
-              <entry>静</entry>
+              <entry>動</entry>
               <entry>-</entry>
             </row>
             <row>
               <entry><option>-dyno</option></entry>
               <entry><emphasis>動的に</emphasis>リンクされるオブジェクトの出力パスを設定する</entry>
-              <entry>静</entry>
+              <entry>動</entry>
               <entry>-</entry>
             </row>
             <row>
               <entry><option>-dynosuf</option></entry>
               <entry>動的オブジェクトファイルの接尾辞を設定する</entry>
-              <entry>静</entry>
+              <entry>動</entry>
               <entry>-</entry>
             </row>
             <row>
 	      <entry><option>-dynload</option></entry>
 	      <entry>実行時に共有ライブラリを見つけるための方法として、いくつかから一つ選ぶ。</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
@@ -2160,25 +2405,31 @@
 	    <row>
 	      <entry><option>-static</option></entry>
 	      <entry>静的なHaskellライブラリを使う</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-threaded</option></entry>
 	      <entry>スレッド化されたランタイムを使う</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-debug</option></entry>
 	      <entry>デバッグ用ランタイムを使う</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
+	      <entry>-</entry>
+	    </row>
+	    <row>
+	      <entry><option>-ticky</option></entry>
+	      <entry>リンク時には、これは<option>-debug</option>を有効にするだけである。<xref linkend="ticky-ticky" />を見よ。</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-eventlog</option></entry>
 	      <entry>ランタイムのevent tracingを有効にする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
@@ -2205,6 +2456,12 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
+            <row>
+              <entry><option>-rdynamic</option></entry>
+              <entry>リンカに、使用されているものだけでなく全てのシンボルを動的シンボルテーブルに加えるように指示する。現在のところ、LinuxとWindows/MinGW32のみ。これは、Linuxでは<literal>-optl -rdynamic</literal>と等価であり、Windowsでは<literal>-optl -export-all-symbols</literal>と等価である。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -2229,13 +2486,13 @@
 	    <row>
 	      <entry><option>-fplugin</option>=<replaceable>module</replaceable></entry>
 	      <entry>与えられたモジュールからエクスポートされているプラグインをロードする</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
 	      <entry><option>-fplugin-opt</option>=<replaceable>module:args</replaceable></entry>
 	      <entry>プラグインモジュールに引数を与える。モジュールは<option>-fplugin</option>で指定されねばならない</entry>
-	      <entry>静</entry>
+	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
 	  </tbody>
@@ -2332,6 +2589,12 @@
               <entry>動</entry>
               <entry>-</entry>
             </row>
+            <row>
+              <entry><option>-pgmreadelf</option> <replaceable>cmd</replaceable></entry>
+              <entry><replaceable>cmd</replaceable>を(Unix binutilsの)readelfコマンドとして使う</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -2400,12 +2663,6 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-optm</option> <replaceable>option</replaceable></entry>
-	      <entry><replaceable>option</replaceable>をmanglerに渡す</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
 	      <entry><option>-opta</option> <replaceable>option</replaceable></entry>
 	      <entry><replaceable>option</replaceable>をアセンブラに渡す</entry>
 	      <entry>動</entry>
@@ -2457,42 +2714,6 @@
 	      <entry>-</entry>
             </row>
           </tbody>
-	  <tbody>
-	    <row>
-	      <entry><option>-monly-[432]-regs</option></entry>
-	      <entry>(x86のみ)レジスタをいくつかCコンパイラに返す</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	  </tbody>
-	</tgroup>
-      </informaltable>
-    </sect2>
-
-
-    <sect2>
-      <title>外部コアファイルに関するオプション</title>
-
-      <para><xref linkend="ext-core"/></para>
-
-      <informaltable>
-	<tgroup cols="4" align="left" colsep="1" rowsep="1">
-	  <thead>
-	    <row>
-	      <entry>フラグ</entry>
-	      <entry>解説</entry>
-	      <entry>動静</entry>
-	      <entry>逆</entry>
-	    </row>
-	  </thead>
-	  <tbody>
-	    <row>
-	      <entry><option>-fext-core</option></entry>
-	      <entry>外部コアファイル<filename>.hcr</filename>を生成する</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	  </tbody>
 	</tgroup>
       </informaltable>
     </sect2>
@@ -2551,12 +2772,6 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-ddump-cpranal</option></entry>
-	      <entry>CPR解析の出力を表示</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
 	      <entry><option>-ddump-cse</option></entry>
 	      <entry>CSEの出力を表示</entry>
 	      <entry>動</entry>
@@ -2571,12 +2786,6 @@
 	    <row>
 	      <entry><option>-ddump-ds</option></entry>
 	      <entry>脱糖器の出力を表示</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-ddump-flatC</option></entry>
-	      <entry>「平坦な」Cを表示</entry>
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
@@ -2665,12 +2874,6 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-ddump-simpl-phases</option></entry>
-	      <entry>単純化器の段階毎の出力を表示</entry>
-	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
 	      <entry><option>-ddump-simpl-iterations</option></entry>
 	      <entry>単純化器の繰り返し毎の出力を表示</entry>
 	      <entry>動</entry>
@@ -2713,6 +2916,12 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
+              <entry><option>-dth-dec-file</option></entry>
+              <entry>評価後のTH宣言を.th.hsに標示する</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
+            <row>
 	      <entry><option>-ddump-types</option></entry>
 	      <entry>型シグネチャを表示</entry>
 	      <entry>動</entry>
@@ -2886,6 +3095,12 @@
 	      <entry>動</entry>
 	      <entry>-</entry>
 	    </row>
+            <row>
+              <entry><option>-frule-check</option></entry>
+              <entry>発動し得たのに発動しなかった規則があった場合、その場所を報告する。文字列の引数を取る。</entry>
+              <entry>動</entry>
+              <entry>-</entry>
+            </row>
 	  </tbody>
 	</tgroup>
       </informaltable>
@@ -2906,7 +3121,7 @@
 	  </thead>
 	  <tbody>
 	    <row>
-              <entry><option>-j <replaceable>N</replaceable></option></entry>
+              <entry><option>-j<replaceable>N</replaceable></option></entry>
               <entry><literal>--make</literal>でコンパイルする際、<replaceable>N</replaceable>個のモジュールを並列にコンパイルする。</entry>
               <entry>動</entry>
               <entry>-</entry>
@@ -2918,21 +3133,9 @@
 	      <entry>-</entry>
 	    </row>
 	    <row>
-	      <entry><option>-dno-black-holing</option></entry>
-	      <entry>ブラックホール化を無効にする(おそらく動作しない)</entry>
-	      <entry>静</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
 	      <entry><option>-fhistory-size</option></entry>
 	      <entry>単純化履歴の大きさを設定する</entry>
 	      <entry>動</entry>
-	      <entry>-</entry>
-	    </row>
-	    <row>
-	      <entry><option>-funregisterised</option></entry>
-	      <entry><link linkend="unreg">非レジスタ化</link>コンパイル(代わりに<option>-unreg</option>を使うこと)</entry>
-	      <entry>静</entry>
 	      <entry>-</entry>
 	    </row>
 	    <row>
