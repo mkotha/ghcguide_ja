@@ -125,7 +125,7 @@ Ok, modules loaded: Main.
 </screen>
     <para>Dをコンパイルして、その後プログラム全体をロードすると次のようになる。</para>
 <screen>
-Prelude> :! ghc -c D.hs
+Prelude> :! ghc -c -dynamic D.hs
 Prelude> :load A
 Compiling B                ( B.hs, interpreted )
 Compiling C                ( C.hs, interpreted )
@@ -135,6 +135,8 @@ Ok, modules loaded: A, B, C, D.
 </screen>
 
     <para>コンパイラのメッセージ中に、<literal>D</literal>についての行がない。これは、ソースファイルとその依存関係が、最後にコンパイルされたときから変更されていないため、コンパイルする必要ないからである。</para>
+
+    <para><literal>-dynamic</literal>フラグがGHCに与えられていることに注意せよ。GHCiは(対応しているプラットフォームなら)動的リンクされたオブジェクトコードを使うので、コンパイル済みコードをGHCiで使うなら、動的リンク用にコンパイルしておかなければならない。</para>
 
     <para>いつでも、<literal>:show modules</literal>コマンドを使って、その時点でロードされているモジュールの一覧を表示することができる。</para>
 
@@ -433,7 +435,7 @@ Prelude>
 
     <para>古い、隠された方の<literal>T</literal>はGHCiによって<literal>main::Interactive.T</literal>と表示されている。これは、新しい<literal>T</literal>(単に<literal>T</literal>と表示される)と区別しようとしてこうなっている。</para>
 
-    <para>クラスや型族のインスタンス宣言は、単に「利用可能なインスタンスの一覧」に追加される。ただし例外が一つある。型族インスタンスには重複があってはならないが、再定義したいこともあるので、左辺が同一であるインスタンスが過去にあった場合にはそれを<emphasis>置き換える</emphasis>。(<xref linkend="type-families"/>を見よ。)</para>
+    <para>クラスや型族のインスタンス宣言は、単に「利用可能なインスタンスの一覧」に追加される。ただし例外が一つある。クラスインスタンスや型族インスタンスを再定義したいこともあるので、それぞれ頭部や左辺が同一であるインスタンスが過去にあった場合にはそれを<emphasis>置き換える</emphasis>。(<xref linkend="type-families"/>を見よ。)</para>
     </sect2>
 
     <sect2 id="ghci-scope">
@@ -1556,7 +1558,7 @@ Prelude> :. cmds.ghci
           <indexterm><primary><literal>:edit</literal></primary></indexterm>
         </term>
         <listitem>
-          <para>エディタを開いて、<replaceable>file</replaceable>、それが省略されたときは直近にロードされたモジュールを編集する。起動されるエディタは<literal>EDITOR</literal>環境変数から採られるか、<literal>EDITOR</literal>が設定されていないときはシステムのデフォルトエディタが使われる。使われるエディタは<literal>:set editor</literal>で変更することができる。</para>
+          <para>エディタを開いて、<replaceable>file</replaceable>、それが省略されたときは直近にロードされたモジュールを編集する。直近のロードにエラーがあった場合、最初のエラーの行にカーソルが置かれる。起動されるエディタは<literal>EDITOR</literal>環境変数から採られるか、<literal>EDITOR</literal>が設定されていないときはシステムのデフォルトエディタが使われる。使われるエディタは<literal>:set editor</literal>で変更することができる。</para>
         </listitem>
       </varlistentry>
 
@@ -2199,11 +2201,28 @@ Prelude> :set -fno-warn-incomplete-patterns -XNoMultiParamTypeClasses
     <sect2 id="ghci-interactive-options">
       <title>対話的評価についてのみのオプションを設定する</title>
 
-      <para>実際にはGHCiはオプションの集合を二つ保持する。モジュールをロードする際に適用されるものと、プロンプトに式やコマンドが入力されたときに適用されるものである。<literal>:set</literal>コマンドは両方を変更するが、<literal>:seti</literal>("set interactive"の略)というコマンドもあって、これは後者にのみ影響する。
+      <para>実際にはGHCiはオプションの集合を<emphasis>二つ</emphasis>保持する。
+<itemizedlist>
+<listitem><para>
+  <emphasis>ロード時オプション</emphasis>は、モジュールをロードする際に適用される。
+</para></listitem>
+<listitem><para>
+  <emphasis>対話時オプション</emphasis>は、GHCiプロンプトに入力された式やコマンドを評価する際に適用される。
+</para></listitem>
+</itemizedlist>
+      <literal>:set</literal>コマンドは両方を変更するが、<literal>:seti</literal>("set interactive"の略)というコマンドもあって、これは対話時オプションにのみ影響する。
       </para>
 
-      <para>この二つのオプションの集合は<literal>:set</literal>と<literal>:seti</literal>を引数なしで使うことでそれぞれ確認できる。例えば、まっさらなGHCiセッションでは次のようなものを目にするかもしれない。
+      <para>ロードされるモジュールに影響を与えずに、対話時オプションだけを変更するのが便利なことがよくある。例えば、
+<screen>
+:seti -XMonoLocalBinds
+</screen>
+        <option>-XMonoLocalBinds</option>がロードされるモジュールにも適用されるのは望ましくない。コンパイルエラーを発生させるかもしれないし、そうでなくても再コンパイルが増える。フラグが変わったことで、モジュールを再コンパイルしなければならないとGHCが考えるからである。
       </para>
+
+      <para>自分の<literal>.ghci</literal>ファイルで言語オプションを設定するなら、<literal>:set</literal>ではなく<literal>:seti</literal>を使うのが良い習慣である(そのオプションをGHCiにロードする全モジュールに本当に適用したいのでない限り)。</para>
+
+      <para>この二つのオプションの集合は<literal>:set</literal>と<literal>:seti</literal>を引数なしで使うことでそれぞれ確認できる。例えば、まっさらなGHCiセッションでは次のようなものを目にするかもしれない。
 
 <screen>
 Prelude> :seti
@@ -2218,19 +2237,20 @@ other dynamic, non-language, flag settings:
   -fimplicit-import-qualified
 warning settings:
 </screen>
-      <para><option>-XExtendedDefaultRules</option>が有効になっていることに注意。これは、プロンプトに入力された式に特別なデフォルト規則(<xref linkend="extended-default-rules" />を見よ)を適用しているからである。
       </para>
 
-      <para>加えて、GHCiでは単相性限定はデフォルトで無効になっている。(<xref linkend="monomorphism" />を見よ)。</para>
+<para>
+この二つのオプション集合は次のように初期化される。まず、両方のオプション集合が<xref linkend="ghci-dot-files"/>にある方法で初期化される。次に、対話時オプションが次のように改変される。
+<itemizedlist>
 
-      <para>プロンプトに入力される式についてのみ言語オプションを変え、ロードされるモジュールにはそのオプションを適用しないでおくのが便利なことがよくある。例えば、
-<screen>
-:seti -XMonoLocalBinds
-</screen><option>-XMonoLocalBinds</option>がロードされるモジュールにも適用されるのは望ましくないだろう。コンパイルエラーを引き起すかもしれないが、もっとよくあるのは、フラグが変わったのでモジュールの再コンパイルが必要だとGHCが判断することで、無駄な再コンパイルが発生することである。
-      </para>
+<listitem><para><option>-XExtendedDefaultRules</option>が有効になる。これは、プロンプトに入力された式に特別なデフォルト規則(<xref linkend="extended-default-rules" />を見よ)を適用するためである。
+      </para></listitem>
 
-      <para>従って、<literal>.ghci</literal>ファイルで言語オプションを設定するときは、本当にGHCiにロードするモジュール全てにそれを適用したいのでない限り、<literal>:set</literal>でなく<literal>:seti</literal>を使うのが良い習慣である。
-      </para>
+<listitem> <para>
+      単相性限定が無効になる。(<xref linkend="monomorphism" />を見よ)。
+      </para></listitem>
+</itemizedlist>
+</para>
     </sect2>
   </sect1>
 
